@@ -25,10 +25,10 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.ui.GeneratorsToolBar;
+import de.varylab.varylab.ui.EditorsToolBar;
 import de.varylab.varylab.ui.image.ImageHook;
 
-public abstract class GeneratorPlugin extends Plugin {
+public abstract class EditorPlugin extends Plugin {
 
 	private View
 		view = null;
@@ -36,19 +36,19 @@ public abstract class GeneratorPlugin extends Plugin {
 		content = null;
 	private ViewMenuBar
 		viewMenuBar = null;
-	private GeneratorsToolBar
+	private EditorsToolBar
 		toolBar = null;
 	private HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> 
 		hif = null;
 	private static Icon
-		defaultIcon = ImageHook.getIcon("cog_go.png");
+		defaultIcon = ImageHook.getIcon("cog_edit.png");
 	
-	private class GeneratorAction extends AbstractAction {
-
+	private class EditAction extends AbstractAction {
+	
 		private static final long 
 			serialVersionUID = 1L;
-
-		public GeneratorAction() {
+	
+		public EditAction() {
 			Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
 			putValue(Action.SMALL_ICON, icon);
 			putValue(Action.NAME, getPluginInfo().name);
@@ -66,18 +66,18 @@ public abstract class GeneratorPlugin extends Plugin {
 					OK_CANCEL_OPTION, 
 					PLAIN_MESSAGE, 
 					getPluginInfo().icon, 
-					new String[] {"Generate", "Cancel"}, 
-					"Generate"
+					new String[] {"Edit", "Cancel"}, 
+					"Edit"
 				);
 			}
 			if (result == OK_OPTION) {
-				generate(content, hif);
+				edit(content, hif);
 			}
 		}
 		
 	}
 	
-	protected abstract void generate(Content content, HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> hif);
+	protected abstract void edit(Content content, HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> hif);
 	
 	protected abstract String[] getMenuPath();
 	
@@ -92,13 +92,13 @@ public abstract class GeneratorPlugin extends Plugin {
 		view = c.getPlugin(View.class);
 		content = JRViewerUtility.getContentPlugin(c);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
-		toolBar = c.getPlugin(GeneratorsToolBar.class);
+		toolBar = c.getPlugin(EditorsToolBar.class);
 		hif = c.getPlugin(HalfedgeInterfacePlugin.class);
-		GeneratorAction action = new GeneratorAction();
+		EditAction action = new EditAction();
 		String[] menuPath = getMenuPath();
 		String[] menuPathLong = new String[menuPath.length + 1];
 		System.arraycopy(menuPath, 0, menuPathLong, 1, menuPath.length);
-		menuPathLong[0] = "Generators";
+		menuPathLong[0] = "Editors";
 		viewMenuBar.addMenuItem(getClass(), 0, action, menuPathLong);
 		toolBar.addAction(getClass(), 0, action);
 	}
@@ -109,5 +109,5 @@ public abstract class GeneratorPlugin extends Plugin {
 		viewMenuBar.removeAll(getClass());
 		toolBar.removeAll(getClass());
 	}
-
+	
 }
