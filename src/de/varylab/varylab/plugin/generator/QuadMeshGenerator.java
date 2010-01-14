@@ -38,7 +38,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		numVSpinner = new JSpinner(numVModel);
 	private JCheckBox	
 		faceCornerChecker = new JCheckBox("Use Face Center Corner"),
-		dimondShaped = new JCheckBox("Use Dimonds");
+		dimondShaped = new JCheckBox("Use Dimonds", true);
 	
 	public QuadMeshGenerator() {
 		panel.setLayout(new GridBagLayout());
@@ -67,7 +67,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Quad Mesh", "Stefan Sechelmann");
-		info.icon = ImageHook.getIcon("shape_handles.png");
+		info.icon = ImageHook.getIcon("combinatorics.png");
 		return info; 
 	}
 	

@@ -5,5 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MTJOptimization"/>
+	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

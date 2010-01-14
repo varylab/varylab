@@ -1,0 +1,156 @@
+package de.varylab.varylab.math;
+
+import no.uib.cipr.matrix.Matrix;
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
+import de.jtem.halfedgetools.functional.DomainValue;
+import de.jtem.halfedgetools.functional.Gradient;
+import de.jtem.halfedgetools.functional.Hessian;
+import de.varylab.mtjoptimization.Optimizable;
+import de.varylab.varylab.hds.VHDS;
+
+public class CombinedOptimizable implements Optimizable {
+
+	private VHDS
+		hds = null;
+	private CombinedFunctional
+		fun = null;
+
+	public CombinedOptimizable(VHDS hds, CombinedFunctional fun) {
+		this.hds = hds;
+		this.fun = fun;
+	}
+	
+	protected static class MTJU implements DomainValue {
+
+		protected Vector
+			u = null;
+		
+		public MTJU(Vector u) {
+			this.u = u;
+		}
+		
+		@Override
+		public void add(int i, double value) {
+			u.add(i, value);
+		}
+
+		@Override
+		public void set(int i, double value) {
+			u.set(i, value);
+		}
+
+		@Override
+		public void setZero() {
+			u.zero();
+		}
+		
+		@Override
+		public double get(int i) {
+			return u.get(i);
+		}
+		
+	}
+	
+	
+	protected static class MTJGradient implements Gradient {
+
+		protected Vector
+			G = null;
+		
+		public MTJGradient(Vector G) {
+			this.G = G;
+		}
+		
+		@Override
+		public void add(int i, double value) {
+			G.add(i, value);
+		}
+
+		@Override
+		public void set(int i, double value) {
+			G.set(i, value);
+		}
+		
+		@Override
+		public void setZero() {
+			G.zero();
+		}
+		
+	}
+	
+	
+	protected static class MTJHessian implements Hessian {
+		
+		protected Matrix
+			H = null;
+		
+		public MTJHessian(Matrix H) {
+			this.H = H;
+		}
+
+		@Override
+		public void add(int i, int j, double value) {
+			H.add(i, j, value);
+		}
+
+		@Override
+		public void set(int i, int j, double value) {
+			H.set(i, j, value);
+		}
+		
+		@Override
+		public void setZero() {
+			H.zero();
+		}
+		
+	}
+	
+	
+	@Override
+	public Double evaluate(Vector x, Vector gradient, Matrix hessian) {
+		MTJU u = new MTJU(x);
+		MTJGradient G = new MTJGradient(gradient);
+		MTJHessian H = new MTJHessian(hessian);
+		SimpleEnergy E = new SimpleEnergy();
+		fun.evaluate(hds, u, E, G, H);
+		return E.get();
+	}
+
+	@Override
+	public Double evaluate(Vector x, Vector gradient) {
+		MTJU u = new MTJU(x);
+		MTJGradient G = new MTJGradient(gradient);
+		SimpleEnergy E = new SimpleEnergy();
+		fun.evaluate(hds, u, E, G, null);
+		return E.get();
+	}
+
+	@Override
+	public Double evaluate(Vector x, Matrix hessian) {
+		MTJU u = new MTJU(x);
+		MTJHessian H = new MTJHessian(hessian);
+		SimpleEnergy E = new SimpleEnergy();
+		fun.evaluate(hds, u, E, null, H);
+		return E.get();
+	}
+
+	@Override
+	public Double evaluate(Vector x) {
+		MTJU u = new MTJU(x);
+		SimpleEnergy E = new SimpleEnergy();
+		fun.evaluate(hds, u, E, null, null);
+		return E.get();
+	}
+
+	public Integer getDomainDimension() {
+		return fun.getDimension(hds);
+	}
+
+	@Override
+	public Matrix getHessianTemplate() {
+		int dim = getDomainDimension();
+		return new CompRowMatrix(dim, dim, SparseUtility.makeNonZeros(hds));
+	}
+
+}

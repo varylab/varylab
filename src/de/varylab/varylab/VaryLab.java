@@ -9,6 +9,9 @@ import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.VertexPositionAdapter;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
+import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.OptimizationManager;
+import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 
 public class VaryLab {
 
@@ -16,6 +19,9 @@ public class VaryLab {
 		v.registerPlugin(new HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS>(VHDS.class, new VertexPositionAdapter()));
 		v.registerPlugin(new QuadMeshGenerator());
 		v.registerPlugin(new HeightFieldEditor());
+		v.registerPlugin(new OptimizationManager());
+		v.registerPlugin(new EdgeLengthOptimizer());
+		v.registerPlugin(new PlanarQuadsOptimizer());
 	}
 	
 	

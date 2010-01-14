@@ -24,7 +24,7 @@ public class HeightFieldEditor extends EditorPlugin {
 	private JPanel
 		panel = new JPanel();
 	private SpinnerNumberModel
-		aModel = new SpinnerNumberModel(0.8, 0.001, 1000.0, 0.01);
+		aModel = new SpinnerNumberModel(1.2, 0.001, 1000.0, 0.01);
 	private JSpinner
 		aSpinner = new JSpinner(aModel);
 	
