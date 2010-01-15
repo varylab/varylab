@@ -1,5 +1,8 @@
 package de.varylab.varylab.math;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
@@ -15,11 +18,22 @@ public class CombinedOptimizable implements Optimizable {
 		hds = null;
 	private CombinedFunctional
 		fun = null;
+	private List<Constraint>
+		constraints = new LinkedList<Constraint>();
 
 	public CombinedOptimizable(VHDS hds, CombinedFunctional fun) {
 		this.hds = hds;
 		this.fun = fun;
 	}
+	
+	public void addConstraint(Constraint c) {
+		constraints.add(c);
+	}
+	
+	public void removeConstraint(Constraint c) {
+		constraints.remove(c);
+	}
+	
 	
 	protected static class MTJU implements DomainValue {
 
@@ -107,6 +121,18 @@ public class CombinedOptimizable implements Optimizable {
 	}
 	
 	
+	private void applyConstraints(Gradient G, Hessian H) {
+		for (Constraint c : constraints) {
+			if (G != null) {
+				c.editGradient(hds, getDomainDimension(), G);
+			}
+			if (H != null) {
+				c.editHessian(hds, getDomainDimension(), H);
+			}
+		}
+	}
+	
+	
 	@Override
 	public Double evaluate(Vector x, Vector gradient, Matrix hessian) {
 		MTJU u = new MTJU(x);
@@ -114,6 +140,7 @@ public class CombinedOptimizable implements Optimizable {
 		MTJHessian H = new MTJHessian(hessian);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, H);
+		applyConstraints(G, H);
 		return E.get();
 	}
 
@@ -123,6 +150,7 @@ public class CombinedOptimizable implements Optimizable {
 		MTJGradient G = new MTJGradient(gradient);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, null);
+		applyConstraints(G, null);
 		return E.get();
 	}
 
@@ -132,6 +160,7 @@ public class CombinedOptimizable implements Optimizable {
 		MTJHessian H = new MTJHessian(hessian);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, null, H);
+		applyConstraints(null, H);
 		return E.get();
 	}
 

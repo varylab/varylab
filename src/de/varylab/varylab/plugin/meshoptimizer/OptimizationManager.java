@@ -19,6 +19,8 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -52,6 +54,7 @@ import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizable;
 import de.varylab.varylab.math.CombinedOptimizableNM;
 import de.varylab.varylab.math.ConjugateGradient;
+import de.varylab.varylab.math.FixingConstraint;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.ui.image.ImageHook;
 
@@ -68,11 +71,24 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 	private Map<String, Double>
 		coefficientMap = new HashMap<String, Double>();
 	private JPanel
+		optimizationPanel = new JPanel(),
+		constraintsPanel = new JPanel(),
 		tablePanel = new JPanel(),
 		pluginOptionsPanel = new JPanel(),
 		optionsPanel = new JPanel();
 	private JButton
 		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png"));
+	private JCheckBox
+		fixBoundaryChecker = new JCheckBox("Fix Boundary"),
+		fixXChecker = new JCheckBox("X"),
+		fixYChecker = new JCheckBox("Y"),
+		fixZChecker = new JCheckBox("Z");
+	private SpinnerNumberModel
+		accuracyModel = new SpinnerNumberModel(-8, -20, -1, -1),
+		maxIterationsModel = new SpinnerNumberModel(150, 1, 10000, 1);
+	private JSpinner
+		accuracySpinner = new JSpinner(accuracyModel),
+		maxIterationSpinner = new JSpinner(maxIterationsModel);
 		
 	
 	public OptimizationManager() {
@@ -88,17 +104,33 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		pluginOptionsPanel.setBorder(BorderFactory.createTitledBorder("Plugin Options"));
 		
 		optionsPanel.setLayout(new GridBagLayout());
-		optionsPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		GridBagConstraints gbc1 = new GridBagConstraints();
 		gbc1.fill = GridBagConstraints.BOTH;
 		gbc1.weightx = 1.0;
-		gbc1.gridwidth = GridBagConstraints.RELATIVE;
+		gbc1.gridwidth = 1;
 		gbc1.insets = new Insets(2, 2, 2, 2);
 		GridBagConstraints gbc2 = new GridBagConstraints();
 		gbc2.fill = GridBagConstraints.BOTH;
 		gbc2.weightx = 1.0;
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
+		
+		constraintsPanel.setLayout(new GridBagLayout());
+		constraintsPanel.setBorder(BorderFactory.createTitledBorder("Constraints"));
+		constraintsPanel.add(fixBoundaryChecker, gbc1);
+		constraintsPanel.add(fixXChecker, gbc1);
+		constraintsPanel.add(fixYChecker, gbc1);
+		constraintsPanel.add(fixZChecker, gbc2);
+		optionsPanel.add(constraintsPanel, gbc2);
+		
+		optimizationPanel.setLayout(new GridBagLayout());
+		optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
+		optimizationPanel.add(new JLabel("Tolerance"), gbc1);
+		optimizationPanel.add(accuracySpinner, gbc2);
+		optimizationPanel.add(new JLabel("Iterations"), gbc1);
+		optimizationPanel.add(maxIterationSpinner, gbc2);
+		optionsPanel.add(optimizationPanel, gbc2);
+		
 		gbc2.weighty = 1.0;
 		optionsPanel.add(new JPanel(), gbc2);
 		gbc2.weighty = 0.0;
@@ -134,14 +166,24 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 			u.set(v.getIndex() * 3 + 2, v.position[2]);
 		}
 		
+		FixingConstraint fixConstraint = new FixingConstraint(
+			fixBoundaryChecker.isSelected(), 
+			fixXChecker.isSelected(), 
+			fixYChecker.isSelected(), 
+			fixZChecker.isSelected()
+		);
+		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
+		int maxIter = maxIterationsModel.getNumber().intValue();
+		
 		if (fun.hasHessian()) {
 			CombinedOptimizable opt = new CombinedOptimizable(hds, fun);
+			opt.addConstraint(fixConstraint);
 			Matrix H = new CompRowMatrix(dim, dim, fun.getNonZeroPattern(hds));
 			NewtonOptimizer optimizer = new NewtonOptimizer(H);
 			optimizer.setStepController(new ArmijoStepController());
 			optimizer.setSolver(Solver.CG);
-			optimizer.setError(1E-8);
-			optimizer.setMaxIterations(100);
+			optimizer.setError(acc);
+			optimizer.setMaxIterations(maxIter);
 			try {
 				optimizer.minimize(u, opt);
 			} catch (NotConvergentException e) {
@@ -156,10 +198,11 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 			}
 		} else {
 			CombinedOptimizableNM opt = new CombinedOptimizableNM(hds, fun);
+			opt.addConstraint(fixConstraint);
 			double[] uArr = u.getData();
-			ConjugateGradient.setITMAX(100);
+			ConjugateGradient.setITMAX(maxIter);
 			ConjugateGradient.setUseDBrent(true);
-			ConjugateGradient.search(uArr, 1E-8, opt);
+			ConjugateGradient.search(uArr, acc, opt);
 			for (VVertex v : hds.getVertices()) {
 				int i = v.getIndex() * 3;
 				v.position[0] = uArr[i + 0];

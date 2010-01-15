@@ -1,7 +1,11 @@
 package de.varylab.varylab.math;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
+import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariablesWithGradient;
 import de.jtem.numericalMethods.util.Arrays;
 import de.varylab.varylab.hds.VHDS;
@@ -12,12 +16,21 @@ public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWith
 		hds = null;
 	private CombinedFunctional
 		fun = null;
-	
+	private List<Constraint>
+		constraints = new LinkedList<Constraint>();
+
 	public CombinedOptimizableNM(VHDS hds, CombinedFunctional fun) {
 		this.hds = hds;
 		this.fun = fun;
 	}
 	
+	public void addConstraint(Constraint c) {
+		constraints.add(c);
+	}
+	
+	public void removeConstraint(Constraint c) {
+		constraints.remove(c);
+	}
 	
 	public class ArrayValue implements DomainValue, Gradient {
 
@@ -51,6 +64,16 @@ public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWith
 	}
 	
 	
+	private void applyConstraints(Gradient G, Hessian H) {
+		for (Constraint c : constraints) {
+			if (G != null) {
+				c.editGradient(hds, getNumberOfVariables(), G);
+			}
+			if (H != null) {
+				c.editHessian(hds, getNumberOfVariables(), H);
+			}
+		}
+	}
 	
 	@Override
 	public double eval(double[] X, double[] G) {
@@ -58,6 +81,7 @@ public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWith
 		ArrayValue gArr = new ArrayValue(G);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, xArr, E, gArr, null);
+		applyConstraints(gArr, null);
 		return E.E;
 	}
 
