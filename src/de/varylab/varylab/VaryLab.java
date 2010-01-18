@@ -1,6 +1,7 @@
 package de.varylab.varylab;
 
 import de.jreality.plugin.JRViewer;
+import de.jreality.plugin.experimental.WebContentLoader;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.plugin.buildin.topology.TopologyOperations;
 import de.varylab.varylab.hds.VEdge;
@@ -24,6 +25,7 @@ public class VaryLab {
 		v.registerPlugin(new OptimizationManager());
 		v.registerPlugin(new EdgeLengthOptimizer());
 		v.registerPlugin(new PlanarQuadsOptimizer());
+		v.registerPlugin(new WebContentLoader());
 	}
 	
 	
