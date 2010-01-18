@@ -2,6 +2,7 @@ package de.varylab.varylab;
 
 import de.jreality.plugin.JRViewer;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
+import de.jtem.halfedgetools.plugin.buildin.topology.TopologyOperations;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
@@ -17,6 +18,7 @@ public class VaryLab {
 
 	private static void addVaryLabPlugins(JRViewer v) {
 		v.registerPlugin(new HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS>(VHDS.class, new VertexPositionAdapter()));
+		v.registerPlugins(TopologyOperations.topologicalEditingJR(new VVertex()));
 		v.registerPlugin(new QuadMeshGenerator());
 		v.registerPlugin(new HeightFieldEditor());
 		v.registerPlugin(new OptimizationManager());

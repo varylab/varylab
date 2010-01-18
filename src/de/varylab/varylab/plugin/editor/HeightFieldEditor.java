@@ -60,7 +60,7 @@ public class HeightFieldEditor extends EditorPlugin {
 			double z = f(2*(x - 0.5), a) * f(2*(y - 0.5), a);
 			v.position[2] = z;
 		}
-		hif.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hif.updateHalfedgeContentAndActiveGeometry(hds);
 	}
 	
 	private double f(double x, double a) {

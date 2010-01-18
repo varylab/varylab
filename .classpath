@@ -7,5 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MTJOptimization"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
+	<classpathentry kind="lib" path="/MTJOptimization/lib/mtj.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

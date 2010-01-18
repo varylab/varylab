@@ -210,7 +210,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 				v.position[2] = uArr[i + 2];
 			}
 		}
-		hif.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hif.updateHalfedgeContentAndActiveGeometry(hds);
 	}
 	
 	
