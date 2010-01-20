@@ -1,6 +1,13 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+
 import de.jreality.math.Rn;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthFunctional;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
@@ -15,10 +22,18 @@ import de.varylab.varylab.ui.image.ImageHook;
 
 public class EdgeLengthOptimizer extends OptimizerPlugin {
 
+	private JPanel
+		panel = new JPanel();
+	private JCheckBox
+		ignoreBoundaryChecker = new JCheckBox("Ignore Boundary");
+	
 	public EdgeLengthOptimizer() {
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		panel.add(ignoreBoundaryChecker, c);
 	}
 	
-	public static class LengthAdapter implements Length {
+	public static class LengthAdapter implements Length<VEdge> {
 
 		private double 
 			length = 0.0;
@@ -28,7 +43,7 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		}
 		
 		@Override
-		public Double getL0() {
+		public Double getTargetLength(VEdge e) {
 			return length;
 		}
 		
@@ -38,18 +53,24 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		
 	}
 	
-	public static class ConstantWeight implements WeightFunction {
+	public static class ConstantWeight implements WeightFunction<VEdge> {
 
 		public double 
 			w = 1.0;
+		public boolean 
+			ignoreBoundary = false;
 		
-		public ConstantWeight(double w) {
+		public ConstantWeight(double w, boolean ignoreBoundary) {
 			this.w = w;
 		}
 		
 		@Override
-		public Double evalWeight(Double l) {
-			return w;
+		public Double getWeight(VEdge e) {
+			if (HalfEdgeUtils.isBoundaryEdge(e) && ignoreBoundary) {
+				return 0.0;
+			} else {
+				return w;
+			}
 		}
 		
 	}
@@ -65,7 +86,9 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		}
 		l /= hds.numEdges() / 2.0;
 		
-		return new EdgeLengthFunctional<VVertex, VEdge, VFace>(new LengthAdapter(l), new ConstantWeight(1.0));
+		LengthAdapter la = new LengthAdapter(l);
+		ConstantWeight wa = new ConstantWeight(1.0, ignoreBoundaryChecker.isSelected());
+		return new EdgeLengthFunctional<VVertex, VEdge, VFace>(la, wa);
 	}
 	
 	@Override
@@ -78,6 +101,11 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		PluginInfo info = new PluginInfo("Edge Length Optimizer", "Stefan Sechelmann");
 		info.icon = ImageHook.getIcon("edgelength.png");
 		return info;
+	}
+	
+	@Override
+	public JPanel getOptionPanel() {
+		return panel;
 	}
 	
 }

@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -28,6 +30,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -58,7 +62,7 @@ import de.varylab.varylab.math.FixingConstraint;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.ui.image.ImageHook;
 
-public class OptimizationManager extends ShrinkPanelPlugin implements ActionListener {
+public class OptimizationManager extends ShrinkPanelPlugin implements ActionListener, ListSelectionListener {
 	
 	private HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> 
 		hif = null;
@@ -80,6 +84,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png"));
 	private JCheckBox
 		fixBoundaryChecker = new JCheckBox("Fix Boundary"),
+		moveAlongBoundaryChecker = new JCheckBox("Allow Inner Boundary Movements"),
 		fixXChecker = new JCheckBox("X"),
 		fixYChecker = new JCheckBox("Y"),
 		fixZChecker = new JCheckBox("Z");
@@ -117,10 +122,11 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		
 		constraintsPanel.setLayout(new GridBagLayout());
 		constraintsPanel.setBorder(BorderFactory.createTitledBorder("Constraints"));
-		constraintsPanel.add(fixBoundaryChecker, gbc1);
 		constraintsPanel.add(fixXChecker, gbc1);
 		constraintsPanel.add(fixYChecker, gbc1);
 		constraintsPanel.add(fixZChecker, gbc2);
+		constraintsPanel.add(fixBoundaryChecker, gbc2);
+		constraintsPanel.add(moveAlongBoundaryChecker, gbc2);
 		optionsPanel.add(constraintsPanel, gbc2);
 		
 		optimizationPanel.setLayout(new GridBagLayout());
@@ -140,7 +146,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		shrinkPanel.add(pluginOptionsPanel);
 		shrinkPanel.add(optionsPanel);
 		pluginTable.setPreferredSize(new Dimension(10, 200));
-		
+
 		optimizeButton.addActionListener(this);
 	}
 	
@@ -168,6 +174,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		
 		FixingConstraint fixConstraint = new FixingConstraint(
 			fixBoundaryChecker.isSelected(), 
+			moveAlongBoundaryChecker.isSelected(),
 			fixXChecker.isSelected(), 
 			fixYChecker.isSelected(), 
 			fixZChecker.isSelected()
@@ -181,7 +188,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 			Matrix H = new CompRowMatrix(dim, dim, fun.getNonZeroPattern(hds));
 			NewtonOptimizer optimizer = new NewtonOptimizer(H);
 			optimizer.setStepController(new ArmijoStepController());
-			optimizer.setSolver(Solver.CG);
+			optimizer.setSolver(Solver.GMRES);
 			optimizer.setError(acc);
 			optimizer.setMaxIterations(maxIter);
 			try {
@@ -221,6 +228,24 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		if (optimizeButton == s) {
 			optimize();
 		}
+	}
+	
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		int row = pluginTable.getSelectedRow();
+		if (pluginTable.getRowSorter() != null) {
+			row = pluginTable.getRowSorter().convertRowIndexToModel(row);
+		}
+		if (row < 0 || row >= optimizerPlugins.size()) return;
+		pluginOptionsPanel.removeAll();
+		OptimizerPlugin p = optimizerPlugins.get(row);
+		if (p.getOptionPanel() == null) {
+			pluginOptionsPanel.add(new JLabel("No Options"));
+			pluginOptionsPanel.updateUI();
+			return;
+		}
+		pluginOptionsPanel.add(p.getOptionPanel());
+		pluginOptionsPanel.updateUI();
 	}
 	
 	
@@ -394,6 +419,8 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		pluginTable.getColumnModel().getColumn(3).setCellRenderer(new SpinnerCellEditor());
 		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
 		pluginTable.setRowHeight(22);
+		pluginTable.getSelectionModel().addListSelectionListener(this);
+		pluginTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 	}
 	
 	@Override
