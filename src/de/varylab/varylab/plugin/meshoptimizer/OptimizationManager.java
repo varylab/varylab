@@ -104,6 +104,10 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		tablePanel.setBorder(BorderFactory.createTitledBorder("Optimizer Plugins"));
 		tablePanel.add(pluginTable);
 		pluginTable.setBorder(BorderFactory.createEtchedBorder());
+		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
+		pluginTable.setRowHeight(22);
+		pluginTable.getSelectionModel().addListSelectionListener(this);
+		pluginTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		
 		pluginOptionsPanel.setLayout(new GridLayout());
 		pluginOptionsPanel.setBorder(BorderFactory.createTitledBorder("Plugin Options"));
@@ -410,17 +414,26 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterfacePlugin.class);
-		optimizerPlugins = c.getPlugins(OptimizerPlugin.class);
+	}
+	
+	private void updatePluginTable() {
 		pluginTable.setModel(new PluginTableModel());
 		pluginTable.getColumnModel().getColumn(0).setMaxWidth(30);
 		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
 		pluginTable.getColumnModel().getColumn(3).setMaxWidth(60);
 		pluginTable.getColumnModel().getColumn(3).setCellEditor(new SpinnerCellEditor());
 		pluginTable.getColumnModel().getColumn(3).setCellRenderer(new SpinnerCellEditor());
-		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
-		pluginTable.setRowHeight(22);
-		pluginTable.getSelectionModel().addListSelectionListener(this);
-		pluginTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+	}
+	
+	public void addOptimizerPlugin(OptimizerPlugin op) {
+		optimizerPlugins.add(op);
+		updatePluginTable();
+	}
+	
+	public void removeOptimizerPlugin(OptimizerPlugin op) {
+		optimizerPlugins.remove(op);
+		pluginTable.revalidate();
+		updatePluginTable();
 	}
 	
 	@Override
