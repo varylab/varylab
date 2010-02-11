@@ -40,12 +40,17 @@ import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import de.jreality.plugin.basic.View;
+import de.jtem.halfedgetools.functional.DomainValue;
+import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.functional.MyDomainValue;
+import de.jtem.halfedgetools.functional.MyEnergy;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.mtjoptimization.NotConvergentException;
 import de.varylab.mtjoptimization.newton.NewtonOptimizer;
 import de.varylab.mtjoptimization.newton.NewtonOptimizer.Solver;
@@ -80,8 +85,15 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		tablePanel = new JPanel(),
 		pluginOptionsPanel = new JPanel(),
 		optionsPanel = new JPanel();
+	private ShrinkPanel
+		animationPanel = new ShrinkPanel("Animation");
 	private JButton
-		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png"));
+		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png")),
+		initButton = new JButton("Init"),
+		playButton = new JButton("Play",ImageHook.getIcon("Play24.gif")),
+		pauseButton = new JButton("Pause",ImageHook.getIcon("Pause24.gif")),
+		evaluateButton = new JButton("Evaluate");
+	
 	private JCheckBox
 		fixBoundaryChecker = new JCheckBox("Fix Boundary"),
 		moveAlongBoundaryChecker = new JCheckBox("Allow Inner Boundary Movements"),
@@ -90,10 +102,12 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		fixZChecker = new JCheckBox("Z");
 	private SpinnerNumberModel
 		accuracyModel = new SpinnerNumberModel(-8, -20, -1, -1),
-		maxIterationsModel = new SpinnerNumberModel(150, 1, 10000, 1);
+		maxIterationsModel = new SpinnerNumberModel(5, 1, 10000, 1);
 	private JSpinner
 		accuracySpinner = new JSpinner(accuracyModel),
 		maxIterationSpinner = new JSpinner(maxIterationsModel);
+	private OptimizerThread 
+		optThread = new OptimizerThread();
 		
 	
 	public OptimizationManager() {
@@ -141,10 +155,19 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		optimizationPanel.add(maxIterationSpinner, gbc2);
 		optionsPanel.add(optimizationPanel, gbc2);
 		
+		animationPanel.setLayout(new GridBagLayout());
+		animationPanel.add(initButton,gbc1);
+		animationPanel.add(playButton,gbc1);
+		animationPanel.add(pauseButton,gbc2);
+		animationPanel.setShrinked(true);
+		optionsPanel.add(animationPanel,gbc2);
+		
 		gbc2.weighty = 1.0;
 		optionsPanel.add(new JPanel(), gbc2);
+		gbc2.gridwidth = 2;
 		gbc2.weighty = 0.0;
-		optionsPanel.add(optimizeButton, gbc2);
+		optionsPanel.add(evaluateButton,gbc2);
+		optionsPanel.add(optimizeButton,gbc2);
 		
 		shrinkPanel.add(tablePanel);
 		shrinkPanel.add(pluginOptionsPanel);
@@ -152,6 +175,13 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		pluginTable.setPreferredSize(new Dimension(10, 200));
 
 		optimizeButton.addActionListener(this);
+		evaluateButton.addActionListener(this);
+		initButton.addActionListener(this);
+		playButton.addActionListener(this);
+		playButton.setEnabled(false);
+		pauseButton.addActionListener(this);
+		pauseButton.setEnabled(false);
+		optThread.start();
 	}
 	
 	
@@ -224,16 +254,82 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		hif.updateHalfedgeContentAndActiveGeometry(hds);
 	}
 	
-	
+	private void evaluate() {
+		VHDS hds = hif.getCachedHalfEdgeDataStructure();
+		List<Functional<VVertex, VEdge, VFace>> funs = new LinkedList<Functional<VVertex,VEdge,VFace>>();
+		Map<Functional<?, ?, ?>, Double> coeffs = new HashMap<Functional<?,?,?>, Double>();
+		for (OptimizerPlugin op : optimizerPlugins) {
+			if (!isActive(op)) continue;
+			Functional<VVertex, VEdge, VFace> fun = op.createFunctional(hds);
+			funs.add(fun);
+			coeffs.put(fun, getCoefficient(op));
+		}
+		
+		int dim = hds.numVertices() * 3;
+		CombinedFunctional fun = new CombinedFunctional(funs, coeffs, dim);
+		Energy E = new MyEnergy();
+		
+		DenseVector u = new DenseVector(dim);
+		for (VVertex v : hds.getVertices()) {
+			u.set(v.getIndex() * 3 + 0, v.position[0]);
+			u.set(v.getIndex() * 3 + 1, v.position[1]);
+			u.set(v.getIndex() * 3 + 2, v.position[2]);
+		}
+		DomainValue x = new MyDomainValue(u);
+		fun.evaluate(hds, x, E, null, null);
+		System.out.println("Energy:" + E.get());
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (optimizeButton == s) {
 			optimize();
+		} else if(evaluateButton == s) {
+			evaluate();
+		} else if(initButton == s) {
+			initOptAnimation();
+			playButton.setEnabled(true);
+		} else if(playButton == s) {
+			pauseButton.setEnabled(true);
+			playButton.setEnabled(false);
+			animateOptimization();
+		} else if(pauseButton == s) {
+			optThread.setPause(true);
+			pauseButton.setEnabled(false);
+			playButton.setEnabled(true);
 		}
 	}
 	
+	private void initOptAnimation() {
+		VHDS hds = hif.getCachedHalfEdgeDataStructure();
+		List<Functional<VVertex, VEdge, VFace>> funs = new LinkedList<Functional<VVertex,VEdge,VFace>>();
+		Map<Functional<?, ?, ?>, Double> coeffs = new HashMap<Functional<?,?,?>, Double>();
+		for (OptimizerPlugin op : optimizerPlugins) {
+			if (!isActive(op)) continue;
+			Functional<VVertex, VEdge, VFace> fun = op.createFunctional(hds);
+			funs.add(fun);
+			coeffs.put(fun, getCoefficient(op));
+		}
+		int dim = 3*hds.numVertices();
+		CombinedFunctional fun = new CombinedFunctional(funs, coeffs, dim);
+		FixingConstraint fixConstraint = new FixingConstraint(
+				fixBoundaryChecker.isSelected(), 
+				moveAlongBoundaryChecker.isSelected(),
+				fixXChecker.isSelected(), 
+				fixYChecker.isSelected(), 
+				fixZChecker.isSelected()
+			);
+		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
+		int step = maxIterationsModel.getNumber().intValue();
+		
+		optThread.initOptimizer(hif, fun, fixConstraint, acc, step);
+	}
+	
+	private void animateOptimization() {
+		optThread.setPause(false);
+	}
+
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		int row = pluginTable.getSelectedRow();
@@ -378,8 +474,7 @@ public class OptimizationManager extends ShrinkPanelPlugin implements ActionList
 		}
 		
 	}
-	
-	
+
 	private double getCoefficient(OptimizerPlugin op) {
 		if (!coefficientMap.containsKey(op.getName())) {
 			coefficientMap.put(op.getName(), 1.0);
