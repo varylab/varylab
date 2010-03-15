@@ -18,8 +18,8 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.CombinedOptimizable.MTJGradient;
-import de.varylab.varylab.math.CombinedOptimizable.MTJHessian;
+import de.varylab.varylab.math.CombinedOptimizableMTJ.MTJGradient;
+import de.varylab.varylab.math.CombinedOptimizableMTJ.MTJHessian;
 
 public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 
@@ -31,8 +31,6 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		E2 = null;
 	private MTJGradient 
 		G2 = null;
-	private MTJHessian
-		H2 = null;
 	private int
 		dim = 0;
 	
@@ -46,7 +44,6 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		this.coeffs = coeffs;
 		E2 = new SimpleEnergy();
 		G2 = new MTJGradient(new DenseVector(dim));
-		H2 = new MTJHessian(new DenseMatrix(dim, dim));
 	}
 	
 	
@@ -68,10 +65,9 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			if (coeff == null || coeff == 0.0) continue;
 			E2.setZero();
 			G2.setZero();
-			H2.setZero();
 			SimpleEnergy ener = E == null ? null : E2;
 			MTJGradient grad = G == null ? null : G2;
-			MTJHessian hess = H == null ? null : H2;
+			MTJHessian hess = H == null ? null : new MTJHessian(new DenseMatrix(dim, dim));;
 			fun.evaluate(hds, x, ener, grad, hess);
 			if (E != null) {
 				E.add(coeff * ener.E);

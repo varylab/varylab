@@ -1,6 +1,9 @@
 package de.varylab.varylab.math;
 
+import java.util.Set;
+
 import de.jreality.math.Rn;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
@@ -11,15 +14,20 @@ import de.varylab.varylab.hds.VVertex;
 
 public class FixingConstraint implements Constraint{
 
-	private boolean 
+	private boolean
+		fixSelection = false,
 		fixBoundary = false,
 		innerBoundary = false,
 		fixX = false,
 		fixY = false,
 		fixZ = false;
 	
+	private Set<? extends Vertex<?,?,?>>
+		fixedVerts = null;
 	
-	public FixingConstraint(boolean fixBoundary, boolean innerBoundaryMovements, boolean fixX, boolean fixY, boolean fixZ) {
+	public <V extends Vertex<?,?,?>> FixingConstraint(Set<V> fixed, boolean fixSelection, boolean fixBoundary, boolean innerBoundaryMovements, boolean fixX, boolean fixY, boolean fixZ) {
+		this.fixSelection = fixSelection;
+		this.fixedVerts = fixed;
 		this.fixBoundary = fixBoundary;
 		this.innerBoundary = innerBoundaryMovements;
 		this.fixX = fixX;
@@ -34,6 +42,14 @@ public class FixingConstraint implements Constraint{
 				G.set(v.getIndex() * 3 + 0, 0.0);
 				G.set(v.getIndex() * 3 + 1, 0.0);
 				G.set(v.getIndex() * 3 + 2, 0.0);
+			}
+		}
+		if(fixSelection) {
+			for (Vertex<?,?,?> v : fixedVerts){
+				int i = v.getIndex();
+				G.set(i * 3 + 0, 0.0);
+				G.set(i * 3 + 1, 0.0);
+				G.set(i * 3 + 2, 0.0);
 			}
 		}
 		if (fixBoundary) {
@@ -72,9 +88,38 @@ public class FixingConstraint implements Constraint{
 
 
 	@Override
-	public void editHessian(VHDS hds, int dim, Hessian G) {
-		
+	public void editHessian(VHDS hds, int dim, Hessian H) {
+		if(fixSelection) {
+			for (Vertex<?,?,?> v : fixedVerts){
+				int i = v.getIndex();
+				for (int j = 0; j < dim; j++) {
+					H.set(i * 3 + 0,j, 0.0);
+					H.set(i * 3 + 1,j, 0.0);
+					H.set(i * 3 + 2,j, 0.0);
+					H.set(j,i * 3 + 0, 0.0);
+					H.set(j,i * 3 + 1, 0.0);
+					H.set(j,i * 3 + 2, 0.0);
+				}
+			}
+		}
+		if (fixBoundary) {
+			for (VVertex v : hds.getVertices()){
+				int i = v.getIndex();
+				if (HalfEdgeUtils.isBoundaryVertex(v)) {
+					for (int j = 0; j < dim; j++) {
+						H.set(i * 3 + 0, j, 0.0);
+						H.set(i * 3 + 1, j, 0.0);
+						H.set(i * 3 + 2, j, 0.0);
+					}
+				}
+			}
+		}
+		for (int i = 0; i < dim; i++) {
+			for (int j = 0; j < dim / 3; j++) {
+				if (fixX) H.set(i, j * 3 + 0, 0.0);
+				if (fixY) H.set(i, j * 3 + 1, 0.0);
+				if (fixZ) H.set(i, j * 3 + 2, 0.0);
+			}
+		}
 	}
-
-
 }

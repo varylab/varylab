@@ -7,18 +7,17 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import de.jreality.math.Rn;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.edgelength.EdgeLengthFunctional;
-import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
-import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.WeightFunction;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
+import de.varylab.varylab.hds.adapter.ConstantWeight;
+import de.varylab.varylab.math.functional.EdgeLengthFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
-import de.varylab.varylab.ui.image.ImageHook;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class EdgeLengthOptimizer extends OptimizerPlugin {
 
@@ -33,51 +32,8 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		panel.add(ignoreBoundaryChecker, c);
 	}
 	
-	public static class LengthAdapter implements Length<VEdge> {
-
-		private double 
-			length = 0.0;
-		
-		public LengthAdapter(double l0) {
-			this.length = l0;
-		}
-		
-		@Override
-		public Double getTargetLength(VEdge e) {
-			return length;
-		}
-		
-		public void setL0(double l0) {
-			this.length = l0;
-		}
-		
-	}
-	
-	public static class ConstantWeight implements WeightFunction<VEdge> {
-
-		public double 
-			w = 1.0;
-		public boolean 
-			ignoreBoundary = false;
-		
-		public ConstantWeight(double w, boolean ignoreBoundary) {
-			this.w = w;
-		}
-		
-		@Override
-		public Double getWeight(VEdge e) {
-			if (HalfEdgeUtils.isBoundaryEdge(e) && ignoreBoundary) {
-				return 0.0;
-			} else {
-				return w;
-			}
-		}
-		
-	}
-	
-	
 	@Override
-	public Functional<VVertex, VEdge, VFace> createFunctional(VHDS hds) {
+	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
 		double l = 0.0;
 		for (VEdge e : hds.getPositiveEdges()) {
 			double[] s = e.getStartVertex().position;
@@ -86,7 +42,7 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		}
 		l /= hds.numEdges() / 2.0;
 		
-		LengthAdapter la = new LengthAdapter(l);
+		ConstantLengthAdapter la = new ConstantLengthAdapter(l);
 		ConstantWeight wa = new ConstantWeight(1.0, ignoreBoundaryChecker.isSelected());
 		return new EdgeLengthFunctional<VVertex, VEdge, VFace>(la, wa);
 	}

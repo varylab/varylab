@@ -1,7 +1,7 @@
 package de.varylab.varylab.hds;
 
-import de.jtem.halfedgetools.jreality.node.JRFace;
+import de.jtem.halfedge.Face;
 
-public class VFace extends JRFace<VVertex, VEdge, VFace> {
+public class VFace extends Face<VVertex, VEdge, VFace> {
 
 }

@@ -9,11 +9,11 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.meshoptimizer.OptimizationManager;
+import de.varylab.varylab.plugin.ui.OptimizerPluginsPanel;
 
 public abstract class OptimizerPlugin extends Plugin {
 
-	protected OptimizationManager
+	protected OptimizerPluginsPanel
 		manager = null;
 	
 	public JPanel getOptionPanel() {
@@ -23,7 +23,7 @@ public abstract class OptimizerPlugin extends Plugin {
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		manager = c.getPlugin(OptimizationManager.class);
+		manager = c.getPlugin(OptimizerPluginsPanel.class);
 		manager.addOptimizerPlugin(this);
 	}
 	
@@ -33,7 +33,7 @@ public abstract class OptimizerPlugin extends Plugin {
 		manager.removeOptimizerPlugin(this);
 	}
 	
-	public abstract Functional<VVertex, VEdge, VFace> createFunctional(VHDS hds);
+	public abstract Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds);
 	
 	public abstract String getName();
 	

@@ -18,15 +18,11 @@ import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
-import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.ui.EditorsToolBar;
-import de.varylab.varylab.ui.image.ImageHook;
+import de.varylab.varylab.plugin.ui.EditorsToolBar;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public abstract class EditorPlugin extends Plugin {
 
@@ -38,7 +34,7 @@ public abstract class EditorPlugin extends Plugin {
 		viewMenuBar = null;
 	private EditorsToolBar
 		toolBar = null;
-	private HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> 
+	private HalfedgeInterface 
 		hif = null;
 	private static Icon
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
@@ -77,7 +73,7 @@ public abstract class EditorPlugin extends Plugin {
 		
 	}
 	
-	protected abstract void edit(Content content, HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> hif);
+	protected abstract void edit(Content content, HalfedgeInterface hif);
 	
 	protected abstract String[] getMenuPath();
 	
@@ -85,7 +81,6 @@ public abstract class EditorPlugin extends Plugin {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
@@ -93,7 +88,7 @@ public abstract class EditorPlugin extends Plugin {
 		content = JRViewerUtility.getContentPlugin(c);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		toolBar = c.getPlugin(EditorsToolBar.class);
-		hif = c.getPlugin(HalfedgeInterfacePlugin.class);
+		hif = c.getPlugin(HalfedgeInterface.class);
 		EditAction action = new EditAction();
 		String[] menuPath = getMenuPath();
 		String[] menuPathLong = new String[menuPath.length + 1];

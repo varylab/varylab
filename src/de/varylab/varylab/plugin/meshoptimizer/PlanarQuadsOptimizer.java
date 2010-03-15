@@ -2,18 +2,20 @@ package de.varylab.varylab.plugin.meshoptimizer;
 
 import de.jreality.math.Pn;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.planarfaces.VolumeFuctional;
-import de.jtem.halfedgetools.functional.planarfaces.PlanarFacesAdapters.VolumeWeight;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.math.functional.VolumeFunctional;
+import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.plugin.OptimizerPlugin;
-import de.varylab.varylab.ui.image.ImageHook;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class PlanarQuadsOptimizer extends OptimizerPlugin {
 
+	private VolumeFunctional<VVertex, VEdge, VFace>
+		functional = new VolumeFunctional<VVertex, VEdge, VFace>(new ConstantWeight(1.0), 1, 1.0);
 	
 	public class ConstantWeight implements VolumeWeight<VFace> {
 		private double 
@@ -31,9 +33,10 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 	
 	
 	@Override
-	public Functional<VVertex, VEdge, VFace> createFunctional(VHDS hds) {
+	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
 		double scale = getShortestEdgeLength(hds);
-		return new VolumeFuctional<VVertex, VEdge, VFace>(new ConstantWeight(1.0), scale, 1.0);
+		functional.setScale(scale);
+		return functional;
 	}
 	
 	public static double getShortestEdgeLength(VHDS hds) {

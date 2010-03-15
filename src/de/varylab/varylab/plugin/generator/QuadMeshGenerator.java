@@ -16,12 +16,8 @@ import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.basic.Content;
 import de.jreality.plugin.icon.ImageHook;
 import de.jreality.scene.proxy.scene.SceneGraphComponent;
-import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.GeneratorPlugin;
 
 public class QuadMeshGenerator extends GeneratorPlugin {
@@ -38,7 +34,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		numVSpinner = new JSpinner(numVModel);
 	private JCheckBox	
 		faceCornerChecker = new JCheckBox("Use Face Center Corner"),
-		dimondShaped = new JCheckBox("Use Dimonds", true);
+		diamondShaped = new JCheckBox("Use Diamonds", true);
 	
 	public QuadMeshGenerator() {
 		panel.setLayout(new GridBagLayout());
@@ -59,7 +55,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		panel.add(numUSpinner, gbc2);
 		panel.add(new JLabel("V Resolution"), gbc1);
 		panel.add(numVSpinner, gbc2);		
-		panel.add(dimondShaped, gbc2);
+		panel.add(diamondShaped, gbc2);
 		panel.add(faceCornerChecker, gbc2);
 	}
 	
@@ -74,10 +70,10 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	@Override
 	protected void generate(
 		Content content,
-		HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> hif
+		HalfedgeInterface hif
 	) {
-		if (dimondShaped.isSelected()) {
-			generateDimonds(content);
+		if (diamondShaped.isSelected()) {
+			generateDiamonds(content);
 		} else {
 			generate(content);
 		}
@@ -88,12 +84,12 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	private void generate(Content content) {
 		int numU = numUModel.getNumber().intValue();
 		int numV = numVModel.getNumber().intValue();
-		double[][][] verts = new double[numU][numV][];
+		double[][][] verts = new double[numV][numU][];
 		for (int u = 0; u < verts.length; u++) {
 			for (int v = 0; v  < verts[0].length; v++) {
 				verts[u][v] = new double[]{
-					u / (double)(numU - 1) - 0.5, 
 					v / (double)(numV - 1) - 0.5, 
+					u / (double)(numU - 1) - 0.5, 
 					0
 				};
 			}
@@ -114,7 +110,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	}
 	
 	
-	private void generateDimonds(Content content) {
+	private void generateDiamonds(Content content) {
 		int numU = numUModel.getNumber().intValue();
 		int numV = numVModel.getNumber().intValue();
 		// vertices
@@ -198,5 +194,5 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	protected JPanel getDialogPanel() {
 		return panel;
 	}
-
+	
 }

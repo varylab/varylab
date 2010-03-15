@@ -1,9 +1,8 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
 import no.uib.cipr.matrix.DenseVector;
-import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.CombinedFunctional;
@@ -15,7 +14,7 @@ public class OptimizerThread extends Thread {
 
 	CombinedOptimizableNM opt = null;
 	
-	HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS>
+	HalfedgeInterface
 		hif = null;
 	
 	VHDS 
@@ -26,20 +25,24 @@ public class OptimizerThread extends Thread {
 	boolean 
 		pause = true,
 		running = true;
-	
+	int gcCounter = 0;
+
+	private boolean watchFunctionValue = true;
+
 	public OptimizerThread() {
 		super("OptimizerThread");
+		
 	}
 	
 	public void initOptimizer(
-		HalfedgeInterfacePlugin<VVertex, VEdge, VFace, VHDS> hif,
+		HalfedgeInterface hif,
 		CombinedFunctional fun,
 		Constraint constraint,
 		double accuracy,
 		int it) 
 	{
 		this.hif = hif;
-		this.hds = hif.getCachedHalfEdgeDataStructure();
+		this.hds = hif.get(new VHDS());
 		opt = new CombinedOptimizableNM(hds, fun);
 		opt.addConstraint(constraint);
 		int dim = hds.numVertices() * 3;
@@ -68,26 +71,39 @@ public class OptimizerThread extends Thread {
 		running = false;
 	}
 	
+	public void watchFunctionValue(boolean watch) {
+		watchFunctionValue = watch;
+	}
+	
 	@Override
 	public void run() {
-		try {
-			while(running) {
+		while(running) {
+			try {
 				if(pause) {
 					synchronized (this) {
 						wait();
 					}
 				} 
-				ConjugateGradient.search(uArr, acc, opt);
+				double fv = ConjugateGradient.search(uArr, acc, opt);
+				if(watchFunctionValue){
+					System.out.println(fv);
+				}
 				for (VVertex v : hds.getVertices()) {
 					int i = v.getIndex() * 3;
 					v.position[0] = uArr[i + 0];
 					v.position[1] = uArr[i + 1];
 					v.position[2] = uArr[i + 2];
 				}
-				hif.updateHalfedgeContentAndActiveGeometry(hds);	
+				HalfedgeSelection hes = hif.getSelection();
+				hif.set(hds);
+				hif.setSelection(hes);
+				if (gcCounter++ > 200) {
+					System.gc();
+					gcCounter = 0;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch(InterruptedException ex) {
-			ex.printStackTrace();
 		}
 	}
 }

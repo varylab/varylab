@@ -1,20 +1,23 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.geodesic.GeodesicLaplaceFunctional;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.math.functional.GeodesicLaplaceFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
-import de.varylab.varylab.ui.image.ImageHook;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class GeodesicLaplaceOptimizer extends OptimizerPlugin {
 
+	GeodesicLaplaceFunctional<VVertex, VEdge, VFace>
+		functional = new GeodesicLaplaceFunctional<VVertex, VEdge, VFace>();
+	
 	@Override
-	public Functional<VVertex, VEdge, VFace> createFunctional(VHDS hds) {
-		return new GeodesicLaplaceFunctional<VVertex, VEdge, VFace>();
+	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
+		return functional;
 	}
 
 	@Override

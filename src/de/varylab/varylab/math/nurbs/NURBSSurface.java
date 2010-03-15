@@ -17,6 +17,11 @@ public class NURBSSurface {
  		p = 2,
  		q = 2;
 	
+ 	
+ 	public NURBSSurface() {
+ 	}
+ 	
+ 	
 	public void getSurfacePoint(double u, double v, double[] S) {
 		NURBSAlgorithm.SurfacePoint(p, U, q, V, controlMesh, u, v, S);
 	}
@@ -65,6 +70,7 @@ public class NURBSSurface {
 	 */
 	public void setControlMesh(double[][][] cm) {
 		this.controlMesh = cm;
+		setDefaultKnots();
 	}
 	
 	

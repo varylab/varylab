@@ -31,57 +31,48 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
+import static de.jtem.halfedgetools.util.HalfEdgeUtilsExtra.getDegree;
+
 import java.util.Collections;
 import java.util.Set;
 
-import javax.swing.JPanel;
-
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Ifs;
+import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
+import de.varylab.varylab.hds.VEdge;
+import de.varylab.varylab.hds.VFace;
+import de.varylab.varylab.hds.VVertex;
 
 public class OddVertexVisualizer extends VisualizerPlugin {
 
-	private JPanel
-		panel = new JPanel();
-	
-	public OddVertexVisualizer() {
-	}
-	
-	
-	public class OddVertexAdapter <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> implements  ColorAdapter2Ifs<V> {
+	@Color
+	public class OddVertexAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 
-		@Override
-		public AdapterType getAdapterType() {
-			return AdapterType.VERTEX_ADAPTER;
+		public OddVertexAdapter() {
+			super(VVertex.class, null, null, double[].class, true, false);
 		}
 		
 		@Override
-		public double[] getColor(V v) {
-			return (HalfEdgeUtilsExtra.getDegree(v)%2==0)?
-					new double[]{0,1,0}:
-					new double[]{1,0,0};
+		public double getPriority() {
+			return 1;
+		}
+		
+		@Override
+		public double[] getVertexValue(VVertex v, AdapterSet a) {
+			if (getDegree(v) % 2 == 0) {
+				return new double[]{0,1,0};
+			} else {
+				return new double[]{1,0,0};
+			}
 		}
 		
 	}
 	
-	@Override
-	public JPanel getOptionPanel() {
-		return panel;
-	}
 	
-	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends Adapter> getAdapters() {
+	public Set<? extends Adapter<?>> getAdapters() {
 		return Collections.singleton(new OddVertexAdapter());
 	}
 
