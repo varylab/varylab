@@ -33,7 +33,7 @@ package de.varylab.varylab.math.functional;
 
 import static de.varylab.varylab.math.functional.VolumeFunctionalUtils.differentiateDet2;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 
 import de.jreality.math.Matrix;
@@ -48,6 +48,7 @@ import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
+import de.varylab.varylab.math.CollectionUtility;
 
 public class PlanarStarFunctional <
 	V extends Vertex<V, E, F>,
@@ -77,8 +78,8 @@ public class PlanarStarFunctional <
 			for (V v: hds.getVertices()) { // flatness
 				List<V> neighbors = HalfEdgeUtils.neighboringVertices(v);
 				neighbors.add(v);
-				List< List<V>> LL = subsets(neighbors,4);
-				for(List<V> tets : LL) {
+				Collection< Collection<V> > LL = CollectionUtility.subsets(neighbors,4);
+				for(Collection<V> tets : LL) {
 					double result = volume2(x,tets);
 					E.add(result);
 				}
@@ -90,7 +91,7 @@ public class PlanarStarFunctional <
 	}
 
 	
-	private double volume2(DomainValue x, List<V> neighbors) {
+	private double volume2(DomainValue x, Collection<V> neighbors) {
 		double[][] tet = new double[4][4];
 		int i = 0;
 		for(V v : neighbors) {
@@ -109,7 +110,7 @@ public class PlanarStarFunctional <
 		for (V v : hds.getVertices()){ // flatness
 			List<V> neighbors = HalfEdgeUtils.neighboringVertices(v);
 			neighbors.add(v);
-			for(List<V> tets : subsets(neighbors,4)) {
+			for(Collection<V> tets : CollectionUtility.subsets(neighbors,4)) {
 				Matrix mat = new Matrix();
 				int i = 0;
 				for(V w : tets) {
@@ -152,34 +153,5 @@ public class PlanarStarFunctional <
 		pos[2] = x.get(v.getIndex() * 3 + 2);
 		pos[3] = 1.0;
 		return pos;
-	}
-	
-	public static <T> List< List<T> > subsets(List<T> L, int k) {
-		if(k > L.size() || k < 0) {
-			return new LinkedList<List<T>>();
-		}
-		if(k == 0) {
-			List<T> L1 = new LinkedList<T>();
-			LinkedList<List<T>> LL = new LinkedList<List<T>>();
-			LL.add(L1);
-			return LL; 
-		}
-		if(k == L.size()) {
-			LinkedList<List<T>> LL = new LinkedList< List<T> >();
-			LL.add(new LinkedList<T>(L));
-			return LL;
-		}
-		List<T> LC = new LinkedList<T>(L);
-		T first = LC.get(0);
-		LC.remove(0);
-		List<List<T>> LL = subsets(LC,k);
-
-		for(List<T> Lk1 : subsets(LC,k-1)) {
-			Lk1.add(first);
-			LL.add(Lk1);
-		}
-
-		return LL;
-		
 	}
 }

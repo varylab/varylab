@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
-import de.varylab.varylab.math.functional.PlanarStarFunctional;
+import de.varylab.varylab.math.CollectionUtility;
 
 public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeListener, ActionListener {
 
@@ -160,7 +161,7 @@ public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			neighbors.add(v);
 			double[] base = null;
 			double[][] tet = new double[3][3];
-			for(List<V> tets : PlanarStarFunctional.subsets(neighbors,4)) {
+			for(Collection<V> tets : CollectionUtility.subsets(neighbors,4)) {
 				base = null;
 				int i = 0;
 				for(V u : tets) {
