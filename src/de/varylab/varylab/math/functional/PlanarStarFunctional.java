@@ -31,13 +31,8 @@ OF SUCH DAMAGE.
 
 package de.varylab.varylab.math.functional;
 
-import static de.varylab.varylab.math.functional.VolumeFunctionalUtils.differentiateDet2;
-
-import java.util.Collection;
 import java.util.List;
 
-import de.jreality.math.Matrix;
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -48,7 +43,6 @@ import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.math.CollectionUtility;
 
 public class PlanarStarFunctional <
 	V extends Vertex<V, E, F>,
@@ -64,6 +58,7 @@ public class PlanarStarFunctional <
 	}
 	
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluate(
@@ -78,80 +73,47 @@ public class PlanarStarFunctional <
 			for (V v: hds.getVertices()) { // flatness
 				List<V> neighbors = HalfEdgeUtils.neighboringVertices(v);
 				neighbors.add(v);
-				Collection< Collection<V> > LL = CollectionUtility.subsets(neighbors,4);
-				for(Collection<V> tets : LL) {
-					double result = volume2(x,tets);
-					E.add(result);
+				E.add(VolumeFunctionalUtils.calculateSumDetSquared(x, neighbors));
+				if(G != null) {
+					VolumeFunctionalUtils.addSumDetSquaredGradient(x, G, neighbors,scale);
 				}
 			}
 		}
-		if (G != null) {
+		if(G != null) {
 			evaluateGradient(hds, x, G);
 		}
 	}
 
-	
-	private double volume2(DomainValue x, Collection<V> neighbors) {
-		double[][] tet = new double[4][4];
-		int i = 0;
-		for(V v : neighbors) {
-			tet[i++] = getPosition(x,v);
-		}
-		double det = Rn.determinant(tet);
-		return det*det;
-	}
 
-	public void evaluateGradient(
-		HalfEdgeDataStructure<V, E, F> hds, 
-		DomainValue x, 
-		Gradient G 
-	){
+	private <
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void evaluateGradient(HDS hds, DomainValue x, Gradient G) {
 		G.setZero();
-		for (V v : hds.getVertices()){ // flatness
+		for (V v: hds.getVertices()) { // flatness
 			List<V> neighbors = HalfEdgeUtils.neighboringVertices(v);
 			neighbors.add(v);
-			for(Collection<V> tets : CollectionUtility.subsets(neighbors,4)) {
-				Matrix mat = new Matrix();
-				int i = 0;
-				for(V w : tets) {
-					mat.setColumn(i++, getPosition(x,w));
-				}
-				int j = 0;
-				for (V w : tets){
-					int vertexIndex = w.getIndex();
-					G.add(vertexIndex * 3 + 0, differentiateDet2(mat, 0, j) * scale);
-					G.add(vertexIndex * 3 + 1, differentiateDet2(mat, 1, j) * scale);
-					G.add(vertexIndex * 3 + 2, differentiateDet2(mat, 2, j) * scale);
-					j++;
-				}
-			}
+			VolumeFunctionalUtils.addSumDetSquaredGradient(x, G, neighbors,scale);
 		}
 	}
-	
+
+	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int getDimension(HDS hds) {
 		return hds.numVertices() * 3;
 	}
 
+	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int[][] getNonZeroPattern(HDS hds) {
 		return null;
 	}
 	
     
-    public boolean hasHessian() {
+    @Override
+	public boolean hasHessian() {
     	return false;
     }
 
 
 	public void setScale(double s) {
 		scale = s;
-	}
-
-	private double[] getPosition(DomainValue x, V v) {
-		double[] pos = new double[4];
-		pos[0] = x.get(v.getIndex() * 3 + 0);
-		pos[1] = x.get(v.getIndex() * 3 + 1);
-		pos[2] = x.get(v.getIndex() * 3 + 2);
-		pos[3] = 1.0;
-		return pos;
 	}
 }

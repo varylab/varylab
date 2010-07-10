@@ -18,8 +18,10 @@ import java.util.Set;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
@@ -46,24 +48,30 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		optimizerPlugins = new LinkedList<OptimizerPlugin>();
 	private JTable
 		pluginTable = new JTable();
+	private JScrollPane
+		pluginScroller = new JScrollPane(pluginTable);
 	private Set<String>
 		activateSet = new HashSet<String>();
 	private JPanel
 		tablePanel = new JPanel(),
 		pluginOptionsPanel = new JPanel();
+	private JCheckBox
+		normalizeEnergies = new JCheckBox("Normalize Energies", true); 
 	
 	public OptimizerPluginsPanel() {
 		tablePanel.setLayout(new GridLayout());
 		tablePanel.setBorder(BorderFactory.createTitledBorder("Optimizer Plugins"));
-		tablePanel.add(pluginTable);
+		tablePanel.add(pluginScroller);
 		pluginTable.setBorder(BorderFactory.createEtchedBorder());
 		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
 		pluginTable.setRowHeight(22);
 		pluginTable.getSelectionModel().addListSelectionListener(this);
 		pluginTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+		pluginTable.getTableHeader().setPreferredSize(new Dimension(100, 0));
 		
 		pluginOptionsPanel.setLayout(new GridLayout());
 		pluginOptionsPanel.setPreferredSize(new Dimension(20, 100));
+		pluginOptionsPanel.setMinimumSize(new Dimension(20, 100));
 		pluginOptionsPanel.setBorder(BorderFactory.createTitledBorder("Plugin Options"));
 		
 		shrinkPanel.setLayout(new GridBagLayout());
@@ -72,9 +80,13 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		c.weightx = 1.0;
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.insets = new Insets(2, 2, 2, 2);
+		shrinkPanel.add(normalizeEnergies, c);
+		c.weighty = 1.0;
 		shrinkPanel.add(tablePanel, c);
+		c.weighty = 0.0;
 		shrinkPanel.add(pluginOptionsPanel, c);
-		pluginTable.setPreferredSize(new Dimension(250, 200));
+		tablePanel.setPreferredSize(new Dimension(250, 200));
+		tablePanel.setMinimumSize(new Dimension(250, 200));
 	}
 
 	@Override
@@ -291,6 +303,10 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			}
 		}
 		return result;
+	}
+	
+	public boolean isNormalizeEnergies() {
+		return normalizeEnergies.isSelected();
 	}
 	
 	@Override

@@ -14,11 +14,11 @@ import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.basic.Content;
-import de.jreality.plugin.icon.ImageHook;
 import de.jreality.scene.proxy.scene.SceneGraphComponent;
+import de.jtem.halfedgetools.plugin.GeneratorPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.GeneratorPlugin;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class QuadMeshGenerator extends GeneratorPlugin {
 
@@ -63,7 +63,7 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Quad Mesh", "Stefan Sechelmann");
-		info.icon = ImageHook.getIcon("combinatorics.png");
+		info.icon = ImageHook.getIcon("quad_gen.png", 16, 16);
 		return info; 
 	}
 	

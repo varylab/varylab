@@ -7,6 +7,7 @@ public class SimpleEnergy implements Energy {
 	protected double 
 		E = 0.0;
 	
+	@Override
 	public double get() {
 		return E;
 	}

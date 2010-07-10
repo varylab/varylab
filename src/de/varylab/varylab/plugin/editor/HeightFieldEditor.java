@@ -14,11 +14,12 @@ import javax.swing.SpinnerNumberModel;
 
 import de.jreality.plugin.basic.Content;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.plugin.EditorPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.EditorPlugin;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class HeightFieldEditor extends EditorPlugin {
 
@@ -98,7 +99,9 @@ public class HeightFieldEditor extends EditorPlugin {
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Hightfield Editor", "Stefan Sechelmann");
+		PluginInfo info = new PluginInfo("Hightfield Editor", "Stefan Sechelmann");
+		info.icon = ImageHook.getIcon("hfe.png", 16, 16);
+		return info;
 	}
 
 }

@@ -20,6 +20,7 @@ public class OriginalLength implements Length<VEdge> {
 		}
 	}
 	
+	@Override
 	public Double getTargetLength(VEdge e) {
 		return el[e.getIndex()];
 	}

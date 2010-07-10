@@ -28,6 +28,8 @@ public class SpringFunctional<
 	private WeightFunction<E> 
 		weight = null;
 	
+	private double power = 2.0;
+	
 	public SpringFunctional(Length<E> l0, WeightFunction<E> w) {
 		this.length = l0;
 		this.weight = w;
@@ -54,12 +56,12 @@ public class SpringFunctional<
 		double[] t = new double[3];
 		double result = 0.0;
 		for (E e : hds.getPositiveEdges()) {
-			if(e.getLeftFace() != null && e.getRightFace() != null) {
+//			if(e.getLeftFace() != null && e.getRightFace() != null) {
 				FunctionalUtils.getPosition(e.getStartVertex(), x, s);
 				FunctionalUtils.getPosition(e.getTargetVertex(), x, t);
 				double el = Rn.euclideanDistance(s, t);
-				result += weight.getWeight(e)*(el-length.getTargetLength(e) )*(el-length.getTargetLength(e));
-			}
+				result += weight.getWeight(e)*Math.pow(el-length.getTargetLength(e),power);
+//			}
 		}
 		return result;
 	}
@@ -81,10 +83,13 @@ public class SpringFunctional<
 				double tl = length.getTargetLength(e);
 				FunctionalUtils.getPosition(e.getStartVertex(), x, vj);
 				Rn.subtract(smt, vk, vj);
+				if(Rn.euclideanDistance(vk,vj)==0) {
+					continue;
+				}
 				double factor = (1-tl/Rn.euclideanDistance(vk, vj));
 				int off = v.getIndex() * 3;
 				for (int d = 0; d < 3; d++) {
-					grad.add(off + d, 2*(vk[d] - vj[d]) * factor * weight.getWeight(e));
+					grad.add(off + d, power*Math.pow((vk[d] - vj[d]),power-1.0) * factor * weight.getWeight(e));
 				}
 			}
 		}
@@ -109,6 +114,9 @@ public class SpringFunctional<
 				FunctionalUtils.getPosition(s, x, vt);
 				Rn.subtract(smt, vs, vt);
 				double el = Rn.euclideanNorm(smt);
+				if(el == 0) {
+					continue;
+				}
 				double el2 = Rn.euclideanNormSquared(smt);
 				double el3 = el2*el;
 				double factor = -2*(1/el3)*weight.getWeight(e);
@@ -169,7 +177,7 @@ public class SpringFunctional<
 
 	@Override
 	public boolean hasHessian() {
-		return true;
+		return false;
 	}
 
 	public void setLength(Length<E> length) {

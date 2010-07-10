@@ -138,13 +138,13 @@ public class CombinedOptimizableTao extends TaoApplication implements
 	}
 	
 	
-	private void applyConstraints(Gradient G, Hessian H) {
+	private void applyConstraints(DomainValue x, Gradient G, Hessian H) {
 		for (Constraint c : constraints) {
 			if (G != null) {
-				c.editGradient(hds, getDomainDimension(), G);
+				c.editGradient(hds, getDomainDimension(), x, G);
 			}
 			if (H != null) {
-				c.editHessian(hds, getDomainDimension(), H);
+				c.editHessian(hds, getDomainDimension(), x, H);
 			}
 		}
 	}
@@ -156,7 +156,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		TaoGradient G = new TaoGradient(g);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, null);
-		applyConstraints(G, null);
+		applyConstraints(u, G, null);
 		g.assemble();
 		return E.get();
 	}
@@ -166,6 +166,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		TaoU u = new TaoU(x);
 		TaoHessian taoHess = new TaoHessian(H);
 		fun.evaluate(hds, u, null, null, taoHess);
+		applyConstraints(u, null, taoHess);
 		H.assemble();
 		return SAME_NONZERO_PATTERN;
 	}

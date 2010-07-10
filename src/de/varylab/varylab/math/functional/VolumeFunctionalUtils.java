@@ -1,8 +1,64 @@
 package de.varylab.varylab.math.functional;
 
+import java.util.Collection;
+import java.util.List;
+
 import de.jreality.math.Matrix;
+import de.jreality.math.Rn;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.functional.DomainValue;
+import de.jtem.halfedgetools.functional.FunctionalUtils;
+import de.jtem.halfedgetools.functional.Gradient;
+import de.varylab.varylab.math.CollectionUtility;
 
 public class VolumeFunctionalUtils {
+
+	public static <V extends Vertex<?,?,?>> double calculateSumDetSquared(DomainValue x, List<V> verts) {
+		double result = 0.0;
+		for(Collection<V> tets : CollectionUtility.subsets(verts,4)) {
+			result += detSquared(x,tets);
+		}
+		return result;
+	}
+	
+	// calculate the volume of the tetrahedron spanned by the verts
+	public static <V extends Vertex<?,?,?>> double detSquared(DomainValue x, Collection<V> verts) {
+		double[][] tet = new double[4][4];
+		int i = 0;
+		for(V v : verts) {
+			tet[i++] = FunctionalUtils.getHomogPosition(x,v);
+		}
+		double det = Rn.determinant(tet);
+		return det*det;
+	}
+	
+	
+	
+	public static 
+		<V extends Vertex<?,?,?>>
+	void addSumDetSquaredGradient(DomainValue x, Gradient G, List<V> verts, double scale) {
+		for(Collection<V> tets : CollectionUtility.subsets(verts,4)) {
+			addDetSquaredGradient(x, G, tets, scale);
+		}
+	}
+
+	public static <
+		V extends Vertex<?,?,?>
+	> void addDetSquaredGradient(DomainValue x, Gradient G,	Collection<V> tets, double scale) {
+		Matrix mat = new Matrix();
+		int i = 0;
+		for(V w : tets) {
+			mat.setColumn(i++, FunctionalUtils.getHomogPosition(x,w));
+		}
+		int j = 0;
+		for (V w : tets){
+			int vertexIndex = w.getIndex();
+			G.add(vertexIndex * 3 + 0, differentiateDet2(mat, 0, j) * scale);
+			G.add(vertexIndex * 3 + 1, differentiateDet2(mat, 1, j) * scale);
+			G.add(vertexIndex * 3 + 2, differentiateDet2(mat, 2, j) * scale);
+			j++;
+		}
+	}
 
 	public static double differentiateDet2(Matrix A, int i, int j){
 		double a_11 = A.getEntry(0, 0);

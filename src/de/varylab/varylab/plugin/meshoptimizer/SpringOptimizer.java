@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -26,12 +27,12 @@ import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.hds.adapter.OriginalLength;
-import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
+public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{ 
 	
 	private final String AVERAGE = "average";
 
@@ -65,6 +66,9 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		functional = new SpringFunctional<VVertex, VEdge, VFace>(
 			la, new ConstantWeight(1, true));
 
+	private JCheckBox
+		setLengthBox = new JCheckBox("update");
+
 	public SpringOptimizer() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
@@ -88,7 +92,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		originalButton.setSelected(true);
 		panel.add(originalButton,gbc);
 		gbc.gridwidth = 3;
-		panel.add(new JLabel(),gbc);
+		panel.add(setLengthBox ,gbc);
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		panel.add(edgeLengthSpinner,gbc);
 
@@ -112,7 +116,13 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
-		
+		if(setLengthBox.isSelected()){
+			updateLength(hds);
+		}
+		return functional;
+	}
+
+	private void updateLength(VHDS hds) {
 		String st = edgeLengthGroup.getSelection().getActionCommand();
 		if(st == AVERAGE) {
 			double l = 0.0;
@@ -130,8 +140,6 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		} else if(st == ORIGINAL) {
 			functional.setLength(new OriginalLength(hds));
 		}
-		
-		return functional;
 	}
 
 	@Override
@@ -187,4 +195,5 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		JRViewerUtility.getContentPlugin(c);
 		super.install(c);
 	}
+
 }

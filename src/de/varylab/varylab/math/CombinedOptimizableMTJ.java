@@ -131,13 +131,13 @@ public class CombinedOptimizableMTJ implements Optimizable {
 	}
 	
 	
-	private void applyConstraints(Gradient G, Hessian H) {
+	private void applyConstraints(DomainValue x, Gradient G, Hessian H) {
 		for (Constraint c : constraints) {
 			if (G != null) {
-				c.editGradient(hds, getDomainDimension(), G);
+				c.editGradient(hds, getDomainDimension(), x, G);
 			}
 			if (H != null) {
-				c.editHessian(hds, getDomainDimension(), H);
+				c.editHessian(hds, getDomainDimension(), x, H);
 			}
 		}
 	}
@@ -150,7 +150,7 @@ public class CombinedOptimizableMTJ implements Optimizable {
 		MTJHessian H = new MTJHessian(hessian);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, H);
-		applyConstraints(G, H);
+		applyConstraints(u, G, H);
 		return E.get();
 	}
 
@@ -160,7 +160,7 @@ public class CombinedOptimizableMTJ implements Optimizable {
 		MTJGradient G = new MTJGradient(gradient);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, null);
-		applyConstraints(G, null);
+		applyConstraints(u, G, null);
 		return E.get();
 	}
 
@@ -170,7 +170,7 @@ public class CombinedOptimizableMTJ implements Optimizable {
 		MTJHessian H = new MTJHessian(hessian);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, null, H);
-		applyConstraints(null, H);
+		applyConstraints(u, null, H);
 		return E.get();
 	}
 
@@ -182,6 +182,7 @@ public class CombinedOptimizableMTJ implements Optimizable {
 		return E.get();
 	}
 
+	@Override
 	public Integer getDomainDimension() {
 		return fun.getDimension(hds);
 	}

@@ -93,15 +93,16 @@ public class DiagonalDistanceFunctional <
 	}
 
 	@Override
-	public <HDS extends HalfEdgeDataStructure<V, E, F>> void evaluate(HDS hds,
-			DomainValue x, Energy E, Gradient G, Hessian H) {
+	public <
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
 		double result = 0.0;
 		if(E != null) {
 			for (F f : hds.getFaces()) { 
 				result += getDiagDistance2andGradient(f, G, x);
 			}
+			E.set(result);
 		}
-		E.set(result);
 	}
 
 	@Override

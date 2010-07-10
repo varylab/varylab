@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MTJOptimization"/>
@@ -12,5 +12,8 @@
 	<classpathentry kind="lib" path="/MTJOptimization/lib/mtj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Hyperbolic Nets"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DiscreteConformalLab"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CurvatureGeometry"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -33,7 +33,6 @@ package de.varylab.varylab.math.functional;
 
 import java.util.List;
 
-import de.jreality.math.Matrix;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -65,6 +64,7 @@ public class VolumeFunctional <
 	}
 	
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluate(
@@ -74,10 +74,13 @@ public class VolumeFunctional <
 		Gradient G, 
 		Hessian H
 	) {
-		
-		E.setZero();
-		for (F f : hds.getFaces()) { // flatness
-			E.add(getDet2(x, f) * weight.getWeight(f) * weight.getWeight(f) * scale);
+		if (E != null) {
+			E.setZero();
+			for (F f : hds.getFaces()) { // flatness
+				double detS = VolumeFunctionalUtils.detSquared(x, HalfEdgeUtils.boundaryVertices(f));
+				double weightS = weight.getWeight(f) * weight.getWeight(f);
+				E.add(detS * weightS * scale);
+			}
 		}
 		if (G != null) {
 			evaluateGradient(hds, x, G, null, alpha);
@@ -92,33 +95,6 @@ public class VolumeFunctional <
 //		}
 	}
 
-	
-	public double getDet2(DomainValue x, F f){
-		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
-		if (boundary.size() != 4) return 0.0;
-		de.jreality.math.Matrix mat = new de.jreality.math.Matrix();
-		int i = 0;
-		for (E edge : boundary){
-			double[] vertexPos = getPosition(x, edge.getTargetVertex());
-			mat.setColumn(i, vertexPos);
-			i++;
-		}
-		double det = mat.getDeterminant();
-		return det * det;
-	}
-	
-	
-	private double[] getPosition(DomainValue x, V v) {
-		double[] pos = new double[4];
-		pos[0] = x.get(v.getIndex() * 3 + 0);
-		pos[1] = x.get(v.getIndex() * 3 + 1);
-		pos[2] = x.get(v.getIndex() * 3 + 2);
-		pos[3] = 1.0;
-		return pos;
-	}
-	
-	
-
 	public void evaluateGradient(
 		HalfEdgeDataStructure<V, E, F> data, 
 		DomainValue x, 
@@ -128,25 +104,13 @@ public class VolumeFunctional <
 	){
 		G.setZero();
 		for (F f : data.getFaces()){ // flatness
-			List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
-			if (boundary.size() != 4)
+			List<V> bdVerts = HalfEdgeUtils.boundaryVertices(f);
+			
+			if (bdVerts.size() != 4)
 				continue;
-			Matrix mat = new Matrix();
-			int i = 0;
-			for (E edge : boundary){
-				double[] vertexPos = getPosition(x, edge.getTargetVertex());
-				mat.setColumn(i, vertexPos);
-				i++;
-			}
-			int j = 0;
-			for (E edge : boundary){
-				int vertexIndex = edge.getTargetVertex().getIndex();
-				double weight2 = weight.getWeight(f) * weight.getWeight(f);
-				G.add(vertexIndex * 3 + 0, VolumeFunctionalUtils.differentiateDet2(mat, 0, j) * weight2 * scale);
-				G.add(vertexIndex * 3 + 1, VolumeFunctionalUtils.differentiateDet2(mat, 1, j) * weight2 * scale);
-				G.add(vertexIndex * 3 + 2, VolumeFunctionalUtils.differentiateDet2(mat, 2, j) * weight2 * scale);
-				j++;
-			}
+			
+			double weight2 = weight.getWeight(f) * weight.getWeight(f);
+			VolumeFunctionalUtils.addDetSquaredGradient(x, G, bdVerts, weight2*scale);
 		}
 //		if (alpha != 0.0) {
 //			for (V v : data.getVertices()) { // minimal movement
@@ -166,16 +130,19 @@ public class VolumeFunctional <
 	
 	
 	
+	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int getDimension(HDS hds) {
 		return hds.numVertices() * 3;
 	}
 
+	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int[][] getNonZeroPattern(HDS hds) {
 		return null;
 	}
 	
     
-    public boolean hasHessian() {
+    @Override
+	public boolean hasHessian() {
     	return false;
     }
 

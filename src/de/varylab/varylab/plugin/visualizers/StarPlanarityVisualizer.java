@@ -178,9 +178,9 @@ public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		
 		
 		@Label
-		private class PlanarityLabelAdapter extends AbstractAdapter<String> {
+		private class StarPlanarityLabelAdapter extends AbstractAdapter<String> {
 
-			public PlanarityLabelAdapter() {
+			public StarPlanarityLabelAdapter() {
 				super(String.class, true, false);
 			}
 
@@ -212,9 +212,9 @@ public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeL
 
 
 		@Color
-		private class PlanarityColorAdapter extends AbstractAdapter<double[]> {
+		private class StarPlanarityColorAdapter extends AbstractAdapter<double[]> {
 
-			public PlanarityColorAdapter() {
+			public StarPlanarityColorAdapter() {
 				super(double[].class, true, false);
 			}
 
@@ -255,10 +255,10 @@ public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		public Set<? extends Adapter<?>> getAdapters() {
 			Set<Adapter<?>> result = new HashSet<Adapter<?>>();
 			if (showColors.isSelected()) {
-				result.add(new PlanarityColorAdapter());
+				result.add(new StarPlanarityColorAdapter());
 			}
 			if (showLabels.isSelected()) {
-				result.add(new PlanarityLabelAdapter());
+				result.add(new StarPlanarityLabelAdapter());
 			}
 			return result;
 		}

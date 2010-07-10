@@ -160,5 +160,9 @@ public class ConstantDirectionFieldPlugin extends OptimizerPlugin implements Cha
 		dirX.setText(c.getProperty(getClass(), "dirX", dirX.getText()));
 		dirY.setText(c.getProperty(getClass(), "dirY", dirY.getText()));
 		dirZ.setText(c.getProperty(getClass(), "dirZ", dirZ.getText()));
+		functional.setDirection(new double[]{
+				Double.parseDouble(dirX.getText()),
+				Double.parseDouble(dirY.getText()),
+				Double.parseDouble(dirZ.getText())});
 	}
 }

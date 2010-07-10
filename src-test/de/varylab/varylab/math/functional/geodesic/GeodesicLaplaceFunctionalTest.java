@@ -6,7 +6,6 @@ import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
-import de.jtem.halfedgetools.functional.MyDomainValue;
 import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
@@ -32,9 +31,8 @@ public class GeodesicLaplaceFunctionalTest
 			result.set(v.getIndex() * 3 + 1, v.position[1]);
 			result.set(v.getIndex() * 3 + 2, v.position[2]);
 		}	
-		MyDomainValue pos = new MyDomainValue(result);
-		
-		setXGradient(pos);
+//		MyDomainValue pos = new MyDomainValue(result);
+//		setXGradient(pos);
 		setHDS(hds);
 		setFuctional(new GeodesicLaplaceFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}

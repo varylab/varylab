@@ -64,13 +64,13 @@ public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWith
 	}
 	
 	
-	private void applyConstraints(Gradient G, Hessian H) {
+	private void applyConstraints(DomainValue x, Gradient G, Hessian H) {
 		for (Constraint c : constraints) {
 			if (G != null) {
-				c.editGradient(hds, getNumberOfVariables(), G);
+				c.editGradient(hds, getNumberOfVariables(), x, G);
 			}
 			if (H != null) {
-				c.editHessian(hds, getNumberOfVariables(), H);
+				c.editHessian(hds, getNumberOfVariables(), x, H);
 			}
 		}
 	}
@@ -81,7 +81,7 @@ public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWith
 		ArrayValue gArr = new ArrayValue(G);
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, xArr, E, gArr, null);
-		applyConstraints(gArr, null);
+		applyConstraints(xArr, gArr, null);
 		return E.E;
 	}
 
