@@ -10,6 +10,9 @@ import de.varylab.varylab.hds.VVertex;
 @TexCoordinate
 public class VTexCoordAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 
+	private static double[]
+	    defaultTexCoordinate = {0, 0, 0};
+	
 	public VTexCoordAdapter() {
 		super(VVertex.class, null, null, double[].class, true, true);
 	}
@@ -21,7 +24,11 @@ public class VTexCoordAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace
 	
 	@Override
 	public double[] getVertexValue(VVertex v, AdapterSet a) {
-		return v.texcoord;
+		if (v.texcoord != null) {
+			return v.texcoord;
+		} else {
+			return defaultTexCoordinate;
+		}
 	}
 	
 	@Override
