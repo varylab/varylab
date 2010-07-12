@@ -11,7 +11,12 @@ import java.util.Stack;
 
 import javax.swing.JButton;
 
+import de.jreality.math.Matrix;
+import de.jreality.math.MatrixBuilder;
+import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.content.CenteredAndScaledContent;
+import de.jreality.scene.Camera;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -30,14 +35,26 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 	JButton
 		selectGeodesicButton = new JButton("Select Geodesic"),
 		selectLatticeButton = new JButton("Select Lattice"),
-		smoothCombButton = new JButton("Smooth (Comb.)");
-	
+		smoothCombButton = new JButton("Smooth (Comb.)"),
+		xyViewButton = new JButton("xy"),
+		yzViewButton = new JButton("yz"),
+		xzViewButton = new JButton("xz"),
+		togglePerspectiveButton = new JButton("persp.");
 	
 	HalfedgeInterface 
 		hif = null;
+
+	private Scene scene;
+
+	private CenteredAndScaledContent content;
 	
 	public Toolbox() {
 		shrinkPanel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc1 = new GridBagConstraints();
+		gbc1.fill = GridBagConstraints.BOTH;
+		gbc1.weightx = 1.0;
+		gbc1.gridwidth = 1;
+		gbc1.insets = new Insets(2, 2, 2, 2);
 		GridBagConstraints gbc2 = new GridBagConstraints();
 		gbc2.fill = GridBagConstraints.BOTH;
 		gbc2.weightx = 1.0;
@@ -46,9 +63,17 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		shrinkPanel.add(selectGeodesicButton,gbc2);
 		shrinkPanel.add(selectLatticeButton,gbc2);
 		shrinkPanel.add(smoothCombButton,gbc2);
+		shrinkPanel.add(xyViewButton,gbc1);
+		shrinkPanel.add(yzViewButton,gbc1);
+		shrinkPanel.add(xzViewButton,gbc1);
+		shrinkPanel.add(togglePerspectiveButton, gbc2);
 		selectGeodesicButton.addActionListener(this);
 		selectLatticeButton.addActionListener(this);
 		smoothCombButton.addActionListener(this);
+		xyViewButton.addActionListener(this);
+		yzViewButton.addActionListener(this);
+		xzViewButton.addActionListener(this);
+		togglePerspectiveButton.addActionListener(this);
 	}
 	
 	private void selectGeodesic() {
@@ -134,6 +159,8 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		scene = c.getPlugin(Scene.class);
+		content = c.getPlugin(CenteredAndScaledContent.class);
 	}
 	
 	@Override
@@ -150,8 +177,22 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 			selectLattice();
 		} else if (smoothCombButton == src) {
 			VHDS hds = hif.get(new VHDS());
-			LaplacianSmoothing.smoothCombinatorially(hds, hif.getAdapters(), true);
+			Set<VVertex> selectedVerts = hif.getSelection().getVertices(hds);
+			LaplacianSmoothing.smoothCombinatorially(hds, selectedVerts, hif.getAdapters(), true);
 			hif.set(hds);
+		} else if (xyViewButton == src) {
+			Matrix trafo = MatrixBuilder.euclidean().rotateX(0).getMatrix();
+			trafo.assignTo(scene.getContentComponent());
+			
+		} else if (yzViewButton == src) {
+			Matrix trafo = MatrixBuilder.euclidean().rotateY(Math.PI/2.0).getMatrix();
+			trafo.assignTo(scene.getContentComponent());
+		} else if (xzViewButton == src) {
+			Matrix trafo = MatrixBuilder.euclidean().rotateX(Math.PI/2.0).getMatrix();
+			trafo.assignTo(scene.getContentComponent());
+		} else if (togglePerspectiveButton == src) {
+			Camera cam = scene.getCameraComponent().getCamera();
+			cam.setPerspective(!cam.isPerspective());	
 		}
 	}
 
