@@ -29,6 +29,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
+import de.varylab.varylab.utilities.SelectionUtility;
 
 public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 
@@ -81,7 +82,7 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		HalfedgeSelection hes = hif.getSelection();
 		Set<VEdge> all = new HashSet<VEdge>();
 		for(VEdge e : hif.getSelection().getEdges(hds)) {
-			all.addAll(selectGeodesic(e, hds));
+			all.addAll(SelectionUtility.selectGeodesic(e, hds));
 		}
 		hes.addAll(all);
 		hif.setSelection(hes);
@@ -118,43 +119,6 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		return sl;
 	}
 	
-	private Set<VEdge> selectGeodesic(VEdge e, VHDS hds) {
-		Set<VEdge> geodesic = new HashSet<VEdge>();
-		VEdge next = e;
-		geodesic.add(next);
-		geodesic.add(next.getOppositeEdge());
-		while(!HalfEdgeUtils.isBoundaryVertex(next.getTargetVertex())) {
-			next = getOpposingEdge(next);
-			if(next == null) break;
-			if(!geodesic.add(next)) break;
-			next = next.getOppositeEdge();
-			if(!geodesic.add(next)) break;
-		}
-		next = e.getOppositeEdge();
-		while(!HalfEdgeUtils.isBoundaryVertex(next.getTargetVertex())) {
-			next = getOpposingEdge(next);
-			if(next == null) break;
-			if(!geodesic.add(next)) break;
-			next = next.getOppositeEdge();
-			if(!geodesic.add(next)) break;
-		}
-		return geodesic;
-	}
-
-	private VEdge getOpposingEdge(VEdge next) {
-		VVertex v = next.getTargetVertex();
-		VEdge opposite = next;
-		int degree = HalfEdgeUtilsExtra.getDegree(v);
-		
-		if(degree%2 != 0) return null;
-		
-		for(int i = 0;i < degree/2; ++i) {
-			opposite = opposite.getNextEdge().getOppositeEdge();
-		}
-		
-		return opposite;
-	}
-
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);

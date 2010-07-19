@@ -16,7 +16,17 @@ import de.jtem.halfedgetools.adapter.type.Position;
 
 public class LaplacianSmoothing {
 
-	public static <V extends Vertex<V,E,F>,E extends Edge<V,E,F>, F extends Face<V,E,F>, HDS extends HalfEdgeDataStructure<V,E,F> > void smoothCombinatorially(HDS hds, Set<V> vertices, AdapterSet as, boolean ignoreBoundary) {
+	public static <
+		V extends Vertex<V,E,F>,
+		E extends Edge<V,E,F>, 
+		F extends Face<V,E,F>, 
+		HDS extends HalfEdgeDataStructure<V,E,F> 
+	> void smoothCombinatorially(
+			HDS hds, 
+			Set<V> vertices, 
+			AdapterSet as, 
+			boolean ignoreBoundary) 
+	{
 		HashMap<V, double[]> oldPositionMap = new HashMap<V, double[]>();
 		for(V v : hds.getVertices()) {
 			oldPositionMap.put(v, as.get(Position.class, v, double[].class));

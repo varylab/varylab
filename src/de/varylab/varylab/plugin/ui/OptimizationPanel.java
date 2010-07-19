@@ -92,7 +92,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		fixXChecker = new JCheckBox("X"),
 		fixYChecker = new JCheckBox("Y"),
 		fixZChecker = new JCheckBox("Z"),
-		tangentialConstraintChecker = new JCheckBox("Tangential"); 
+		tangentialConstraintChecker = new JCheckBox("Tangential"),
+		smoothGradientChecker = new JCheckBox("Smooth Gradient"); 
 	
 	private SpinnerNumberModel
 		accuracyModel = new SpinnerNumberModel(-8, -20, -1, -1),
@@ -133,10 +134,12 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(fixBoundaryYChecker, gbc1);
 		constraintsPanel.add(fixBoundaryZChecker, gbc2);
 		constraintsPanel.add(moveAlongBoundaryChecker, gbc2);
+		constraintsPanel.add(tangentialConstraintChecker, gbc2);
+		constraintsPanel.add(smoothGradientChecker, gbc2);
 		shrinkPanel.add(constraintsPanel, gbc2);
 		
 		shrinkPanel.add(fixHeightChecker, gbc2);
-		shrinkPanel.add(tangentialConstraintChecker, gbc2);
+		
 		
 		
 		shrinkPanel.add(new JLabel("Tolerance"), gbc1);
@@ -198,6 +201,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		app.addConstraint(fixConstraint);
 		if(tangentialConstraintChecker.isSelected()) {
 			app.addConstraint(new TangentialConstraint());
+		}
+		if(smoothGradientChecker.isSelected()) {
+			app.addConstraint(new SmoothGradientConstraint());
 		}
 		Vec x = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
