@@ -18,8 +18,6 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.CombinedOptimizableMTJ.MTJGradient;
-import de.varylab.varylab.math.CombinedOptimizableMTJ.MTJHessian;
 
 public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 

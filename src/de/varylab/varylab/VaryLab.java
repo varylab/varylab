@@ -17,6 +17,7 @@ import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
 import de.varylab.varylab.hds.calculator.VPositionCalculator;
@@ -45,10 +46,12 @@ import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
+import de.varylab.varylab.plugin.ui.WeightsEditor;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
+import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
 
 public class VaryLab {
 
@@ -56,6 +59,7 @@ public class VaryLab {
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new VPositionAdapter());
 		hif.addAdapter(new VTexCoordAdapter());
+		hif.addAdapter(new NodeWeigthAdapter());
 		hif.addCalculator(new VPositionCalculator());
 		hif.addCalculator(new VSubdivisionCalculator());
 		hif.set(new VHDS());
@@ -98,6 +102,7 @@ public class VaryLab {
 		
 		v.registerPlugin(new Sky());
 		v.registerPlugin(new AngleCalculatorPlugin());
+		v.registerPlugin(new WeightsEditor());
 	}
 
 
@@ -111,6 +116,7 @@ public class VaryLab {
 		v.registerPlugin(new StarPlanarityVisualizer());
 		v.registerPlugin(new HyperbolicPatchVisualizer());
 		v.registerPlugin(new NodeIndexVisualizer());
+		v.registerPlugin(new WeightsVisualizer());
 	}
 
 

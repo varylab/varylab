@@ -10,24 +10,23 @@ public class VVertex extends Vertex<VVertex, VEdge, VFace> implements HasBspPos 
 	public double[]
 	    position = null,
 	    texcoord = null;
-	private Integer
-		solverIndex = -1;
 	private boolean
 		variable = true;
+	private double
+		weight = 1.0;
 
-	public Integer getSolverIndex() {
-		return solverIndex;
-	}
-	
-	public void setSolverIndex(Integer solverIndex) {
-		this.solverIndex = solverIndex;
-	}
-	
 	public boolean isVariable() {
 		return variable;
 	}
 	public void setVariable(boolean variable) {
 		this.variable = variable;
+	}
+	
+	public double getWeight() {
+		return weight;
+	}
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 
 	public Point getPosition() {
