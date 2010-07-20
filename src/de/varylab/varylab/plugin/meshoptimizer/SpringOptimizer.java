@@ -16,6 +16,7 @@ import javax.swing.event.ChangeListener;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewerUtility;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -24,6 +25,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.hds.adapter.AdaptedWeightFunction;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.hds.adapter.OriginalLength;
@@ -42,6 +44,8 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 
 	private JPanel
 		panel = new JPanel();
+	private HalfedgeInterface
+		hif = null;
 	
 	private SpinnerNumberModel
 		edgeLengthModel = new SpinnerNumberModel(1.0,0.,100.,1.),
@@ -119,6 +123,8 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		if(setLengthBox.isSelected()){
 			updateLength(hds);
 		}
+		AdapterSet aSet = hif.getAdapters();
+		functional.setWeight(new AdaptedWeightFunction(aSet));
 		return functional;
 	}
 
@@ -194,6 +200,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		c.getPlugin(HalfedgeInterface.class);
 		JRViewerUtility.getContentPlugin(c);
 		super.install(c);
+		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 
 }

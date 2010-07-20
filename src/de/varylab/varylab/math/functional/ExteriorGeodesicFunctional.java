@@ -14,6 +14,7 @@ import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 public class ExteriorGeodesicFunctional<
@@ -22,9 +23,14 @@ public class ExteriorGeodesicFunctional<
 		F extends Face<V, E, F>
 	> implements Functional<V, E, F> {
 
+	
+	private HalfedgeSelection
+		manualGeodesics = new HalfedgeSelection();
+	
+	
 	@Override
 	public <
-	HDS extends HalfEdgeDataStructure<V, E, F>>
+		HDS extends HalfEdgeDataStructure<V, E, F>>
 	void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
 		if (E != null) {
 			E.set(evaluate(hds, x));
@@ -150,5 +156,9 @@ public class ExteriorGeodesicFunctional<
 		return false;
 	}
 
+	public void setManualGeodesics(HalfedgeSelection manualGeodesics) {
+		this.manualGeodesics = manualGeodesics;
+	}
+	
 
 }

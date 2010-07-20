@@ -5,6 +5,7 @@ import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
+import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.SelectionInterface;
@@ -41,6 +42,7 @@ import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
+import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
@@ -103,6 +105,7 @@ public class VaryLab {
 		v.registerPlugin(new Sky());
 		v.registerPlugin(new AngleCalculatorPlugin());
 		v.registerPlugin(new WeightsEditor());
+		v.registerPlugin(new RemoveGeodesicPlugin());
 	}
 
 
