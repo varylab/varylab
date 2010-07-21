@@ -5,7 +5,6 @@ import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
-import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.SelectionInterface;
@@ -18,6 +17,7 @@ import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
@@ -48,7 +48,7 @@ import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
-import de.varylab.varylab.plugin.ui.WeightsEditor;
+import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
@@ -62,6 +62,7 @@ public class VaryLab {
 		hif.addAdapter(new VPositionAdapter());
 		hif.addAdapter(new VTexCoordAdapter());
 		hif.addAdapter(new NodeWeigthAdapter());
+		hif.addAdapter(new GeodesicLabelAdapter());
 		hif.addCalculator(new VPositionCalculator());
 		hif.addCalculator(new VSubdivisionCalculator());
 		hif.set(new VHDS());
@@ -104,7 +105,7 @@ public class VaryLab {
 		
 		v.registerPlugin(new Sky());
 		v.registerPlugin(new AngleCalculatorPlugin());
-		v.registerPlugin(new WeightsEditor());
+		v.registerPlugin(new NodePropertyEditor());
 		v.registerPlugin(new RemoveGeodesicPlugin());
 	}
 

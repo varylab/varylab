@@ -6,6 +6,8 @@ public class VEdge extends Edge<VVertex, VEdge, VFace>{
 
 	private double
 		weight = 1.0;
+	private int
+		geodesicLabel = -1;
 	
 	public double getWeight() {
 		return weight;
@@ -14,5 +16,11 @@ public class VEdge extends Edge<VVertex, VEdge, VFace>{
 		this.weight = weight;
 	}
 
+	public int getGeodesicLabel() {
+		return geodesicLabel;
+	}
+	public void setGeodesicLabel(int geodesicLabel) {
+		this.geodesicLabel = geodesicLabel;
+	}
 	
 }

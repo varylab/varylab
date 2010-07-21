@@ -15,5 +15,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Hyperbolic Nets"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DiscreteConformalLab"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CurvatureGeometry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

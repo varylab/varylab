@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui;
+package de.varylab.varylab.plugin.ui.nodeeditor;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -6,42 +6,40 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.jreality.plugin.basic.View;
+import de.jtem.beans.InspectorPanel;
 import de.jtem.halfedge.Node;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Weight;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.SelectionAdapter;
 import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.SelectionListener;
 import de.jtem.halfedgetools.plugin.VisualizersManager;
 import de.jtem.halfedgetools.util.NodeComparator;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
 
-public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionListener, ChangeListener, ActionListener, SelectionListener {
+public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelectionListener, ChangeListener, ActionListener, SelectionListener {
 	
 	private HalfedgeInterface
 		hif = null;
@@ -57,22 +55,21 @@ public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionLis
 	private Set<Node<?,?,?>>
 		selectedNodes = new TreeSet<Node<?,?,?>>(new NodeComparator<Node<?,?,?>>());
 	
-	private SpinnerNumberModel
-		weightModel = new SpinnerNumberModel(1.0, -1000.0, 1000.0, 0.1),
-		smoothLambdaModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01);
-	private JSpinner
-		weightSpinner = new JSpinner(weightModel),
-		smoothLambdaSpinner = new JSpinner(smoothLambdaModel);
 	private JList
 		selectedNodesList = new JList();
 	private JScrollPane
 		selectionScroller = new JScrollPane(selectedNodesList);
-	private JButton
-		smoothButton = new JButton("Smooth Weights");
+	private JComboBox
+		adapterCombo = new JComboBox();
+	private InspectorPanel
+		inspector = new InspectorPanel(true);
+	private JScrollPane
+		ispectorScroller = new JScrollPane(inspector);
 	
 	
-	public WeightsEditor() {
+	public NodePropertyEditor() {
 		shrinkPanel.setLayout(new GridBagLayout());
+		shrinkPanel.setName("Node Properties");
 		GridBagConstraints c1 = new GridBagConstraints();
 		c1.insets = new Insets(1,1,1,1);
 		c1.fill = GridBagConstraints.BOTH;
@@ -86,19 +83,22 @@ public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionLis
 		c2.weightx = 1.0;
 		c2.gridwidth = GridBagConstraints.REMAINDER;
 		
+		c2.weighty = 1.0;
 		shrinkPanel.add(selectionScroller, c2);
 		selectionScroller.setPreferredSize(new Dimension(10, 70));
 		selectionScroller.setMinimumSize(new Dimension(10, 70));
-		shrinkPanel.add(new JLabel("Weight"), c1);
-		shrinkPanel.add(weightSpinner, c2);
-		shrinkPanel.add(new JSeparator(), c2);
-		shrinkPanel.add(smoothButton, c1);
-		shrinkPanel.add(smoothLambdaSpinner);
+		c2.weighty = 0.0;
+		shrinkPanel.add(adapterCombo, c2);
+		shrinkPanel.add(ispectorScroller, c2);
 		
-		smoothButton.addActionListener(this);
-		weightSpinner.addChangeListener(this);
+		inspector.addChangeListener(this);
+		adapterCombo.addActionListener(this);
 		selectedNodesList.getSelectionModel().addListSelectionListener(this);
+
+		ispectorScroller.setPreferredSize(new Dimension(10, 100));
+		ispectorScroller.setMinimumSize(new Dimension(10, 100));
 	}
+	
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -114,13 +114,27 @@ public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionLis
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
-		if (smoothButton == s) {
-			double lambda = smoothLambdaModel.getNumber().doubleValue();
-			Map<VVertex, Double> difMap = new HashMap<VVertex, Double>();
-			VHDS hds = hif.get(new VHDS());
-			for (VVertex v : hds.getVertices()) {
-				// :TODO implement heat diffusion?
+		if (adapterCombo == s) {
+			List<Node<?,?,?>> listSelection = getSelectedNodes();
+			if (listSelection.isEmpty()) return;
+			Node<?,?,?> refNode = listSelection.iterator().next();
+			@SuppressWarnings("unchecked")
+			Adapter<Object> a = (Adapter<Object>)adapterCombo.getSelectedItem();
+			Object o = a.get(refNode, hif.getAdapters());
+			Object vc = new Object();
+			if (o instanceof Double) {
+				vc = new DoubleValueContainer((Double)o, listSelection, a, hif.getAdapters());
 			}
+			if (o instanceof double[]) {
+				vc = new DoubleArrayValueContainer((double[])o, listSelection, a, hif.getAdapters());
+			}
+			if (o instanceof Integer) {
+				vc = new IntegerValueContainer((Integer)o, listSelection, a, hif.getAdapters());
+			}
+			if (o instanceof Boolean) {
+				vc = new BooleanValueContainer((Boolean)o, listSelection, a, hif.getAdapters());
+			}
+			inspector.setObject(vc);
 		}
 	}
 	
@@ -128,30 +142,16 @@ public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionLis
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (selectedNodesList.getSelectedValue() == null) return;
-		Node<?,?,?> n = (Node<?,?,?>)selectedNodesList.getSelectedValue();
-		AdapterSet a = hif.getAdapters();
-		Double w = a.get(Weight.class, n, Double.class);
-		if (w != null) {
-			weightModel.setValue(w);
-		}
+		updateInspector();
 	}
+	
 	
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if (disableListeners) return;
 		if (selectedNodesList.getSelectedValue() == null) return;
-		AdapterSet a = hif.getAdapters();
-		Object[] listSelection = selectedNodesList.getSelectedValues();
-//		int[] selIndices = selectedNodesList.getSelectedIndices();
-		for (Object s : listSelection) {
-			Double w = weightModel.getNumber().doubleValue();
-			a.set(Weight.class, (Node<?,?,?>)s, w);
-		}
 		if (visualizersManager.isActive(weightsVisualizer)) {
-//			HalfedgeSelection s = new HalfedgeSelection(selectedNodes);			
 			visualizersManager.updateContent();
-//			sel.setSelection(s);
-//			selectedNodesList.setSelectedIndices(selIndices);
 		}
 	}
 	
@@ -171,11 +171,52 @@ public class WeightsEditor extends ShrinkPanelPlugin implements ListSelectionLis
 			selectedNodesList.setSelectedValue(n, true);
 			disableListeners = false;
 		}
+		updateInspector();
 	}
+	
+	
+	private void updateInspector() {
+		AdapterSet aSet = hif.getAdapters();
+		AdapterSet compSet = new AdapterSet();
+		List<Node<?,?,?>> listSelection = getSelectedNodes();
+		for (Adapter<?> a : aSet) {
+			if (a instanceof SelectionAdapter) continue;
+			boolean accept = true;
+			for (Object n : listSelection) {
+				accept &= a.canAccept(((Node<?,?,?>)n).getClass());
+				accept &= a.isGetter() && a.isSetter();
+			}
+			if (accept) {
+				compSet.add(a);
+			}
+		}
+		DefaultComboBoxModel adapterModel = new DefaultComboBoxModel();
+		for (Adapter<?> a : compSet) {
+			adapterModel.addElement(a);
+		}
+		adapterCombo.setModel(adapterModel);
+		adapterCombo.setSelectedIndex(0);
+	}
+	
+	
+	private List<Node<?,?,?>> getSelectedNodes() {
+		Object[] listSelection = selectedNodesList.getSelectedValues();
+		List<Node<?,?,?>> result = new LinkedList<Node<?,?,?>>();
+		for (Object o : listSelection) {
+			result.add((Node<?,?,?>)o);
+		}
+		return result;
+	}
+	
 	
 	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
 		return View.class;
+	}
+	
+	@Override
+	public PluginInfo getPluginInfo() {
+		return new PluginInfo("Node Property Editor", "Varylab Group");
 	}
 
 }
