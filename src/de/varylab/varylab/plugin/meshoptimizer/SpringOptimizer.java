@@ -29,8 +29,8 @@ import de.varylab.varylab.hds.adapter.AdaptedWeightFunction;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.hds.adapter.OriginalLength;
-import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.SpringFunctional;
+import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
@@ -44,8 +44,6 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 
 	private JPanel
 		panel = new JPanel();
-	private HalfedgeInterface
-		hif = null;
 	
 	private SpinnerNumberModel
 		edgeLengthModel = new SpinnerNumberModel(1.0,0.,100.,1.),
@@ -68,10 +66,13 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	
 	private SpringFunctional<VVertex, VEdge, VFace>
 		functional = new SpringFunctional<VVertex, VEdge, VFace>(
-			la, new ConstantWeight(1, true));
+			la, new ConstantWeight(1, true),false);
 
 	private JCheckBox
-		setLengthBox = new JCheckBox("update");
+		setLengthBox = new JCheckBox("update"),
+		diagonalsBox = new JCheckBox("diagonals");
+
+	private HalfedgeInterface hif;
 
 	public SpringOptimizer() {
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -113,6 +114,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		originalButton.setActionCommand(ORIGINAL);
 		edgeLengthGroup.add(constantButton);
 		constantButton.setActionCommand(CONSTANT);
+		panel.add(diagonalsBox, gbc);
 		
 		edgeLengthSpinner.addChangeListener(this);
 		springSpinner.addChangeListener(this);
@@ -123,6 +125,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		if(setLengthBox.isSelected()){
 			updateLength(hds);
 		}
+		functional.setDiagonals(diagonalsBox.isSelected());
 		AdapterSet aSet = hif.getAdapters();
 		functional.setWeight(new AdaptedWeightFunction(aSet));
 		return functional;
@@ -201,6 +204,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		JRViewerUtility.getContentPlugin(c);
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		
 	}
 
 }

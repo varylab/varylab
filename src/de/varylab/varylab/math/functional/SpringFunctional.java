@@ -30,7 +30,9 @@ public class SpringFunctional<
 	
 	private double power = 2.0;
 	
-	public SpringFunctional(Length<E> l0, WeightFunction<E> w) {
+	private boolean diagonals = false;
+	
+	public SpringFunctional(Length<E> l0, WeightFunction<E> w, boolean diagonals) {
 		this.length = l0;
 		this.weight = w;
 	}
@@ -63,33 +65,74 @@ public class SpringFunctional<
 				result += weight.getWeight(e)*Math.pow(el-length.getTargetLength(e),power);
 //			}
 		}
+		if(diagonals) {
+			for(F f: hds.getFaces()) {
+				List<V> vertices = HalfEdgeUtils.boundaryVertices(f);
+				for(int i = 0; i < vertices.size(); ++i) {
+					for(int j = 0; j < vertices.size(); ++j) {
+						V vi = vertices.get(i),
+						  vj = vertices.get(j);
+						FunctionalUtils.getPosition(vi, x, s);
+						FunctionalUtils.getPosition(vj, x, t);
+						double el = Rn.euclideanDistance(s, t);
+						result += Math.pow(el,power);
+					}
+				}
+			}
+		}
 		return result;
 	}
 
 	public void evaluateGradient(
 		//input
-			HalfEdgeDataStructure<V, E, F> G,
+			HalfEdgeDataStructure<V, E, F> hds,
 			DomainValue x,
 		//output
 			Gradient grad
 	) {
 		grad.setZero();
-		double[] vk = new double[3];
-		double[] vj = new double[3];
+		double[] s = new double[3];
+		double[] t = new double[3];
 		double[] smt = new double[3];
-		for (V v : G.getVertices()) {
-			FunctionalUtils.getPosition(v, x, vk);
+		for (V v : hds.getVertices()) {
+			FunctionalUtils.getPosition(v, x, s);
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
 				double tl = length.getTargetLength(e);
-				FunctionalUtils.getPosition(e.getStartVertex(), x, vj);
-				Rn.subtract(smt, vk, vj);
-				if(Rn.euclideanDistance(vk,vj)==0) {
+				FunctionalUtils.getPosition(e.getStartVertex(), x, t);
+				Rn.subtract(smt, s, t);
+				if(Rn.euclideanDistance(s,t)==0) {
 					continue;
 				}
-				double factor = (1-tl/Rn.euclideanDistance(vk, vj));
+				double factor = (1-tl/Rn.euclideanDistance(s, t));
 				int off = v.getIndex() * 3;
 				for (int d = 0; d < 3; d++) {
-					grad.add(off + d, power*Math.pow((vk[d] - vj[d]),power-1.0) * factor * weight.getWeight(e));
+					grad.add(off + d, power*Math.pow((s[d] - t[d]),power-1.0) * factor * weight.getWeight(e));
+				}
+			}
+		}
+		if(diagonals) {
+			for(F f: hds.getFaces()) {
+				List<V> vertices = HalfEdgeUtils.boundaryVertices(f);
+				for(int i = 0; i < vertices.size(); ++i) {
+					for(int j = 0; j < vertices.size(); ++j) {
+						V vi = vertices.get(i),
+						  vj = vertices.get(j);
+						FunctionalUtils.getPosition(vi, x, s);
+						FunctionalUtils.getPosition(vj, x, t);
+						Rn.subtract(smt, s, t);
+						if(Rn.euclideanDistance(s,t)==0) {
+							continue;
+						}
+						double factor = 1;
+						int off = vi.getIndex() * 3;
+						for (int d = 0; d < 3; d++) {
+							grad.add(off + d, power*Math.pow((s[d] - t[d]),power-1.0) * factor);
+						}
+						off = vj.getIndex() * 3;
+						for (int d = 0; d < 3; d++) {
+							grad.add(off + d, -power*Math.pow((s[d] - t[d]),power-1.0) * factor);
+						}
+					}
 				}
 			}
 		}
@@ -186,6 +229,11 @@ public class SpringFunctional<
 
 	public void setWeight(WeightFunction<E> weight) {
 		this.weight = weight;
+	}
+
+	public void setDiagonals(boolean diags) {
+		diagonals = diags;
+		
 	}
 
 }

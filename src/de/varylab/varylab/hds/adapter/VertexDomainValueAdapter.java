@@ -16,6 +16,7 @@ public class VertexDomainValueAdapter extends AbstractTypedAdapter<VVertex, VEdg
 	
 	public VertexDomainValueAdapter(DomainValue x) {
 		super(VVertex.class, null, null, double[].class, true, true);
+		this.x = x;
 	}
 	
 	@Override

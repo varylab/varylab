@@ -36,7 +36,7 @@ public class SpringRemeshingUtility {
 		Length<VEdge> lengths = new ConstantLengthAdapter(0.0);
 		WeightFunction<VEdge> weights = new TextureWeightAdapter();
 		SpringFunctional<VVertex, VEdge, VFace>	
-		 	fun = new SpringFunctional<VVertex, VEdge, VFace>(lengths, weights);
+		 	fun = new SpringFunctional<VVertex, VEdge, VFace>(lengths, weights,false);
 		optimize(
 			fun,
 			lattice.getHDS(),
@@ -63,7 +63,7 @@ public class SpringRemeshingUtility {
 		WeightFunction<VEdge> weights = new MapWeightAdapter(0.0, boundaryWeights);
 		Length<VEdge> lengths = new ConstantLengthAdapter(0.0);
 		SpringFunctional<VVertex, VEdge, VFace>	
-			fun = new SpringFunctional<VVertex, VEdge, VFace>(lengths, weights);
+			fun = new SpringFunctional<VVertex, VEdge, VFace>(lengths, weights,false);
 		optimize(
 			fun, 
 			lattice.getHDS(), 
