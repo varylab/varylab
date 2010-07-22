@@ -1,5 +1,7 @@
 package de.varylab.varylab;
 
+import javax.swing.UIManager;
+
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
@@ -140,7 +142,8 @@ public class VaryLab {
 	
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		NativePathUtility.set("native");
 		JRViewer v = new JRViewer();
 		v.setPropertiesFile("VaryLab.xml");

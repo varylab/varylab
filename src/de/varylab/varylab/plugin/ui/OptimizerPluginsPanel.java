@@ -35,6 +35,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import de.jreality.plugin.basic.View;
+import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
@@ -173,6 +174,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		
 	}
 	
+	
 	private class SpinnerCellEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer, ChangeListener {
 
 		private static final long 
@@ -259,6 +261,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	private void updatePluginTable() {
 		pluginTable.setModel(new PluginTableModel());
 		pluginTable.getColumnModel().getColumn(0).setMaxWidth(30);
+		pluginTable.getColumnModel().getColumn(0).setCellRenderer(new IconCellRenderer());
 		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
 		pluginTable.getColumnModel().getColumn(3).setMaxWidth(60);
 		pluginTable.getColumnModel().getColumn(3).setCellEditor(new SpinnerCellEditor());
