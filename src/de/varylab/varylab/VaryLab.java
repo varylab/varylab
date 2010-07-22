@@ -144,6 +144,7 @@ public class VaryLab {
 	
 	public static void main(String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		UIManager.getDefaults().put("Slider.paintValue", false);
 		NativePathUtility.set("native");
 		JRViewer v = new JRViewer();
 		v.setPropertiesFile("VaryLab.xml");
