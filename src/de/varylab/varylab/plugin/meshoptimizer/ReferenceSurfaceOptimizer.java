@@ -13,7 +13,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import de.jreality.plugin.basic.Content;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.reader.Readers;
@@ -83,6 +82,8 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		panel.add(showSurfaceChecker,c2);
 		showSurfaceChecker.addActionListener(this);
 		loadButton.addActionListener(this);
+		
+		chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 	}
 	
 	@Override
@@ -117,6 +118,10 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 			}
 			loadFile();
 			AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
+			if (refSGC == null) {
+				functional.setReferenceSurface(null, as);
+				return;
+			}
 			converter.ifs2heds((IndexedFaceSet)SceneGraphUtility.getFirstGeometry(refSGC), refSurface, as);
 			functional.setReferenceSurface(refSurface, as);
 		} else if (showSurfaceChecker == src) {
@@ -147,6 +152,8 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			refSGC = null;
 		}
 	}
 

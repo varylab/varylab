@@ -15,7 +15,6 @@ import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
-import de.jreality.plugin.content.CenteredAndScaledContent;
 import de.jreality.scene.Camera;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -33,7 +32,12 @@ import de.varylab.varylab.utilities.SelectionUtility;
 
 public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 
-	JButton
+	
+	private HalfedgeInterface 
+		hif = null;
+	private Scene 
+		scene = null;
+	private JButton
 		selectGeodesicButton = new JButton("Select Geodesic"),
 		selectLatticeButton = new JButton("Select Lattice"),
 		smoothCombButton = new JButton("Smooth (Comb.)"),
@@ -41,14 +45,8 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		yzViewButton = new JButton("yz"),
 		xzViewButton = new JButton("xz"),
 		togglePerspectiveButton = new JButton("persp.");
-	
-	HalfedgeInterface 
-		hif = null;
 
-	private Scene scene;
 
-	private CenteredAndScaledContent content;
-	
 	public Toolbox() {
 		shrinkPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc1 = new GridBagConstraints();
@@ -124,12 +122,11 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		scene = c.getPlugin(Scene.class);
-		content = c.getPlugin(CenteredAndScaledContent.class);
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Geodesic Selector", "Thilo Roerig");
+		return new PluginInfo("Halfedge Toolbox", "Thilo Roerig");
 	}
 
 	@Override
