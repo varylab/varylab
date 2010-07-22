@@ -123,8 +123,7 @@ public class CurvatureVisualizer extends VisualizerPlugin implements ActionListe
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void initVisualization(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		VHDS mesh = hif.get(new VHDS());
-		Triangulator t = new Triangulator();
-		t.triangulate(mesh);
+		Triangulator.triangulate(mesh);
 		VVertex[] kdVertices = mesh.getVertices().toArray(new VVertex[0]);
 		KdTree<VVertex> kd = new KdTree<VVertex>(kdVertices, 10, false);
 		double scale = CurvatureUtility.meanEdgeLength(mesh);

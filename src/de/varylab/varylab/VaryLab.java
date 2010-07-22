@@ -52,6 +52,7 @@ import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
+import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
@@ -123,6 +124,7 @@ public class VaryLab {
 		v.registerPlugin(new HyperbolicPatchVisualizer());
 		v.registerPlugin(new NodeIndexVisualizer());
 		v.registerPlugin(new WeightsVisualizer());
+		v.registerPlugin(new GeodesicLabelVisualizer());
 	}
 
 
