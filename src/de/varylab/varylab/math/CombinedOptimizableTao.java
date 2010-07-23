@@ -6,6 +6,7 @@ import static de.varylab.jtao.TaoAppAddHess.PreconditionerType.SAME_NONZERO_PATT
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
@@ -15,6 +16,8 @@ import de.varylab.jtao.TaoAppAddCombinedObjectiveAndGrad;
 import de.varylab.jtao.TaoAppAddHess;
 import de.varylab.jtao.TaoApplication;
 import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.hds.adapter.VertexDomainValueAdapter;
+import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class CombinedOptimizableTao extends TaoApplication implements
 		TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess {
@@ -25,7 +28,8 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		fun = null;
 	private List<Constraint>
 		constraints = new LinkedList<Constraint>();
-		
+	private boolean
+		smoothing = false;
 
 	public CombinedOptimizableTao(VHDS hds, CombinedFunctional fun) {
 		this.hds = hds;
@@ -41,6 +45,9 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		constraints.remove(c);
 	}
 
+	public void enableSmoothing(boolean smoothing) {
+		this.smoothing = smoothing;
+	}
 
 	public static class TaoU implements DomainValue {
 
@@ -157,9 +164,15 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		SimpleEnergy E = new SimpleEnergy();
 		fun.evaluate(hds, u, E, G, null);
 		applyConstraints(u, G, null);
+		if(smoothing) applySmoothing(u);
 		g.assemble();
 		return E.get();
 	}
+
+	private void applySmoothing(DomainValue x) {
+		LaplacianSmoothing.smoothCombinatorially(hds, new AdapterSet(new VertexDomainValueAdapter(x)), true);
+	}
+
 
 	@Override
 	public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {

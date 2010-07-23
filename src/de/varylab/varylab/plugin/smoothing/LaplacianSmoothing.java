@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.smoothing;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,13 +27,15 @@ public class LaplacianSmoothing {
 			AdapterSet as, 
 			boolean ignoreBoundary) 
 	{
+		if(vertices == null || vertices.size() == 0) {
+			return;
+		}
+		
 		HashMap<V, double[]> oldPositionMap = new HashMap<V, double[]>();
 		for(V v : hds.getVertices()) {
 			oldPositionMap.put(v, as.get(Position.class, v, double[].class));
 		}
-		if(vertices.size() == 0) {
-			vertices.addAll(hds.getVertices());
-		}
+		
 		for(V v : vertices) {
 			if(ignoreBoundary && HalfEdgeUtils.isBoundaryVertex(v)) {
 				continue;
@@ -45,9 +47,19 @@ public class LaplacianSmoothing {
 				Rn.add(newPos,newPos,oldPositionMap.get(nv));
 			}
 			Rn.times(newPos, 1.0/(2*neighs.size()), newPos);
-			System.out.println(Arrays.toString(newPos));
 			as.set(Position.class, v, newPos);
 		}
 	}
 	
+	public static <
+		V extends Vertex<V,E,F>,
+		E extends Edge<V,E,F>, 
+		F extends Face<V,E,F>, 
+		HDS extends HalfEdgeDataStructure<V,E,F> 
+	> void smoothCombinatorially(
+		HDS hds, 
+		AdapterSet as, 
+		boolean ignoreBoundary) {
+		smoothCombinatorially(hds, new HashSet<V>(hds.getVertices()), as, ignoreBoundary);
+	}
 }

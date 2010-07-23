@@ -32,7 +32,6 @@ import de.varylab.varylab.utilities.SelectionUtility;
 
 public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 
-	
 	private HalfedgeInterface 
 		hif = null;
 	private Scene 
@@ -45,7 +44,6 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		yzViewButton = new JButton("yz"),
 		xzViewButton = new JButton("xz"),
 		togglePerspectiveButton = new JButton("persp.");
-
 
 	public Toolbox() {
 		shrinkPanel.setLayout(new GridBagLayout());
@@ -132,6 +130,8 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
+		double[] oldTrafo = scene.getContentComponent().getTransformation().getMatrix();
+		double scale = oldTrafo[15];
 		if(selectGeodesicButton == src) {
 			selectGeodesic();
 		} else if (selectLatticeButton == src) {
@@ -139,17 +139,20 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		} else if (smoothCombButton == src) {
 			VHDS hds = hif.get(new VHDS());
 			Set<VVertex> selectedVerts = hif.getSelection().getVertices(hds);
+			if(selectedVerts.size() == 0) {
+				selectedVerts.addAll(hds.getVertices());
+			}
 			LaplacianSmoothing.smoothCombinatorially(hds, selectedVerts, hif.getAdapters(), true);
 			hif.set(hds);
 		} else if (xyViewButton == src) {
-			Matrix trafo = MatrixBuilder.euclidean().rotateX(0).getMatrix();
+			Matrix trafo = MatrixBuilder.euclidean().rotateX(0).scale(scale).getMatrix();
 			trafo.assignTo(scene.getContentComponent());
 			
 		} else if (yzViewButton == src) {
-			Matrix trafo = MatrixBuilder.euclidean().rotateY(Math.PI/2.0).getMatrix();
+			Matrix trafo = MatrixBuilder.euclidean().rotateY(Math.PI/2.0).scale(scale).getMatrix();
 			trafo.assignTo(scene.getContentComponent());
 		} else if (xzViewButton == src) {
-			Matrix trafo = MatrixBuilder.euclidean().rotateX(Math.PI/2.0).getMatrix();
+			Matrix trafo = MatrixBuilder.euclidean().rotateX(Math.PI/2.0).scale(scale).getMatrix();
 			trafo.assignTo(scene.getContentComponent());
 		} else if (togglePerspectiveButton == src) {
 			Camera cam = scene.getCameraComponent().getCamera();

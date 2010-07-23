@@ -1,6 +1,7 @@
 package de.varylab.varylab.math.functional;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -118,14 +119,17 @@ public class ReferenceSurfaceFunctional<
 		double[] closestPointOnSurface = new double[3];
 		double[] pointOnSurface = new double[3];
 		double distance = -1;
+		HashSet<F> visitedFaces = new HashSet<F>();
 		for(V vc : closest) {
 			for(F f: HalfEdgeUtilsExtra.getFaceStar(vc)) {
+				if(visitedFaces.contains(f)) continue;
 				pointOnSurface = projectOnto(vpos,f,ras);
 				double actDist = Rn.euclideanDistanceSquared(pointOnSurface, vpos);
 				if(distance == -1 || actDist < distance) {
 					System.arraycopy(pointOnSurface, 0, closestPointOnSurface, 0, 3);
 					distance = actDist;
 				}
+				visitedFaces.add(f);
 			}
 		}
 		return closestPointOnSurface;
@@ -159,7 +163,7 @@ public class ReferenceSurfaceFunctional<
 		if(bc[2] < 0) {
 			proj = projectOntoLine(proj,vt1,vt2);
 		}
-		return Rn.add(null,proj,vt1);
+		return Rn.add(null,proj,v1);
 	}
 	
 	private double[] projectOntoLine(double[] pos, double[] v, double[] w) {
@@ -205,7 +209,7 @@ public class ReferenceSurfaceFunctional<
 			double[] pt = closestPointMap.get(v);
 			double[] vpos = new double[3];
 			FunctionalUtils.getPosition(v, x, vpos);
-			double[] v2pt = Rn.subtract(null, pt, vpos);
+			double[] v2pt = Rn.subtract(null, vpos, pt);
 			Rn.times(v2pt, 2.0, v2pt);
 			FunctionalUtils.addVectorToGradient(grad, 3*v.getIndex(), v2pt);
 		}

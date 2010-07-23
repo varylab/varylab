@@ -93,7 +93,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		fixYChecker = new JCheckBox("Y"),
 		fixZChecker = new JCheckBox("Z"),
 		tangentialConstraintChecker = new JCheckBox("Tangential"),
-		smoothGradientChecker = new JCheckBox("Smooth Gradient"); 
+		smoothGradientChecker = new JCheckBox("Smooth Gradient"),
+		smoothSurfaceChecker = new JCheckBox("SmoothSurface"); 
 	
 	private SpinnerNumberModel
 		accuracyModel = new SpinnerNumberModel(-8, -20, -1, -1),
@@ -135,7 +136,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(fixBoundaryZChecker, gbc2);
 		constraintsPanel.add(moveAlongBoundaryChecker, gbc2);
 		constraintsPanel.add(tangentialConstraintChecker, gbc2);
-		constraintsPanel.add(smoothGradientChecker, gbc2);
+		constraintsPanel.add(smoothGradientChecker, gbc1);
+		constraintsPanel.add(smoothSurfaceChecker,gbc2);
 		shrinkPanel.add(constraintsPanel, gbc2);
 		
 		shrinkPanel.add(fixHeightChecker, gbc2);
@@ -205,6 +207,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		if(smoothGradientChecker.isSelected()) {
 			app.addConstraint(new SmoothGradientConstraint());
 		}
+		app.enableSmoothing(smoothSurfaceChecker.isSelected());
+		
 		Vec x = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
 			x.setValue(v.getIndex() * 3 + 0, v.position[0], InsertMode.INSERT_VALUES);

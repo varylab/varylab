@@ -13,11 +13,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.reader.Readers;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.viewerapp.FileLoaderDialog;
 import de.jreality.util.Input;
 import de.jreality.util.SceneGraphUtility;
@@ -25,6 +25,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VEdge;
@@ -51,7 +52,8 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		chooser = FileLoaderDialog.createFileChooser();
 
 	private JCheckBox
-		showSurfaceChecker = new JCheckBox("Show Surface");
+		showSurfaceChecker = new JCheckBox("Show Surface"),
+		wireFrameChecker = new JCheckBox("Wireframe");
 	
 	private View view;
 
@@ -62,7 +64,8 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	private ConverterJR2Heds 
 		converter = new ConverterJR2Heds();
 
-	private Scene scene;
+	private HalfedgeInterface 
+		hif = null;
 	
 	public ReferenceSurfaceOptimizer() {
 		panel.setLayout(new GridBagLayout());
@@ -79,8 +82,11 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		c2.weightx = 1.0;
 		c2.gridwidth = GridBagConstraints.REMAINDER;
 		panel.add(loadButton,c2);
-		panel.add(showSurfaceChecker,c2);
+		panel.add(showSurfaceChecker,c1);
+		panel.add(wireFrameChecker,c2);
+		wireFrameChecker.setEnabled(false);
 		showSurfaceChecker.addActionListener(this);
+		wireFrameChecker.addActionListener(this);
 		loadButton.addActionListener(this);
 		
 		chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
@@ -114,21 +120,28 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		if(loadButton == src) {
 			if(showSurfaceChecker.isSelected()) {
 				showSurfaceChecker.setSelected(false);
-				scene.getContentComponent().removeChild(refSGC);
+				hif.getAuxComponent().removeChild(refSGC);
 			}
 			loadFile();
 			AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
-			if (refSGC == null) {
-				functional.setReferenceSurface(null, as);
-				return;
-			}
 			converter.ifs2heds((IndexedFaceSet)SceneGraphUtility.getFirstGeometry(refSGC), refSurface, as);
 			functional.setReferenceSurface(refSurface, as);
 		} else if (showSurfaceChecker == src) {
 			if(showSurfaceChecker.isSelected()) {
-				scene.getContentComponent().addChild(refSGC);
+				hif.getAuxComponent().addChild(refSGC);
+				wireFrameChecker.setEnabled(true);
+				if(wireFrameChecker.isSelected()) {
+					refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
+				}
 			} else {
-				scene.getContentComponent().removeChild(refSGC);
+				hif.getAuxComponent().removeChild(refSGC);
+				wireFrameChecker.setEnabled(false);
+			}
+		} else if(wireFrameChecker == src) {
+			if(wireFrameChecker.isSelected()) {
+				refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
+			} else {
+				refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, true);
 			}
 		}
 		
@@ -137,7 +150,7 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	@Override
 	public void install(Controller c) throws Exception {
 		view = c.getPlugin(View.class);
-		scene = c.getPlugin(Scene.class);
+		hif = c.getPlugin(HalfedgeInterface.class);
 		super.install(c);
 	}
 	
