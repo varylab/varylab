@@ -18,6 +18,10 @@ import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
+import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
@@ -33,6 +37,8 @@ import de.varylab.varylab.plugin.editor.VertexEditorPlugin;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
+import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
+import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
@@ -84,7 +90,7 @@ public class VaryLab {
 		v.registerPlugin(new HeightFieldEditor());
 		
 		addOptimizationPlugins(v);
-
+		addLnFPlugins(v);
 		addVisualizerPlugins(v);
 		
 		v.registerPlugin(new CatmullClarkPlugin());
@@ -146,15 +152,23 @@ public class VaryLab {
 		v.registerPlugin(new ReferenceSurfaceOptimizer());
 	}
 	
+	private static void addLnFPlugins(JRViewer v) {
+		v.registerPlugin(new LookAndFeelSwitch());
+		v.registerPlugin(new FHLookAndFeel());
+		v.registerPlugin(new TinyLookAndFeel());
+		v.registerPlugin(new CrossPlatformLnF());
+		v.registerPlugin(new NimbusLnF());
+		v.registerPlugin(new SystemLookAndFeel());
+	}
 	
 	
 	public static void main(String[] args) throws Exception {
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		UIManager.getDefaults().put("Slider.paintValue", false);
 		NativePathUtility.set("native");
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
+		v.getController().setManageLookAndFeel(true);
 		v.setPropertiesFile("VaryLab.xml");
 		v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
 		v.setShowPanelSlots(true, true, true, true);

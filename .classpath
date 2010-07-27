@@ -8,6 +8,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MTJOptimization"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
 	<classpathentry kind="lib" path="lib/jPETScTaoV1.7jPETScTao.jar"/>
+	<classpathentry kind="lib" path="lib/fhlaf_1.0b2_bin.jar"/>
+	<classpathentry kind="lib" path="lib/tinylaf-1.4.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry kind="lib" path="/MTJOptimization/lib/mtj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
