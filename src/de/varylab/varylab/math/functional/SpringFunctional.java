@@ -58,12 +58,10 @@ public class SpringFunctional<
 		double[] t = new double[3];
 		double result = 0.0;
 		for (E e : hds.getPositiveEdges()) {
-//			if(e.getLeftFace() != null && e.getRightFace() != null) {
-				FunctionalUtils.getPosition(e.getStartVertex(), x, s);
-				FunctionalUtils.getPosition(e.getTargetVertex(), x, t);
-				double el = Rn.euclideanDistance(s, t);
-				result += weight.getWeight(e)*Math.pow(el-length.getTargetLength(e),power);
-//			}
+			FunctionalUtils.getPosition(e.getStartVertex(), x, s);
+			FunctionalUtils.getPosition(e.getTargetVertex(), x, t);
+			double el = Rn.euclideanDistance(s, t);
+			result += weight.getWeight(e)*Math.pow(el-length.getTargetLength(e),power);
 		}
 		if(diagonals) {
 			for(F f: hds.getFaces()) {

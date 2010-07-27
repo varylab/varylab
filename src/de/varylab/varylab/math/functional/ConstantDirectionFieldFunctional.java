@@ -5,7 +5,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
@@ -49,11 +48,9 @@ public class ConstantDirectionFieldFunctional<
 	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
 		double result = 0.0;
 		for(V v : hds.getVertices()) {
-			if(!HalfEdgeUtils.isBoundaryVertex(v)) {
-				double[] vv = new double[3];
-				FunctionalUtils.getPosition(v, x, vv);
-				result += Rn.innerProduct(dir,vv);
-			}
+			double[] vv = new double[3];
+			FunctionalUtils.getPosition(v, x, vv);
+			result += Rn.innerProduct(dir,vv);
 		}
 		return result;
 	}

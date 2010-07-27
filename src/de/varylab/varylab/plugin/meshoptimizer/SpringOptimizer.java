@@ -1,7 +1,6 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
@@ -69,44 +68,38 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 			la, new ConstantWeight(1, true),false);
 
 	private JCheckBox
-		setLengthBox = new JCheckBox("update"),
+		updateLength = new JCheckBox("update"),
 		diagonalsBox = new JCheckBox("diagonals");
 
 	private HalfedgeInterface hif;
 
 	public SpringOptimizer() {
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 0.0;
+		GridBagConstraints c1 = new GridBagConstraints();
+		c1.insets = new Insets(1,1,1,1);
+		c1.fill = GridBagConstraints.BOTH;
+		c1.anchor = GridBagConstraints.WEST;
+		c1.weightx = 1.0;
+		c1.gridwidth = 1;
+		GridBagConstraints c2 = new GridBagConstraints();
+		c2.insets = new Insets(1,1,1,1);
+		c2.fill = GridBagConstraints.BOTH;
+		c2.anchor = GridBagConstraints.WEST;
+		c2.weightx = 1.0;
+		c2.gridwidth = GridBagConstraints.REMAINDER;
 		
-		gbc.insets = new Insets(2, 2, 2, 2);
-		panel.setLayout(new GridBagLayout());
+		panel.add(diagonalsBox, c1);
+		panel.add(updateLength ,c2);
 		
-		gbc.weightx = 0;
-		gbc.gridwidth = 3;
-		panel.add(new JLabel("Edge Length"),gbc);
-		
-		gbc.weightx = 1.;
-		gbc.gridwidth = 1;
-//		averageBox.setIcon(ImageHook.getIcon("average16w.png"));
-//		averageBox.setSelectedIcon(ImageHook.getIcon("average16.png"));
-//		panel.add(averageBox,gbc);
-		panel.add(constantButton,gbc);
-		panel.add(averageButton,gbc);
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		originalButton.setSelected(true);
-		panel.add(originalButton,gbc);
-		gbc.gridwidth = 3;
-		panel.add(setLengthBox ,gbc);
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		panel.add(edgeLengthSpinner,gbc);
+		panel.add(new JLabel("Length"),c1);
+		panel.add(edgeLengthSpinner,c2);
 
-		gbc.weightx = .0;
-		gbc.gridwidth = 3;
-		panel.add(new JLabel("Spring Constant"),gbc);
-		gbc.weightx = 1;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		panel.add(springSpinner,gbc);
+		panel.add(constantButton,c1);
+		panel.add(averageButton,c1);
+		originalButton.setSelected(true);
+		panel.add(originalButton,c2);
+		
+		panel.add(new JLabel("Strength"),c1);
+		panel.add(springSpinner,c2);
 
 		edgeLengthGroup.add(averageButton);
 		averageButton.setActionCommand(AVERAGE);
@@ -114,7 +107,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		originalButton.setActionCommand(ORIGINAL);
 		edgeLengthGroup.add(constantButton);
 		constantButton.setActionCommand(CONSTANT);
-		panel.add(diagonalsBox, gbc);
+		
 		
 		edgeLengthSpinner.addChangeListener(this);
 		springSpinner.addChangeListener(this);
@@ -122,7 +115,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
-		if(setLengthBox.isSelected()){
+		if(updateLength.isSelected()){
 			updateLength(hds);
 		}
 		functional.setDiagonals(diagonalsBox.isSelected());
