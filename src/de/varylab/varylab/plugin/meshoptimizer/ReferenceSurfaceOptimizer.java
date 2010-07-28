@@ -87,6 +87,7 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		panel.add(showSurfaceChecker,c1);
 		panel.add(wireFrameChecker,c2);
 		wireFrameChecker.setEnabled(false);
+		showSurfaceChecker.setEnabled(false);
 		showSurfaceChecker.addActionListener(this);
 		wireFrameChecker.addActionListener(this);
 		loadButton.addActionListener(this);
@@ -128,6 +129,7 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 			AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
 			converter.ifs2heds((IndexedFaceSet)SceneGraphUtility.getFirstGeometry(refSGC), refSurface, as);
 			functional.setReferenceSurface(refSurface, as);
+			showSurfaceChecker.setEnabled(true);
 		} else if (showSurfaceChecker == src) {
 			if(showSurfaceChecker.isSelected()) {
 				hif.getAuxComponent().addChild(refSGC);

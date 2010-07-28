@@ -9,7 +9,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
@@ -21,6 +20,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.remeshing.RemeshingUtility;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.utilities.SelectionUtility;
 
 public class StripSubdivisionPlugin extends HalfedgeAlgorithmPlugin {
 
@@ -60,9 +60,20 @@ public class StripSubdivisionPlugin extends HalfedgeAlgorithmPlugin {
 	> void subdivideStrip1D(F f, E fe, VertexPositionCalculator vc)
 	{
 		LinkedList<F> stripFaces = new LinkedList<F>();
+		LinkedList<E> stripEdges = new LinkedList<E>();
 		LinkedList<V> stripVertices = new LinkedList<V>();
 		
-		generateStrip1D(f, fe, vc, stripFaces, stripVertices);
+		SelectionUtility.generateStrip1D(f, fe, stripFaces, stripEdges);
+		
+		for(E se: stripEdges) {
+			if(se.isPositive()) {
+				V 	v1 = se.getStartVertex(),
+				v2 = se.getTargetVertex(),
+				v = TopologyAlgorithms.splitEdge(se);
+				vc.set(v,Rn.times(null, 0.5, Rn.add(null,vc.get(v1),vc.get(v2))));
+				stripVertices.addLast(v);
+			}
+		}
 		for(int i = 0; i < stripFaces.size(); ++i) {
 			RemeshingUtility.splitFaceAt(
 					stripFaces.get(i),
@@ -71,86 +82,6 @@ public class StripSubdivisionPlugin extends HalfedgeAlgorithmPlugin {
 		}
 	}
 
-	private  <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HEDS extends HalfEdgeDataStructure<V, E, F>
-	> void generateStrip1D(F f, E fe, VertexPositionCalculator vc,
-			LinkedList<F> stripFaces,
-			LinkedList<V> stripVertices)
-	{
-		LinkedList<E> stripEdges = new LinkedList<E>();
-		stripFaces.addFirst(f);
-		E e = fe;
-		stripEdges.addLast(e);
-		
-		F rf = e.getRightFace();
-		while(e.getRightFace() != null) {
-			if(HalfEdgeUtils.isInteriorFace(rf) && (HalfEdgeUtils.boundaryEdges(rf).size() % 2) != 0) {
-				break;
-			}
-			stripFaces.addLast(rf);
-			e = getOppositeEdgeInFace(e.getOppositeEdge());
-			if(e == null) {
-				break;
-			}
-			rf = e.getRightFace();
-			stripEdges.addLast(e);
-		}
-		e = getOppositeEdgeInFace(fe);
-		if(e == null) {
-			return;
-		}
-		stripEdges.addFirst(e.getOppositeEdge());
-		rf = e.getRightFace();
-		while(rf != null) {
-			if(HalfEdgeUtils.isInteriorFace(rf) && (HalfEdgeUtils.boundaryEdges(rf).size() % 2) != 0) {
-				break;
-			}
-			stripFaces.addFirst(rf);
-			e = getOppositeEdgeInFace(e.getOppositeEdge());
-			if(e == null) {
-				break;
-			}
-			rf = e.getRightFace();
-			stripEdges.addFirst(e.getOppositeEdge());
-		}
-		for(E se: stripEdges) {
-			V 	v1 = se.getStartVertex(),
-				v2 = se.getTargetVertex(),
-				v = TopologyAlgorithms.splitEdge(se);
-			vc.set(v,Rn.times(null, 0.5, Rn.add(null,vc.get(v1),vc.get(v2))));
-			stripVertices.addLast(v);
-		}
-	}
-
-
-	private <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
-	> E getOppositeEdgeInFace(E e) {
-		F f = e.getLeftFace();
-		E oe = e;
-		if((HalfEdgeUtils.boundaryEdges(f).size() % 2) == 0) {
-			for(int i = 0; i < HalfEdgeUtils.boundaryEdges(f).size()/2; ++i) {
-				oe = oe.getNextEdge();
-			}
-		} else {
-			if(!HalfEdgeUtils.isInteriorFace(f)) {
-				for(E be : HalfEdgeUtils.boundaryEdges(f)) {
-					if(be.getRightFace() == null) {
-						return be;
-					}
-				}
-			} else {
-				return null;
-			}
-		}
-		return oe;
-	}
-	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Strip Subdivider", "Thilo Roerig");
