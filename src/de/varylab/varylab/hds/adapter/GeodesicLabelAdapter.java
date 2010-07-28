@@ -17,6 +17,7 @@ public class GeodesicLabelAdapter extends AbstractTypedAdapter<VVertex, VEdge, V
 		super(null, VEdge.class, null, Integer.class, true, true);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -29,6 +30,7 @@ public class GeodesicLabelAdapter extends AbstractTypedAdapter<VVertex, VEdge, V
 		return -1;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

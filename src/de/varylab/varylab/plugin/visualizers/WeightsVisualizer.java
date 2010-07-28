@@ -120,6 +120,7 @@ public class WeightsVisualizer extends VisualizerPlugin implements ActionListene
 		placesModel.setValue(c.getProperty(getClass(), "decimalPlaces", placesModel.getNumber().intValue()));
 	}
 	
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

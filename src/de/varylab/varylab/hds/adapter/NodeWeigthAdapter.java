@@ -18,6 +18,7 @@ public class NodeWeigthAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFac
 		super(VVertex.class, VEdge.class, VFace.class, Double.class, true, true);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -36,6 +37,7 @@ public class NodeWeigthAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFac
 		return 0.0;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
