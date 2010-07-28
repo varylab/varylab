@@ -1,0 +1,80 @@
+package de.varylab.varylab.plugin.selection;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
+
+public class LatticeSelection extends AlgorithmPlugin {
+
+	
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Selection;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Lattice";
+	}
+	
+	@Override
+	public double getPriority() {
+		return 1;
+	}
+
+	@Override
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
+		HalfedgeSelection hes = hif.getSelection();
+		Set<V> all = new HashSet<V>();
+		for(V v : hif.getSelection().getVertices(hds)) {
+			all.addAll(selectSublattice(v));
+		}
+		hes.addAll(all);
+		hif.setSelection(hes);
+	}
+	
+	
+	private  <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> Set<V> selectSublattice(V v) {
+		Set<V> sl = new HashSet<V>();
+		Stack<V> queue = new Stack<V>();
+		queue.add(v);
+		while(!queue.isEmpty()) {
+			V av = queue.pop();
+			if(sl.contains(av)) {
+				continue;
+			}
+			for(E e : HalfEdgeUtilsExtra.get1Ring(av)) {
+				if(HalfEdgeUtils.isBoundaryEdge(e)) {
+					continue;
+				}
+				V tv = e.getOppositeEdge().getNextEdge().getTargetVertex();
+				queue.add(tv);
+			}
+			sl.add(av);
+		}
+		return sl;
+	}
+
+}

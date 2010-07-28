@@ -1,17 +1,19 @@
 package de.varylab.varylab.plugin;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.ui.OptimizerPluginsPanel;
 
-public abstract class OptimizerPlugin extends Plugin {
+public abstract class OptimizerPlugin extends Plugin implements UIFlavor {
 
 	protected OptimizerPluginsPanel
 		manager = null;
@@ -40,6 +42,14 @@ public abstract class OptimizerPlugin extends Plugin {
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		if (getOptionPanel() != null) {
+			SwingUtilities.updateComponentTreeUI(getOptionPanel());
+		}
 	}
 	
 }

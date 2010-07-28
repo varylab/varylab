@@ -1,8 +1,11 @@
 package de.varylab.varylab.plugin.subdivision;
 
+import java.awt.event.InputEvent;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -14,15 +17,15 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.remeshing.RemeshingUtility;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.utilities.SelectionUtility;
 
-public class StripSubdivisionPlugin extends HalfedgeAlgorithmPlugin {
+public class StripSubdivisionPlugin extends AlgorithmPlugin {
 
 	@Override
 	public <
@@ -80,6 +83,11 @@ public class StripSubdivisionPlugin extends HalfedgeAlgorithmPlugin {
 					stripVertices.get(i),
 					stripVertices.get(i+1));
 		}
+	}
+	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('S', InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK);
 	}
 
 	@Override

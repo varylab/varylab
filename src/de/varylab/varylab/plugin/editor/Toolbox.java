@@ -5,10 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.swing.JButton;
 
@@ -17,20 +14,14 @@ import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Camera;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
-import de.varylab.varylab.utilities.SelectionUtility;
 
 public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 
@@ -39,9 +30,6 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 	private Scene 
 		scene = null;
 	private JButton
-		selectGeodesicButton = new JButton("Select Geodesic"),
-		selectStripButton = new JButton("Select Strip"),
-		selectLatticeButton = new JButton("Select Lattice"),
 		smoothCombButton = new JButton("Smooth (Comb.)"),
 		xyViewButton = new JButton("xy"),
 		yzViewButton = new JButton("yz"),
@@ -60,17 +48,11 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		gbc2.weightx = 1.0;
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
-		shrinkPanel.add(selectGeodesicButton,gbc1);
-		shrinkPanel.add(selectStripButton,gbc2);
-		shrinkPanel.add(selectLatticeButton,gbc2);
 		shrinkPanel.add(smoothCombButton,gbc2);
 		shrinkPanel.add(xyViewButton,gbc1);
 		shrinkPanel.add(yzViewButton,gbc1);
 		shrinkPanel.add(xzViewButton,gbc1);
 		shrinkPanel.add(togglePerspectiveButton, gbc2);
-		selectGeodesicButton.addActionListener(this);
-		selectStripButton.addActionListener(this);
-		selectLatticeButton.addActionListener(this);
 		smoothCombButton.addActionListener(this);
 		xyViewButton.addActionListener(this);
 		yzViewButton.addActionListener(this);
@@ -78,47 +60,7 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		togglePerspectiveButton.addActionListener(this);
 	}
 	
-	private void selectGeodesic() {
-		VHDS hds = hif.get(new VHDS());
-		HalfedgeSelection hes = hif.getSelection();
-		Set<VEdge> all = new HashSet<VEdge>();
-		for(VEdge e : hif.getSelection().getEdges(hds)) {
-			all.addAll(SelectionUtility.selectGeodesic(e, hds));
-		}
-		hes.addAll(all);
-		hif.setSelection(hes);
-	}
 
-	private void selectLattice() {
-		VHDS hds = hif.get(new VHDS());
-		HalfedgeSelection hes = hif.getSelection();
-		Set<VVertex> all = new HashSet<VVertex>();
-		for(VVertex v : hif.getSelection().getVertices(hds)) {
-			all.addAll(selectSublattice(v, hds));
-		}
-		hes.addAll(all);
-		hif.setSelection(hes);
-	}
-	private Set<VVertex> selectSublattice(VVertex v, VHDS hds) {
-		Set<VVertex> sl = new HashSet<VVertex>();
-		Stack<VVertex> queue = new Stack<VVertex>();
-		queue.add(v);
-		while(!queue.isEmpty()) {
-			VVertex av = queue.pop();
-			if(sl.contains(av)) {
-				continue;
-			}
-			for(VEdge e : HalfEdgeUtilsExtra.get1Ring(av)) {
-				if(HalfEdgeUtils.isBoundaryEdge(e)) {
-					continue;
-				}
-				VVertex tv = e.getOppositeEdge().getNextEdge().getTargetVertex();
-				queue.add(tv);
-			}
-			sl.add(av);
-		}
-		return sl;
-	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -137,13 +79,7 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		Object src = e.getSource();
 		double[] oldTrafo = scene.getContentComponent().getTransformation().getMatrix();
 		double scale = oldTrafo[15];
-		if(selectGeodesicButton == src) {
-			selectGeodesic();
-		} else if (selectLatticeButton == src) {
-			selectLattice();
-		} else if(selectStripButton == src) {
-			selectStrip();
-		} else if (smoothCombButton == src) {
+		if (smoothCombButton == src) {
 			VHDS hds = hif.get(new VHDS());
 			Set<VVertex> selectedVerts = hif.getSelection().getVertices(hds);
 			if(selectedVerts.size() == 0) {
@@ -165,27 +101,6 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 			Camera cam = scene.getCameraComponent().getCamera();
 			cam.setPerspective(!cam.isPerspective());	
 		}
-	}
-
-	private void selectStrip() {
-		VHDS hds = hif.get(new VHDS());
-		HalfedgeSelection hes = hif.getSelection();
-		HashSet<VEdge> edges = new HashSet<VEdge>(hes.getEdges(hds));
-		Set<VFace> faces = hes.getFaces(hds);
-		LinkedList<VFace> stripFaces = new LinkedList<VFace>();
-		LinkedList<VEdge> stripEdges = new LinkedList<VEdge>();
-		for(VFace f:faces) {
-			for(VEdge e : HalfEdgeUtils.boundaryEdges(f)) {
-				stripFaces.clear();
-				stripEdges.clear();
-				if(edges.contains(e)) {
-					SelectionUtility.generateStrip1D(f, e, stripFaces, stripEdges);
-					hes.addAll(stripFaces);
-					hes.addAll(stripEdges);
-				}
-			}
-		}
-		hif.setSelection(hes);
 	}
 
 	@Override

@@ -11,21 +11,20 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import de.jreality.geometry.IndexedFaceSetUtility;
-import de.jreality.plugin.basic.Content;
-import de.jreality.scene.IndexedFaceSet;
-import de.jreality.scene.proxy.scene.SceneGraphComponent;
-import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
-import de.jtem.halfedgetools.plugin.GeneratorPlugin;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.utilities.Rectangle2D;
 
-public class HexMeshGenerator extends GeneratorPlugin {
+public class HexMeshGenerator extends AlgorithmDialogPlugin {
 
 	private JPanel
 		panel = new JPanel();
@@ -35,10 +34,6 @@ public class HexMeshGenerator extends GeneratorPlugin {
 		ySizeModel = new SpinnerNumberModel(10.0, 0.1, 1000.0, 0.1),
 		numUModel = new SpinnerNumberModel(6, 1, 10000, 1),
 		numVModel = new SpinnerNumberModel(6, 1, 10000, 1);
-	private ConverterHeds2JR
-		converter = new ConverterHeds2JR();
-	private SceneGraphComponent
-		root = new SceneGraphComponent();
 		
 	private JSpinner
 		alphaSpinner = new JSpinner(alphaModel),
@@ -89,8 +84,12 @@ public class HexMeshGenerator extends GeneratorPlugin {
 		
 	}
 	
-	@Override
-	protected void generate(Content content, HalfedgeInterface hif) {
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
 		HexMeshFactory hmf = new HexMeshFactory(alphaModel.getNumber().doubleValue());
 		if(resolutionButton.isSelected()) {
 			hmf.setResolution(numUModel.getNumber().intValue(), numVModel.getNumber().intValue());
@@ -98,25 +97,7 @@ public class HexMeshGenerator extends GeneratorPlugin {
 		if(sizeButton.isSelected()) {
 			hmf.setSize(new Rectangle2D(new double[]{0.0,0.0},new double[]{xSizeModel.getNumber().doubleValue(),ySizeModel.getNumber().doubleValue()}));
 		}
-		VHDS hds = hmf.getHDS();
-//		Rectangle2D bbox = hmf.getInsideRectangle();
-//		MatrixBuilder mb = MatrixBuilder.euclidean();
-//		Matrix T = 
-//			mb
-//			.scale(xSizeModel.getNumber().doubleValue()/bbox.getWidth(), ySizeModel.getNumber().doubleValue()/bbox.getHeight(), 1)
-//			.translate(-bbox.getMinX(), -bbox.getMinY(), 0)
-//			.getMatrix();
-//		hds.applyTransformation(T);
-		AdapterSet adapters = new AdapterSet(new VPositionAdapter());
-		IndexedFaceSet ifs =  converter.heds2ifs(hds, adapters);
-		IndexedFaceSetUtility.calculateAndSetFaceNormals(ifs);
-		root.setGeometry(ifs);
-		content.setContent(root);
-	}
-
-	@Override
-	protected String[] getMenuPath() {
-		return new String[]{};
+		hcp.set(hmf.getHDS());
 	}
 
 	
@@ -130,6 +111,16 @@ public class HexMeshGenerator extends GeneratorPlugin {
 	@Override
 	protected JPanel getDialogPanel() {
 		return panel;
+	}
+
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Generator;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Hex Mesh";
 	}
 	
 }

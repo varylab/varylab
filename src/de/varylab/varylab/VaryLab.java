@@ -30,13 +30,13 @@ import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
 import de.varylab.varylab.hds.calculator.VPositionCalculator;
 import de.varylab.varylab.hds.calculator.VSubdivisionCalculator;
-import de.varylab.varylab.plugin.OBJExportPlugin;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.editor.VertexEditorPlugin;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
+import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
 import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
@@ -52,6 +52,9 @@ import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
+import de.varylab.varylab.plugin.selection.GeodesicSelection;
+import de.varylab.varylab.plugin.selection.LatticeSelection;
+import de.varylab.varylab.plugin.selection.StripSelection;
 import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
@@ -97,14 +100,10 @@ public class VaryLab {
 		v.registerPlugin(new LoopPlugin());
 		
 		v.registerPlugin(new ConsolePlugin());
-		v.registerPlugins(HalfedgePluginFactory.createGeometryPlugins());
-		v.registerPlugins(HalfedgePluginFactory.createSubdivisionPlugins());
+		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.registerPlugin(new RoofSubdivisionPlugin());
 		v.registerPlugin(new StripSubdivisionPlugin());
 		v.registerPlugin(new SplitFacePlugin());
-		v.registerPlugins(HalfedgePluginFactory.createTopologyPlugins());
-		v.registerPlugins(HalfedgePluginFactory.createVisualizerPlugins());
-		v.registerPlugins(HalfedgePluginFactory.createGeneratorPlugins());
 		v.registerPlugin(new Toolbox());
 		
 		v.registerPlugin(new SurfaceRemeshingPlugin());
@@ -119,6 +118,9 @@ public class VaryLab {
 		v.registerPlugin(new AngleCalculatorPlugin());
 		v.registerPlugin(new NodePropertyEditor());
 		v.registerPlugin(new RemoveGeodesicPlugin());
+		v.registerPlugin(new GeodesicSelection());
+		v.registerPlugin(new LatticeSelection());
+		v.registerPlugin(new StripSelection());
 	}
 
 

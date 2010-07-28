@@ -12,15 +12,21 @@ import javax.swing.SpinnerNumberModel;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
-import de.jreality.math.MatrixBuilder;
-import de.jreality.plugin.basic.Content;
-import de.jreality.scene.proxy.scene.SceneGraphComponent;
-import de.jtem.halfedgetools.plugin.GeneratorPlugin;
+import de.jreality.scene.IndexedFaceSet;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class QuadMeshGenerator extends GeneratorPlugin {
+public class QuadMeshGenerator extends AlgorithmDialogPlugin {
 
 	private JPanel
 		panel = new JPanel();
@@ -35,6 +41,8 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 	private JCheckBox	
 		faceCornerChecker = new JCheckBox("Use Face Center Corner"),
 		diamondShaped = new JCheckBox("Use Diamonds", true);
+	private ConverterJR2Heds
+		converter = new ConverterJR2Heds();
 	
 	public QuadMeshGenerator() {
 		panel.setLayout(new GridBagLayout());
@@ -67,21 +75,27 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		return info; 
 	}
 	
-	@Override
-	protected void generate(
-		Content content,
-		HalfedgeInterface hif
-	) {
+	
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+		IndexedFaceSet ifs = null;
 		if (diamondShaped.isSelected()) {
-			generateDiamonds(content);
+			ifs = generateDiamonds();
 		} else {
-			generate(content);
+			ifs = generate();
 		}
+		converter.ifs2heds(ifs, hds, hcp.getAdapters());
+		hcp.update();
 	}
+
 	
 	
 	
-	private void generate(Content content) {
+	private IndexedFaceSet generate() {
 		int numU = numUModel.getNumber().intValue();
 		int numV = numVModel.getNumber().intValue();
 		double[][][] verts = new double[numV][numU][];
@@ -102,15 +116,11 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		qmf.setGenerateEdgesFromFaces(true);
 		qmf.setGenerateFaceNormals(true);
 		qmf.update();
-		SceneGraphComponent root = new SceneGraphComponent();
-		root.setName("GeneratedQuadMesh");
-		root.setGeometry(qmf.getGeometry());
-		MatrixBuilder.euclidean().scale(sizeModel.getNumber().doubleValue()).assignTo(root);
-		content.setContent(root);
+		return qmf.getIndexedFaceSet();
 	}
 	
 	
-	private void generateDiamonds(Content content) {
+	private IndexedFaceSet generateDiamonds() {
 		int numU = numUModel.getNumber().intValue();
 		int numV = numVModel.getNumber().intValue();
 		// vertices
@@ -176,18 +186,18 @@ public class QuadMeshGenerator extends GeneratorPlugin {
 		ifsf.setGenerateEdgesFromFaces(true);
 		ifsf.setGenerateFaceNormals(true);
 		ifsf.update();
-		SceneGraphComponent root = new SceneGraphComponent();
-		root.setName("GeneratedQuadMesh");
-		root.setGeometry(ifsf.getGeometry());
-		MatrixBuilder.euclidean().scale(sizeModel.getNumber().doubleValue()).assignTo(root);
-		content.setContent(root);
+		return ifsf.getIndexedFaceSet();
 	}
-	
 	
 
 	@Override
-	protected String[] getMenuPath() {
-		return new String[] {};
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Generator;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Quad Mesh";
 	}
 	
 	@Override

@@ -12,16 +12,22 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import de.jreality.plugin.basic.Content;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.plugin.EditorPlugin;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class HeightFieldEditor extends EditorPlugin {
+public class HeightFieldEditor extends AlgorithmDialogPlugin {
 
 	private JPanel
 		panel = new JPanel();
@@ -57,15 +63,15 @@ public class HeightFieldEditor extends EditorPlugin {
 		panel.add(knickButton,gbc2);
 	}
 	
-	
-	@Override
-	protected void edit(
-		Content content,
-		HalfedgeInterface hif
-	) {
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
 		double a = aModel.getNumber().doubleValue();
-		VHDS hds = hif.get(new VHDS(), new AdapterSet());
-		for (VVertex v : hds.getVertices()) {
+		VHDS r = hcp.get(new VHDS(), new AdapterSet());
+		for (VVertex v : r.getVertices()) {
 			if (v.position == null) continue;
 			double x = v.position[0];
 			double y = v.position[1];
@@ -79,19 +85,15 @@ public class HeightFieldEditor extends EditorPlugin {
 			}
 			v.position[2] = z;
 		}
-		hif.set(hds, new AdapterSet());
+		hcp.set(r, new AdapterSet());
 	}
+
 	
 	private double f(double x, double a) {
 		return a * (cosh(1/a) - cosh(x/a)); 
 	}
 	
 
-	@Override
-	protected String[] getMenuPath() {
-		return new String[] {};
-	}
-	
 	@Override
 	protected JPanel getDialogPanel() {
 		return panel;
@@ -102,6 +104,16 @@ public class HeightFieldEditor extends EditorPlugin {
 		PluginInfo info = new PluginInfo("Hightfield Editor", "Stefan Sechelmann");
 		info.icon = ImageHook.getIcon("hfe.png", 16, 16);
 		return info;
+	}
+
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Geometry;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Height Field";
 	}
 
 }

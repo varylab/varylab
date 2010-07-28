@@ -1,7 +1,10 @@
 package de.varylab.varylab.plugin.subdivision;
 
+import java.awt.event.InputEvent;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -11,14 +14,14 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.utilities.SelectionUtility;
 
-public class RemoveGeodesicPlugin extends HalfedgeAlgorithmPlugin {
+public class RemoveGeodesicPlugin extends AlgorithmPlugin {
 
 	@Override
 	public <
@@ -37,7 +40,7 @@ public class RemoveGeodesicPlugin extends HalfedgeAlgorithmPlugin {
 		for(E e : edges) {
 			if(removedEdges.contains(e)) continue;
 			
-			Set<E> geodesic = SelectionUtility.selectGeodesic(e, hds);
+			Set<E> geodesic = SelectionUtility.selectGeodesic(e);
 			removedEdges.addAll(geodesic);
 			for(E ge : geodesic) {
 				if(ge.isPositive()) {
@@ -60,6 +63,11 @@ public class RemoveGeodesicPlugin extends HalfedgeAlgorithmPlugin {
 		hcp.set(hds);
 	}
 
+	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('G', InputEvent.SHIFT_DOWN_MASK);
+	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {

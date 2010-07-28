@@ -6,7 +6,6 @@ import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
-import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
@@ -17,9 +16,8 @@ public class SelectionUtility {
 	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> Set<E> selectGeodesic(E e, HDS hds) {
+		F extends Face<V, E, F>
+	> Set<E> selectGeodesic(E e) {
 		Set<E> geodesic = new HashSet<E>();
 		E next = e;
 		geodesic.add(next);
@@ -46,8 +44,7 @@ public class SelectionUtility {
 	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HDS extends HalfEdgeDataStructure<V, E, F>
+		F extends Face<V, E, F>
 	> E getOpposingEdge(E next) {
 		V v = next.getTargetVertex();
 		E opposite = next;
@@ -91,8 +88,7 @@ public class SelectionUtility {
 	public static  <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HEDS extends HalfEdgeDataStructure<V, E, F>
+		F extends Face<V, E, F> 
 	> void generateStrip1D(F f, E fe,
 			LinkedList<F> stripFaces,
 			LinkedList<E> stripEdges)

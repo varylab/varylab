@@ -10,14 +10,21 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
-import de.jreality.plugin.basic.Content;
-import de.jreality.scene.proxy.scene.SceneGraphComponent;
-import de.jtem.halfedgetools.plugin.GeneratorPlugin;
+import de.jreality.scene.IndexedFaceSet;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class SimpleRoofGenerator extends GeneratorPlugin{
+public class SimpleRoofGenerator extends AlgorithmDialogPlugin {
 
 	private JPanel 
 		panel = new JPanel();
@@ -29,6 +36,9 @@ public class SimpleRoofGenerator extends GeneratorPlugin{
 	private JSpinner
 		xSizeSpinner = new JSpinner(xSizeModel),
 		ySizeSpinner = new JSpinner(ySizeModel);
+	
+	private ConverterJR2Heds
+		converter = new ConverterJR2Heds();
 	
 	public SimpleRoofGenerator() {
 		panel .setLayout(new GridBagLayout());
@@ -49,17 +59,20 @@ public class SimpleRoofGenerator extends GeneratorPlugin{
 		panel.add(ySizeSpinner, gbc2);
 	}
 	
-	@Override
-	protected void generate(Content content, HalfedgeInterface hif) {
-		generateSimpleRoof(content);
+	
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+		IndexedFaceSet ifs = generateSimpleRoof();
+		converter.ifs2heds(ifs, hds, hcp.getAdapters());
+		hcp.update();
 	}
+	
 
-	@Override
-	protected String[] getMenuPath() {
-		return new String[] {};
-	}
-
-	private void generateSimpleRoof(Content content) {
+	private IndexedFaceSet generateSimpleRoof() {
 		double[][] verts = new double[12][3];
 		double xStep = xSizeModel.getNumber().doubleValue()/3.0;
 		double yStep = ySizeModel.getNumber().doubleValue()/2.0;
@@ -69,7 +82,6 @@ public class SimpleRoofGenerator extends GeneratorPlugin{
 				verts[i*4+j] = new double[] {j*xStep+move, i*yStep, 0};
 			}
 		}
-		
 		
 		// faces
 		int[][] faces = new int[10][];
@@ -91,16 +103,22 @@ public class SimpleRoofGenerator extends GeneratorPlugin{
 		ifsf.setGenerateEdgesFromFaces(true);
 		ifsf.setGenerateFaceNormals(true);
 		ifsf.update();
-		SceneGraphComponent root = new SceneGraphComponent();
-		root.setName("GeneratedSimpleRoof");
-		root.setGeometry(ifsf.getGeometry());
-//		MatrixBuilder.euclidean().scale(xSizeModel.getNumber().doubleValue()).assignTo(root);
-		content.setContent(root);
+		return ifsf.getIndexedFaceSet();
 	}
 	
 	@Override
 	protected JPanel getDialogPanel() {
 		return panel;
+	}
+	
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Generator;
+	}
+	
+	@Override
+	public String getAlgorithmName() {
+		return "Simple Roof";
 	}
 	
 	@Override
