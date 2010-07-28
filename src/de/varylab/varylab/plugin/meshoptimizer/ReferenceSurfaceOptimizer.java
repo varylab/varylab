@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
 import de.jreality.reader.Readers;
@@ -28,6 +29,7 @@ import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
@@ -37,7 +39,7 @@ import de.varylab.varylab.math.functional.ReferenceSurfaceFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements ActionListener {
+public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements ActionListener, UIFlavor {
 
 	private JPanel
 		panel = new JPanel();
@@ -152,6 +154,11 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		view = c.getPlugin(View.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		super.install(c);
+	}
+	
+	@Override
+	public void mainUIChanged(String arg0) {
+		SwingUtilities.updateComponentTreeUI(chooser);
 	}
 	
 	private void loadFile() {

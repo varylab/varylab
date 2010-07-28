@@ -19,13 +19,16 @@ import de.jreality.writer.WriterOBJ;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 import de.varylab.varylab.plugin.ui.ExportToolBar;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class OBJExportPlugin extends Plugin{
+public class OBJExportPlugin extends Plugin implements UIFlavor {
 
 	private ExportToolBar toolBar;
 
+	private JFileChooser 
+		saveChooser = new JFileChooser();
 	private Icon
 		defaultIcon = ImageHook.getIcon("disk.png");
 
@@ -36,9 +39,6 @@ public class OBJExportPlugin extends Plugin{
 	private Scene scene;
 	
 	private class ExportAction extends AbstractAction {
-		
-		private JFileChooser 
-			saveChooser = new JFileChooser();
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -108,6 +108,11 @@ public class OBJExportPlugin extends Plugin{
 	public void uninstall(Controller c) throws Exception {
 		super.uninstall(c);
 		toolBar.removeAll(getClass());
+	}
+	
+	@Override
+	public void mainUIChanged(String arg0) {
+		SwingUtilities.updateComponentTreeUI(saveChooser);
 	}
 	
 	@Override
