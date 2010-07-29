@@ -92,7 +92,6 @@ public class OBJExportPlugin extends AlgorithmPlugin implements UIFlavor {
 		super.install(c);
 		scene = c.getPlugin(Scene.class);
 		view = c.getPlugin(View.class);
-		super.install(c);
 	}
 	
 
