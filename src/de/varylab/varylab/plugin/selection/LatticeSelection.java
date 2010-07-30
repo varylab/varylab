@@ -16,6 +16,8 @@ import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
+import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class LatticeSelection extends AlgorithmPlugin {
 
@@ -77,4 +79,10 @@ public class LatticeSelection extends AlgorithmPlugin {
 		return sl;
 	}
 
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = new PluginInfo();
+		info.icon = ImageHook.getIcon("latticeSel.png",16,16);
+		return info;
+	}
 }
