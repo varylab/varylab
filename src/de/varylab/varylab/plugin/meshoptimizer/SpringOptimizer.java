@@ -1,7 +1,10 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -27,35 +30,41 @@ import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.AdaptedWeightFunction;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
+import de.varylab.varylab.hds.adapter.LengthRangeAdapter;
 import de.varylab.varylab.hds.adapter.OriginalLength;
 import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{ 
+public class SpringOptimizer extends OptimizerPlugin implements ChangeListener, ActionListener { 
 	
 	private final String AVERAGE = "average";
 
 	private final String ORIGINAL = "original";
 
 	private final String CONSTANT = "constant";
-
+	
+	private final String RANGE = "range";
+	
 	private JPanel
 		panel = new JPanel();
 	
 	private SpinnerNumberModel
-		edgeLengthModel = new SpinnerNumberModel(1.0,0.,100.,1.),
+		minLengthModel = new SpinnerNumberModel(1.0,0.,100.,.1),
+		maxLengthModel = new SpinnerNumberModel(1.0,0.,100.,.1),
 		springModel = new SpinnerNumberModel(1.,0.,100.,1.);
 	
 	private JSpinner
-		edgeLengthSpinner = new JSpinner(edgeLengthModel),
+		minLengthSpinner = new JSpinner(minLengthModel),
+		maxLengthSpinner = new JSpinner(maxLengthModel),
 		springSpinner = new JSpinner(springModel);
 	
 	private JRadioButton 
 		averageButton = new JRadioButton("avg."),
 		originalButton = new JRadioButton("orig."),
-		constantButton = new JRadioButton("const.");
+		constantButton = new JRadioButton("const."),
+		rangeButton = new JRadioButton("range");
 	
 	private ButtonGroup
 		edgeLengthGroup = new ButtonGroup();
@@ -87,29 +96,46 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		c2.weightx = 1.0;
 		c2.gridwidth = GridBagConstraints.REMAINDER;
 		
+		panel.setLayout(new GridBagLayout());
+		c1.weightx = 2.0;
 		panel.add(diagonalsBox, c1);
+		c2.weightx = 2.0;
 		panel.add(updateLength ,c2);
 		
-		panel.add(new JLabel("Length"),c1);
-		panel.add(edgeLengthSpinner,c2);
-
+		c2.weightx = 1.0;
+		c1.weightx = 1.0;
 		panel.add(constantButton,c1);
 		panel.add(averageButton,c1);
 		originalButton.setSelected(true);
-		panel.add(originalButton,c2);
+		panel.add(originalButton,c1);
+		panel.add(rangeButton,c2);
+		
+		panel.add(new JLabel("Length"),c1);
+		panel.add(minLengthSpinner,c1);
+		panel.add(maxLengthSpinner,c2);
+		maxLengthSpinner.setEnabled(rangeButton.isSelected());
 		
 		panel.add(new JLabel("Strength"),c1);
 		panel.add(springSpinner,c2);
 
 		edgeLengthGroup.add(averageButton);
 		averageButton.setActionCommand(AVERAGE);
+		averageButton.addActionListener(this);
+		
 		edgeLengthGroup.add(originalButton);
 		originalButton.setActionCommand(ORIGINAL);
+		originalButton.addActionListener(this);
+		
 		edgeLengthGroup.add(constantButton);
 		constantButton.setActionCommand(CONSTANT);
+		constantButton.addActionListener(this);
 		
+		edgeLengthGroup.add(rangeButton);
+		rangeButton.setActionCommand(RANGE);
+		rangeButton.addActionListener(this);
 		
-		edgeLengthSpinner.addChangeListener(this);
+		minLengthSpinner.addChangeListener(this);
+		maxLengthSpinner.addChangeListener(this);
 		springSpinner.addChangeListener(this);
 	}
 	
@@ -134,13 +160,22 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 				l += Rn.euclideanDistance(s, t);
 			}
 			l /= hds.numEdges() / 2.0;
-			edgeLengthModel.setValue(l);
+			minLengthModel.setValue(l);
 			functional.setLength(new ConstantLengthAdapter(l));
+			maxLengthSpinner.setEnabled(false);
 		} else if(st == CONSTANT) {
-			double l = edgeLengthModel.getNumber().doubleValue();
+			double l = minLengthModel.getNumber().doubleValue();
 			functional.setLength(new ConstantLengthAdapter(l));
+			maxLengthSpinner.setEnabled(false);
 		} else if(st == ORIGINAL) {
 			functional.setLength(new OriginalLength(hds));
+			maxLengthSpinner.setEnabled(false);
+		} else if(st == RANGE) {
+			double
+				lmin = minLengthModel.getNumber().doubleValue(),
+				lmax = maxLengthModel.getNumber().doubleValue();
+			AdapterSet aSet = hif.getAdapters();
+			functional.setLength(new LengthRangeAdapter(lmin, lmax, aSet));
 		}
 	}
 
@@ -148,7 +183,8 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	public void storeStates(Controller c) throws Exception {
 		super.storeStates(c);
 		c.storeProperty(getClass(), "mode", edgeLengthGroup.getSelection().getActionCommand());
-		c.storeProperty(getClass(), "constantLength", edgeLengthModel.getNumber().doubleValue());
+		c.storeProperty(getClass(), "minLength", minLengthModel.getNumber().doubleValue());
+		c.storeProperty(getClass(), "maxLength", maxLengthModel.getNumber().doubleValue());
 		c.storeProperty(getClass(), "springConstant", springModel.getNumber().doubleValue());
 	}
 	
@@ -159,8 +195,11 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		averageButton.setSelected(actString.equals(AVERAGE));
 		constantButton.setSelected(actString.equals(CONSTANT));
 		originalButton.setSelected(actString.equals(ORIGINAL));
-		edgeLengthModel.setValue(c.getProperty(getClass(), "constantLength", edgeLengthModel.getNumber().doubleValue()));
+		rangeButton.setSelected(actString.equals(RANGE));
+		minLengthModel.setValue(c.getProperty(getClass(), "minLength", minLengthModel.getNumber().doubleValue()));
+		maxLengthModel.setValue(c.getProperty(getClass(), "maxLength", maxLengthModel.getNumber().doubleValue()));
 		springModel.setValue(c.getProperty(getClass(), "springConstant", springModel.getNumber().doubleValue()));
+		maxLengthSpinner.setEnabled(rangeButton.isSelected());
 	}
 	
 	
@@ -172,7 +211,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Spring Energy Optimizer", "Thilo Roerig");
-		info.icon = ImageHook.getIcon("spring.png");
+		info.icon = ImageHook.getIcon("spring.png",16,16);
 		return info;
 	}
 
@@ -184,8 +223,8 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		Object src = e.getSource();
-		if(edgeLengthSpinner == src) {
-			functional.setLength(new ConstantLengthAdapter(edgeLengthModel.getNumber().doubleValue()));
+		if(minLengthSpinner == src) {
+			functional.setLength(new ConstantLengthAdapter(minLengthModel.getNumber().doubleValue()));
 		} else if(springSpinner == src) {
 			functional.setWeight(new ConstantWeight(springModel.getNumber().doubleValue(),true));
 		}
@@ -200,4 +239,17 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener{
 		
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if(rangeButton == src) {
+			maxLengthSpinner.setEnabled(true);
+			maxLengthSpinner.setValue(minLengthModel.getNumber().doubleValue());
+		} else if(
+				constantButton == src ||
+				originalButton == src ||
+				averageButton == src) {
+			maxLengthSpinner.setEnabled(false);
+		}
+	}
 }

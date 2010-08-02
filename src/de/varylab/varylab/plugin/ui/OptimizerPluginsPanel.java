@@ -71,8 +71,8 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		pluginTable.getTableHeader().setPreferredSize(new Dimension(100, 0));
 		
 		pluginOptionsPanel.setLayout(new GridLayout());
-		pluginOptionsPanel.setPreferredSize(new Dimension(20, 100));
-		pluginOptionsPanel.setMinimumSize(new Dimension(20, 100));
+		pluginOptionsPanel.setPreferredSize(new Dimension(20, 150));
+		pluginOptionsPanel.setMinimumSize(new Dimension(20, 150));
 		pluginOptionsPanel.setBorder(BorderFactory.createTitledBorder("Plugin Options"));
 		
 		shrinkPanel.setLayout(new GridBagLayout());
