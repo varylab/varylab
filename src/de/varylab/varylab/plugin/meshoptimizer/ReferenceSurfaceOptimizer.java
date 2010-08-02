@@ -159,7 +159,8 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	}
 	
 	@Override
-	public void mainUIChanged(String arg0) {
+	public void mainUIChanged(String lnfClass) {
+		super.mainUIChanged(lnfClass);
 		SwingUtilities.updateComponentTreeUI(chooser);
 	}
 	
