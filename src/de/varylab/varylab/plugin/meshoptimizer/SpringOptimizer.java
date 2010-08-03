@@ -27,7 +27,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.hds.adapter.AdaptedWeightFunction;
+import de.varylab.varylab.hds.adapter.AdaptedEdgeWeightFunction;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.hds.adapter.LengthRangeAdapter;
@@ -146,7 +146,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener, 
 		}
 		functional.setDiagonals(diagonalsBox.isSelected());
 		AdapterSet aSet = hif.getAdapters();
-		functional.setWeight(new AdaptedWeightFunction(aSet));
+		functional.setWeight(new AdaptedEdgeWeightFunction(aSet));
 		return functional;
 	}
 

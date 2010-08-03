@@ -124,4 +124,8 @@ public class DiagonalDistanceFunctional <
 	public void setScale(double scale) {
 		this.scale = scale;
 	}
+	
+	public void setWeight(VolumeWeight<F> weight) {
+		this.weight = weight;
+	}
 }

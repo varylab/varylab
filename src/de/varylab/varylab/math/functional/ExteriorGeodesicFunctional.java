@@ -57,7 +57,7 @@ public class ExteriorGeodesicFunctional<
 	 * @param v 
 	 * @return a map which maps one edge of each pair onto its partner
 	 */
-	private Map<E, E> findGeodesicPairs(V v) {
+	private Map<E, E> findGeodesicPairs(V v, boolean manualOnly) {
 		Map<E, E> r = new HashMap<E, E>();
 		List<E> star = HalfEdgeUtils.incomingEdges(v);
 		Set<Integer> geodesicsSet = new HashSet<Integer>();
@@ -79,7 +79,7 @@ public class ExteriorGeodesicFunctional<
 			}
 			star.removeAll(gSet);
 		}
-		if (star.size() % 2 != 0) return r;
+		if (manualOnly || star.size() % 2 != 0) return r;
 		int nn = star.size();
 		for (int i = 0; i < nn/2; i++) {
 			E e1 = star.get(i);
@@ -99,34 +99,18 @@ public class ExteriorGeodesicFunctional<
 		       vs = new double[3],
 		       vt = new double[3];
 		for (V v : hds.getVertices()) {
-			if(!HalfEdgeUtils.isBoundaryVertex(v)) {
-				FunctionalUtils.getPosition(v, x, vv);
-				Map<E, E> geodesicPairs = findGeodesicPairs(v);
-				double[] angles = new double[geodesicPairs.size()];
-				int i = 0;
-				for (E e : geodesicPairs.keySet()) {
-					E ee = geodesicPairs.get(e);
-					FunctionalUtils.getPosition(e.getStartVertex(), x, vs);
-					FunctionalUtils.getPosition(ee.getStartVertex(), x, vt);
-					angles[i++] = Math.PI-FunctionalUtils.angle(vs,vv,vt); 
-				}
-				result += Rn.euclideanNormSquared(angles);
-//				List<V> star = HalfEdgeUtilsExtra.getVertexStar(v);
-//				int nn = star.size();
-//				double[] angles = new double[nn/2];
-//				if(nn % 2 == 0) { // vertex has an even number of neighbors!
-//					for(int i = 0; i < nn/2; ++i){
-//						FunctionalUtils.getPosition(star.get(i), x, vs);
-//						FunctionalUtils.getPosition(star.get(i+nn/2), x, vt);
-//						angles[i] = Math.PI-FunctionalUtils.angle(vs,vv,vt); 
-//					}
-//					result += Rn.euclideanNormSquared(angles);
-//				} else { // interior vertex of odd degree.
-//
-//				}	
-			} else { // boundary vertex.
+			FunctionalUtils.getPosition(v, x, vv);
+			Map<E, E> geodesicPairs = findGeodesicPairs(v,HalfEdgeUtils.isBoundaryVertex(v));
 
+			double[] angles = new double[geodesicPairs.size()];
+			int i = 0;
+			for (E e : geodesicPairs.keySet()) {
+				E ee = geodesicPairs.get(e);
+				FunctionalUtils.getPosition(e.getStartVertex(), x, vs);
+				FunctionalUtils.getPosition(ee.getStartVertex(), x, vt);
+				angles[i++] = Math.PI-FunctionalUtils.angle(vs,vv,vt); 
 			}
+			result += Rn.euclideanNormSquared(angles);
 		}
 		return result;
 	}
@@ -147,10 +131,9 @@ public class ExteriorGeodesicFunctional<
 		       dt = new double[3];
 		G.setZero();
 		for (V v : hds.getVertices()) {
-			if(!HalfEdgeUtils.isBoundaryVertex(v)) {
 				FunctionalUtils.getPosition(v, x, vv);
 				int vi = v.getIndex();
-				Map<E, E> geodesicPairs = findGeodesicPairs(v);
+				Map<E, E> geodesicPairs = findGeodesicPairs(v,HalfEdgeUtils.isBoundaryVertex(v));
 				double[] angles = new double[geodesicPairs.size()];
 				int i = 0;
 				for (E e : geodesicPairs.keySet()) {
@@ -179,42 +162,6 @@ public class ExteriorGeodesicFunctional<
 					FunctionalUtils.addVectorToGradient(G, 3*vi, dv);
 					FunctionalUtils.addVectorToGradient(G, 3*ti, dt);
 				}
-//				int vi = v.getIndex();
-//				List<V> star = HalfEdgeUtilsExtra.getVertexStar(v);
-//				int nn = star.size();
-//				double[] angles = new double[nn/2];
-//				if(nn % 2 == 0) { // vertex has an even number of neighbors!
-//					for(int i = 0; i < nn/2; ++i){
-//						V 	s = star.get(i),
-//							t = star.get(i+nn/2);
-//						FunctionalUtils.getPosition(s, x, vs);
-//						FunctionalUtils.getPosition(t, x, vt);
-//						angles[i] = Math.PI-FunctionalUtils.angle(vs,vv,vt); 
-//					}
-//					for (int i = 0; i < nn/2; i++) {
-//						V  s = star.get(i),
-//						   t = star.get(i+nn/2);
-//						int	si = s.getIndex(),
-//						ti = t.getIndex();
-//
-//						FunctionalUtils.getPosition(s, x, vs);
-//						FunctionalUtils.getPosition(t, x, vt);
-//						FunctionalUtils.angleGradient(vs, vv, vt, ds, dv, dt);
-//						double scale = -2.0*angles[i];
-//						Rn.times(ds,scale, ds);
-//						Rn.times(dv,scale, dv);
-//						Rn.times(dt,scale, dt);
-//
-//						FunctionalUtils.addVectorToGradient(G, 3*si, ds);
-//						FunctionalUtils.addVectorToGradient(G, 3*vi, dv);
-//						FunctionalUtils.addVectorToGradient(G, 3*ti, dt);
-//					}
-//				} else { // interior vertex of odd degree.
-//
-//				}	
-			} else { // boundary vertex.
-
-			}
 		}
 	}
 

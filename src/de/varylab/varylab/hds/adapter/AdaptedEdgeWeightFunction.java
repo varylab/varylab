@@ -5,12 +5,12 @@ import de.jtem.halfedgetools.adapter.type.Weight;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.WeightFunction;
 
-public class AdaptedWeightFunction implements WeightFunction<VEdge> {
+public class AdaptedEdgeWeightFunction implements WeightFunction<VEdge> {
 
 	private AdapterSet
 		aSet = null;
 	
-	public AdaptedWeightFunction(AdapterSet a) {
+	public AdaptedEdgeWeightFunction(AdapterSet a) {
 		aSet = a;
 	}
 	

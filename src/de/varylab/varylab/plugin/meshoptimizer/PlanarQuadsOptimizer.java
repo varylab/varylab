@@ -9,15 +9,20 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import de.jreality.math.Pn;
+import de.jreality.plugin.JRViewerUtility;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.hds.adapter.AdaptedFaceWeightFunction;
 import de.varylab.varylab.math.functional.DiagonalDistanceFunctional;
-import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.math.functional.VolumeFunctional;
+import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
@@ -37,6 +42,9 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 	
 	private ButtonGroup
 		functionalButtonGroup = new ButtonGroup();
+
+	private HalfedgeInterface 
+		hif = null;
 	
 	public class ConstantWeight implements VolumeWeight<VFace> {
 		private double 
@@ -47,7 +55,7 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 		}
 
 		@Override
-		public double getWeight(VFace f) {
+		public Double getWeight(VFace f) {
 			return a;
 		}
 	}
@@ -73,6 +81,9 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 		double scale = getShortestEdgeLength(hds);
 		volFunctional.setScale(scale);
 		diagFunctional.setScale(scale);
+		AdapterSet aSet = hif.getAdapters();
+		volFunctional.setWeight(new AdaptedFaceWeightFunction(aSet));
+		diagFunctional.setWeight(new AdaptedFaceWeightFunction(aSet));
 		if(volButton.isSelected()) {
 			return volFunctional;
 		} else if(diagButton.isSelected()) {
@@ -110,6 +121,14 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 	@Override
 	public JPanel getOptionPanel() {
 		return panel ;
+	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		c.getPlugin(HalfedgeInterface.class);
+		JRViewerUtility.getContentPlugin(c);
+		super.install(c);
+		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 	
 }

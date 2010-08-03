@@ -19,7 +19,6 @@ public class PlanarNgonsFunctional <
 > implements Functional<V, E, F> {
 	
 	
-	@SuppressWarnings("unused")
 	private VolumeWeight<F>
 		weight = null;
 	@SuppressWarnings("unused")
@@ -46,8 +45,12 @@ public class PlanarNgonsFunctional <
 	) {
 		if(E != null) {
 			E.setZero();
+			double w = 0.0;
 			for (F f : hds.getFaces()) { // flatness
-				E.add(VolumeFunctionalUtils.calculateSumDetSquared(x,HalfEdgeUtils.boundaryVertices(f)));
+				w = weight.getWeight(f);
+				if(w != 0) {
+					E.add(w*VolumeFunctionalUtils.calculateSumDetSquared(x,HalfEdgeUtils.boundaryVertices(f)));
+				}
 			}
 		}
 		if(G != null) {
@@ -62,8 +65,12 @@ public class PlanarNgonsFunctional <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluateGradient(HDS hds, DomainValue x, Gradient G) {
 		if(G != null) {
+			double w = 0.0;
 			for(F f : hds.getFaces()) {
-				VolumeFunctionalUtils.addSumDetSquaredGradient(x, G, HalfEdgeUtils.boundaryVertices(f),scale);					
+				w = weight.getWeight(f);
+				if(w != 0) {
+					VolumeFunctionalUtils.addSumDetSquaredGradient(x, G, HalfEdgeUtils.boundaryVertices(f),scale);
+				}
 			}
 		}
 	}
@@ -85,6 +92,10 @@ public class PlanarNgonsFunctional <
 	@Override
 	public boolean hasHessian() {
 		return false;
+	}
+
+	public void setWeight(VolumeWeight<F> weightFunction) {
+		this.weight = weightFunction;
 	}
 	
 }

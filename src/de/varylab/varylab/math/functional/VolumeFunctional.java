@@ -53,6 +53,7 @@ public class VolumeFunctional <
 
 	private VolumeWeight<F>
 		weight = null;
+	
 	private double
 		scale = 1.0,
 		alpha = 0.0;
@@ -77,7 +78,11 @@ public class VolumeFunctional <
 		if (E != null) {
 			E.setZero();
 			for (F f : hds.getFaces()) { // flatness
-				double detS = VolumeFunctionalUtils.detSquared(x, HalfEdgeUtils.boundaryVertices(f));
+				List<V> boundaryVertices = HalfEdgeUtils.boundaryVertices(f);
+				if (boundaryVertices.size() != 4) {
+					continue;
+				}
+				double detS = VolumeFunctionalUtils.detSquared(x, boundaryVertices);
 				double weightS = weight.getWeight(f) * weight.getWeight(f);
 				E.add(detS * weightS * scale);
 			}
@@ -150,5 +155,11 @@ public class VolumeFunctional <
 	public void setScale(double s) {
 		scale = s;
 	}
+	
+	public void setWeight(VolumeWeight<F> weightFunction) {
+		this.weight = weightFunction;
+	}
+	
+
     
 }

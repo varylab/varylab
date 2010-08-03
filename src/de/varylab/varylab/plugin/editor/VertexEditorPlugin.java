@@ -19,6 +19,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -39,6 +40,8 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	
 	private JPanel
 		panel = new JPanel();
+
+	private HalfedgeSelection hes;
 	
 	public VertexEditorPlugin() {
 		tool.addPointDragListener(this);
@@ -87,10 +90,12 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 
 	@Override
 	public void pointDragEnd(PointDragEvent e) {
+		hif.setSelection(hes);
 	}
 	
 	@Override
 	public void pointDragStart(PointDragEvent e) {
+		hes = new HalfedgeSelection(hif.getSelection());
 	}
 	
 	@Override
