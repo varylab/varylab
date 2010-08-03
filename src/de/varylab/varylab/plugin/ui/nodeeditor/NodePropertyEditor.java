@@ -13,9 +13,11 @@ import java.util.TreeSet;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -23,7 +25,10 @@ import javax.swing.event.ListSelectionListener;
 
 import de.jreality.plugin.basic.View;
 import de.jtem.beans.InspectorPanel;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -51,6 +56,12 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 		visualizersManager = null;
 	private boolean
 		disableListeners = false;
+	private Adapter<?>
+		lastAdapter = null;
+	private JButton
+		selectVerticesButton = new JButton("V"),
+		selectEdgesButton = new JButton("E"),
+		selectFacesButton = new JButton("F");
 	
 	private Set<Node<?,?,?>>
 		selectedNodes = new TreeSet<Node<?,?,?>>(new NodeComparator<Node<?,?,?>>());
@@ -88,6 +99,10 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 		selectionScroller.setPreferredSize(new Dimension(10, 70));
 		selectionScroller.setMinimumSize(new Dimension(10, 70));
 		c2.weighty = 0.0;
+		shrinkPanel.add(selectVerticesButton, c1);
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		shrinkPanel.add(selectEdgesButton, c1);
+		shrinkPanel.add(selectFacesButton, c2);
 		shrinkPanel.add(adapterCombo, c2);
 		shrinkPanel.add(ispectorScroller, c2);
 		
@@ -97,6 +112,10 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 
 		ispectorScroller.setPreferredSize(new Dimension(10, 100));
 		ispectorScroller.setMinimumSize(new Dimension(10, 100));
+		
+		selectVerticesButton.addActionListener(this);
+		selectEdgesButton.addActionListener(this);
+		selectFacesButton.addActionListener(this);
 	}
 	
 	
@@ -135,6 +154,29 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 				vc = new BooleanValueContainer((Boolean)o, listSelection, a, hif.getAdapters());
 			}
 			inspector.setObject(vc);
+			lastAdapter = a;
+		}
+		if (selectVerticesButton == s || selectEdgesButton == s || selectFacesButton == s) {
+			List<Integer> indexList = new LinkedList<Integer>();
+			ListModel model = selectedNodesList.getModel();
+			for (int i = 0; i < model.getSize(); i++) {
+				Object o = model.getElementAt(i);
+				if (o instanceof Vertex<?, ?, ?> && selectVerticesButton == s) {
+					indexList.add(i);
+				}
+				if (o instanceof Edge<?, ?, ?> && selectEdgesButton == s) {
+					indexList.add(i);
+				}
+				if (o instanceof Face<?, ?, ?> && selectFacesButton == s) {
+					indexList.add(i);
+				}
+			}
+			int i = 0;
+			int[] indices = new int[indexList.size()];
+			for (Integer ii : indexList) {
+				indices[i++] = ii;
+			}
+			selectedNodesList.setSelectedIndices(indices);
 		}
 	}
 	
@@ -195,7 +237,11 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 			adapterModel.addElement(a);
 		}
 		adapterCombo.setModel(adapterModel);
-		adapterCombo.setSelectedIndex(0);
+		if (lastAdapter != null && compSet.contains(lastAdapter)) {
+			adapterCombo.setSelectedItem(lastAdapter);
+		} else {
+			adapterCombo.setSelectedIndex(0);
+		}
 	}
 	
 	
