@@ -76,7 +76,7 @@ public class QuadRemeshingUtility {
 //		} while (e != be);
 //		boundaryCorners.remove(boundaryCorners.size()-1);
 //		if(boundaryVertices.getFirst() != boundaryVertices.getLast()) {
-//			System.err.println("polygon didn't close!"); // FIXME
+//			System.err.println("polygon didn't close!");
 //		}
 //		boundaryVertices.removeLast();
 //	}

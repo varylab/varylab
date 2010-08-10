@@ -32,9 +32,6 @@ public class GeodesicAngleFunctional<
 		if (G != null) {
 			evaluateGradient(hds, x, G);
 		}
-		if (H != null) {
-			evaluateHessian(hds, x, H);
-		}
 	}
 
 	// Calculate the energy of a given configuration
@@ -131,7 +128,6 @@ public class GeodesicAngleFunctional<
 			HalfEdgeDataStructure<V, E, F> G, DomainValue x,
 		// output
 			Hessian hess) {
-		// TODO: Calculate the hessian for a given configuration x
 	}
 
 	@Override
@@ -142,13 +138,11 @@ public class GeodesicAngleFunctional<
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int[][] getNonZeroPattern(
 			HDS hds) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean hasHessian() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

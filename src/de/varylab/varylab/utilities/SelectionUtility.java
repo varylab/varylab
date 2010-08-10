@@ -60,9 +60,8 @@ public class SelectionUtility {
 	}
 
 	public static <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
+		E extends Edge<?, E, F>, 
+		F extends Face<?, E, F> 
 	> E getOppositeEdgeInFace(E e) 
 	{
 		F f = e.getLeftFace();
@@ -86,13 +85,16 @@ public class SelectionUtility {
 	}
 	
 	public static  <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
-	> void generateStrip1D(F f, E fe,
+		E extends Edge<?, E, F>, 
+		F extends Face<?, E, F> 
+	> void generateStrip1D(E fe,
 			LinkedList<F> stripFaces,
 			LinkedList<E> stripEdges)
 	{
+		if(fe.getLeftFace() == null) {
+			fe = fe.getOppositeEdge();
+		}
+		F f = fe.getLeftFace();
 		stripFaces.addFirst(f);
 		E e = fe;
 		stripEdges.addLast(e);

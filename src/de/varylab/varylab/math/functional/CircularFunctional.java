@@ -34,9 +34,6 @@ public class CircularFunctional<
 		if (G != null) {
 			evaluateGradient(hds, x, G);
 		}
-		if (H != null) {
-			evaluateHessian(hds, x, H);
-		}
 	}
 
 	// Calculate the energy of a given configuration
@@ -133,14 +130,6 @@ public class CircularFunctional<
 		}
 	}
 
-	public void evaluateHessian(
-		// input
-			HalfEdgeDataStructure<V, E, F> G, DomainValue x,
-		// output
-			Hessian hess) {
-		// TODO: Calculate the hessian for a given configuration x
-	}
-
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int getDimension(HDS hds) {
 		return 3*hds.numVertices();
@@ -149,13 +138,11 @@ public class CircularFunctional<
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int[][] getNonZeroPattern(
 			HDS hds) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean hasHessian() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

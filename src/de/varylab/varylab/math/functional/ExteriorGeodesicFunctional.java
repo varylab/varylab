@@ -170,7 +170,6 @@ public class ExteriorGeodesicFunctional<
 			HalfEdgeDataStructure<V, E, F> G, DomainValue x,
 			// output
 			Hessian hess) {
-		// TODO: Calculate the hessian for a given configuration x
 	}
 
 	@Override

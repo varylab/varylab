@@ -53,7 +53,7 @@ public class StripSelection extends AlgorithmPlugin {
 				stripFaces.clear();
 				stripEdges.clear();
 				if(edges.contains(e)) {
-					SelectionUtility.generateStrip1D(f, e, stripFaces, stripEdges);
+					SelectionUtility.generateStrip1D(e, stripFaces, stripEdges);
 					hes.addAll(stripFaces);
 					hes.addAll(stripEdges);
 				}

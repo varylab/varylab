@@ -1,7 +1,6 @@
 package de.varylab.varylab.plugin.subdivision;
 
 import java.awt.event.InputEvent;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -44,12 +43,10 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
 		Set<E> edges = hcp.getSelection().getEdges(hds);
-		HashSet<F> faces = new HashSet<F>(hcp.getSelection().getFaces(hds));
 		
 		for(E e : edges) {
-			F f = e.getLeftFace();
-			if(faces.contains(f)) {
-				subdivideStrip1D(f, e, vc);
+			if(e.isPositive()) {
+				subdivideStrip1D(e, vc);
 			}
 		}
 		hcp.set(hds);	
@@ -60,13 +57,13 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HEDS extends HalfEdgeDataStructure<V, E, F>
-	> void subdivideStrip1D(F f, E fe, VertexPositionCalculator vc)
+	> void subdivideStrip1D(E fe, VertexPositionCalculator vc)
 	{
 		LinkedList<F> stripFaces = new LinkedList<F>();
 		LinkedList<E> stripEdges = new LinkedList<E>();
 		LinkedList<V> stripVertices = new LinkedList<V>();
 		
-		SelectionUtility.generateStrip1D(f, fe, stripFaces, stripEdges);
+		SelectionUtility.generateStrip1D(fe, stripFaces, stripEdges);
 		
 		for(E se: stripEdges) {
 			if(se.isPositive()) {

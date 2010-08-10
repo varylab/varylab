@@ -1,7 +1,5 @@
 package de.varylab.varylab.plugin.visualizers;
 
-import hyperbolicnets.core.DataModel;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,8 +16,8 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.converter.UVMeshGenerator;
 
 public class HyperbolicPatchVisualizer extends VisualizerPlugin implements ActionListener {
 
@@ -87,15 +85,36 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 	public SceneGraphComponent getComponent() {
 		VHDS hds = new VHDS();
 		hds = hif.get(hds);
-		UVMeshGenerator uvGenerator = new UVMeshGenerator(hds);
-		double[][][][] xyzcoord = uvGenerator.getArray();
-		DataModel patchModel = new DataModel();
-		patchModel.setResolution(resolution);
-		DataModel.setVertices(xyzcoord);
-		patchModel.initPatches(parameter);
-		return patchModel.getGeometricObjects();
+		HFaceSurface hSurface = new HFaceSurface(hds);
+		//FIXME: insert proper Values for q and starting edge
+		VEdge startEdge = hds.getEdge(0);
+		double[] q = getInitialQ(startEdge);
+		hSurface.propagateQ(startEdge,q);
+		//TODO: manage the initial parameters for the parametrisation
+		hSurface.propagateParametrisation();
+		
+		// FIXME: Something like the following should be implemented.
+		SceneGraphComponent patchRoot = new SceneGraphComponent();
+		/*
+		patchRoot.setName("Hyperbolic Patches");
+		for(HFace hf : hSurface.getFaces()) {
+			HyperbolicPatch hp = new HyperbolicPatch(hf);
+			patchRoot.addChild(hp.getSgc());
+		}
+		*/
+//		UVMeshGenerator uvGenerator = new UVMeshGenerator(hds);
+//		double[][][][] xyzcoord = uvGenerator.getArray();
+//		DataModel patchModel = new DataModel();
+//		patchModel.setResolution(resolution);
+//		DataModel.setVertices(xyzcoord);
+//		patchModel.initPatches(parameter);
+		return patchRoot;
 	}
 	
+	private double[] getInitialQ(VEdge startEdge) {
+		return new double[]{1.0,0.0,0.0,0.0,0.0,0.0};
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		resolution = resolutionModel.getNumber().intValue();

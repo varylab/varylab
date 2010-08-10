@@ -81,7 +81,6 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 			HalfEdgeDataStructure<V, E, F> G, DomainValue x,
 		// output
 			Hessian hess) {
-		// TODO: Calculate the hessian for a given configuration x
 	}
 
 	@Override
@@ -92,7 +91,6 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> int[][] getNonZeroPattern(
 			HDS hds) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
