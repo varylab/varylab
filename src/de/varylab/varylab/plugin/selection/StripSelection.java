@@ -44,20 +44,14 @@ public class StripSelection extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
 		HalfedgeSelection hes = hif.getSelection();
-		HashSet<E> edges = new HashSet<E>(hes.getEdges(hds));
-		Set<F> faces = hes.getFaces(hds);
 		LinkedList<F> stripFaces = new LinkedList<F>();
 		LinkedList<E> stripEdges = new LinkedList<E>();
-		for(F f:faces) {
-			for(E e : HalfEdgeUtils.boundaryEdges(f)) {
-				stripFaces.clear();
-				stripEdges.clear();
-				if(edges.contains(e)) {
-					SelectionUtility.generateStrip1D(e, stripFaces, stripEdges);
-					hes.addAll(stripFaces);
-					hes.addAll(stripEdges);
-				}
-			}
+		for(E e : hes.getEdges(hds)) {
+			stripFaces.clear();
+			stripEdges.clear();
+			SelectionUtility.generateStrip1D(e, stripFaces, stripEdges);
+			hes.addAll(stripFaces);
+			hes.addAll(stripEdges);
 		}
 		hif.setSelection(hes);
 	}
