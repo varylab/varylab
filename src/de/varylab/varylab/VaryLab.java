@@ -71,7 +71,6 @@ import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
-import de.varylab.varylab.plugin.visualizers.CyclidicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
@@ -152,7 +151,6 @@ public class VaryLab {
 		v.registerPlugin(new StarPlanarityVisualizer());
 		
 		v.registerPlugin(new HyperbolicPatchVisualizer());
-		v.registerPlugin(new CyclidicPatchVisualizer());
 		
 		v.registerPlugin(new NodeIndexVisualizer());
 		v.registerPlugin(new WeightsVisualizer());
