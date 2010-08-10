@@ -1,11 +1,21 @@
 package de.varylab.varylab.plugin.ui;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,8 +34,8 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 
 	private View 
 		view = null;
-	private JPanel
-		panel = new JPanel();
+	private GUIPanel
+		panel = new GUIPanel();
 	
 	private List<WidgetPlugin>
 		widgets = new LinkedList<WidgetPlugin>();
@@ -35,6 +45,24 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 		panel.setOpaque(false);
 		panel.setLayout(new WrapLayout(FlowLayout.LEADING, 2, 2));
 	}
+	
+	
+	private class GUIPanel extends JPanel {
+		
+		private static final long 
+			serialVersionUID = 1L;
+
+		@Override
+		public void paint(Graphics g) {
+			Graphics2D g2d = (Graphics2D)g;
+			for (WidgetPlugin w : widgets) {
+				w.paint(g2d, panel);
+			}
+			super.paint(g);
+		}
+		
+	}
+	
 	
 	
 	private void updateLayout() {
@@ -56,6 +84,12 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 		JLayeredPane layers = mainFrame.getLayeredPane();
 		layers.add(panel, JLayeredPane.MODAL_LAYER);
 		viewComponent.addComponentListener(this);
+		
+		EventForwarder ef = new EventForwarder(viewComponent);
+		panel.addMouseListener(ef);
+		panel.addMouseMotionListener(ef);
+		panel.addMouseWheelListener(ef);
+		panel.addKeyListener(ef);
 	}
 	
 	
@@ -67,15 +101,23 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 	
 	public void addWidget(WidgetPlugin wp) {
 		widgets.add(wp);
-		panel.add(wp.getWidgetComponent());
+		if (wp.getWidgetComponent() != null) {
+			panel.add(wp.getWidgetComponent());
+		}
 		
 	}
 	
 	public void removeWidgetPlugin(WidgetPlugin wp) {
 		widgets.remove(wp);
-		panel.remove(wp.getWidgetComponent());
+		if (wp.getWidgetComponent() != null) {
+			panel.remove(wp.getWidgetComponent());
+		}
 	}
 
+	public JPanel getPanel() {
+		return panel;
+	}
+	
 
 	@Override
 	public void componentResized(ComponentEvent e) {
@@ -98,6 +140,78 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 	@Override
 	public void componentHidden(ComponentEvent e) {
 		updateLayout();
+	}
+	
+	
+	
+	private class EventForwarder implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+
+		private Component
+			target = null;
+		
+		public EventForwarder(Component target) {
+			this.target = target;
+		}
+
+		private void forward(AWTEvent eo) {
+			target.dispatchEvent(eo);
+		}
+		
+		@Override
+		public void keyTyped(KeyEvent e) {
+			forward(e);
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			forward(e);
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			forward(e);			
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			forward(e);				
+		}
+		
 	}
 	
 
