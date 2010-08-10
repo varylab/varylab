@@ -18,5 +18,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DiscreteConformalLab"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CurvatureGeometry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

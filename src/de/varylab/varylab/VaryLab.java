@@ -1,11 +1,6 @@
 package de.varylab.varylab;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-
 import javax.swing.UIManager;
-
-import com.sun.awt.AWTUtilities;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -130,14 +125,7 @@ public class VaryLab {
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
 		
-		GraphicsDevice[] gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		if ((AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT)) &&
-				(AWTUtilities.isTranslucencyCapable(gd[0].getDefaultConfiguration()))) {
-			v.registerPlugin(new ViewSwitchWidget());
-		}
-
-		
-//		v.registerPlugin(new AxisFramePlugin());
+		v.registerPlugin(new ViewSwitchWidget());
 	}
 
 
@@ -149,9 +137,7 @@ public class VaryLab {
 		v.registerPlugin(new CurvatureVisualizer());
 		v.registerPlugin(new NormalVisualizer());
 		v.registerPlugin(new StarPlanarityVisualizer());
-		
 		v.registerPlugin(new HyperbolicPatchVisualizer());
-		
 		v.registerPlugin(new NodeIndexVisualizer());
 		v.registerPlugin(new WeightsVisualizer());
 		v.registerPlugin(new GeodesicLabelVisualizer());
@@ -186,6 +172,7 @@ public class VaryLab {
 	
 	
 	public static void main(String[] args) throws Exception {
+		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
 		UIManager.getDefaults().put("Slider.paintValue", false);
 		NativePathUtility.set("native");
 		View.setIcon(ImageHook.getIcon("surface.png"));
