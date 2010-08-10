@@ -12,6 +12,8 @@ public class Strip<E extends Edge<?,E,F>, F extends Face<?,E,F>> {
 	LinkedList<F> faces = new LinkedList<F>();
 	LinkedList<E> edges = new LinkedList<E>();
 	
+	// TODO: Fix for closed manifolds.
+	
 	public Strip(E e) {
 		SelectionUtility.generateStrip1D(e, faces, edges);
 	}

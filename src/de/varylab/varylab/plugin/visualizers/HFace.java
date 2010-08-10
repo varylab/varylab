@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.visualizers;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
@@ -21,11 +22,39 @@ public class HFace {
 		edgeQMap = new HashMap<VEdge, double[]>(),
 		edgeParameterLineMap = new HashMap<VEdge, double[]>();
 	
+	private double[][] 
+	    diagonals = new double[2][6];
+	
 	public HFace(VFace f) {
 		vFace = f;
 		calculatePlueckerCoordinates();
+		calculateDiagonals();
 	}
 	
+	private void calculateDiagonals() {
+		VEdge e = vFace.getBoundaryEdge();
+		VVertex 
+			v1 = e.getStartVertex(),
+			v2 = e.getTargetVertex(),
+			v3 = e.getNextEdge().getTargetVertex(),
+			v4 = e.getPreviousEdge().getStartVertex();
+		double[]
+		       vc1 = new double[4],
+		       vc2 = new double[4],
+		       vc3 = new double[4],
+		       vc4 = new double[4];
+		System.arraycopy(v1.position, 0, vc1, 0, 3);
+		System.arraycopy(v2.position, 0, vc2, 0, 3);
+		System.arraycopy(v3.position, 0, vc3, 0, 3);
+		System.arraycopy(v4.position, 0, vc4, 0, 3);
+		vc1[3]=1;
+		vc2[3]=1;
+		vc3[3]=1;
+		vc4[3]=1;
+		PlueckerLineGeometry.lineFromPoints(diagonals[0], vc1, vc3);
+		PlueckerLineGeometry.lineFromPoints(diagonals[1], vc2, vc4);
+	}
+
 	//get the pluecker coordinates of the specified edge
 	public double[] getPluecker(VEdge e) {
 		return edgePlueckerMap.get(e);
@@ -81,4 +110,7 @@ public class HFace {
 		return pl;
 	}
 
+	public VFace getvFace() {
+		return vFace;
+	}
 }

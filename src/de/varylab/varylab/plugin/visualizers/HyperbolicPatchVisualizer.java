@@ -89,7 +89,9 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 		//FIXME: insert proper Values for q and starting edge
 		VEdge startEdge = hds.getEdge(0);
 		double[] q = getInitialQ(startEdge);
+		
 		hSurface.propagateQ(startEdge,q);
+		
 		//TODO: manage the initial parameters for the parametrisation
 		hSurface.propagateParametrisation();
 		
