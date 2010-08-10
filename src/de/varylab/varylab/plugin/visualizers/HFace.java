@@ -1,10 +1,15 @@
 package de.varylab.varylab.plugin.visualizers;
 
+import static de.jtem.projgeom.P5.LINE_SPACE;
+
+import hyperbolicnets.core.DataModel;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.projgeom.P5;
 import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
@@ -65,13 +70,26 @@ public class HFace {
 		return edgeQMap.get(e);
 	}
 	
+	//get the 1/2 parameter line beloning to the family of the specified edge
+	public double[] getParameterLine(VEdge e) {
+		return edgeParameterLineMap.get(e);
+	}
+	
 	//set q on all four edges of the quad
-	public void setQ(VEdge e, double[] q) {
-		// TODO: set q's on all four halfedges s.t. the patch lies in the interior.
-		// FIXME: now all q's are just set to be equal!!!
-		for(VEdge be: HalfEdgeUtils.boundaryEdges(vFace)) {
-			edgeQMap.put(be,q);
-		}
+	public void setQ(VEdge e1, double[] q) {
+		// TODO: check that q's on all four halfedges are set s.t. the patch lies in the interior.
+		// (Maybe at another place as this should be checked only for the inital quad...)
+		double[] qStar = P5.getIntersectionOfLineWithPolar(null, diagonals[0], diagonals[0], q, LINE_SPACE);
+		VEdge
+			e2 = e1.getNextEdge(),
+			// TODO: Use SelectionUtility.getOppositeEdgeInFace(VEdge) ?
+			e3 = e2.getNextEdge(),
+			e4 = e3.getNextEdge();
+		
+		edgeQMap.put(e1,q);
+		edgeQMap.put(e3,q);
+		edgeQMap.put(e2,qStar);
+		edgeQMap.put(e4,qStar);
 	}
 
 	private void calculatePlueckerCoordinates() {
@@ -92,25 +110,39 @@ public class HFace {
 		}
 	}
 
-	public void setParameterLine(VEdge e, double d) {
-		// FIXME: calculate the pluecker coordinates of the intermediate line
-		// corresponding to the parameter d?!
-		double[] pc = new double[]{d,0,0,0,0,0};
+	/**
+	 * @param e - corresponds to the A-net edge l 
+	 * @param y - homogeneous coordinates of a point on l
+	 * 
+	 * Calculates Pluecker coordinates of line through y in the complementary planar family (i.e. not containing l)
+	 * and links them with the next and previous halfedges of e.
+	 */
+	public void setParameterLine(VEdge e, double[] y) {
+		VEdge oppositeEdgeInFace = SelectionUtility.getOppositeEdgeInFace(e);
+		double[] pc1 = edgePlueckerMap.get(e);
+		double[] pc2 = edgePlueckerMap.get(oppositeEdgeInFace);
+		double[] pc = PlueckerLineGeometry.normalize(null, DataModel.getLineOfPlanarFamilyThroughPoint(pc1, pc2, edgeQMap.get(e), y));
 		
 		edgeParameterLineMap.put(e.getNextEdge(),pc);
 		edgeParameterLineMap.put(e.getPreviousEdge(),pc);
 	}
 	
+	// returns pluecker coords of 3 lines spanning the planar family containing the A-net edge corresponding to e
 	public double[][] getParameterLines(VEdge e) {
 		VEdge oppositeEdgeInFace = SelectionUtility.getOppositeEdgeInFace(e);
 		double[][] pl = new double[3][6];
-		pl[0] = Arrays.copyOf(getQ(e), 6);
+		pl[0] = Arrays.copyOf(edgePlueckerMap.get(e), 6);
 		pl[1] = Arrays.copyOf(edgeParameterLineMap.get(e), 6);
-		pl[2] = Arrays.copyOf(edgeParameterLineMap.get(oppositeEdgeInFace), 6);
+		pl[2] = Arrays.copyOf(edgePlueckerMap.get(oppositeEdgeInFace), 6);
 		return pl;
 	}
 
 	public VFace getvFace() {
 		return vFace;
 	}
+
+	public double[][] getDiagonals() {
+		return diagonals;
+	}
+	
 }

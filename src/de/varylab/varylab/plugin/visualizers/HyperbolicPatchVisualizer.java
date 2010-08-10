@@ -1,5 +1,8 @@
 package de.varylab.varylab.plugin.visualizers;
 
+import hyperbolicnets.core.HyperbolicPatch;
+import hyperbolicnets.core.PlanarFamily;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,7 +19,10 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.projgeom.P5;
+import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
+import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 
 public class HyperbolicPatchVisualizer extends VisualizerPlugin implements ActionListener {
@@ -54,9 +60,7 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 		gbc2.weightx = 1.0;
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
-		
-		
-		
+				
 		panel.add(new JLabel("Resolution"), gbc1);
 		panel.add(resolutionSpinner, gbc2);
 		panel.add(new JLabel("Parameter"), gbc1);
@@ -86,35 +90,26 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 		VHDS hds = new VHDS();
 		hds = hif.get(hds);
 		HFaceSurface hSurface = new HFaceSurface(hds);
-		//FIXME: insert proper Values for q and starting edge
+		//TODO: Implement interactive choice of starting edge
 		VEdge startEdge = hds.getEdge(0);
-		double[] q = getInitialQ(startEdge);
 		
-		hSurface.propagateQ(startEdge,q);
+		//TODO: Adapt to proper range?
+		hSurface.propagateQ(startEdge, parameter * Math.PI);
 		
-		//TODO: manage the initial parameters for the parametrisation
+		//TODO: Implement interactive choice of Inital 1/2 - parameter lines
 		hSurface.propagateParametrisation();
 		
-		// FIXME: Something like the following should be implemented.
 		SceneGraphComponent patchRoot = new SceneGraphComponent();
-		/*
 		patchRoot.setName("Hyperbolic Patches");
 		for(HFace hf : hSurface.getFaces()) {
-			HyperbolicPatch hp = new HyperbolicPatch(hf);
+			VEdge e = hf.getvFace().getBoundaryEdge();
+			PlanarFamily pf1 = new PlanarFamily(hf.getParameterLines(e), P5.LINE_SPACE, PlueckerLineGeometry.getTolerance());
+			PlanarFamily pf2 = new PlanarFamily(hf.getParameterLines(e.getNextEdge()), P5.LINE_SPACE, PlueckerLineGeometry.getTolerance());
+			HyperbolicPatch hp = new HyperbolicPatch("Hyperbolic Patch", new PlanarFamily[] {pf1,pf2});
 			patchRoot.addChild(hp.getSgc());
 		}
-		*/
-//		UVMeshGenerator uvGenerator = new UVMeshGenerator(hds);
-//		double[][][][] xyzcoord = uvGenerator.getArray();
-//		DataModel patchModel = new DataModel();
-//		patchModel.setResolution(resolution);
-//		DataModel.setVertices(xyzcoord);
-//		patchModel.initPatches(parameter);
+		
 		return patchRoot;
-	}
-	
-	private double[] getInitialQ(VEdge startEdge) {
-		return new double[]{1.0,0.0,0.0,0.0,0.0,0.0};
 	}
 
 	@Override
