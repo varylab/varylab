@@ -1,6 +1,11 @@
 package de.varylab.varylab;
 
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.UIManager;
+
+import com.sun.awt.AWTUtilities;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -66,6 +71,7 @@ import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
+import de.varylab.varylab.plugin.visualizers.CyclidicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
@@ -125,7 +131,14 @@ public class VaryLab {
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
 		
-		v.registerPlugin(new ViewSwitchWidget());
+		GraphicsDevice[] gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		if ((AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT)) &&
+				(AWTUtilities.isTranslucencyCapable(gd[0].getDefaultConfiguration()))) {
+			v.registerPlugin(new ViewSwitchWidget());
+		}
+
+		
+//		v.registerPlugin(new AxisFramePlugin());
 	}
 
 
@@ -137,7 +150,10 @@ public class VaryLab {
 		v.registerPlugin(new CurvatureVisualizer());
 		v.registerPlugin(new NormalVisualizer());
 		v.registerPlugin(new StarPlanarityVisualizer());
+		
 		v.registerPlugin(new HyperbolicPatchVisualizer());
+		v.registerPlugin(new CyclidicPatchVisualizer());
+		
 		v.registerPlugin(new NodeIndexVisualizer());
 		v.registerPlugin(new WeightsVisualizer());
 		v.registerPlugin(new GeodesicLabelVisualizer());
