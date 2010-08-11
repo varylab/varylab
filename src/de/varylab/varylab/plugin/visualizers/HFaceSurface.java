@@ -108,7 +108,7 @@ public class HFaceSurface {
 		double[]
 		       pc1 = aktFace.getPluecker(e),
 		       pc2 = aktFace.getParameterLine(e.getPreviousEdge());
-		nextFace.setParameterLine(e.getOppositeEdge(), PlueckerLineGeometry.lineIntersectLine(null, pc1, pc2));
+		nextFace.setParameterLine(e.getOppositeEdge(), PlueckerLineGeometry.lineIntersectLineWhileExistenceIsUnchecked(null, pc1, pc2));
 	}
 
 	public Collection<HFace> getFaces() {

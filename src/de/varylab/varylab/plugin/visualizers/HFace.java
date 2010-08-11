@@ -58,6 +58,8 @@ public class HFace {
 		vc4[3]=1;
 		PlueckerLineGeometry.lineFromPoints(diagonals[0], vc1, vc3);
 		PlueckerLineGeometry.lineFromPoints(diagonals[1], vc2, vc4);
+		diagonals[0] = PlueckerLineGeometry.normalize(null, diagonals[0]);
+		diagonals[1] = PlueckerLineGeometry.normalize(null, diagonals[1]);
 	}
 
 	//get the pluecker coordinates of the specified edge
@@ -79,7 +81,9 @@ public class HFace {
 	public void setQ(VEdge e1, double[] q) {
 		// TODO: check that q's on all four halfedges are set s.t. the patch lies in the interior.
 		// (Maybe at another place as this should be checked only for the inital quad...)
+		q = PlueckerLineGeometry.normalize(null, q);
 		double[] qStar = P5.getIntersectionOfLineWithPolar(null, diagonals[0], diagonals[1], q, LINE_SPACE);
+		qStar = PlueckerLineGeometry.normalize(null, qStar);
 		VEdge
 			e2 = e1.getNextEdge(),
 			e3 = SelectionUtility.getOppositeEdgeInFace(e1),
@@ -105,6 +109,7 @@ public class HFace {
 			vc2[3]=1;
 			double[] plueckerCoords = new double[6];
 			PlueckerLineGeometry.lineFromPoints(plueckerCoords, vc1,vc2);
+			plueckerCoords = PlueckerLineGeometry.normalize(null, plueckerCoords);
 			edgePlueckerMap.put(e,plueckerCoords);
 		}
 	}
