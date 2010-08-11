@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.ui;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -86,6 +87,7 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 		viewComponent.addComponentListener(this);
 		
 		EventForwarder ef = new EventForwarder(viewComponent);
+		panel.setFocusable(true);
 		panel.addMouseListener(ef);
 		panel.addMouseMotionListener(ef);
 		panel.addMouseWheelListener(ef);
@@ -154,6 +156,8 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 		}
 
 		private void forward(AWTEvent eo) {
+			Component t = ((Container)target).getComponents()[0];
+			t.requestFocus();
 			target.dispatchEvent(eo);
 		}
 		
@@ -190,6 +194,7 @@ public class VarylabCustomGUI extends Plugin implements ComponentListener {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			forward(e);			
+			panel.requestFocus();
 		}
 
 		@Override

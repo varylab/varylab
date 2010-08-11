@@ -114,9 +114,9 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		int h = Math.abs(active.y - start.y);
 		int x = Math.min(active.x, start.x);
 		int y = Math.min(active.y, start.y);
-		g.setColor(Color.RED);
+		g.setColor(Color.MAGENTA);
 		float[] dash = {0f, 2f, 3f, 4f};
-		BasicStroke s = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
+		BasicStroke s = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
 		g.setStroke(s);
 		g.drawRect(x, y, w, h);
 		
@@ -154,7 +154,6 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		isDragging = false;
-		System.out.println(hif.getSelection().getVertices());
 		repaint();
 		contentTools.setRotationEnabled(true);
 	}
