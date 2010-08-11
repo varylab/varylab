@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.visualizers;
 
+import hyperbolicnets.core.DataModel;
 import hyperbolicnets.core.HyperbolicPatch;
 import hyperbolicnets.core.PlanarFamily;
 
@@ -38,7 +39,7 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 	
 	private SpinnerNumberModel
 		resolutionModel = new SpinnerNumberModel(11,2,51,1),
-		parameterModel = new SpinnerNumberModel(0.5,0,1,0.05);
+		parameterModel = new SpinnerNumberModel(0.25,0,1,0.05);
 	
 	private JSpinner
 		resolutionSpinner = new JSpinner(resolutionModel),
@@ -46,7 +47,7 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 
 	private int resolution = 11;
 
-	private double parameter = 0.5;
+	private double parameter = parameterModel.getNumber().doubleValue();
 
 	public HyperbolicPatchVisualizer() {
 		panel.setLayout(new GridBagLayout());
@@ -115,6 +116,7 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		resolution = resolutionModel.getNumber().intValue();
+		DataModel.setResolution(resolution);
 		parameter = parameterModel.getNumber().doubleValue();
 		manager.updateContent();
 	}

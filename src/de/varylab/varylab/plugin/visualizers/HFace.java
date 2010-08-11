@@ -79,12 +79,11 @@ public class HFace {
 	public void setQ(VEdge e1, double[] q) {
 		// TODO: check that q's on all four halfedges are set s.t. the patch lies in the interior.
 		// (Maybe at another place as this should be checked only for the inital quad...)
-		double[] qStar = P5.getIntersectionOfLineWithPolar(null, diagonals[0], diagonals[0], q, LINE_SPACE);
+		double[] qStar = P5.getIntersectionOfLineWithPolar(null, diagonals[0], diagonals[1], q, LINE_SPACE);
 		VEdge
 			e2 = e1.getNextEdge(),
-			// TODO: Use SelectionUtility.getOppositeEdgeInFace(VEdge) ?
-			e3 = e2.getNextEdge(),
-			e4 = e3.getNextEdge();
+			e3 = SelectionUtility.getOppositeEdgeInFace(e1),
+			e4 = SelectionUtility.getOppositeEdgeInFace(e2);
 		
 		edgeQMap.put(e1,q);
 		edgeQMap.put(e3,q);
@@ -93,7 +92,6 @@ public class HFace {
 	}
 
 	private void calculatePlueckerCoordinates() {
-		double[] plueckerCoords = new double[6];
 		for(VEdge e : HalfEdgeUtils.boundaryEdges(vFace)) {
 			VVertex 
 				v1 = e.getStartVertex(),
@@ -105,6 +103,7 @@ public class HFace {
 			System.arraycopy(v2.position, 0, vc2, 0, 3);
 			vc1[3]=1;
 			vc2[3]=1;
+			double[] plueckerCoords = new double[6];
 			PlueckerLineGeometry.lineFromPoints(plueckerCoords, vc1,vc2);
 			edgePlueckerMap.put(e,plueckerCoords);
 		}
@@ -118,13 +117,14 @@ public class HFace {
 	 * and links them with the next and previous halfedges of e.
 	 */
 	public void setParameterLine(VEdge e, double[] y) {
-		VEdge oppositeEdgeInFace = SelectionUtility.getOppositeEdgeInFace(e);
-		double[] pc1 = edgePlueckerMap.get(e);
-		double[] pc2 = edgePlueckerMap.get(oppositeEdgeInFace);
-		double[] pc = PlueckerLineGeometry.normalize(null, DataModel.getLineOfPlanarFamilyThroughPoint(pc1, pc2, edgeQMap.get(e), y));
+		VEdge previousEdge = e.getPreviousEdge();
+		double[] pc1 = edgePlueckerMap.get(previousEdge);
+		VEdge nextEdge = e.getNextEdge();
+		double[] pc2 = edgePlueckerMap.get(nextEdge);
+		double[] pc = PlueckerLineGeometry.normalize(null, DataModel.getLineOfPlanarFamilyThroughPoint(pc1, pc2, edgeQMap.get(nextEdge), y));
 		
-		edgeParameterLineMap.put(e.getNextEdge(),pc);
-		edgeParameterLineMap.put(e.getPreviousEdge(),pc);
+		edgeParameterLineMap.put(nextEdge,pc);
+		edgeParameterLineMap.put(previousEdge,pc);
 	}
 	
 	// returns pluecker coords of 3 lines spanning the planar family containing the A-net edge corresponding to e
