@@ -126,8 +126,8 @@ public class VaryLab {
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
 		
-		v.registerPlugin(new ViewSwitchWidget());
-		v.registerPlugin(new MarqueeWidget());
+//		v.registerPlugin(new ViewSwitchWidget());
+//		v.registerPlugin(new MarqueeWidget());
 	}
 
 
