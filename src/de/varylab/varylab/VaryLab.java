@@ -71,8 +71,6 @@ import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
-import de.varylab.varylab.plugin.widget.MarqueeWidget;
-import de.varylab.varylab.plugin.widget.ViewSwitchWidget;
 
 public class VaryLab {
 
@@ -125,9 +123,6 @@ public class VaryLab {
 		v.registerPlugin(new GeodesicSelection());
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
-		
-		v.registerPlugin(new ViewSwitchWidget());
-		v.registerPlugin(new MarqueeWidget());
 	}
 
 
