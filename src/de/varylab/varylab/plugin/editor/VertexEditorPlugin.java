@@ -17,7 +17,6 @@ import de.jreality.scene.PointSet;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.tool.InputSlot;
-import de.jreality.tools.DragEventTool;
 import de.jreality.tools.PointDragEvent;
 import de.jreality.tools.PointDragListener;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -36,8 +35,8 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	private HalfedgeInterface
 		hif = null;
 	
-	private DragEventTool
-		tool = new DragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
+	private SwingDragEventTool
+		tool = new SwingDragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
 	
 	private JCheckBox
 		xBox = new JCheckBox("X"),
