@@ -153,7 +153,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		PositionAdapter a1 = new PositionAdapter();
 		TexCoordAdapter a2 = new TexCoordAdapter(false);
 		AdapterSet a = new AdapterSet(a1, a2);
-		remesh = hcp.get(remesh,a);
+		remesh = hcp.get(remesh, a);
 		RemeshingUtility.projectOntoBoundary(remesh, surface);
 		mapInnerVertices(surface,remesh);
 		hcp.set(remesh);

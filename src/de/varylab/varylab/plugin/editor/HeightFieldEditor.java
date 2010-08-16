@@ -71,7 +71,7 @@ public class HeightFieldEditor extends AlgorithmDialogPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
 		double a = aModel.getNumber().doubleValue();
-		VHDS r = hcp.get(new VHDS(), new AdapterSet());
+		VHDS r = hcp.get(new VHDS());
 		for (VVertex v : r.getVertices()) {
 			if (v.position == null) continue;
 			double x = v.position[0];

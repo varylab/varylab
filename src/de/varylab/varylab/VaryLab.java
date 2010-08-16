@@ -10,7 +10,6 @@ import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
-import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -23,7 +22,6 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
-import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
@@ -49,7 +47,6 @@ import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
@@ -82,9 +79,7 @@ public class VaryLab {
 		hif.addAdapter(new GeodesicLabelAdapter());
 		hif.addCalculator(new VPositionCalculator());
 		hif.addCalculator(new VSubdivisionCalculator());
-		hif.set(new VHDS());
 		v.registerPlugin(hif);
-		v.registerPlugin(new SelectionInterface());
 		v.registerPlugin(new OptimizationPanel());
 		v.registerPlugin(new VertexEditorPlugin());
 		
@@ -154,7 +149,7 @@ public class VaryLab {
 		v.registerPlugin(new ElectrostaticOptimizer());
 		v.registerPlugin(new PlanarNGonsOptimizer());
 		v.registerPlugin(new ExteriorGeodesicOptimizer());
-		v.registerPlugin(new ReferenceSurfaceOptimizer());
+//		v.registerPlugin(new ReferenceSurfaceOptimizer());
 		v.registerPlugin(new CircularQuadOptimizer());
 	}
 	

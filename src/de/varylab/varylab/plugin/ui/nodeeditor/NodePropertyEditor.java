@@ -34,7 +34,6 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.SelectionAdapter;
-import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.SelectionListener;
 import de.jtem.halfedgetools.plugin.VisualizersManager;
 import de.jtem.halfedgetools.util.NodeComparator;
@@ -48,8 +47,6 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	
 	private HalfedgeInterface
 		hif = null;
-	private SelectionInterface
-		sel = null;
 	private WeightsVisualizer
 		weightsVisualizer = null;
 	private VisualizersManager
@@ -123,8 +120,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		sel = c.getPlugin(SelectionInterface.class);
-		sel.addSelectionListener(this);
+		hif.addSelectionListener(this);
 		weightsVisualizer = c.getPlugin(WeightsVisualizer.class);
 		visualizersManager = c.getPlugin(VisualizersManager.class);
 	}
@@ -199,7 +195,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	
 	
 	@Override
-	public void selectionChanged(HalfedgeSelection s, SelectionInterface sif) {
+	public void selectionChanged(HalfedgeSelection s, HalfedgeInterface hif) {
 		selectedNodes.clear();
 		selectedNodes.addAll(s.getNodes());
 		DefaultListModel model = new DefaultListModel();
