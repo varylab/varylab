@@ -1,8 +1,22 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
+import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
+import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
+import static de.jreality.shader.CommonAttributes.FACE_DRAW;
+import static de.jreality.shader.CommonAttributes.LINE_SHADER;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
+import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
+import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
+import static java.awt.Color.ORANGE;
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.SwingUtilities.getWindowAncestor;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,19 +28,21 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.basic.View;
 import de.jreality.reader.Readers;
+import de.jreality.scene.Appearance;
+import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.viewerapp.FileLoaderDialog;
 import de.jreality.util.Input;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
@@ -41,15 +57,14 @@ import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements ActionListener, UIFlavor {
 
-	private JPanel
-		panel = new JPanel();
-	
-	private JButton
-		loadButton = new JButton("Load");
-	
+
 	private ReferenceSurfaceFunctional<VVertex, VEdge, VFace>
 		functional = new ReferenceSurfaceFunctional<VVertex, VEdge, VFace>();
-	
+
+	private JPanel
+		panel = new JPanel();
+	private JButton
+		loadButton = new JButton("Load");
 	private JFileChooser 
 		chooser = FileLoaderDialog.createFileChooser();
 
@@ -57,15 +72,13 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		showSurfaceChecker = new JCheckBox("Show Surface"),
 		wireFrameChecker = new JCheckBox("Wireframe");
 	
-	private View view;
-
-	private SceneGraphComponent refSGC;
+	private Appearance
+		refSurfaceAppearance = new Appearance("Reference Surface Appearance");
+	private HalfedgeLayer
+		refSurfaceLayer = null; 
 	
-	private VHDS refSurface = new VHDS();
-	
-	private ConverterJR2Heds 
-		converter = new ConverterJR2Heds();
-
+	private View 
+		view = null;
 	private HalfedgeInterface 
 		hif = null;
 	
@@ -116,45 +129,55 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	public JPanel getOptionPanel() {
 		return panel;
 	}
+	
+	
+	private void updateStates() {
+		refSurfaceAppearance.setAttribute(FACE_DRAW, !wireFrameChecker.isSelected());
+		refSurfaceAppearance.setAttribute(EDGE_DRAW, wireFrameChecker.isSelected());
+		refSurfaceAppearance.setAttribute(VERTEX_DRAW, false);
+		refSurfaceAppearance.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
+		refSurfaceAppearance.setAttribute(TRANSPARENCY_ENABLED, true);
+		refSurfaceAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, 0.3);
+		refSurfaceAppearance.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		refSurfaceAppearance.setAttribute(LINE_SHADER + "." + TRANSPARENCY, 0.3);
+		refSurfaceAppearance.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		refSurfaceLayer.setAppearance(refSurfaceAppearance);
+		wireFrameChecker.setEnabled(showSurfaceChecker.isSelected());
+		if (showSurfaceChecker.isSelected()) {
+			hif.addLayer(refSurfaceLayer);
+		} else {
+			hif.removeLayer(refSurfaceLayer);
+		}
+	}
+	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if(loadButton == src) {
-			if(showSurfaceChecker.isSelected()) {
-				showSurfaceChecker.setSelected(false);
-				hif.getAuxComponent().removeChild(refSGC);
-			}
-			loadFile();
+			SceneGraphComponent c = loadFile();
+			Geometry g = SceneGraphUtility.getFirstGeometry(c);
+			if (!(g instanceof IndexedFaceSet)) return;
+			IndexedFaceSet ifs = (IndexedFaceSet)g;
+			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+			refSurfaceLayer.set(ifs);
 			AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
-			converter.ifs2heds((IndexedFaceSet)SceneGraphUtility.getFirstGeometry(refSGC), refSurface, as);
+			VHDS refSurface = refSurfaceLayer.get(new VHDS());
 			functional.setReferenceSurface(refSurface, as);
 			showSurfaceChecker.setEnabled(true);
-		} else if (showSurfaceChecker == src) {
-			if(showSurfaceChecker.isSelected()) {
-				hif.getAuxComponent().addChild(refSGC);
-				wireFrameChecker.setEnabled(true);
-				if(wireFrameChecker.isSelected()) {
-					refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
-				}
-			} else {
-				hif.getAuxComponent().removeChild(refSGC);
-				wireFrameChecker.setEnabled(false);
-			}
-		} else if(wireFrameChecker == src) {
-			if(wireFrameChecker.isSelected()) {
-				refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
-			} else {
-				refSGC.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, true);
-			}
 		}
-		
+		hif.checkContent();
+		updateStates();
 	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
 		view = c.getPlugin(View.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		refSurfaceLayer = new HalfedgeLayer(hif);
+		refSurfaceLayer.setName("Reference Surface");
+		refSurfaceLayer.setAppearance(refSurfaceAppearance);
 		super.install(c);
 	}
 	
@@ -164,20 +187,21 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		SwingUtilities.updateComponentTreeUI(chooser);
 	}
 	
-	private void loadFile() {
+	private SceneGraphComponent loadFile() {
+		Window w = getWindowAncestor(view.getViewer().getViewingComponent());
 		File file = null;
-		if (chooser.showOpenDialog(view.getViewer().getViewingComponent()) == JFileChooser.APPROVE_OPTION) {
+		if (chooser.showOpenDialog(w) == APPROVE_OPTION) {
 			file = chooser.getSelectedFile();
 		}
+		SceneGraphComponent c = null;
 		if (file != null) {
 			try {
-				refSGC = Readers.read(Input.getInput(file));
+				c = Readers.read(Input.getInput(file));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			refSGC = null;
 		}
+		return c;
 	}
 
 }
