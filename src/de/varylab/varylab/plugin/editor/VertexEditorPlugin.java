@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewerUtility;
@@ -101,16 +102,22 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	public void pointDragEnd(PointDragEvent e) {
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		AdapterSet adapters = hif.getAdapters();
-		Vertex<?,?,?> v = hds.getVertex(e.getIndex());
+		final Vertex<?,?,?> v = hds.getVertex(e.getIndex());
 		double[] oldPos = adapters.get(Position.class, v, double[].class);
 		double[] translation = Rn.subtract(null, position, oldPos);
 		for(Vertex<?,?,?> sv: selectedVertices) {
 			double[] xyz = adapters.get(Position.class,sv,double[].class);
 			adapters.set(Position.class,sv,Rn.add(null, xyz, translation));
 		}
-		hif.update();
-		hes.add(v);
-		hif.setSelection(hes);
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				hif.update();
+				hes.add(v);
+				hif.setSelection(hes);
+			}
+		});
 	}
 	
 	@Override
