@@ -1,13 +1,12 @@
 package de.varylab.varylab;
 
-import javax.swing.UIManager;
-
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
+import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -165,8 +164,7 @@ public class VaryLab {
 	
 	
 	public static void main(String[] args) throws Exception {
-		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
-		UIManager.getDefaults().put("Slider.paintValue", false);
+		JRHalfedgeViewer.initHalfedgeFronted();
 		NativePathUtility.set("native");
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
