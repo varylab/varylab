@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/CurvatureGeometry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
+	<classpathentry kind="src" path="/jrworkspace"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
