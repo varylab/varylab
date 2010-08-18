@@ -23,7 +23,6 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.projgeom.P5;
 import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 
 public class HyperbolicPatchVisualizer extends VisualizerPlugin implements ActionListener {

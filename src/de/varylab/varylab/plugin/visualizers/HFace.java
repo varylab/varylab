@@ -1,13 +1,11 @@
 package de.varylab.varylab.plugin.visualizers;
 
 import static de.jtem.projgeom.P5.LINE_SPACE;
-
 import hyperbolicnets.core.DataModel;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.projgeom.P5;
 import de.jtem.projgeom.PlueckerLineGeometry;
