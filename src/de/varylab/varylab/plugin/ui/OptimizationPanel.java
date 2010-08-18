@@ -278,7 +278,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			v.position[1] = x.getValue(i + 1);
 			v.position[2] = maxz_before*x.getValue(i + 2)/maxz_after;
 		}
-		HalfedgeSelection hes = hif.getSelection();
+		HalfedgeSelection hes = new HalfedgeSelection(hif.getSelection());
 		hif.set(hds, new AdapterSet());
 		hif.setSelection(hes);
 	}
