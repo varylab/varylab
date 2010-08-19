@@ -158,7 +158,7 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		if(loadButton == src) {
 			SceneGraphComponent c = loadFile();
 			Geometry g = SceneGraphUtility.getFirstGeometry(c);
-			if (!(g instanceof IndexedFaceSet)) return;
+			if (g == null || !(g instanceof IndexedFaceSet)) return;
 			IndexedFaceSet ifs = (IndexedFaceSet)g;
 			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 			refSurfaceLayer.set(ifs);
