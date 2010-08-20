@@ -57,6 +57,7 @@ import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
+import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
@@ -86,6 +87,8 @@ public class VaryLab {
 		v.registerPlugin(new QuadMeshGenerator());
 		v.registerPlugin(new HexMeshGenerator());
 		v.registerPlugin(new SimpleRoofGenerator());
+		
+		v.registerPlugin(new IdentifyVerticesPlugin());
 		
 		v.registerPlugin(new HeightFieldEditor());
 		

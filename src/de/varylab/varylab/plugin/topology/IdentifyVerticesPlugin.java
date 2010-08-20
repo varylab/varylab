@@ -36,8 +36,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -54,11 +56,11 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.discreteconformal.heds.bsp.HasBspPos;
 import de.varylab.discreteconformal.heds.bsp.KdTree;
@@ -78,12 +80,13 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		identificationMap = new HashMap<Vertex<?,?,?>, Vertex<?,?,?>>();
 	
 	private JLabel
-		infoLabel = new JLabel();
+		infoLabel = new JLabel("Vertex pairs found:");
 
-	private double 
-		distance = 0.0;
-
-	private HalfedgeSelection oldSelection;
+	private JCheckBox
+		noEdgeCollapseChecker = new JCheckBox("no edge collapse");
+	
+	private HalfedgeSelection 
+		oldSelection = null;
 	
 	public IdentifyVerticesPlugin() {
 		panel.setLayout(new GridBagLayout());
@@ -101,6 +104,8 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		
 		distanceSpinner.addChangeListener(this);
 		
+		panel.add(noEdgeCollapseChecker,gbc2);
+		noEdgeCollapseChecker.setSelected(true);
 		panel.add(new JLabel("Distance"), gbc1);
 		panel.add(distanceSpinner, gbc2);
 		
@@ -115,26 +120,24 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		if(oldSelection == null) {
-			oldSelection = hcp.getSelection();
-		}
-		if(identificationMap.size() == 0) {
-			calculateAndShowIdentification(hds, hif);
-		}
-		HashSet<Vertex<?,?,?>> alreadyMerged = new HashSet<Vertex<?,?,?>>();
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		for(Vertex<?,?,?> v : identificationMap.keySet()) {
-			if(alreadyMerged.contains(v)) {
-				continue;
+		if(calculateAndShowIdentification(hds, hif)) {
+			HashSet<Vertex<?,?,?>> alreadyMerged = new HashSet<Vertex<?,?,?>>();
+			VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
+			for(Vertex<?,?,?> v : identificationMap.keySet()) {
+				if(alreadyMerged.contains(v)) {
+					continue;
+				}
+
+				Vertex<?,?,?> w = identificationMap.get(v);
+
+				stitch(hds,vc,(V)v,(V)w);
+				alreadyMerged.add(v);
+				alreadyMerged.add(w);
 			}
-			
-			Vertex<?,?,?> w = identificationMap.get(v);
-			
-			stitch(hds,vc,(V)v,(V)w);
-			alreadyMerged.add(v);
-			alreadyMerged.add(w);
+
+			hif.set(hds);
 		}
-		
+		hif.setSelection(oldSelection);
 	}
 
 	private <
@@ -143,44 +146,38 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> boolean stitch(HDS hds, VertexPositionCalculator vc, V v1, V v2) {
-		List<V> commonNeighs = HalfEdgeUtilsExtra.getVertexStar(v1);
-		commonNeighs.retainAll(HalfEdgeUtilsExtra.getVertexStar(v2));
-		for(V n : commonNeighs) {
-			E 	e1 = HalfEdgeUtils.findEdgeBetweenVertices(v1, n),
-				e2 = HalfEdgeUtils.findEdgeBetweenVertices(v2, n);
-			if(e1.getLeftFace() != null) {
-				e1 = e1.getOppositeEdge();
-			}
-			if(e2.getLeftFace() != null) {
-				e2 = e2.getOppositeEdge();
-			}
-			if(e1.getLeftFace() != null || e2.getLeftFace() != null) {
-				return false;
+
+		List<E> inEdges = findEdgesOfCommonHole(v1,v2);
+		E 	ie1 = null,
+			ie2 = null;
+		if(inEdges.size() == 2) {
+			ie1 = inEdges.get(0);
+			ie2 = inEdges.get(1);
+		} else {
+			for(E e: HalfEdgeUtils.incomingEdges(v1)) {
+				if(e.getLeftFace() == null) {
+					ie1 = e;
+					break;
+				}
 			}
 			for(E e: HalfEdgeUtils.incomingEdges(v2)) {
-				e.setTargetVertex(v1);
+				if(e.getLeftFace() == null) {
+					ie2 = e;
+					break;
+				}
 			}
-			e1.getOppositeEdge().linkOppositeEdge(e2.getOppositeEdge());
-			double[]
-			       coord1 = vc.get(v1),
-			       coord2 = vc.get(v2);
-			
-			vc.set(v1, Rn.linearCombination(null, .5, coord1, .5, coord2));
-			if(oldSelection.isSelected(e1)) {
-				oldSelection.remove(e1);
-			}
-			if(oldSelection.isSelected(e2)) {
-				oldSelection.remove(e2);
-			}
-			if(oldSelection.isSelected(v2)) {
-				oldSelection.remove(v2);
-				oldSelection.setSelected(v1, true);
-			}
-			hds.removeEdge(e1);
-			hds.removeEdge(e2);
-			hds.removeVertex(v2);
 		}
-		return true;
+		if(ie1 == null || ie2 == null) {
+			return false;
+		}
+		
+		E splitE = insertEdge(v1,ie1,v2,ie2);
+		double[] newCoords = Rn.linearCombination(null, .5, vc.get(v1), .5, vc.get(v2));
+		V newV = TopologyAlgorithms.collapseEdge(splitE);
+		vc.set(newV,newCoords);
+		removeDigons(newV);
+		
+		return true;		
 	}
 	
 	@Override
@@ -205,13 +202,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(oldSelection == null) {
-			oldSelection = hcp.getSelection();
-		}
-		if(distance != distanceModel.getNumber().doubleValue()) {
-			distance = distanceModel.getNumber().doubleValue();
-			calculateAndShowIdentification(hcp.get(), hcp);
-		}
+		calculateAndShowIdentification(hcp.get(), hcp);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -220,7 +211,9 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void calculateAndShowIdentification(HDS hds, HalfedgeInterface hif) {
+	> boolean calculateAndShowIdentification(HDS hds, HalfedgeInterface hif) {
+		double distance = distanceModel.getNumber().doubleValue();
+		identificationMap.clear();
 		infoLabel.setText("");
 		HalfedgeSelection identifySel = new HalfedgeSelection();
 		List<V> vertices = hds.getVertices();
@@ -231,13 +224,17 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 				for(HasBspPos near : kdtree.collectKNearest(hv, 3)) {
 					double dist = kdtree.distance2(near, hv);
 					if(near != hv && (dist <= distance)) {
+						if(noEdgeCollapseChecker.isSelected()) {
+							if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)near) != null) {
+								continue;
+							}
+						}
 						identifySel.setSelected(v, true);
 						identifySel.setSelected((Vertex<?,?,?>)near, true);
 						if((identificationMap.containsKey(v) && identificationMap.get(v) != near) ||
 								(identificationMap.containsKey(near) && identificationMap.get(near) != v)) {
-							distanceModel.setValue(0.0);
-							infoLabel.setText("Ambiguous identification");
-							return;
+							infoLabel.setText("identification impossible - not unique");
+							return false;
 						}
 						identificationMap.put((Vertex<?, ?, ?>) near, v);
 						identificationMap.put(v, (Vertex<?, ?, ?>) near);
@@ -254,13 +251,17 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 					if(v.getIndex() < w.getIndex()) {
 						double dist = Rn.euclideanDistance(vc.get(v), vc.get(w));
 						if(dist <= distance) {
+							if(noEdgeCollapseChecker.isSelected()) {
+								if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)w) != null) {
+									continue;
+								}
+							}
 							identifySel.setSelected(v, true);
 							identifySel.setSelected(w, true);
 							if((identificationMap.containsKey(v) && identificationMap.get(v) != w) ||
 									(identificationMap.containsKey(w) && identificationMap.get(w) != v)){
-								distanceModel.setValue(0.0);
-								infoLabel.setText("Ambiguous identification");
-								return;
+								infoLabel.setText("identification impossible - not unique");
+								return false;
 							}
 							identificationMap.put(w, v);
 							identificationMap.put(v, w);
@@ -270,5 +271,87 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 			}
 		}
 		hif.setSelection(identifySel);
+		infoLabel.setText("Vertex pairs found:" + identificationMap.size()/2);
+		return true;
+	}
+	
+	// Returns a list of incoming edges of v1 resp. v2, such that the left faces
+	// of the edge are equal (may be null / hole) and this face contains v1 and v2
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> List<E> findEdgesOfCommonHole(V v1, V v2) {
+		List<E> inEdges = new LinkedList<E>();
+		for(E e : HalfEdgeUtils.incomingEdges(v1)) {
+			if(e.getLeftFace() != null) {
+				continue;
+			}
+			E be = e.getNextEdge();
+			while(be.getTargetVertex() != v1) {
+				if(be.getTargetVertex() == v2) {
+					inEdges.add(e);
+					inEdges.add(be);
+					return inEdges;
+				}
+				be = be.getNextEdge();
+			}
+		}
+		return inEdges;
+	}
+	
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	>  E insertEdge(V v1, E e1, V v2, E e2) {
+		HalfEdgeDataStructure<V, E, F> hds = v1.getHalfEdgeDataStructure();
+		E	ne = hds.addNewEdge(),
+			neo = hds.addNewEdge();
+		ne.linkOppositeEdge(neo);
+		ne.setTargetVertex(v2);
+		neo.setTargetVertex(v1);
+		ne.linkNextEdge(e2.getNextEdge());
+		neo.linkNextEdge(e1.getNextEdge());
+		ne.linkPreviousEdge(e1);
+		neo.linkPreviousEdge(e2);
+		return ne;
+	}
+	
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void removeDigons(V v) {
+		for(E e : HalfEdgeUtils.incomingEdges(v)) {
+			if(e.getNextEdge() == e.getPreviousEdge()) {
+				E eo = e.getOppositeEdge();
+				eo.linkOppositeEdge(e.getNextEdge().getOppositeEdge());
+				eo.getHalfEdgeDataStructure().removeEdge(e.getNextEdge());
+				eo.getHalfEdgeDataStructure().removeEdge(e);
+			}
+		}
+	}
+	
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeBeforeDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
+		oldSelection = hcp.getSelection();
+		double minEdgeLength = Double.POSITIVE_INFINITY;
+		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
+		for(E e : hds.getPositiveEdges()) {
+			double length = Rn.euclideanDistance(vc.get(e.getStartVertex()), vc.get(e.getTargetVertex()));
+			if(length < minEdgeLength) {
+				minEdgeLength = length;
+			}
+		}
+		distanceModel.setMaximum(5*minEdgeLength);
+		distanceModel.setStepSize(minEdgeLength/5.0);
+		calculateAndShowIdentification(hds,hcp);
 	}
 }
