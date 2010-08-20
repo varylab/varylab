@@ -173,7 +173,7 @@ public class VaryLab {
 		v.setPropertiesFile("VaryLab.xml");
 		v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
 		v.setShowPanelSlots(true, true, true, true);
-		v.addContentSupport(ContentType.CenteredAndScaled);
+		v.addContentSupport(ContentType.Raw);
 		v.setShowToolBar(true);
 		v.setShowMenuBar(true);
 		v.addBasicUI();
