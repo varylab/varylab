@@ -31,6 +31,7 @@ import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.editor.VertexEditorPlugin;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
+import de.varylab.varylab.plugin.generator.PrimitivesGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
@@ -83,10 +84,9 @@ public class VaryLab {
 		v.registerPlugin(hif);
 		v.registerPlugin(new OptimizationPanel());
 		v.registerPlugin(new VertexEditorPlugin());
+		v.registerPlugin(new IdentifyVerticesPlugin());
 		
-		v.registerPlugin(new QuadMeshGenerator());
-		v.registerPlugin(new HexMeshGenerator());
-		v.registerPlugin(new SimpleRoofGenerator());
+		addGeneratorPlugins(v);
 		
 		v.registerPlugin(new IdentifyVerticesPlugin());
 		
@@ -121,6 +121,14 @@ public class VaryLab {
 		v.registerPlugin(new GeodesicSelection());
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
+	}
+
+
+	private static void addGeneratorPlugins(JRViewer v) {
+		v.registerPlugin(new QuadMeshGenerator());
+		v.registerPlugin(new HexMeshGenerator());
+		v.registerPlugin(new SimpleRoofGenerator());
+		v.registerPlugin(new PrimitivesGenerator());
 	}
 
 
