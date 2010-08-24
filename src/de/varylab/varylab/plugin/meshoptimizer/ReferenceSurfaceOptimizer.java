@@ -104,8 +104,6 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 		showSurfaceChecker.addActionListener(this);
 		wireFrameChecker.addActionListener(this);
 		loadButton.addActionListener(this);
-		
-		chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 	}
 	
 	@Override
@@ -190,6 +188,10 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	private SceneGraphComponent loadFile() {
 		Window w = getWindowAncestor(view.getViewer().getViewingComponent());
 		File file = null;
+		File userDir = new File(System.getProperty("user.dir"));
+		if (userDir.exists()) {
+			chooser.setCurrentDirectory(userDir);
+		}
 		if (chooser.showOpenDialog(w) == APPROVE_OPTION) {
 			file = chooser.getSelectedFile();
 		}
