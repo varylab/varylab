@@ -31,6 +31,7 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		primitivesGroup = new ButtonGroup();
 	
 	private JRadioButton
+		triangleButton = new JRadioButton("triangle"),
 		cubeButton = new JRadioButton("cube"),
 		openCubeButton = new JRadioButton("open cube"),
 		tetrahedronButton = new JRadioButton("tetrahedron");
@@ -51,9 +52,13 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
 		
+		triangleButton.setSelected(true);
+		primitivesGroup.add(triangleButton);
+		primitivesGroup.add(openCubeButton);
 		primitivesGroup.add(cubeButton);
 		primitivesGroup.add(tetrahedronButton);
 		
+		panel.add(triangleButton,gbc2);
 		panel.add(cubeButton,gbc2);
 		panel.add(openCubeButton, gbc2);
 		panel.add(tetrahedronButton,gbc2);
@@ -75,6 +80,9 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
 		IndexedFaceSet ifs = null;
+		if(triangleButton.isSelected()) {
+			ifs = Primitives.regularPolygon(3);
+		}
 		if(cubeButton.isSelected()) {
 			ifs = Primitives.cube();
 		}
