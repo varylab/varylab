@@ -42,6 +42,7 @@ import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
@@ -158,6 +159,7 @@ public class VaryLab {
 		v.registerPlugin(new ConstantDirectionFieldPlugin());
 		v.registerPlugin(new SpringOptimizer());
 		v.registerPlugin(new ElectrostaticOptimizer());
+		v.registerPlugin(new ElectrostaticSphereOptimizer());
 		v.registerPlugin(new PlanarNGonsOptimizer());
 		v.registerPlugin(new ExteriorGeodesicOptimizer());
 		v.registerPlugin(new ReferenceSurfaceOptimizer());
