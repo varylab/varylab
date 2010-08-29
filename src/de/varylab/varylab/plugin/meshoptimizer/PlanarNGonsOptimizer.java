@@ -11,8 +11,8 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.AdaptedFaceWeightFunction;
-import de.varylab.varylab.math.functional.PlanarNgonsFunctional;
 import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
+import de.varylab.varylab.math.functional.PlanarNgonsFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 

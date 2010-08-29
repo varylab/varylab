@@ -2,11 +2,11 @@ package de.varylab.varylab.plugin.meshoptimizer;
 
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.varylab.discreteconformal.functional.ElectrostaticSphereFunctional;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.ElectrostaticSphereFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 

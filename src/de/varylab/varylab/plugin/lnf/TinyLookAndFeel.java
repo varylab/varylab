@@ -8,7 +8,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.sf.tinylaf.controlpanel.ControlPanel;
-
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelPlugin;
 
 public class TinyLookAndFeel extends LookAndFeelPlugin implements ActionListener {

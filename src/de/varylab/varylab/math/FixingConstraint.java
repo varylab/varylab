@@ -23,15 +23,15 @@ public class FixingConstraint implements Constraint{
 		fixBoundaryY = false,
 		fixBoundaryZ = false,
 		innerBoundary = false,
-		fixX = false,
-		fixY = false,
-		fixZ = false;
+		fixGlobalX = false,
+		fixGlobalY = false,
+		fixGlobalZ = false;
 	
-	private Collection<? extends Vertex<?,?,?>>
-		fixedVerts = null;
+	private Collection<VVertex>
+		selectedVertices = null;
 	
-	public <V extends Vertex<?,?,?>> FixingConstraint(
-		Collection<V> fixed, 
+	public FixingConstraint(
+		Collection<VVertex> selectedVertices, 
 		boolean fixSelectionX, 
 		boolean fixSelectionY, 
 		boolean fixSelectionZ, 
@@ -39,21 +39,21 @@ public class FixingConstraint implements Constraint{
 		boolean fixBoundaryY, 
 		boolean fixBoundaryZ, 
 		boolean innerBoundaryMovements, 
-		boolean fixX, 
-		boolean fixY, 
-		boolean fixZ
+		boolean fixGlobalX, 
+		boolean fixGlobalY, 
+		boolean fixGlobalZ
 	) {
 		this.fixSelectionX = fixSelectionX;
 		this.fixSelectionY = fixSelectionY;
 		this.fixSelectionZ = fixSelectionZ;
-		this.fixedVerts = fixed;
+		this.selectedVertices = selectedVertices;
 		this.fixBoundaryX = fixBoundaryX;
 		this.fixBoundaryY = fixBoundaryY;
 		this.fixBoundaryZ = fixBoundaryZ;
 		this.innerBoundary = innerBoundaryMovements;
-		this.fixX = fixX;
-		this.fixY = fixY;
-		this.fixZ = fixZ;
+		this.fixGlobalX = fixGlobalX;
+		this.fixGlobalY = fixGlobalY;
+		this.fixGlobalZ = fixGlobalZ;
 	}
 
 
@@ -66,7 +66,7 @@ public class FixingConstraint implements Constraint{
 				G.set(v.getIndex() * 3 + 2, 0.0);
 			}
 		}
-		for (Vertex<?,?,?> v : fixedVerts){
+		for (VVertex v : selectedVertices){
 			int i = v.getIndex();
 			if (fixSelectionX) G.set(i * 3 + 0, 0.0);
 			if (fixSelectionY) G.set(i * 3 + 1, 0.0);
@@ -76,7 +76,7 @@ public class FixingConstraint implements Constraint{
 			if (!HalfEdgeUtils.isBoundaryVertex(v)){
 				continue;
 			}
-			if (fixedVerts.contains(v)) {
+			if (selectedVertices.contains(v)) {
 				continue;
 			}
 			int i = v.getIndex();
@@ -102,16 +102,16 @@ public class FixingConstraint implements Constraint{
 			}
 		}
 		for (int i = 0; i < dim / 3; i++) {
-			if (fixX) G.set(i * 3 + 0, 0.0);
-			if (fixY) G.set(i * 3 + 1, 0.0);
-			if (fixZ) G.set(i * 3 + 2, 0.0);
+			if (fixGlobalX) G.set(i * 3 + 0, 0.0);
+			if (fixGlobalY) G.set(i * 3 + 1, 0.0);
+			if (fixGlobalZ) G.set(i * 3 + 2, 0.0);
 		}
 	}
 
 
 	@Override
 	public void editHessian(VHDS hds, int dim, DomainValue x, Hessian H) {
-		for (Vertex<?,?,?> v : fixedVerts){
+		for (Vertex<?,?,?> v : selectedVertices){
 			int i = v.getIndex();
 			for (int j = 0; j < dim; j++) {
 				if (fixSelectionX) H.set(i * 3 + 0,j, 0.0);
@@ -126,7 +126,7 @@ public class FixingConstraint implements Constraint{
 			if (!HalfEdgeUtils.isBoundaryVertex(v)){
 				continue;
 			}
-			if (fixedVerts.contains(v)) {
+			if (selectedVertices.contains(v)) {
 				continue;
 			}
 			int i = v.getIndex();
@@ -138,9 +138,9 @@ public class FixingConstraint implements Constraint{
 		}
 		for (int i = 0; i < dim; i++) {
 			for (int j = 0; j < dim / 3; j++) {
-				if (fixX) H.set(i, j * 3 + 0, 0.0);
-				if (fixY) H.set(i, j * 3 + 1, 0.0);
-				if (fixZ) H.set(i, j * 3 + 2, 0.0);
+				if (fixGlobalX) H.set(i, j * 3 + 0, 0.0);
+				if (fixGlobalY) H.set(i, j * 3 + 1, 0.0);
+				if (fixGlobalZ) H.set(i, j * 3 + 2, 0.0);
 			}
 		}
 	}

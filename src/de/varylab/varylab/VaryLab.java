@@ -20,6 +20,7 @@ import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
+import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
@@ -192,6 +193,7 @@ public class VaryLab {
 		v.addBasicUI();
 		v.addContentUI();
 		addVaryLabPlugins(v);
+		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
 	}
 
