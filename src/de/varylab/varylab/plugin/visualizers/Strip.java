@@ -62,6 +62,7 @@ public class Strip<E extends Edge<?,E,F>, F extends Face<?,E,F>> {
 		return edges;
 	}
 	
+	@Override
 	public String toString() {
 		String str = new String();
 		str += edges.getFirst() + ", ";

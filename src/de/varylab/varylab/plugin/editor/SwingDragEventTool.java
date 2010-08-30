@@ -206,6 +206,7 @@ public class SwingDragEventTool extends AbstractTool {
 	
 	
 	
+	@Override
 	public void activate(final ToolContext tc) {
 		ActivationRunnable run = new ActivationRunnable(tc);
 		try {
@@ -281,6 +282,7 @@ public class SwingDragEventTool extends AbstractTool {
 	}
 	
 	
+	@Override
 	public void perform(ToolContext tc) {
 		PerformRunnable run = new PerformRunnable(tc);
 		try {
@@ -320,6 +322,7 @@ public class SwingDragEventTool extends AbstractTool {
 		
 	}
 	
+	@Override
 	public void deactivate(ToolContext tc) {
 		DeactiveRunnable run = new DeactiveRunnable();
 		try {
