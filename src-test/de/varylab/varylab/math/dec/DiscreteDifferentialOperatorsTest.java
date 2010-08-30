@@ -14,7 +14,6 @@ import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
-import de.jtem.halfedgetools.util.BoundaryOperators;
 
 public class DiscreteDifferentialOperatorsTest {
 
@@ -61,10 +60,10 @@ public class DiscreteDifferentialOperatorsTest {
 	@Test
 	public void testTetrahedron() {
 		FunctionalTestData.createCombinatorialTetrahedron(hds);
-		BoundaryOperators bdOp = new BoundaryOperators(hds);
+		DiscreteDifferentialOperators bdOp = new DiscreteDifferentialOperators(hds);
 		Matrix 
-			d0 = bdOp.getOperatorMatrix(0),
-			d1 = bdOp.getOperatorMatrix(1);
+			d0 = bdOp.getBoundaryMatrix(0),
+			d1 = bdOp.getBoundaryMatrix(1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
 		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
@@ -75,10 +74,10 @@ public class DiscreteDifferentialOperatorsTest {
 		DefaultJRHDS hds = new DefaultJRHDS();
 		
 		FunctionalTestData.createCombinatorialPyrWithBnd(hds);
-		BoundaryOperators bdOp = new BoundaryOperators(hds);
+		DiscreteDifferentialOperators bdOp = new DiscreteDifferentialOperators(hds);
 		Matrix 
-			d0 = bdOp.getOperatorMatrix(0),
-			d1 = bdOp.getOperatorMatrix(1);
+			d0 = bdOp.getBoundaryMatrix(0),
+			d1 = bdOp.getBoundaryMatrix(1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
 		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
