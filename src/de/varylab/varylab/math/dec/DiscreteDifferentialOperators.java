@@ -1,11 +1,18 @@
 package de.varylab.varylab.math.dec;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
+import no.uib.cipr.matrix.DenseMatrix;
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Matrices;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixEntry;
+import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.sparse.CompDiagMatrix;
 import no.uib.cipr.matrix.sparse.FlexCompColMatrix;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
@@ -13,10 +20,15 @@ import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
+import de.varylab.varylab.hds.adapter.GaussianCurvatureAdapter;
 
 public class DiscreteDifferentialOperators {
 
@@ -298,6 +310,130 @@ public class DiscreteDifferentialOperators {
 		return M;
 	}
 
+	public int getIndex(Edge<?,?,?> e) {
+		return edgeMap.get(e);
+	}
+	
+	public VectorFieldAdapter getTrivialConnectionVectorField() {
+		ConnectionAdapter trivialConnection = calculateTrivialConnection(heds);
+		Map<Face<?,?,?>,double[]> vf = new HashMap<Face<?,?,?>, double[]>();
+		Stack<Face<?,?,?>> queue = new Stack<Face<?,?,?>>();
+		Face<?,?,?> f = heds.getFace(0);
+		Edge<?,?,?> e = f.getBoundaryEdge();
+		double[] ev = Rn.subtract(null, 
+						adapters.get(Position.class, e.getTargetVertex(), double[].class),
+						adapters.get(Position.class, e.getStartVertex(), double[].class));
+		vf.put(f, Rn.normalize(null, ev));
+		queue.add(f);
+		while(!queue.isEmpty()) {
+			Face<?,?,?> actFace = queue.pop();
+			Edge<?,?,?> bdEdge = actFace.getBoundaryEdge();
+			do {
+				Face<?,?,?> neighFace = bdEdge.getRightFace();
+				if(neighFace != null && !(vf.containsKey(neighFace))) {
+					double[] neighVector = transportVector(vf.get(actFace),actFace,bdEdge,trivialConnection);
+					vf.put(neighFace, neighVector);
+					queue.add(neighFace);
+				}
+				bdEdge = bdEdge.getNextEdge();
+			} while(bdEdge != actFace.getBoundaryEdge());
+		}
+		return new VectorFieldAdapter(vf);
+	}
+
+	private <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> ConnectionAdapter calculateTrivialConnection(HDS hds) {
+		Set<F> bdFaces = new HashSet<F>();
+		for(V v: HalfEdgeUtils.boundaryVertices(hds)) {
+			bdFaces.addAll(HalfEdgeUtilsExtra.getFaceStar(v));
+		}
+		int eulerChar = (hds.numVertices()-hds.numEdges()/2+hds.numFaces());
+		
+	//	int
+	//		numVertices = hds.numVertices(),
+	//		numEdges = hds.numEdges()/2,
+	//		numBdEdges = HalfEdgeUtils.boundaryEdges(hds).size()*2;
+	//	Set<List<E>> paths = HomologyUtility.getDualGeneratorPaths(hds.getVertex(0), new Search.DefaultWeightAdapter<E>());
+		//TODO deal with boundary
+	//	Matrix A = new FlexCompRowMatrix(numVertices-bdFaces.size()+paths.size(),numEdges-numBdEdges);
+		Matrix d0 = new DenseMatrix(getDifferential(0));
+		Matrix d1 = getDifferential(1);
+		Vector b = new DenseVector(hds.numVertices());
+		GaussianCurvatureAdapter gca = new GaussianCurvatureAdapter();
+		double totalSingularities = 0.0;
+		for(V v: hds.getVertices()) {
+			double val = gca.get(v,adapters);
+			double sing = adapters.get(Singularity.class, v, Double.class);
+			totalSingularities += sing;
+			val -= 2*Math.PI*sing;
+			b.set(v.getIndex(), val);
+		}
+		if(eulerChar != totalSingularities) {
+			throw new IllegalArgumentException("Sum of singularities does not match Euler characteristic: " +totalSingularities+" != "+eulerChar);
+		}
+		Vector solution = new DenseVector(hds.numEdges()/2);
+		d0.transSolve(b,solution);
+		
+		Matrix L = new DenseMatrix(hds.numFaces(),hds.numFaces());
+		d1.transBmult(d1, L);
+		Vector z = new DenseVector(hds.numFaces());
+		d1.mult(solution, z);
+		Vector y = new DenseVector(hds.numFaces());
+		L.solve(z,y);
+		Vector proj = new DenseVector(hds.numEdges()/2);
+		d1.transMult(y,proj);
+		solution.add(-1.0,proj);
+		return new ConnectionAdapter(solution,edgeMap);
+	}
+
+	private double[] transportVector(
+			double[] vector, 
+			Face<?, ?, ?> actFace, 
+			Edge<?, ?, ?> bdEdge, 
+			ConnectionAdapter trivialConnection) {
+		double[]
+		       common = getEdgeVector(bdEdge,adapters),
+		       le = getEdgeVector(bdEdge.getPreviousEdge().getOppositeEdge(),adapters),
+		       re = getEdgeVector(bdEdge.getOppositeEdge().getPreviousEdge(),adapters);
+		Matrix 
+			bl = new DenseMatrix(orthonormalBasis(common,le)),
+			br = new DenseMatrix(orthonormalBasis(common,re)),
+			rot = new DenseMatrix(rotationMatrix(trivialConnection.get(bdEdge, null))),
+			tmp = new DenseMatrix(3,3),
+			tmp2 = new DenseMatrix(3,3);
+		DenseVector tvec = new DenseVector(3);
+		rot.mult(bl, tmp);
+		br.transAmult(tmp, tmp2);
+		tmp2.mult(new DenseVector(vector), tvec);
+		return Matrices.getArray(tvec);
+	}
+
+	private double[][] rotationMatrix(double angle) {
+		return new double[][] {
+				new double[]{Math.cos(angle),-Math.sin(angle),0.0},
+				new double[]{Math.sin(angle),Math.cos(angle),0.0},
+				new double[]{0.0,0.0,1.0}
+				};
+	}
+
+	private double[][] orthonormalBasis(double[] v1, double[] v2) {
+		double[]
+		       b1 = Rn.normalize(null, v1),
+		       b2 = Rn.normalize(null, Rn.add(null, v2, Rn.times(null, -Rn.innerProduct(v2, b1), b1))),
+		       b3 = Rn.normalize(null, Rn.crossProduct(null, b1, b2));
+		return new double[][]{b1,b2,b3};
+	}
+
+	private double[] getEdgeVector(Edge<?,?,?> e, AdapterSet as) {
+		return Rn.subtract(null, 
+				as.get(Position.class,e.getTargetVertex(),double[].class),
+				as.get(Position.class,e.getStartVertex(),double[].class));
+	}
+
 	private void calculateLaplaceOperator(int dim, Matrix M) {
 		getCoDifferential(dim).mult(getDifferential(dim), M);
 		getDifferential(dim-1).multAdd(getCoDifferential(dim-1), M);
@@ -313,5 +449,35 @@ public class DiscreteDifferentialOperators {
 		return minv;
 	}
 	
-	
+	private class ConnectionAdapter extends AbstractAdapter<Double> {
+
+		private Map<Edge<?,?,?>,Double> 
+			edgeAngleMap = new HashMap<Edge<?,?,?>, Double>();
+		
+		public ConnectionAdapter(Vector val, Map<Edge<?,?,?>,Integer> map) {
+			super(Double.class, true, false);
+			for(Edge<?,?,?> e: map.keySet()) {
+				edgeAngleMap.put(e, (e.isPositive()?1.0:-1.0)*val.get(map.get(e)));
+			}
+		}
+
+		@Override
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+			return Edge.class.isAssignableFrom(nodeClass);
+		}
+
+		@Override
+		public double getPriority() {
+			return 0;
+		}
+		
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> Double getE(E e, AdapterSet a) {
+			return edgeAngleMap.get(e);
+		}
+		
+	}
 }
