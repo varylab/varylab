@@ -8,13 +8,12 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
-import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 
 @VectorField
 public class VectorFieldAdapter extends AbstractAdapter<double[]> {
 	
-	Map<Face<?,?,?>,double[]>
+	private Map<Face<?,?,?>,double[]>
 		faceVectorMap = new HashMap<Face<?,?,?>, double[]>();
 	
 	public VectorFieldAdapter() {

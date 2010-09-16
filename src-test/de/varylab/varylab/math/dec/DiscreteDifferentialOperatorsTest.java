@@ -13,6 +13,8 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
+import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
+import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 
@@ -48,7 +50,8 @@ public class DiscreteDifferentialOperatorsTest {
 		AdapterSet as = new AdapterSet();
 		as.add(new JRPositionAdapter());
 		
-		DiscreteDifferentialOperators ddOp = new DiscreteDifferentialOperators(hds,as);
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,as);
 		
 		s0.add(-1.0,ddOp.getHodgeStar(0));
 		s1.add(-1.0,ddOp.getHodgeStar(1));
@@ -73,8 +76,8 @@ public class DiscreteDifferentialOperatorsTest {
 		
 		AdapterSet as = new AdapterSet();
 		as.add(new JRPositionAdapter());
-		DiscreteDifferentialOperators ddOp = new DiscreteDifferentialOperators(hds,as);
-
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,as);
 		Matrix 
 			D0 = ddOp.getDifferential(0),
 			D1 = ddOp.getDifferential(1),
@@ -97,8 +100,8 @@ public class DiscreteDifferentialOperatorsTest {
 		
 		AdapterSet as = new AdapterSet();
 		as.add(new JRPositionAdapter());
-		DiscreteDifferentialOperators ddOp = new DiscreteDifferentialOperators(hds,as);
-
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,as);
 		Matrix 
 			cD0 = new CompColMatrix(ddOp.getCoDifferential(0)),
 			cD1 = ddOp.getCoDifferential(1),
@@ -114,8 +117,8 @@ public class DiscreteDifferentialOperatorsTest {
 		}
 		AdapterSet as = new AdapterSet();
 		as.add(new JRPositionAdapter());
-		DiscreteDifferentialOperators ddOp = new DiscreteDifferentialOperators(hds,as);
-
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,as);
 		Matrix 
 			L0 = ddOp.getLaplaceOperator(0),
 			L1 = ddOp.getLaplaceOperator(1),
@@ -128,10 +131,11 @@ public class DiscreteDifferentialOperatorsTest {
 	@Test
 	public void testTetrahedron() {
 		FunctionalTestData.createCombinatorialTetrahedron(hds);
-		DiscreteDifferentialOperators bdOp = new DiscreteDifferentialOperators(hds,null);
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,null);
 		Matrix 
-			d0 = bdOp.getBoundaryOperator(0),
-			d1 = bdOp.getBoundaryOperator(1);
+			d0 = ddOp.getBoundaryOperator(0),
+			d1 = ddOp.getBoundaryOperator(1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
 		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
@@ -142,10 +146,11 @@ public class DiscreteDifferentialOperatorsTest {
 		DefaultJRHDS hds = new DefaultJRHDS();
 		
 		FunctionalTestData.createCombinatorialPyrWithBnd(hds);
-		DiscreteDifferentialOperators bdOp = new DiscreteDifferentialOperators(hds,null);
+		DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS> ddOp = 
+			new DiscreteDifferentialOperators<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>(hds,null);
 		Matrix 
-			d0 = bdOp.getBoundaryOperator(0),
-			d1 = bdOp.getBoundaryOperator(1);
+			d0 = ddOp.getBoundaryOperator(0),
+			d1 = ddOp.getBoundaryOperator(1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
 		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);

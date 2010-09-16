@@ -16,7 +16,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -86,7 +85,7 @@ public class HeightFieldEditor extends AlgorithmDialogPlugin {
 			}
 			v.position[2] = z;
 		}
-		hcp.set(r, new AdapterSet());
+		hcp.set(r);
 	}
 
 	

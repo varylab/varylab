@@ -1,8 +1,8 @@
 package de.varylab.varylab.math.dec;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -13,29 +13,35 @@ import no.uib.cipr.matrix.Matrices;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.sparse.AbstractIterativeSolver;
 import no.uib.cipr.matrix.sparse.CompDiagMatrix;
 import no.uib.cipr.matrix.sparse.FlexCompColMatrix;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
+import no.uib.cipr.matrix.sparse.GMRES;
+import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
+import de.varylab.discreteconformal.util.HomologyUtility;
+import de.varylab.discreteconformal.util.Search;
 import de.varylab.varylab.hds.adapter.GaussianCurvatureAdapter;
 
-public class DiscreteDifferentialOperators {
+public class DiscreteDifferentialOperators <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F> > 
+{
 
 	private Map<Edge<?,?,?>, Integer>
 		edgeMap = new HashMap<Edge<?,?,?>, Integer>();
 		
-	private HalfEdgeDataStructure<?,?,?>
+	private HDS
 		heds = null;
 		
 	private Matrix
@@ -57,8 +63,14 @@ public class DiscreteDifferentialOperators {
 	
 	private AdapterSet
 		adapters = new AdapterSet();
+
+	private ConnectionAdapter 
+		ca = null;
 	
-	public DiscreteDifferentialOperators(HalfEdgeDataStructure<?,?,?> hds, AdapterSet as) {
+	private VectorFieldAdapter
+		vf = null;
+	
+	public DiscreteDifferentialOperators(HDS hds, AdapterSet as) {
 		if(as != null) {
 			adapters.addAll(as);
 		}
@@ -314,8 +326,8 @@ public class DiscreteDifferentialOperators {
 		return edgeMap.get(e);
 	}
 	
-	public VectorFieldAdapter getTrivialConnectionVectorField() {
-		ConnectionAdapter trivialConnection = calculateTrivialConnection(heds);
+	private VectorFieldAdapter calculateTrivialConnectionVectorField() {
+		getTrivialConnectionAdapter();
 		Map<Face<?,?,?>,double[]> vf = new HashMap<Face<?,?,?>, double[]>();
 		Stack<Face<?,?,?>> queue = new Stack<Face<?,?,?>>();
 		Face<?,?,?> f = heds.getFace(0);
@@ -331,8 +343,9 @@ public class DiscreteDifferentialOperators {
 			do {
 				Face<?,?,?> neighFace = bdEdge.getRightFace();
 				if(neighFace != null && !(vf.containsKey(neighFace))) {
-					double[] neighVector = transportVector(vf.get(actFace),actFace,bdEdge,trivialConnection);
+					double[] neighVector = transportVector(vf.get(actFace),actFace,bdEdge,ca);
 					vf.put(neighFace, neighVector);
+					//	System.out.println(neighFace +":"+Arrays.toString(neighVector));
 					queue.add(neighFace);
 				}
 				bdEdge = bdEdge.getNextEdge();
@@ -341,50 +354,78 @@ public class DiscreteDifferentialOperators {
 		return new VectorFieldAdapter(vf);
 	}
 
-	private <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> ConnectionAdapter calculateTrivialConnection(HDS hds) {
-		Set<F> bdFaces = new HashSet<F>();
-		for(V v: HalfEdgeUtils.boundaryVertices(hds)) {
-			bdFaces.addAll(HalfEdgeUtilsExtra.getFaceStar(v));
-		}
-		int eulerChar = (hds.numVertices()-hds.numEdges()/2+hds.numFaces());
+	private ConnectionAdapter calculateTrivialConnection() {
+//		Set<Face<?,?,?>> bdFaces = new HashSet<Face<?,?,?>>();
+//		for(Vertex<?,?,?> v: HalfEdgeUtils.boundaryVertices(heds)) {
+//			bdFaces.addAll(HalfEdgeUtilsExtra.getFaceStar(v));
+//		}
+		int eulerChar = (heds.numVertices()-heds.numEdges()/2+heds.numFaces());
 		
 	//	int
 	//		numVertices = hds.numVertices(),
 	//		numEdges = hds.numEdges()/2,
 	//		numBdEdges = HalfEdgeUtils.boundaryEdges(hds).size()*2;
-	//	Set<List<E>> paths = HomologyUtility.getDualGeneratorPaths(hds.getVertex(0), new Search.DefaultWeightAdapter<E>());
+		Set<List<E>> paths = HomologyUtility.getDualGeneratorPaths(heds.getVertex(0), new Search.DefaultWeightAdapter<E>());
+		int numGenerators = paths.size();
 		//TODO deal with boundary
-	//	Matrix A = new FlexCompRowMatrix(numVertices-bdFaces.size()+paths.size(),numEdges-numBdEdges);
-		Matrix d0 = new DenseMatrix(getDifferential(0));
+//		Matrix A = new FlexCompRowMatrix(numVertices-bdFaces.size()+paths.size(),numEdges-numBdEdges);
+//		Matrix d0 = getDifferential(0);
+		Matrix d0 = getDifferential(0);
 		Matrix d1 = getDifferential(1);
-		Vector b = new DenseVector(hds.numVertices());
+//		Vector b = new DenseVector(heds.numEdges()/2);
+		Vector b = new DenseVector(heds.numVertices()+numGenerators);
 		GaussianCurvatureAdapter gca = new GaussianCurvatureAdapter();
 		double totalSingularities = 0.0;
-		for(V v: hds.getVertices()) {
-			double val = gca.get(v,adapters);
+		for(V v: heds.getVertices()) {
+			double val = -gca.get(v,adapters);
 			double sing = adapters.get(Singularity.class, v, Double.class);
 			totalSingularities += sing;
-			val -= 2*Math.PI*sing;
+			val += 2*Math.PI*sing;
 			b.set(v.getIndex(), val);
 		}
-		if(eulerChar != totalSingularities) {
+		if(Math.abs(eulerChar - totalSingularities) >= 1E-6) {
 			throw new IllegalArgumentException("Sum of singularities does not match Euler characteristic: " +totalSingularities+" != "+eulerChar);
 		}
-		Vector solution = new DenseVector(hds.numEdges()/2);
-		d0.transSolve(b,solution);
+
+		Vector solution = new DenseVector(heds.numEdges()/2);
 		
-		Matrix L = new DenseMatrix(hds.numFaces(),hds.numFaces());
+//		Matrix A = new FlexCompColMatrix(heds.numEdges()/2, heds.numEdges()/2);
+		Matrix A = new DenseMatrix(heds.numVertices()+numGenerators,heds.numEdges()/2);
+		Iterator<MatrixEntry> mi = d0.iterator();
+		while(mi.hasNext()) {
+			MatrixEntry me = mi.next();
+			// Attention: transposing!
+			A.set(me.column(),me.row(),me.get());
+		}
+		int i = 0;
+		for(List<E> path : paths) {
+			for(E e: path) {
+				A.set(heds.numVertices()+i,edgeMap.get(e),e.isPositive()?+1.0:-1.0);
+			}
+		}
+		A.solve(b, solution);
+//		AbstractIterativeSolver gmresA = new GMRES(solution);
+//		
+//		try {
+//			gmresA.solve(A, b, solution);
+//		} catch (IterativeSolverNotConvergedException e) {
+//			System.out.println("Iterative solver not converged");
+//			e.printStackTrace();
+//		}
+//		
+		Matrix L = new FlexCompColMatrix(heds.numFaces(),heds.numFaces());
 		d1.transBmult(d1, L);
-		Vector z = new DenseVector(hds.numFaces());
+		Vector z = new DenseVector(heds.numFaces());
 		d1.mult(solution, z);
-		Vector y = new DenseVector(hds.numFaces());
-		L.solve(z,y);
-		Vector proj = new DenseVector(hds.numEdges()/2);
+		Vector y = new DenseVector(heds.numFaces());
+		AbstractIterativeSolver gmresL = new GMRES(y);
+		try {
+			gmresL.solve(L, z, y);
+		} catch (IterativeSolverNotConvergedException e) {
+			System.out.println("Iterative solver not converged");
+			e.printStackTrace();
+		}
+		Vector proj = new DenseVector(heds.numEdges()/2);
 		d1.transMult(y,proj);
 		solution.add(-1.0,proj);
 		return new ConnectionAdapter(solution,edgeMap);
@@ -448,36 +489,19 @@ public class DiscreteDifferentialOperators {
 		}
 		return minv;
 	}
-	
-	private class ConnectionAdapter extends AbstractAdapter<Double> {
 
-		private Map<Edge<?,?,?>,Double> 
-			edgeAngleMap = new HashMap<Edge<?,?,?>, Double>();
-		
-		public ConnectionAdapter(Vector val, Map<Edge<?,?,?>,Integer> map) {
-			super(Double.class, true, false);
-			for(Edge<?,?,?> e: map.keySet()) {
-				edgeAngleMap.put(e, (e.isPositive()?1.0:-1.0)*val.get(map.get(e)));
-			}
+	public ConnectionAdapter getTrivialConnectionAdapter() {
+		if(ca  == null) {
+			ca = calculateTrivialConnection();
 		}
-
-		@Override
-		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-			return Edge.class.isAssignableFrom(nodeClass);
-		}
-
-		@Override
-		public double getPriority() {
-			return 0;
-		}
-		
-		public <
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>
-		> Double getE(E e, AdapterSet a) {
-			return edgeAngleMap.get(e);
-		}
-		
+		return ca;
 	}
+	
+	public VectorFieldAdapter getTrivialConnectionVectorField() {
+		if(vf == null) {
+			vf = calculateTrivialConnectionVectorField();
+		}
+		return vf;
+	}
+	
 }

@@ -4,18 +4,22 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.experimental.WebContentLoader;
 import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
+import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
+import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
@@ -28,6 +32,10 @@ import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
 import de.varylab.varylab.hds.calculator.VPositionCalculator;
 import de.varylab.varylab.hds.calculator.VSubdivisionCalculator;
+import de.varylab.varylab.math.dec.ConnectionVisualizer;
+import de.varylab.varylab.math.dec.SingularityAdapter;
+import de.varylab.varylab.math.dec.VectorFieldVisualizer;
+import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.editor.VertexEditorPlugin;
@@ -67,6 +75,7 @@ import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
+import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
@@ -77,16 +86,20 @@ public class VaryLab {
 
 	private static void addVaryLabPlugins(JRViewer v) {
 		HalfedgeInterface hif = new HalfedgeInterface();
-		hif.addAdapter(new VPositionAdapter());
-		hif.addAdapter(new VTexCoordAdapter());
-		hif.addAdapter(new NodeWeigthAdapter());
-		hif.addAdapter(new GeodesicLabelAdapter());
+		hif.addGlobalAdapter(new VPositionAdapter(), true);
+		hif.addGlobalAdapter(new VTexCoordAdapter(), true);
+		hif.addGlobalAdapter(new NodeWeigthAdapter(), true);
+		hif.addGlobalAdapter(new GeodesicLabelAdapter(), true);
+		hif.addGlobalAdapter(new SingularityAdapter(), true);
 		hif.addCalculator(new VPositionCalculator());
 		hif.addCalculator(new VSubdivisionCalculator());
+		
 		v.registerPlugin(hif);
 		v.registerPlugin(new OptimizationPanel());
 		v.registerPlugin(new VertexEditorPlugin());
 		v.registerPlugin(new IdentifyVerticesPlugin());
+
+		v.registerPlugin(new TrivialConnectionPlugin());
 		
 		addGeneratorPlugins(v);
 		
@@ -113,8 +126,8 @@ public class VaryLab {
 		
 		v.registerPlugin(new OBJExportPlugin());
 		
-//		v.registerPlugin(new HalfedgeDebuggerPlugin());
-//		v.registerPlugin(new WebContentLoader());
+		v.registerPlugin(new HalfedgeDebuggerPlugin());
+		v.registerPlugin(new WebContentLoader());
 		
 		v.registerPlugin(new Sky());
 		v.registerPlugin(new AngleCalculatorPlugin());
@@ -147,6 +160,11 @@ public class VaryLab {
 		v.registerPlugin(new WeightsVisualizer());
 		v.registerPlugin(new GeodesicLabelVisualizer());
 		v.registerPlugin(new CircularityVisualizer());
+		v.registerPlugin(new GaussCurvatureVisualizer());
+		v.registerPlugin(new AngleDefectVisualizer());
+		v.registerPlugin(new VectorFieldVisualizer());
+		v.registerPlugin(new ConnectionVisualizer());
+		v.registerPlugin(new PositiveEdgeVisualizer());
 	}
 
 

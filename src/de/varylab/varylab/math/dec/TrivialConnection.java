@@ -39,7 +39,7 @@ public class TrivialConnection {
 //		Set<List<E>> paths = HomologyUtility.getDualGeneratorPaths(hds.getVertex(0), new Search.DefaultWeightAdapter<E>());
 		//TODO deal with boundary
 //		Matrix A = new FlexCompRowMatrix(numVertices-bdFaces.size()+paths.size(),numEdges-numBdEdges);
-		DiscreteDifferentialOperators dop = new DiscreteDifferentialOperators(hds, hif.getAdapters());
+		DiscreteDifferentialOperators<V,E,F,HDS> dop = new DiscreteDifferentialOperators<V,E,F,HDS>(hds, hif.getAdapters());
 		Matrix d0 = new DenseMatrix(dop.getDifferential(0));
 		Matrix d1 = dop.getDifferential(1);
 		Vector b = new DenseVector(hds.numVertices());

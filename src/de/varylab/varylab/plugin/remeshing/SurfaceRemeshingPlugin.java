@@ -31,7 +31,6 @@ import de.jreality.plugin.content.ContentAppearance;
 import de.jreality.plugin.experimental.ManagedContent;
 import de.jreality.ui.AppearanceInspector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
@@ -150,10 +149,13 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 
 	private void liftMesh() {
-		PositionAdapter a1 = new PositionAdapter();
-		TexCoordAdapter a2 = new TexCoordAdapter(false);
-		AdapterSet a = new AdapterSet(a1, a2);
-		remesh = hcp.get(remesh, a);
+		if(hcp.getAdapters().query(PositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new PositionAdapter(),true);
+		}
+		if(hcp.getAdapters().query(TexCoordAdapter.class) == null) {
+			hcp.addGlobalAdapter(new TexCoordAdapter(false),true);
+		}
+		remesh = hcp.get(remesh);
 		RemeshingUtility.projectOntoBoundary(remesh, surface);
 		mapInnerVertices(surface,remesh);
 		hcp.set(remesh);
@@ -162,11 +164,14 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private void remeshSurface() throws RemeshingException {
 		lifted = false;
-		PositionAdapter a1 = new PositionAdapter();
-		TexCoordAdapter a2 = new TexCoordAdapter(false);
-		AdapterSet a = new AdapterSet(a1, a2);
+		if(hcp.getAdapters().query(PositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new PositionAdapter(),true);
+		}
+		if(hcp.getAdapters().query(TexCoordAdapter.class) == null) {
+			hcp.addGlobalAdapter(new TexCoordAdapter(false),true);
+		}
 		remesh.clear();
-		surface = hcp.get(surface, a);
+		surface = hcp.get(surface);
 		if (surface == null) {
 			return;
 		}
@@ -290,7 +295,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		for (VVertex v : overlap) {
 			TopologyAlgorithms.removeVertex(v);
 		}
-		hcp.set(remesh, a);
+		hcp.set(remesh);
 	}
 	
 	

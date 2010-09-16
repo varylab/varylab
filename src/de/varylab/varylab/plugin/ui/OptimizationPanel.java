@@ -29,7 +29,6 @@ import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.Vector.Norm;
 import de.jreality.plugin.basic.View;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
@@ -279,7 +278,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			v.position[2] = maxz_before*x.getValue(i + 2)/maxz_after;
 		}
 		HalfedgeSelection hes = new HalfedgeSelection(hif.getSelection());
-		hif.set(hds, new AdapterSet());
+		hif.set(hds);
 		hif.setSelection(hes);
 	}
 	
