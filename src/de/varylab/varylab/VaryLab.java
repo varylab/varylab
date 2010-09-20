@@ -74,6 +74,7 @@ import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
+import de.varylab.varylab.plugin.visualizers.ConicalityVisualizer;
 import de.varylab.varylab.plugin.visualizers.CurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
@@ -165,6 +166,7 @@ public class VaryLab {
 		v.registerPlugin(new VectorFieldVisualizer());
 		v.registerPlugin(new ConnectionVisualizer());
 		v.registerPlugin(new PositiveEdgeVisualizer());
+		v.registerPlugin(new ConicalityVisualizer());
 	}
 
 
