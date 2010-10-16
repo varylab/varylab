@@ -61,6 +61,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		normalizeEnergies = new JCheckBox("Normalize Energies", true); 
 	
 	public OptimizerPluginsPanel() {
+		shrinkPanel.setTitle("Optimizer Plugins");
 		tablePanel.setLayout(new GridLayout());
 		tablePanel.setBorder(BorderFactory.createTitledBorder("Optimizer Plugins"));
 		tablePanel.add(pluginScroller);

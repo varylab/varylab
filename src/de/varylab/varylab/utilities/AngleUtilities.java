@@ -30,6 +30,7 @@ public class AngleUtilities {
 			}
 			previousEdge = e;
 		}
+		assert previousEdge != null;
 		E e = dualPath.get(0);
 		if(e.getStartVertex() == previousEdge.getStartVertex()) {
 			totalAngle += angleAt(e.getLeftFace(),e.getStartVertex(),a);

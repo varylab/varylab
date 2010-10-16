@@ -36,7 +36,6 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.MyDomainValue;
 import de.jtem.halfedgetools.functional.MyEnergy;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -52,6 +51,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.hds.adapter.CoordinatePetscAdapter;
 import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableTao;
 import de.varylab.varylab.math.FixingConstraint;
@@ -108,6 +108,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	public OptimizationPanel() {
 		setInitialPosition(SHRINKER_RIGHT);
 		shrinkPanel.setLayout(new GridBagLayout());
+		shrinkPanel.setTitle("Optimization");
 		GridBagConstraints gbc1 = new GridBagConstraints();
 		gbc1.fill = GridBagConstraints.BOTH;
 		gbc1.weightx = 1.0;
@@ -271,15 +272,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			maxz_after = 1.0;
 		}
 		
-		for (VVertex v : hds.getVertices()) {
-			int i = v.getIndex() * 3;
-			v.position[0] = x.getValue(i + 0);
-			v.position[1] = x.getValue(i + 1);
-			v.position[2] = maxz_before*x.getValue(i + 2)/maxz_after;
-		}
-		HalfedgeSelection hes = new HalfedgeSelection(hif.getSelection());
-		hif.set(hds);
-		hif.setSelection(hes);
+		double zScale = maxz_before/maxz_after;
+		CoordinatePetscAdapter posAdapter = new CoordinatePetscAdapter(x, zScale);
+		hif.updateGeometry(posAdapter);
 	}
 	
 	private void evaluate() {
@@ -331,6 +326,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		return new CombinedFunctional(funs, coeffs, dim);
 	}
+	
+	
 	
 	public DomainValue createPositionValue(VHDS hds) {
 		int dim = hds.numVertices() * 3;

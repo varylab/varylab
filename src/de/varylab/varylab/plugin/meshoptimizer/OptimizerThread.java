@@ -1,10 +1,11 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
-import no.uib.cipr.matrix.DenseVector;
+import javax.swing.SwingUtilities;
+
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.hds.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableNM;
 import de.varylab.varylab.math.ConjugateGradient;
@@ -12,12 +13,11 @@ import de.varylab.varylab.math.Constraint;
 
 public class OptimizerThread extends Thread {
 
-	CombinedOptimizableNM opt = null;
-	
-	HalfedgeInterface
+	private CombinedOptimizableNM 
+		opt = null;
+	private HalfedgeInterface
 		hif = null;
-	
-	VHDS 
+	private VHDS 
 		hds = null;
 	
 	double acc = 1E-6;
@@ -31,7 +31,6 @@ public class OptimizerThread extends Thread {
 
 	public OptimizerThread() {
 		super("OptimizerThread");
-		
 	}
 	
 	public void initOptimizer(
@@ -45,14 +44,7 @@ public class OptimizerThread extends Thread {
 		this.hds = hif.get(new VHDS());
 		opt = new CombinedOptimizableNM(hds, fun);
 		opt.addConstraint(constraint);
-		int dim = hds.numVertices() * 3;
-		DenseVector u = new DenseVector(dim);
-		for (VVertex v : hds.getVertices()) {
-			u.set(v.getIndex() * 3 + 0, v.position[0]);
-			u.set(v.getIndex() * 3 + 1, v.position[1]);
-			u.set(v.getIndex() * 3 + 2, v.position[2]);
-		}
-		uArr = u.getData();
+		uArr = new double[hds.numVertices() * 3];
 		ConjugateGradient.setITMAX(it);
 		ConjugateGradient.setUseDBrent(true);
 	}
@@ -83,20 +75,32 @@ public class OptimizerThread extends Thread {
 					synchronized (this) {
 						wait();
 					}
-				} 
+				}
+				// get active coordinates
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						for (VVertex v : hds.getVertices()) {
+							uArr[v.getIndex() * 3 + 0] = v.position[0];
+							uArr[v.getIndex() * 3 + 1] = v.position[1];
+							uArr[v.getIndex() * 3 + 2] = v.position[2];
+						}
+					}
+				});
+				// minimize
 				double fv = ConjugateGradient.search(uArr, acc, opt);
 				if(watchFunctionValue){
 					System.out.println(fv);
 				}
-				for (VVertex v : hds.getVertices()) {
-					int i = v.getIndex() * 3;
-					v.position[0] = uArr[i + 0];
-					v.position[1] = uArr[i + 1];
-					v.position[2] = uArr[i + 2];
-				}
-				HalfedgeSelection hes = hif.getSelection();
-				hif.set(hds);
-				hif.setSelection(hes);
+				// update coordinates
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						CoordinateArrayAdapter posAdapter = new CoordinateArrayAdapter(uArr, 1);
+						hif.updateGeometryNoUndo(posAdapter);
+					}
+				});
+				// clean memory from time to time
 				if (gcCounter++ > 200) {
 					System.gc();
 					gcCounter = 0;
@@ -106,4 +110,6 @@ public class OptimizerThread extends Thread {
 			}
 		}
 	}
+	
+	
 }

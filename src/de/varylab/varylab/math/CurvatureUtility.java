@@ -175,33 +175,33 @@ public class CurvatureUtility {
 
 
 	public static Basis getTensor(
-			Point p,
-			double scale,
-			KdTree<VVertex> kd
-		 ){
-			KdPosition position = new KdPosition(p);
-			Collection<VFace> faces = KdUtility.collectFacesInRadius(kd, position, scale);
-			Collection<VEdge> edges = KdUtility.collectEdgesInRadius(kd, position, scale);
-			double area=0;
-			for(VFace f :faces){
-				area += toTriangle(f).computeArea();
-			}
-			DenseMatrix matrix = new DenseMatrix(3,3);
-			DenseMatrix tmp = new DenseMatrix(3,3);
-			double beta = 0;
-			double edgeLength = 0;
-			
-			for(VEdge e :edges){
-				beta = getAngle(e);
-				edgeLength = getLength(e);
-				tmp = getEdgeCurvatureTensor(e);
-				matrix.add(beta*edgeLength,tmp);
-			}
-			matrix.scale(1/area);
-			Vector c1 = new Vector(matrix.getData()[0],matrix.getData()[1],matrix.getData()[2]);
-			Vector c2 = new Vector(matrix.getData()[3],matrix.getData()[4],matrix.getData()[5]);
-			Vector c3 = new Vector(matrix.getData()[6],matrix.getData()[7],matrix.getData()[8]);
-			return new Basis(c1,c2,c3);
+		Point p,
+		double scale,
+		KdTree<VVertex> kd
+	 ){
+		KdPosition position = new KdPosition(p);
+		Collection<VFace> faces = KdUtility.collectFacesInRadius(kd, position, scale);
+		Collection<VEdge> edges = KdUtility.collectEdgesInRadius(kd, position, scale);
+		double area=0;
+		for(VFace f :faces){
+			area += toTriangle(f).computeArea();
+		}
+		DenseMatrix matrix = new DenseMatrix(3,3);
+		DenseMatrix tmp = new DenseMatrix(3,3);
+		double beta = 0;
+		double edgeLength = 0;
+		
+		for(VEdge e :edges){
+			beta = getAngle(e);
+			edgeLength = getLength(e);
+			tmp = getEdgeCurvatureTensor(e);
+			matrix.add(beta*edgeLength,tmp);
+		}
+		matrix.scale(1/area);
+		Vector c1 = new Vector(matrix.getData()[0],matrix.getData()[1],matrix.getData()[2]);
+		Vector c2 = new Vector(matrix.getData()[3],matrix.getData()[4],matrix.getData()[5]);
+		Vector c3 = new Vector(matrix.getData()[6],matrix.getData()[7],matrix.getData()[8]);
+		return new Basis(c1,c2,c3);
 	}
 	
 	public static double meanEdgeLength(VHDS mesh) {
