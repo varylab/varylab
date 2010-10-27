@@ -156,7 +156,6 @@ public class CurvatureVisualizer extends VisualizerPlugin implements ActionListe
 			k1VecList.add(B.getX());
 			k2VecList.add(B.getY());
 			nVecList.add(B.getZ());
-			
 		}
 		double vecScale = CurvatureUtility.meanEdgeLength(mesh) * 0.7;
 		IndexedLineSet k1Set = GeometryUtility.createVectorSet(k1VecList, centerList, vecScale);

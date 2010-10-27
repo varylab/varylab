@@ -67,7 +67,7 @@ public class DiscreteDifferentialOperators <
 	private ConnectionAdapter 
 		ca = null;
 	
-	private VectorFieldAdapter
+	private VectorFieldMapAdapter
 		vf = null;
 	
 	public DiscreteDifferentialOperators(HDS hds, AdapterSet as) {
@@ -326,7 +326,7 @@ public class DiscreteDifferentialOperators <
 		return edgeMap.get(e);
 	}
 	
-	private VectorFieldAdapter calculateTrivialConnectionVectorField() {
+	private VectorFieldMapAdapter calculateTrivialConnectionVectorField() {
 		getTrivialConnectionAdapter();
 		Map<Face<?,?,?>,double[]> vf = new HashMap<Face<?,?,?>, double[]>();
 		Stack<Face<?,?,?>> queue = new Stack<Face<?,?,?>>();
@@ -351,7 +351,7 @@ public class DiscreteDifferentialOperators <
 				bdEdge = bdEdge.getNextEdge();
 			} while(bdEdge != actFace.getBoundaryEdge());
 		}
-		return new VectorFieldAdapter(vf);
+		return new VectorFieldMapAdapter(vf, "Trivial Connection");
 	}
 
 	private ConnectionAdapter calculateTrivialConnection() {
@@ -497,7 +497,7 @@ public class DiscreteDifferentialOperators <
 		return ca;
 	}
 	
-	public VectorFieldAdapter getTrivialConnectionVectorField() {
+	public VectorFieldMapAdapter getTrivialConnectionVectorField() {
 		if(vf == null) {
 			vf = calculateTrivialConnectionVectorField();
 		}

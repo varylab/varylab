@@ -235,8 +235,6 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 		adapterCombo.setModel(adapterModel);
 		if (lastAdapter != null && compSet.contains(lastAdapter)) {
 			adapterCombo.setSelectedItem(lastAdapter);
-		} else {
-			adapterCombo.setSelectedIndex(0);
 		}
 	}
 	

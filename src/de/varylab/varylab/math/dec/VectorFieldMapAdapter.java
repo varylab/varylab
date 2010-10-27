@@ -9,20 +9,24 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
-public class VectorFieldAdapter extends AbstractAdapter<double[]> {
+public class VectorFieldMapAdapter extends AbstractAdapter<double[]> {
 	
 	private Map<Face<?,?,?>,double[]>
 		faceVectorMap = new HashMap<Face<?,?,?>, double[]>();
+	private String
+		name = "Vector Field";
 	
-	public VectorFieldAdapter() {
+	public VectorFieldMapAdapter() {
 		super(double[].class,true,true);
 	}
 	
-	public VectorFieldAdapter(Map<Face<?,?,?>,double[]> vf) {
+	public VectorFieldMapAdapter(Map<Face<?,?,?>,double[]> vf, String name) {
 		super(double[].class,true,true);
 		faceVectorMap = new HashMap<Face<?,?,?>, double[]>(vf);
+		this.name = name;
 	}
 
 	@Override
@@ -53,5 +57,10 @@ public class VectorFieldAdapter extends AbstractAdapter<double[]> {
 	@Override
 	public double getPriority() {
 		return 0;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

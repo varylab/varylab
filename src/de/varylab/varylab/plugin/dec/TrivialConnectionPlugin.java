@@ -15,7 +15,7 @@ import de.varylab.varylab.math.dec.Connection;
 import de.varylab.varylab.math.dec.ConnectionAdapter;
 import de.varylab.varylab.math.dec.DiscreteDifferentialOperators;
 import de.varylab.varylab.math.dec.Singularity;
-import de.varylab.varylab.math.dec.VectorFieldAdapter;
+import de.varylab.varylab.math.dec.VectorFieldMapAdapter;
 
 public class TrivialConnectionPlugin extends AlgorithmPlugin {
 
@@ -39,7 +39,7 @@ public class TrivialConnectionPlugin extends AlgorithmPlugin {
 	{
 		DiscreteDifferentialOperators<V,E,F,HDS> dop = new DiscreteDifferentialOperators<V,E,F,HDS>(hds, hcp.getAdapters());
 		ConnectionAdapter trivialConnectionAdapter = dop.getTrivialConnectionAdapter();
-		VectorFieldAdapter vfAdapter = dop.getTrivialConnectionVectorField();
+		VectorFieldMapAdapter vfAdapter = dop.getTrivialConnectionVectorField();
 		hcp.addLayerAdapter(trivialConnectionAdapter,false);
 		hcp.addLayerAdapter(vfAdapter,false);
 		if(!checkCurvature(hds,hcp.getAdapters())) {

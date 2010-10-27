@@ -33,7 +33,6 @@ import de.varylab.varylab.hds.calculator.VPositionCalculator;
 import de.varylab.varylab.hds.calculator.VSubdivisionCalculator;
 import de.varylab.varylab.math.dec.ConnectionVisualizer;
 import de.varylab.varylab.math.dec.SingularityAdapter;
-import de.varylab.varylab.math.dec.VectorFieldVisualizer;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
@@ -161,7 +160,6 @@ public class VaryLab {
 		v.registerPlugin(new CircularityVisualizer());
 		v.registerPlugin(new GaussCurvatureVisualizer());
 		v.registerPlugin(new AngleDefectVisualizer());
-		v.registerPlugin(new VectorFieldVisualizer());
 		v.registerPlugin(new ConnectionVisualizer());
 		v.registerPlugin(new PositiveEdgeVisualizer());
 		v.registerPlugin(new ConicalityVisualizer());

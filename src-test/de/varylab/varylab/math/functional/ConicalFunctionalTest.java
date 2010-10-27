@@ -5,7 +5,6 @@ import java.util.Random;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedgetools.functional.FunctionalTest;
-import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.functional.MyDomainValue;
 import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
@@ -20,7 +19,7 @@ public class ConicalFunctionalTest
 	public void init() {
 		DefaultJRHDS hds = new DefaultJRHDS();
 	
-		FunctionalTestData.createCombinatorial4Quads(hds);
+//		FunctionalTestData.createCombinatorial4Quads(hds);
 		Random random = new Random(123);
 //		for (DefaultJRVertex v : hds.getVertices()) {
 //			v.position = new double[]{random.nextDouble(), random.nextDouble(), random.nextDouble()};
