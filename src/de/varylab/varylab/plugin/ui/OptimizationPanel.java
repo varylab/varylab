@@ -399,16 +399,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	private void initOptAnimation() {
 		VHDS hds = hif.get(new VHDS());
-//		List<Functional<VVertex, VEdge, VFace>> funs = new LinkedList<Functional<VVertex,VEdge,VFace>>();
-//		Map<Functional<?, ?, ?>, Double> coeffs = new HashMap<Functional<?,?,?>, Double>();
-//		for (OptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-//			Functional<VVertex, VEdge, VFace> fun = op.getFunctional(hds);
-//			funs.add(fun);
-//			coeffs.put(fun, pluginsPanel.getCoefficient(op));
-//		}
-//		int dim = 3*hds.numVertices();
 		CombinedFunctional fun = createFunctional(hds);
-//		CombinedFunctional fun = new CombinedFunctional(funs, coeffs, dim);
 		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hif.get(new VHDS()));
 		
 		FixingConstraint fixConstraint = new FixingConstraint(
