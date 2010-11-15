@@ -24,7 +24,6 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.ConformalLab;
-import de.varylab.discreteconformal.heds.CoHDS;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
