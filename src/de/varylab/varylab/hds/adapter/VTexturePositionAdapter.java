@@ -2,18 +2,18 @@ package de.varylab.varylab.hds.adapter;
 
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.TexCoordinate;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
 
-@TexCoordinate
-public class VTexCoordAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
+@TexturePosition
+public class VTexturePositionAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 
 	private static double[]
 	    defaultTexCoordinate = {0, 0, 0, 1};
 	
-	public VTexCoordAdapter() {
+	public VTexturePositionAdapter() {
 		super(VVertex.class, null, null, double[].class, true, true);
 	}
 	
@@ -38,7 +38,7 @@ public class VTexCoordAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace
 			v.texcoord = new double[] {value[0], value[1], 0, 1.0};
 			break;
 		case 3:
-			v.texcoord = new double[] {value[0], value[1], 0, value[2]};
+			v.texcoord = new double[] {value[0], value[1], value[2], 1.0};
 			break;
 		case 4:
 		default:	

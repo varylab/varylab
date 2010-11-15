@@ -42,8 +42,8 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.discreteconformal.heds.CoFace;
 import de.varylab.discreteconformal.heds.CoHDS;
 import de.varylab.discreteconformal.heds.CoVertex;
-import de.varylab.discreteconformal.heds.adapter.PositionAdapter;
-import de.varylab.discreteconformal.heds.adapter.TexCoordAdapter;
+import de.varylab.discreteconformal.heds.adapter.CoPositionAdapter;
+import de.varylab.discreteconformal.heds.adapter.CoTexturePositionAdapter;
 import de.varylab.discreteconformal.heds.bsp.KdTree;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
@@ -150,11 +150,11 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 
 	private void liftMesh() {
-		if(hcp.getAdapters().query(PositionAdapter.class) == null) {
-			hcp.addGlobalAdapter(new PositionAdapter(),true);
+		if(hcp.getAdapters().query(CoPositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new CoPositionAdapter(),true);
 		}
-		if(hcp.getAdapters().query(TexCoordAdapter.class) == null) {
-			hcp.addGlobalAdapter(new TexCoordAdapter(false),true);
+		if(hcp.getAdapters().query(CoTexturePositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new CoTexturePositionAdapter(false),true);
 		}
 		remesh = hcp.get(remesh);
 		RemeshingUtility.projectOntoBoundary(remesh, surface);
@@ -165,11 +165,11 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private void remeshSurface() throws RemeshingException {
 		lifted = false;
-		if(hcp.getAdapters().query(PositionAdapter.class) == null) {
-			hcp.addGlobalAdapter(new PositionAdapter(),true);
+		if(hcp.getAdapters().query(CoPositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new CoPositionAdapter(),true);
 		}
-		if(hcp.getAdapters().query(TexCoordAdapter.class) == null) {
-			hcp.addGlobalAdapter(new TexCoordAdapter(false),true);
+		if(hcp.getAdapters().query(CoTexturePositionAdapter.class) == null) {
+			hcp.addGlobalAdapter(new CoTexturePositionAdapter(false),true);
 		}
 		remesh.clear();
 		surface = hcp.get(surface);

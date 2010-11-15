@@ -24,11 +24,13 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.ConformalLab;
+import de.varylab.discreteconformal.heds.CoHDS;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
+import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
-import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
+import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.math.dec.ConnectionVisualizer;
 import de.varylab.varylab.math.dec.SingularityAdapter;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
@@ -82,7 +84,7 @@ public class VaryLab {
 	private static void addVaryLabPlugins(JRViewer v) {
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addGlobalAdapter(new VPositionAdapter(), true);
-		hif.addGlobalAdapter(new VTexCoordAdapter(), true);
+		hif.addGlobalAdapter(new VTexturePositionAdapter(), true);
 		hif.addGlobalAdapter(new NodeWeigthAdapter(), true);
 		hif.addGlobalAdapter(new GeodesicLabelAdapter(), true);
 		hif.addGlobalAdapter(new SingularityAdapter(), true);
@@ -205,6 +207,7 @@ public class VaryLab {
 		addVaryLabPlugins(v);
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
+		v.getPlugin(HalfedgeInterface.class).set(new VHDS());
 	}
 
 }
