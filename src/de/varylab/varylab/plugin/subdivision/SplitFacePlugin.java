@@ -12,10 +12,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -33,14 +30,9 @@ public class SplitFacePlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
 			HDS hds, 
-			CalculatorSet c, 
-			HalfedgeInterface hcp) throws CalculatorException 
+			AdapterSet a, 
+			HalfedgeInterface hcp) 
 	{
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || fc == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
-		}
 		Set<F> faces = hcp.getSelection().getFaces(hds);
 		HashSet<V> vertices = new HashSet<V>(hcp.getSelection().getVertices(hds));
 

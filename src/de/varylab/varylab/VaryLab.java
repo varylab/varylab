@@ -29,8 +29,6 @@ import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexCoordAdapter;
-import de.varylab.varylab.hds.calculator.VPositionCalculator;
-import de.varylab.varylab.hds.calculator.VSubdivisionCalculator;
 import de.varylab.varylab.math.dec.ConnectionVisualizer;
 import de.varylab.varylab.math.dec.SingularityAdapter;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
@@ -88,8 +86,6 @@ public class VaryLab {
 		hif.addGlobalAdapter(new NodeWeigthAdapter(), true);
 		hif.addGlobalAdapter(new GeodesicLabelAdapter(), true);
 		hif.addGlobalAdapter(new SingularityAdapter(), true);
-		hif.addCalculator(new VPositionCalculator());
-		hif.addCalculator(new VSubdivisionCalculator());
 		
 		v.registerPlugin(hif);
 		v.registerPlugin(new OptimizationPanel());

@@ -11,8 +11,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -31,8 +30,8 @@ public class RemoveGeodesicPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
 		HDS hds, 
-		CalculatorSet c, 
-		HalfedgeInterface hcp) throws CalculatorException 
+		AdapterSet a, 
+		HalfedgeInterface hcp)  
 	{
 		HashSet<E> edges = new HashSet<E>(hcp.getSelection().getEdges(hds));
 		HashSet<E> removedEdges = new HashSet<E>();

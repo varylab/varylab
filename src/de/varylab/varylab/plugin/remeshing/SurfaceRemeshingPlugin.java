@@ -33,6 +33,7 @@ import de.jreality.ui.AppearanceInspector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -180,6 +181,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			JOptionPane.showMessageDialog(w, "Surface has no texture coordinates.", "Error", WARNING_MESSAGE);
 			return;
 		}
+		HalfedgeSelection sel = hcp.getSelection();
+		Set<CoVertex> featureSet = sel.getVertices(surface);
+		featureSet.retainAll(HalfEdgeUtils.boundaryVertices(surface));
+		
 		AppearanceInspector ai = contentAppearance.getAppearanceInspector();
 		Matrix texMatrix = ai.getTextureMatrix();
 
@@ -290,7 +295,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			v.setTextureCoord(TextureUtility.transformCoord(tex, texInvMatrix));	
 		}
 		
-		RemeshingUtility.cutTargetBoundary(faceOverlap, overlap, surface);
+		RemeshingUtility.cutTargetBoundary(faceOverlap, overlap, surface, featureSet);
 		
 		for (VVertex v : overlap) {
 			TopologyAlgorithms.removeVertex(v);

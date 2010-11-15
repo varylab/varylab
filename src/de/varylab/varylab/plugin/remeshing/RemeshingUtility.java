@@ -38,7 +38,7 @@ public class RemeshingUtility {
 	 * @param r
 	 * @param source
 	 */
-	public static void cutTargetBoundary(Set<VFace> overlap, Set<VVertex> vertexOverlap, CoHDS source) {
+	public static void cutTargetBoundary(Set<VFace> overlap, Set<VVertex> vertexOverlap, CoHDS source, Set<CoVertex> boundaryFeatures) {
 		// collect intersection candidates
 		Set<VEdge> checkEdges = new HashSet<VEdge>();
 		for (VFace f : overlap) {
@@ -106,6 +106,14 @@ public class RemeshingUtility {
 			}
 			splitFaceAt(f, v1, v2);
 		}
+	}
+	
+	
+	
+	public static boolean isFeatureVertexInConvexTextureFace(CoVertex fv, VFace f) {
+//		double[] fp = fv.getPosition().get();
+		
+		return false;
 	}
 	
 	

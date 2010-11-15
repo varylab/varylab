@@ -7,10 +7,10 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 
-@BaryCenter
+@BaryCenter4d
 public class CircumcircleCenterAdapter extends AbstractAdapter<double[]> {
 	
 	public CircumcircleCenterAdapter() {

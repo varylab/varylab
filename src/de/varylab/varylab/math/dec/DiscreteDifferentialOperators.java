@@ -25,8 +25,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.varylab.discreteconformal.util.HomologyUtility;
 import de.varylab.discreteconformal.util.Search;
 import de.varylab.varylab.hds.adapter.GaussianCurvatureAdapter;
@@ -152,7 +152,7 @@ public class DiscreteDifferentialOperators <
 					       emc = Rn.linearCombination(null, 0.5, vc, 0.5, ovc);
 					Face<?,?,?> face = e.getLeftFace();
 					if(face != null) {
-						double[] ccc = adapters.get(BaryCenter.class, face, double[].class);
+						double[] ccc = adapters.get(BaryCenter4d.class, face, double[].class);
 						double 
 							b = Rn.euclideanDistance(vc, emc),
 							h = Rn.euclideanDistance(ccc, emc);
@@ -160,7 +160,7 @@ public class DiscreteDifferentialOperators <
 					}
 					face = e.getRightFace();
 					if(face != null) {
-						double[] ccc = adapters.get(BaryCenter.class, e.getRightFace(), double[].class);
+						double[] ccc = adapters.get(BaryCenter4d.class, e.getRightFace(), double[].class);
 						double
 							b = Rn.euclideanDistance(vc, emc),
 							h = Rn.euclideanDistance(ccc, emc);
@@ -186,13 +186,13 @@ public class DiscreteDifferentialOperators <
 				
 				Face<?,?,?> face = e.getLeftFace();
 				if(face != null) {
-					double[] ccc = adapters.get(BaryCenter.class, face, double[].class);
+					double[] ccc = adapters.get(BaryCenter4d.class, face, double[].class);
 					double h = Rn.euclideanDistance(ccc, emc);
 					dualVolume += h;
 				}
 				face = e.getRightFace();
 				if(face != null) {
-					double[] ccc = adapters.get(BaryCenter.class, e.getRightFace(), double[].class);
+					double[] ccc = adapters.get(BaryCenter4d.class, e.getRightFace(), double[].class);
 					double h = Rn.euclideanDistance(ccc, emc);
 					dualVolume += h;
 				}

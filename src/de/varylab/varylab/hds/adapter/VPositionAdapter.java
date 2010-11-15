@@ -1,5 +1,6 @@
 package de.varylab.varylab.hds.adapter;
 
+import de.jreality.math.Pn;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
@@ -26,7 +27,11 @@ public class VPositionAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace
 	
 	@Override
 	public void setVertexValue(VVertex v, double[] value, AdapterSet a) {
-		v.position = value;
+		if (value.length == 3) {
+			v.position = Pn.homogenize(null, value);
+		} else {
+			v.position = value;
+		}
 	}
 	
 }

@@ -9,8 +9,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -43,7 +42,7 @@ public class LatticeSelection extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		HalfedgeSelection hes = hif.getSelection();
 		Set<V> all = new HashSet<V>();
 		for(V v : hif.getSelection().getVertices(hds)) {

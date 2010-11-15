@@ -5,16 +5,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.BaryCenter;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -31,16 +31,12 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
 		HDS hds, 
-		CalculatorSet c, 
-		HalfedgeInterface hcp) throws CalculatorException 
-	{
+		AdapterSet a, 
+		HalfedgeInterface hcp
+	) {
 		HDS hds2 = hcp.createEmpty(hds);
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || fc == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
-		}
-		execute(hds, hds2, vc, fc);
+		TypedAdapterSet<double[]> da = a.querySet(double[].class);
+		execute(hds, hds2, da);
 		hcp.set(hds2);	
 	}
 
@@ -50,17 +46,15 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HEDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
-			HEDS oldHeds, 
-			HEDS newHeds, 
-			VertexPositionCalculator vA,
-			FaceBarycenterCalculator fA) 
-	{
+		HEDS oldHeds, 
+		HEDS newHeds, 
+		TypedAdapterSet<double[]> a
+	) {
 		
 		Map<E, V> oldEtoNewV = new HashMap<E, V>();
 		for(E e : oldHeds.getPositiveEdges()) {
 			V v = newHeds.addNewVertex();
-			vA.set(v,Rn.times(null, 0.5, 
-					Rn.add(null,vA.get(e.getStartVertex()),vA.get(e.getTargetVertex()))));
+			a.set(Position.class, v, a.get(BaryCenter4d.class, e));
 			oldEtoNewV.put(e,v);
 			oldEtoNewV.put(e.getOppositeEdge(),v);
 		}
@@ -90,9 +84,9 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 			int size = HalfEdgeUtils.boundaryEdges(f).size();
 			if(!HalfEdgeUtils.isInteriorFace(f) && ((size%2) != 0)) {
 				// FIXME: Cannot deal with more than one boundary edge!
-				subdivideBd(f, faceEdgeMap.get(f), newHeds, oldVtoNewV,oldEtoNewV,vA, fA); 
+				subdivideBd(f, faceEdgeMap.get(f), newHeds, oldVtoNewV,oldEtoNewV, a); 
 			} else {
-				subdivide(f, faceEdgeMap.get(f), newHeds, oldVtoNewV,oldEtoNewV, vA, fA);
+				subdivide(f, faceEdgeMap.get(f), newHeds, oldVtoNewV,oldEtoNewV, a);
 			}
 //			print(newHeds,vA);
 		}
@@ -104,16 +98,15 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HEDS extends HalfEdgeDataStructure<V, E, F>
 	> void subdivide(
-			F f, 
-			E fe,
-			HEDS hds,
-			Map<V, V> oldVtoNewV, 
-			Map<E, V> oldEtoNewV,
-			VertexPositionCalculator vc,
-			FaceBarycenterCalculator fc) 
-	{
+		F f, 
+		E fe,
+		HEDS hds,
+		Map<V, V> oldVtoNewV, 
+		Map<E, V> oldEtoNewV,
+		TypedAdapterSet<double[]> a
+	) {
 		V vf = hds.addNewVertex();
-		vc.set(vf, fc.get(f));
+		a.set(Position.class, vf, a.get(BaryCenter.class, f));
 		E e = fe;
 		do {
 			V v1 = oldEtoNewV.get(e.getPreviousEdge());
@@ -121,7 +114,7 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 			V v2 = oldVtoNewV.get(oldStartVertex);
 			if(v2 == null) {
 				v2 = hds.addNewVertex();
-				vc.set(v2, vc.get(oldStartVertex));
+				a.set(Position.class, v2, a.get(Position.class, oldStartVertex));
 				oldVtoNewV.put(oldStartVertex, v2);
 			}
 			V v3 = oldEtoNewV.get(e);
@@ -142,9 +135,8 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 		HEDS hds,
 		Map<V, V> oldVtoNewV, 
 		Map<E, V> oldEtoNewV,
-		VertexPositionCalculator vc,
-		FaceBarycenterCalculator fc) 
-	{
+		TypedAdapterSet<double[]> a
+	) {
 		E be = f.getBoundaryEdge();
 		while(!HalfEdgeUtils.isBoundaryEdge(be)) {
 			be = be.getNextEdge();
@@ -160,7 +152,7 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 			
 			if(v2 == null) {
 				v2 = hds.addNewVertex();
-				vc.set(v2, vc.get(oldStartVertex));
+				a.set(Position.class, v2, a.get(Position.class, oldStartVertex));
 				oldVtoNewV.put(oldStartVertex, v2);
 			}
 			V v3 = oldEtoNewV.get(e);

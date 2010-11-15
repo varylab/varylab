@@ -6,15 +6,13 @@ import java.util.Set;
 
 import javax.swing.KeyStroke;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -34,19 +32,13 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
 		HDS hds, 
-		CalculatorSet c, 
-		HalfedgeInterface hcp) throws CalculatorException 
+		AdapterSet a, 
+		HalfedgeInterface hcp)  
 	{
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || fc == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
-		}
 		Set<E> edges = hcp.getSelection().getEdges(hds);
-		
 		for(E e : edges) {
 			if(e.isPositive()) {
-				subdivideStrip1D(e, vc);
+				subdivideStrip1D(e, a);
 			}
 		}
 		hcp.set(hds);	
@@ -57,7 +49,7 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HEDS extends HalfEdgeDataStructure<V, E, F>
-	> void subdivideStrip1D(E fe, VertexPositionCalculator vc)
+	> void subdivideStrip1D(E fe, AdapterSet a)
 	{
 		LinkedList<F> stripFaces = new LinkedList<F>();
 		LinkedList<E> stripEdges = new LinkedList<E>();
@@ -67,10 +59,9 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 		
 		for(E se: stripEdges) {
 			if(se.isPositive()) {
-				V 	v1 = se.getStartVertex(),
-				v2 = se.getTargetVertex(),
-				v = TopologyAlgorithms.splitEdge(se);
-				vc.set(v,Rn.times(null, 0.5, Rn.add(null,vc.get(v1),vc.get(v2))));
+				double[] b = a.get(BaryCenter4d.class, se, double[].class); 
+				V v = TopologyAlgorithms.splitEdge(se);
+				a.set(Position.class, v, b);
 				stripVertices.addLast(v);
 			}
 		}

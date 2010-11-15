@@ -53,9 +53,11 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Length;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -119,10 +121,10 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		if(calculateAndShowIdentification(hds, hif)) {
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
+		TypedAdapterSet<double[]> da = a.querySet(double[].class);
+		if(calculateAndShowIdentification(hds, hif, da)) {
 			HashSet<Vertex<?,?,?>> alreadyMerged = new HashSet<Vertex<?,?,?>>();
-			VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 			for(Vertex<?,?,?> v : identificationMap.keySet()) {
 				if(alreadyMerged.contains(v)) {
 					continue;
@@ -130,7 +132,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 
 				Vertex<?,?,?> w = identificationMap.get(v);
 
-				stitch(hds,vc,(V)v,(V)w);
+				stitch(hds, da, (V)v, (V)w);
 				alreadyMerged.add(v);
 				alreadyMerged.add(w);
 			}
@@ -145,7 +147,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> boolean stitch(HDS hds, VertexPositionCalculator vc, V v1, V v2) {
+	> boolean stitch(HDS hds, TypedAdapterSet<double[]> a, V v1, V v2) {
 
 		List<E> inEdges = findEdgesOfCommonHole(v1,v2);
 		E 	ie1 = null,
@@ -172,11 +174,12 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		}
 		
 		E splitE = insertEdge(v1,ie1,v2,ie2);
-		double[] newCoords = Rn.linearCombination(null, .5, vc.get(v1), .5, vc.get(v2));
+		double[] p1 = a.get(Position3d.class, v1);
+		double[] p2 = a.get(Position3d.class, v2);
+		double[] newCoords = Rn.linearCombination(null, .5, p1, .5, p2);
 		V newV = TopologyAlgorithms.collapseEdge(splitE);
-		vc.set(newV,newCoords);
+		a.set(Position.class, newV, newCoords);
 		removeDigons(newV);
-		
 		return true;		
 	}
 	
@@ -202,7 +205,8 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		calculateAndShowIdentification(hcp.get(), hcp);
+		TypedAdapterSet<double[]> a = hcp.getAdapters().querySet(double[].class);
+		calculateAndShowIdentification(hcp.get(), hcp, a);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -211,7 +215,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> boolean calculateAndShowIdentification(HDS hds, HalfedgeInterface hif) {
+	> boolean calculateAndShowIdentification(HDS hds, HalfedgeInterface hif, TypedAdapterSet<double[]> a) {
 		double distance = distanceModel.getNumber().doubleValue();
 		identificationMap.clear();
 		infoLabel.setText("");
@@ -242,14 +246,10 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 				}
 			}
 		} else {
-			VertexPositionCalculator vc = hif.getCalculators().get(hds.getVertexClass(), VertexPositionCalculator.class);
-			if(vc == null) {
-				throw new CalculatorException("No VertexPositionCalculators found for " + hds.getVertexClass());
-			}
 			for(V v : vertices) {
 				for(V w : vertices) {
 					if(v.getIndex() < w.getIndex()) {
-						double dist = Rn.euclideanDistance(vc.get(v), vc.get(w));
+						double dist = Rn.euclideanDistance(a.get(Position3d.class, v), a.get(Position.class, w));
 						if(dist <= distance) {
 							if(noEdgeCollapseChecker.isSelected()) {
 								if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)w) != null) {
@@ -341,18 +341,18 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeBeforeDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
+	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		oldSelection = hcp.getSelection();
 		double minEdgeLength = Double.POSITIVE_INFINITY;
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 		for(E e : hds.getPositiveEdges()) {
-			double length = Rn.euclideanDistance(vc.get(e.getStartVertex()), vc.get(e.getTargetVertex()));
+			double length = a.get(Length.class, e, Double.class);
 			if(length < minEdgeLength) {
 				minEdgeLength = length;
 			}
 		}
 		distanceModel.setMaximum(5*minEdgeLength);
 		distanceModel.setStepSize(minEdgeLength/5.0);
-		calculateAndShowIdentification(hds,hcp);
+		TypedAdapterSet<double[]> da = a.querySet(double[].class);
+		calculateAndShowIdentification(hds,hcp, da);
 	}
 }

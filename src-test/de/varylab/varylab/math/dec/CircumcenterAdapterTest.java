@@ -9,8 +9,8 @@ import org.junit.Test;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
@@ -43,7 +43,7 @@ public class CircumcenterAdapterTest {
 		as.add(new JRPositionAdapter());
 		as.add(new CircumcircleCenterAdapter());
 		for(DefaultJRFace f :  hds.getFaces()) {
-			double[] ccc = as.get(BaryCenter.class, f, double[].class);
+			double[] ccc = as.get(BaryCenter4d.class, f, double[].class);
 			List<DefaultJRVertex> bdVerts = HalfEdgeUtils.boundaryVertices(f);
 			double radius = Rn.euclideanDistanceSquared(ccc, as.get(Position.class, bdVerts.get(0), double[].class));
 			for(int i = 1; i < 3; ++i) {

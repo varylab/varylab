@@ -17,8 +17,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -82,7 +81,7 @@ public class QuadMeshGenerator extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		IndexedFaceSet ifs = null;
 		if (diamondShaped.isSelected()) {
 			ifs = generateDiamonds();
