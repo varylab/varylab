@@ -1,9 +1,9 @@
 package de.varylab.varylab.math.functional;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 
 import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.DenseVector;
@@ -15,8 +15,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
+import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
@@ -24,26 +25,21 @@ import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.varylab.discreteconformal.heds.bsp.HasBspPos;
-import de.varylab.discreteconformal.heds.bsp.KdTree;
 
 
 public class ReferenceSurfaceFunctional<
-		V extends Vertex<V, E, F> & HasBspPos, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>>
-	implements Functional<V, E, F> {
+	V extends Vertex<V, E, F>, 
+	E extends Edge<V, E, F>, 
+	F extends Face<V, E, F>>
+implements Functional<V, E, F> {
 
 	private HashMap<V,double[]> 
 		closestPointMap = new HashMap<V, double[]>();
-		
 	private HalfEdgeDataStructure<V, E, F> 
 		refSurface = null;
-
 	private AdapterSet
 		refas = null;
-	
-	private KdTree<V> 
+	private KdTree<V, E, F> 
 		kdtree = null;
 	
 	@Override
@@ -64,7 +60,7 @@ public class ReferenceSurfaceFunctional<
 			double[] vpos = new double[3];
 			for(V v: hds.getVertices()) {
 				FunctionalUtils.getPosition(v, x, vpos);
-				double[] pt = getClosestPointOnSurface(refSurface, refas, kdtree, new KdTree.KdPosition(vpos));
+				double[] pt = getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
 				closestPointMap.put(v, pt);
 			}
 		}
@@ -111,11 +107,10 @@ public class ReferenceSurfaceFunctional<
 	private double[] getClosestPointOnSurface(
 			HalfEdgeDataStructure<V, E, F> surface,
 			AdapterSet ras,
-			KdTree<V> kdtree,
-			HasBspPos v)
+			KdTree<V, E, F> kdtree,
+			double[] v)
 	{
-		Vector<V> closest = kdtree.collectKNearest(v, 5);
-		double[] vpos = v.getBspPos().get();
+		Collection<V> closest = kdtree.collectKNearest(v, 5);
 		double[] closestPointOnSurface = new double[3];
 		double[] pointOnSurface = new double[3];
 		double distance = -1;
@@ -123,8 +118,8 @@ public class ReferenceSurfaceFunctional<
 		for(V vc : closest) {
 			for(F f: HalfEdgeUtilsExtra.getFaceStar(vc)) {
 				if(visitedFaces.contains(f)) continue;
-				pointOnSurface = projectOnto(vpos,f,ras);
-				double actDist = Rn.euclideanDistanceSquared(pointOnSurface, vpos);
+				pointOnSurface = projectOnto(v, f, ras);
+				double actDist = Rn.euclideanDistanceSquared(pointOnSurface, v);
 				if(distance == -1 || actDist < distance) {
 					System.arraycopy(pointOnSurface, 0, closestPointOnSurface, 0, 3);
 					distance = actDist;
@@ -136,13 +131,13 @@ public class ReferenceSurfaceFunctional<
 	}
 
 	private double[] projectOnto(double[] pos, F f, AdapterSet as) {
-		double[] fn = as.get(Normal.class, f, double[].class);
+		double[] fn = as.getD(Normal.class, f);
 		List<V> verts = HalfEdgeUtils.boundaryVertices(f);
 		
 		double[] 
-		       v1 = as.get(Position.class, verts.get(0), double[].class),
-		       v2 = as.get(Position.class, verts.get(1), double[].class),
-		       v3 = as.get(Position.class, verts.get(2), double[].class);
+		       v1 = as.getD(Position3d.class, verts.get(0)),
+		       v2 = as.getD(Position3d.class, verts.get(1)),
+		       v3 = as.getD(Position3d.class, verts.get(2));
 		
 		double[] 
 		       vt1 = Rn.subtract(null, v1, v1),
@@ -227,7 +222,7 @@ public class ReferenceSurfaceFunctional<
 	> void setReferenceSurface(HDS refSurface, AdapterSet as) {
 		this.refSurface = refSurface;
 		Triangulator.triangulate(refSurface);
-		kdtree = new KdTree<V>(refSurface.getVertices(),5,false);
+		kdtree = new KdTree<V, E, F>(refSurface, as, 5 ,false);
 		refas = as;
 	}
 }

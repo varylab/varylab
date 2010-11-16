@@ -47,7 +47,7 @@ public class RoofSubdivisionPlugin extends AlgorithmPlugin {
 		HEDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(
 		HEDS oldHeds, 
-		HEDS newHeds, 
+		HEDS newHeds,
 		TypedAdapterSet<double[]> a
 	) {
 		

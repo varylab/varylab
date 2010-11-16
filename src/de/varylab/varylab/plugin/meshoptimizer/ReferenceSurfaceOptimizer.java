@@ -160,7 +160,9 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 			IndexedFaceSet ifs = (IndexedFaceSet)g;
 			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 			refSurfaceLayer.set(ifs);
-			AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
+			AdapterSet as = AdapterSet.createGenericAdapters(); 
+			as.add(new VPositionAdapter());
+			as.add(new NormalAdapter());
 			VHDS refSurface = refSurfaceLayer.get(new VHDS());
 			functional.setReferenceSurface(refSurface, as);
 			showSurfaceChecker.setEnabled(true);

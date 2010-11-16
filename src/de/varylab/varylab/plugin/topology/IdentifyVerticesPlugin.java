@@ -59,13 +59,12 @@ import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
+import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.discreteconformal.heds.bsp.HasBspPos;
-import de.varylab.discreteconformal.heds.bsp.KdTree;
 
 public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements ChangeListener {
 
@@ -209,7 +208,6 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		calculateAndShowIdentification(hcp.get(), hcp, a);
 	}
 
-	@SuppressWarnings("unchecked")
 	private <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
@@ -220,56 +218,55 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		identificationMap.clear();
 		infoLabel.setText("");
 		HalfedgeSelection identifySel = new HalfedgeSelection();
-		List<V> vertices = hds.getVertices();
-		if(vertices.get(0) instanceof HasBspPos) {
-			KdTree<HasBspPos> kdtree = new KdTree<HasBspPos>((List<HasBspPos>)vertices, 5, false);
-			for(V v : vertices) {
-				HasBspPos hv = (HasBspPos)v;
-				for(HasBspPos near : kdtree.collectKNearest(hv, 3)) {
-					double dist = kdtree.distance2(near, hv);
-					if(near != hv && (dist <= distance)) {
-						if(noEdgeCollapseChecker.isSelected()) {
-							if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)near) != null) {
-								continue;
-							}
-						}
-						identifySel.setSelected(v, true);
-						identifySel.setSelected((Vertex<?,?,?>)near, true);
-						if((identificationMap.containsKey(v) && identificationMap.get(v) != near) ||
-								(identificationMap.containsKey(near) && identificationMap.get(near) != v)) {
-							infoLabel.setText("identification impossible - not unique");
-							return false;
-						}
-						identificationMap.put((Vertex<?, ?, ?>) near, v);
-						identificationMap.put(v, (Vertex<?, ?, ?>) near);
-					}
-				}
-			}
-		} else {
-			for(V v : vertices) {
-				for(V w : vertices) {
-					if(v.getIndex() < w.getIndex()) {
-						double dist = Rn.euclideanDistance(a.get(Position3d.class, v), a.get(Position.class, w));
-						if(dist <= distance) {
-							if(noEdgeCollapseChecker.isSelected()) {
-								if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)w) != null) {
-									continue;
-								}
-							}
-							identifySel.setSelected(v, true);
-							identifySel.setSelected(w, true);
-							if((identificationMap.containsKey(v) && identificationMap.get(v) != w) ||
-									(identificationMap.containsKey(w) && identificationMap.get(w) != v)){
-								infoLabel.setText("identification impossible - not unique");
-								return false;
-							}
-							identificationMap.put(w, v);
-							identificationMap.put(v, w);
+		KdTree<V, E, F> kdtree = new KdTree<V, E, F>(hds, a, 5, false);
+		for(V v : hds.getVertices()) {
+			double[] hv = a.get(Position3d.class, v);
+			for(V near : kdtree.collectKNearest(hv, 3)) {
+				double[] nearP = a.get(Position3d.class, near);
+				double dist = kdtree.distance2(nearP, hv);
+				if(near != v && (dist <= distance)) {
+					if(noEdgeCollapseChecker.isSelected()) {
+						if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)near) != null) {
+							continue;
 						}
 					}
+					identifySel.setSelected(v, true);
+					identifySel.setSelected((Vertex<?,?,?>)near, true);
+					if((identificationMap.containsKey(v) && identificationMap.get(v) != near) ||
+							(identificationMap.containsKey(near) && identificationMap.get(near) != v)) {
+						infoLabel.setText("identification impossible - not unique");
+						return false;
+					}
+					identificationMap.put((Vertex<?, ?, ?>) near, v);
+					identificationMap.put(v, (Vertex<?, ?, ?>) near);
 				}
 			}
 		}
+//		} else {
+//			for(V v : vertices) {
+//				for(V w : vertices) {
+//					if(v.getIndex() < w.getIndex()) {
+//						double dist = Rn.euclideanDistance(a.get(Position3d.class, v), a.get(Position.class, w));
+//						if(dist <= distance) {
+//							if(noEdgeCollapseChecker.isSelected()) {
+//								if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)w) != null) {
+//									continue;
+//								}
+//							}
+//							identifySel.setSelected(v, true);
+//							identifySel.setSelected(w, true);
+//							if((identificationMap.containsKey(v) && identificationMap.get(v) != w) ||
+//									(identificationMap.containsKey(w) && identificationMap.get(w) != v)){
+//								infoLabel.setText("identification impossible - not unique");
+//								return false;
+//							}
+//							identificationMap.put(w, v);
+//							identificationMap.put(v, w);
+//						}
+//					}
+//				}
+//			}
+//		}
 		hif.setSelection(identifySel);
 		infoLabel.setText("Vertex pairs found:" + identificationMap.size()/2);
 		return true;

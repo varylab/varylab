@@ -1,6 +1,5 @@
 package de.varylab.varylab.plugin.generator;
 
-import geom3d.Point;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.varylab.varylab.hds.VHDS;
@@ -86,20 +85,20 @@ public class HexMeshFactory {
 	}
 	
 	public Rectangle2D getInsideRectangle() {
-		Point ll = hds.getVertex(0).getPosition();
-		Point ur = hds.getVertex(hds.numVertices()-1).getPosition();
+		double[] ll = hds.getVertex(0).position;
+		double[] ur = hds.getVertex(hds.numVertices()-1).position;
 		return new Rectangle2D(
-						new double[]{ll.get(0) + w[0], ll.get(1) + w[1]},
-						new double[]{ur.get(0) - w[0], ur.get(1) - w[1]});
+			new double[]{ll[0] + w[0], ll[1] + w[1]},
+			new double[]{ur[0] - w[0], ur[1] - w[1]}
+		);
 	}
 	
 	public Rectangle2D getOutsideRectangle() {
-		Point ur = hds.getVertex(hds.numVertices()-1).getPosition();
-		
+		double[] ur = hds.getVertex(hds.numVertices()-1).position;
 		return new Rectangle2D(
-						new double[]{0.0,0.0},
-						new double[]{ur.get(0)+w[0],ur.get(1)+((uHex%2==1)?w[1]:0)}
-						);
+			new double[]{0.0,0.0},
+			new double[]{ur[0]+w[0],ur[1]+((uHex%2==1)?w[1]:0)}
+		);
 	}
 	
 	private void updateHDS() {
@@ -136,8 +135,8 @@ public class HexMeshFactory {
 				move *= (i % 2 == 0) ? 1 : -1;
 				xPos += move*wv[0]/2;
 				yPos += move*wv[1]/2;
-				Point pos = new Point(xPos, yPos, 1);
-				vv.setPosition(pos);
+				double[] pos = {xPos, yPos, 0, 1};
+				vv.position = pos;
 			}
 		}
 	}
