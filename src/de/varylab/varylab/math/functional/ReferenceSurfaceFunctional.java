@@ -50,7 +50,8 @@ implements Functional<V, E, F> {
 			DomainValue x, 
 			Energy E, 
 			Gradient G, 
-			Hessian H) {
+			Hessian H
+	) {
 		if(refSurface == null) {
 			if(E != null) E.setZero();
 			if(G != null) G.setZero();
