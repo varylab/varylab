@@ -22,9 +22,9 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.GaussCurvatureAdapter;
 import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
-import de.varylab.varylab.hds.adapter.GaussianCurvatureAdapter;
 
 public class GaussCurvatureVisualizer extends VisualizerPlugin implements ChangeListener {
 	
@@ -72,8 +72,8 @@ public class GaussCurvatureVisualizer extends VisualizerPlugin implements Change
 		@Label
 		private class GaussCurvatureLabelAdapter extends AbstractAdapter<String> {
 
-			private GaussianCurvatureAdapter
-				gca = new GaussianCurvatureAdapter();
+			private GaussCurvatureAdapter
+				gca = new GaussCurvatureAdapter();
 			
 			public GaussCurvatureLabelAdapter() {
 				super(String.class, true, false);
