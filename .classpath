@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="de/varylab/varylab/plugin/remeshing/|de/varylab/varylab/plugin/subdivision/SplitFacePlugin.java|de/varylab/varylab/plugin/subdivision/StripSubdivisionPlugin.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>

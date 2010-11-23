@@ -5,20 +5,35 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.jreality.math.Rn;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VVertex;
 
-public class TriangleLattice extends Lattice {
+public class TriangleLattice <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F>
+> extends Lattice<V, E, F, HDS> {
 
-	private double ystep = 0.5;
-	private double xstep = 1.0/6.0;
+	private AdapterSet
+		a = null;
+	private double 
+		ystep = 0.5,
+		xstep = 1.0/6.0;
 	
-	public TriangleLattice(Rectangle2D bbox) {
-		super(new double[]{1.0/3.0,0.0}, new double[]{1.0/6.0,0.5},bbox);
+	public TriangleLattice(HDS template, AdapterSet a, Rectangle2D bbox) {
+		super(template, new double[]{1.0/3.0,0.0}, new double[]{1.0/6.0,0.5},bbox);
+		this.a = a;
 		double xSpan = bbox.getWidth();
 		double ySpan = bbox.getHeight();
 		yRes = (int)Math.ceil(ySpan / ystep);
@@ -31,19 +46,21 @@ public class TriangleLattice extends Lattice {
 		
 		for (int i = 0; i < xRes; i++) {
 			for (int j = 0; j < yRes; j++) {
-				VVertex v = lhds.addNewVertex();
+				V v = lhds.addNewVertex();
 				double xPos = ll[0] + (2*i+j)*xstep ;
 				double yPos = ll[1] + j * ystep;
-				v.position = new double[]{xPos,yPos,1.0};
-				v.texcoord = new double[]{xPos,yPos,1.0};
+				double[] p = new double[]{xPos,yPos,1.0};
+				double[] t = new double[]{xPos,yPos,1.0};
+				a.set(Position.class, v, p);
+				a.set(TexturePosition.class, v, t);
 			}
 		}
 		for (int i = 0; i < xRes  - 1; i++) {
 			for (int j = 0; j < yRes - 1; j++) {
-				VVertex v1 = lhds.getVertex(i*yRes + j); 
-				VVertex v2 = lhds.getVertex((i+1)*yRes + j); 
-				VVertex v3 = lhds.getVertex((i+1)*yRes + j + 1); 
-				VVertex v4 = lhds.getVertex(i*yRes + j + 1); 
+				V v1 = lhds.getVertex(i*yRes + j); 
+				V v2 = lhds.getVertex((i+1)*yRes + j); 
+				V v3 = lhds.getVertex((i+1)*yRes + j + 1); 
+				V v4 = lhds.getVertex(i*yRes + j + 1); 
 				HalfEdgeUtils.constructFaceByVertices(lhds, v1, v2, v4);
 				HalfEdgeUtils.constructFaceByVertices(lhds, v2, v3, v4);
 			}
@@ -51,52 +68,61 @@ public class TriangleLattice extends Lattice {
 	}
 	
 	@Override
-	public VVertex insertVertex(double i, double j) {
-		VVertex v = null;
+	public V insertVertex(double i, double j) {
 		int il = (int) Math.floor(i);
 		int jl = (int) Math.floor(j);
-		
+		V v = null;
 		if(j%1 == 0) {
-			VVertex v1 = lhds.getVertex((int)(il*yRes + j));
-			VVertex v2 = lhds.getVertex((int)((il+1)*yRes + j));
-			VEdge re = HalfEdgeUtils.findEdgeBetweenVertices(v1, v2);
-			VFace f = TopologyAlgorithms.removeEdgeFill(re);
+			V v1 = lhds.getVertex((int)(il*yRes + j));
+			V v2 = lhds.getVertex((int)((il+1)*yRes + j));
+			E re = HalfEdgeUtils.findEdgeBetweenVertices(v1, v2);
+			F f = TopologyAlgorithms.removeEdgeFill(re);
 			v = TopologyAlgorithms.splitFace(f);
-			v.position = Rn.times(null, 0.5, Rn.add(null, v1.position, v2.position));
-			v.texcoord =  Rn.times(null, 0.5, Rn.add(null, v1.texcoord, v2.texcoord));
+			double[] p1 = a.getD(Position3d.class, v1);
+			double[] p2 = a.getD(Position3d.class, v2);
+			double[] t1 = a.getD(TexturePosition2d.class, v1);
+			double[] t2 = a.getD(TexturePosition2d.class, v2);
+			double[] p = Rn.times(null, 0.5, Rn.add(null, p1, p2));
+			double[] t = Rn.times(null, 0.5, Rn.add(null, t1, t2));
+			a.set(Position.class, v, p);
+			a.set(TexturePosition.class, v, t);
 		} else {
-			VVertex v1 = lhds.getVertex((il*yRes + jl));
-			VVertex v2 = lhds.getVertex(((il+1)*yRes + jl + 1));
-			List<VEdge> ne = insertEdge(v1,v2, true);
+			V v1 = lhds.getVertex((il*yRes + jl));
+			V v2 = lhds.getVertex(((il+1)*yRes + jl + 1));
+			List<E> ne = insertEdge(v1,v2, true);
 			v = ne.get(0).getTargetVertex();
 			double[] pos = getPos(i,j);
-			System.arraycopy(pos, 0, v.position, 0, 2);
-			System.arraycopy(pos, 0, v.texcoord, 0, 2);
+			a.set(Position.class, v, pos.clone());
+			a.set(TexturePosition.class, v, pos.clone());
 		}
 		return v;
 	}
 	
 	@Override
-	public List<VEdge> insertEdge(VVertex v1, VVertex v2, boolean newVertices) {
-		LinkedList<VEdge> edges = new LinkedList<VEdge>();
-		VEdge e = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
-		VVertex v = null;
+	public List<E> insertEdge(V v1, V v2, boolean newVertices) {
+		LinkedList<E> edges = new LinkedList<E>();
+		E e = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
 		if(e == null) {
-			for(VEdge re: HalfEdgeUtilsExtra.get1Ring(v1)) {
-				VFace rf = re.getRightFace();
+			for(E re: HalfEdgeUtilsExtra.get1Ring(v1)) {
+				F rf = re.getRightFace();
 				if(rf != null && HalfEdgeUtils.boundaryVertices(rf).contains(v2)) {
 					if(newVertices) {
-						VFace f = TopologyAlgorithms.removeEdgeFill(re);
-						v = TopologyAlgorithms.splitFace(f);
+						F f = TopologyAlgorithms.removeEdgeFill(re);
+						V v = TopologyAlgorithms.splitFace(f);
 						edges.add(HalfEdgeUtils.findEdgeBetweenVertices(v1, v));
 						edges.add(HalfEdgeUtils.findEdgeBetweenVertices(v, v2));
-						v.position = Rn.times(null, 0.5, Rn.add(null, v1.position, v2.position));
-						v.texcoord =  Rn.times(null, 0.5, Rn.add(null, v1.texcoord, v2.texcoord));
+						double[] p1 = a.getD(Position3d.class, v1);
+						double[] p2 = a.getD(Position3d.class, v2);
+						double[] t1 = a.getD(TexturePosition2d.class, v1);
+						double[] t2 = a.getD(TexturePosition2d.class, v2);
+						double[] p = Rn.times(null, 0.5, Rn.add(null, p1, p2));
+						double[] t = Rn.times(null, 0.5, Rn.add(null, t1, t2));
+						a.set(Position.class, v, p);
+						a.set(TexturePosition.class, v, t);
 					} else {
 						TopologyAlgorithms.flipEdge(re);
-						VEdge e12 = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
+						E e12 = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
 						edges.add(e12);
-						
 					}
 					break;
 				}

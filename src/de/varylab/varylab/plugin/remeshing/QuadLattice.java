@@ -1,22 +1,33 @@
 package de.varylab.varylab.plugin.remeshing;
 
 
-import geom3d.Point;
-
 import java.awt.geom.Rectangle2D;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VVertex;
 
-public class QuadLattice extends Lattice{
+public class QuadLattice <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F>
+> extends Lattice<V, E, F, HDS> {
 
-	public QuadLattice(Rectangle2D bbox) {
-		super(new double[]{.5,0},new double[]{0,.5},bbox);
+	private AdapterSet
+		a = null;
+	
+	public QuadLattice(HDS template, AdapterSet a, Rectangle2D bbox) {
+		super(template, new double[]{.5,0},new double[]{0,.5},bbox);
+		this.a = a;
 		double xSpan = bbox.getWidth();
 		double ySpan = bbox.getHeight();
 		xRes = (int)Math.ceil(xSpan * 2);
@@ -30,45 +41,47 @@ public class QuadLattice extends Lattice{
 		
 		for (int i = 0; i < xRes; i++) {
 			for (int j = 0; j < yRes; j++) {
-				VVertex v = lhds.addNewVertex();
+				V v = lhds.addNewVertex();
 				double xPos =  ll[0] + i * 0.5;
 				double yPos =  ll[1] + j * 0.5;
-				v.position = new double[]{xPos,yPos,1.0};
-				v.texcoord = new double[]{xPos,yPos,1.0};
+				double[] p = new double[]{xPos,yPos,1.0};
+				double[] t = new double[]{xPos,yPos,1.0};
+				a.set(Position.class, v, p);
+				a.set(TexturePosition.class, v, t);
 			}
 		}
 		for (int i = 0; i < xRes - 1; i++) {
 			for (int j = 0; j < yRes - 1; j++) {
-				VVertex v1 = lhds.getVertex(i*yRes + j); 
-				VVertex v2 = lhds.getVertex((i+1)*yRes + j); 
-				VVertex v3 = lhds.getVertex((i+1)*yRes + j + 1); 
-				VVertex v4 = lhds.getVertex(i*yRes + j + 1); 
+				V v1 = lhds.getVertex(i*yRes + j); 
+				V v2 = lhds.getVertex((i+1)*yRes + j); 
+				V v3 = lhds.getVertex((i+1)*yRes + j + 1); 
+				V v4 = lhds.getVertex(i*yRes + j + 1); 
 				HalfEdgeUtils.constructFaceByVertices(lhds, v1, v2, v3, v4);
 			}
 		}
 	}
 	
 	@Override
-	public VVertex insertVertex(double i, double j) {
+	public V insertVertex(double i, double j) {
 		int il = (int) Math.floor(i);
 		int jl = (int) Math.floor(j);
-		VVertex 
+		V 
 			v1 = getVertex(il,jl),
 			v2 = getVertex(il+1,jl);
-		VFace f = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2).getLeftFace();
-		VVertex v = TopologyAlgorithms.splitFace(f);
+		F f = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2).getLeftFace();
+		V v = TopologyAlgorithms.splitFace(f);
 		double[] position = getPos(i,j);
-		Point pt = new Point(position[0], position[1], 0.0);
-		v.setPosition(pt);
-		v.setTexCoord(pt);
+		double[] p = {position[0], position[1], 0.0};
+		a.set(Position.class, v, p);
+		a.set(TexturePosition.class, v, p.clone());
 		return v;
 	}
 	
 	@Override
-	public List<VEdge> insertEdge(VVertex v1, VVertex v2, boolean newVertices) {
-		VEdge e = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
+	public List<E> insertEdge(V v1, V v2, boolean newVertices) {
+		E e = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
 		if(e == null) {
-			for(VFace f : HalfEdgeUtils.facesIncidentWithVertex(v1)) {
+			for(F f : HalfEdgeUtils.facesIncidentWithVertex(v1)) {
 				if(HalfEdgeUtils.boundaryVertices(f).contains(v2)){
 					RemeshingUtility.splitFaceAt(f,v1,v2);
 					e = HalfEdgeUtils.findEdgeBetweenVertices(v1,v2);
@@ -77,8 +90,6 @@ public class QuadLattice extends Lattice{
 
 			}
 		}
-		List<VEdge> edges = new LinkedList<VEdge>();
-		edges.add(e);
-		return edges;
+		return Collections.singletonList(e);
 	}
 }

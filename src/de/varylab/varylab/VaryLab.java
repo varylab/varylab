@@ -56,11 +56,14 @@ import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
+import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
 import de.varylab.varylab.plugin.selection.StripSelection;
 import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
+import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
+import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
@@ -110,11 +113,11 @@ public class VaryLab {
 		v.registerPlugin(new ConsolePlugin());
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.registerPlugin(new RoofSubdivisionPlugin());
-//		v.registerPlugin(new StripSubdivisionPlugin());
-//		v.registerPlugin(new SplitFacePlugin());
+		v.registerPlugin(new StripSubdivisionPlugin());
+		v.registerPlugin(new SplitFacePlugin());
 		v.registerPlugin(new Toolbox());
 		
-//		v.registerPlugin(new SurfaceRemeshingPlugin());
+		v.registerPlugin(new SurfaceRemeshingPlugin());
 		v.registerPlugin(new DiscreteConformalPlugin());
 		
 		v.registerPlugin(new OBJExportPlugin());

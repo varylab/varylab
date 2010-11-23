@@ -5,17 +5,20 @@ import java.util.List;
 
 import de.jreality.math.Rn;
 import de.jreality.scene.proxy.scene.SceneGraphComponent;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 
-public abstract class Lattice {
+public abstract class Lattice <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F>
+> {
 
-	protected VHDS 
-		lhds = new VHDS();
-	
-//	protected Map<VEdge, Double>
-//		weightMap = new HashMap<VEdge, Double>();
+	protected HDS
+		lhds = null;
 	
 	protected int 
 		xRes,
@@ -37,7 +40,9 @@ public abstract class Lattice {
 	    v1 = new double[2],
 		v2 = new double[2];
 	
-	public Lattice(double[] v1, double[] v2, Rectangle2D bbox) {
+	public Lattice(HDS template, double[] v1, double[] v2, Rectangle2D bbox) {
+		template.clear();
+		lhds = template;
 		ll[0] = bbox.getMinX();
 		ll[1] = bbox.getMinY();
 		this.bbox = bbox;
@@ -45,13 +50,14 @@ public abstract class Lattice {
 		System.arraycopy(v2, 0, this.v2, 0, 2);
 	}
 		
-	public VHDS getHDS() {
+	public HDS getHDS() {
 		return lhds;
 	}
 
-	public LatticeLine2D getClosestLatticeLine(double[] pt, double[] dir) {
+	public LatticeLine2D<V, E, F, HDS> getClosestLatticeLine(double[] pt, double[] dir) {
 		Slope s = compass.getClosestSlope(dir[0],dir[1]);
-		return new LatticeLine2D(s, (int) Math.round(s.distance(pt)), this);
+		int n = (int) Math.round(s.distance(pt));
+		return new LatticeLine2D<V, E, F, HDS>(s, n, this);
 	}
 
 	public double[] getIJ(double[] xy) {
@@ -73,14 +79,14 @@ public abstract class Lattice {
 	}
 
 
-	public VVertex getVertex(int i, int j) {
+	public V getVertex(int i, int j) {
 		return lhds.getVertex(i*yRes+j);
 	}
 
-	public abstract List<VEdge> insertEdge(VVertex last, VVertex v, boolean newVertices);
+	public abstract List<E> insertEdge(V last, V v, boolean newVertices);
 
-	public VVertex getLatticeVertex(double[] pt) {
-		VVertex v = null;
+	public V getLatticeVertex(double[] pt) {
+		V v = null;
 		double[] ij = getIJ(pt); 
 			
 		if(ij[0] % 1 == 0 && ij[1] % 1 == 0) {
@@ -91,7 +97,7 @@ public abstract class Lattice {
 		return v;
 	}
 
-	public abstract VVertex insertVertex(double i, double j);
+	public abstract V insertVertex(double i, double j);
 
 	public boolean isLatticePoint(double[] pt) {
 		double[] ij = getIJ(pt);
