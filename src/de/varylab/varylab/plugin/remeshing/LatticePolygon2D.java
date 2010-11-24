@@ -11,7 +11,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
-import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 
 public class LatticePolygon2D <
 	V extends Vertex<V, E, F>,
@@ -43,7 +43,7 @@ public class LatticePolygon2D <
 		while(vvi.hasNext() && cvi.hasNext()) {
 			V vv = vvi.next();
 			V cv = cvi.next();
-			double[] t = a.getD(TexturePosition3d.class, cv);
+			double[] t = a.getD(TexturePosition2d.class, cv);
 			a.set(Position.class, vv, t);
 		}
 	}

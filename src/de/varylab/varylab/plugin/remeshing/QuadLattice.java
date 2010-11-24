@@ -44,8 +44,8 @@ public class QuadLattice <
 				V v = lhds.addNewVertex();
 				double xPos =  ll[0] + i * 0.5;
 				double yPos =  ll[1] + j * 0.5;
-				double[] p = new double[]{xPos,yPos,1.0};
-				double[] t = new double[]{xPos,yPos,1.0};
+				double[] p = new double[]{xPos, yPos, 0.0};
+				double[] t = new double[]{xPos, yPos, 0.0};
 				a.set(Position.class, v, p);
 				a.set(TexturePosition.class, v, t);
 			}

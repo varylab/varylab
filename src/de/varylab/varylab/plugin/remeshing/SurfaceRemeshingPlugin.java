@@ -144,8 +144,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 
 	private void liftMesh() {
-		remesh = hcp.get(remesh);
-		RemeshingUtility.projectOntoBoundary(remesh, surface, hcp.getAdapters());
+		remesh = hcp.get(new VHDS());
+		RemeshingUtility.alignRemeshBoundary(remesh, surface, hcp.getAdapters());
 		RemeshingUtility.mapInnerVertices(surface, surfaceKD, remesh, hcp.getAdapters());
 		hcp.set(remesh);
 	}
@@ -187,6 +187,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesher.setLattice(new TriangleLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
 			remesh = remesher.remesh(surface, a); 
 			for (VVertex v : remesh.getVertices()) {
+				texInvMatrix.transformVector(v.position);
+				texInvMatrix.transformVector(v.texcoord);
+			}
+			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.texcoord);
 			}
 			hcp.set(remesh);
@@ -199,6 +203,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesher.setLattice(new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
 			remesh = remesher.remesh(surface, a); 
 			for (VVertex v : remesh.getVertices()) {
+				texInvMatrix.transformVector(v.position);
+				texInvMatrix.transformVector(v.texcoord);
+			}
+			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.texcoord);
 			}
 			hcp.set(remesh);

@@ -417,7 +417,7 @@ public class RemeshingUtility {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> F getContainingFace(V v, HDS mesh, AdapterSet a, KdTree<V, E, F> meshKD) {
-		double[] p = a.getD(TexturePosition3d.class, v);
+		double[] p = a.getD(Position3d.class, v);
 		Collection<V> nearbyVertices = meshKD.collectKNearest(p, 5);
 		Set<F> checkFaces = new HashSet<F>();
 		for (V nv : nearbyVertices) {
@@ -467,7 +467,7 @@ public class RemeshingUtility {
 			double[] v2 = Rn.subtract(null, p, sp);
 			double[] v2r = {-v2[1], v2[0], 0};
 			double dot = Rn.innerProduct(v1, v2r);
-			if(abs(dot) <= 1E-6) {
+			if(abs(dot) <= 1E-4) {
 				continue;
 			}
 			if (firstEdge) {
@@ -500,13 +500,13 @@ public class RemeshingUtility {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> Rectangle2D getTextureBoundingBox(HDS hds, AdapterSet a) {
-		double[] T = a.getD(TexturePosition3d.class, hds.getVertex(0));
+		double[] T = a.getD(TexturePosition2d.class, hds.getVertex(0));
 		double minX = T[0];
 		double maxX = minX;
 		double minY = T[1];
 		double maxY = minY;
 		for (V v : hds.getVertices()) {
-			T = a.getD(TexturePosition3d.class, v);
+			T = a.getD(TexturePosition2d.class, v);
 			if (T[0] < minX) {
 				minX = T[0]; 
 			}
@@ -545,7 +545,7 @@ public class RemeshingUtility {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void projectOntoBoundary(HDS remesh, HDS mesh, AdapterSet a) {
+	> void alignRemeshBoundary(HDS remesh, HDS mesh, AdapterSet a) {
 		for (V v : HalfEdgeUtils.boundaryVertices(remesh)) {
 			E e = RemeshingUtility.findClosestEdge(v, mesh, a);
 			double[] newPos = RemeshingUtility.projectOntoEdge(v, e, a);
@@ -573,7 +573,7 @@ public class RemeshingUtility {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	>  double[] projectOntoEdge(V v, E e, AdapterSet a) {
 		double[] 
-	       projectedVertex = new double[]{0.0,0.0,0.0},
+	       projectedVertex = new double[]{0.0, 0.0, 0.0},
 	       vpos = a.getD(Position3d.class, v),
 	       v1 = a.getD(TexturePosition3d.class, e.getStartVertex()),
 	       v2 = a.getD(TexturePosition3d.class, e.getTargetVertex()),
@@ -581,9 +581,9 @@ public class RemeshingUtility {
 	       sv = Rn.subtract(null, vpos, v1);
 		double factor = Rn.innerProduct(ev, sv)/Rn.innerProduct(ev, ev);
 		if(factor > 1) {
-			System.arraycopy(v2, 0, projectedVertex, 0, 3);
+			projectedVertex = v2.clone();
 		} else if(factor < 0) {
-			System.arraycopy(v1, 0, projectedVertex, 0, 3);
+			projectedVertex = v1.clone();
 		} else {
 			Rn.add(projectedVertex, v1, Rn.times(null, factor, ev));
 		}

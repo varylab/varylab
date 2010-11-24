@@ -90,7 +90,7 @@ public class LatticeRemesher <
 //		child6.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child6);
 		
-		RemeshingUtility.projectOntoBoundary(hds, chds, a);
+		RemeshingUtility.alignRemeshBoundary(hds, chds, a);
 		
 //		JRViewer.display(root);
 		return hds;
