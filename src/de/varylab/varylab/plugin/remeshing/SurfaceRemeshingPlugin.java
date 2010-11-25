@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,6 +29,7 @@ import de.jreality.math.Matrix;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.content.ContentAppearance;
 import de.jreality.ui.AppearanceInspector;
+import de.jreality.util.LoggingSystem;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
@@ -82,8 +85,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	private KdTree<VVertex, VEdge, VFace>
 		surfaceKD = null;
 	
-	private HashMap<VVertex, double[]>
-		flatCoordMap = new HashMap<VVertex, double[]>();
+	private HashMap<Integer, double[]>
+		remeshPosMap = new HashMap<Integer, double[]>();
 	private boolean 
 		lifted = false;
 	
@@ -136,8 +139,13 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	
 	
 	private void flattenMesh() {
+		if (remeshPosMap.size() != remesh.numVertices()) {
+			Logger log = LoggingSystem.getLogger(SurfaceRemeshingPlugin.class);
+			log.log(Level.WARNING, "Surface out of sync with the plugin");
+			return;
+		}
 		for(VVertex v : remesh.getVertices()) {
-			v.position = flatCoordMap.get(v);
+			v.position = remeshPosMap.get(v.getIndex());
 		}
 		hcp.set(remesh);
 	}
@@ -153,6 +161,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private void remeshSurface() throws RemeshingException {
 		lifted = false;
+		remeshPosMap.clear();
 		surface = hcp.get(surface);
 		AdapterSet a = hcp.getAdapters();
 		if (surface.getVertex(0).texcoord == null) {
@@ -186,9 +195,11 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		case TrianglesQuantized:
 			remesher.setLattice(new TriangleLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
 			remesh = remesher.remesh(surface, a); 
+			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
 				texInvMatrix.transformVector(v.position);
 				texInvMatrix.transformVector(v.texcoord);
+				remeshPosMap.put(v.getIndex(), v.position);
 			}
 			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.texcoord);
@@ -205,6 +216,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			for (VVertex v : remesh.getVertices()) {
 				texInvMatrix.transformVector(v.position);
 				texInvMatrix.transformVector(v.texcoord);
+				remeshPosMap.put(v.getIndex(), v.position);
 			}
 			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.texcoord);
