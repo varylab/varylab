@@ -26,6 +26,7 @@ public class SingularityAdapter extends AbstractAdapter<Double> {
 		return Vertex.class.isAssignableFrom(nodeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 
@@ -39,6 +40,7 @@ public class SingularityAdapter extends AbstractAdapter<Double> {
 	}
 	
 
+	@Override
 	public <
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 

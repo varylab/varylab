@@ -31,6 +31,7 @@ public class ConnectionAdapter extends AbstractAdapter<Double> {
 		return 0;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
