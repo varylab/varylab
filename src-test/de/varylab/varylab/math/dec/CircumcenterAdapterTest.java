@@ -40,7 +40,7 @@ public class CircumcenterAdapterTest {
 //		v2.position = new double[] {1.0,0.0,0.0};
 //		v3.position = new double[] {0.0,1.0,0.0};
 		
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
 		for(DefaultJRFace f :  hds.getFaces()) {

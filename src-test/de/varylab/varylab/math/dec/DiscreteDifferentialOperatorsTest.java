@@ -12,6 +12,7 @@ import org.junit.Test;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.CircumCenterAdapter;
+import de.jtem.halfedgetools.adapter.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.dec.DiscreteDifferentialOperators;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
@@ -47,9 +48,10 @@ public class DiscreteDifferentialOperatorsTest {
 		
 		s2.set(0,0,2);
 		
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
+		as.add(new UndirectedEdgeIndex());
 		
 		s0.add(-1.0,DiscreteDifferentialOperators.getHodgeStar(hds,as,0));
 		s1.add(-1.0,DiscreteDifferentialOperators.getHodgeStar(hds,as,1));
@@ -72,9 +74,10 @@ public class DiscreteDifferentialOperatorsTest {
 		v2.position = new double[] {1.0,0.0,0.0};
 		v3.position = new double[] {0.0,1.0,0.0};
 		
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
+		as.add(new UndirectedEdgeIndex());
 
 		Matrix 
 			D0 = DiscreteDifferentialOperators.getDifferential(hds,as,0),
@@ -96,9 +99,10 @@ public class DiscreteDifferentialOperatorsTest {
 		v2.position = new double[] {1.0,0.0,0.0};
 		v3.position = new double[] {0.0,1.0,0.0};
 		
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
+		as.add(new UndirectedEdgeIndex());
 
 		Matrix 
 			cD0 = new CompColMatrix(DiscreteDifferentialOperators.getCoDifferential(hds,as,0)),
@@ -129,9 +133,10 @@ public class DiscreteDifferentialOperatorsTest {
 	@Test
 	public void testTetrahedron() {
 		FunctionalTestData.createCombinatorialTetrahedron(hds);
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
+		as.add(new UndirectedEdgeIndex());
 		
 		Matrix 
 			d0 = DiscreteDifferentialOperators.getBoundaryOperator(hds,as,0),
@@ -146,9 +151,10 @@ public class DiscreteDifferentialOperatorsTest {
 		DefaultJRHDS hds = new DefaultJRHDS();
 		
 		FunctionalTestData.createCombinatorialPyrWithBnd(hds);
-		AdapterSet as = new AdapterSet();
+		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());
 		as.add(new CircumCenterAdapter());
+		as.add(new UndirectedEdgeIndex());
 
 		Matrix 
 			d0 = DiscreteDifferentialOperators.getBoundaryOperator(hds,as,0),

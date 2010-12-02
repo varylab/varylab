@@ -2,9 +2,6 @@ package de.varylab.varylab.math.functional;
 
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
-
-import org.junit.Test;
-
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
@@ -46,27 +43,14 @@ public class ReferenceSurfaceFunctionalTest extends FunctionalTest<VVertex, VEdg
 		MyDomainValue pos = new MyDomainValue(result);
 		
 		setXGradient(pos);
-//		setXHessian(pos);
 		setHDS(hds);
 		ReferenceSurfaceFunctional<VVertex, VEdge, VFace> functional =
 			new ReferenceSurfaceFunctional<VVertex, VEdge, VFace>();
-		AdapterSet as = new AdapterSet(new VPositionAdapter(), new NormalAdapter());
+		AdapterSet as = AdapterSet.createGenericAdapters(); 
+		as.add(new VPositionAdapter());
+		as.add(new NormalAdapter());
 		functional.setReferenceSurface(refSurface, as);
 		setFuctional(functional);
 	}
 	
-	@Override
-	@Test
-	public void testGradient() throws Exception {
-		super.testGradient();
-	}
-	
-	@Override
-	@Test
-	public void testHessian() throws Exception {
-		super.testHessian();
-	}
-	
-	
-
 }
