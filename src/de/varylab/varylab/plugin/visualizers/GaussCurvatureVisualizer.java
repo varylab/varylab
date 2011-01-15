@@ -4,8 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,7 +18,6 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.GaussCurvatureAdapter;
 import de.jtem.halfedgetools.adapter.type.Label;
@@ -57,8 +54,8 @@ public class GaussCurvatureVisualizer extends VisualizerPlugin implements Change
 		}
 	
 		@Override
-		public Set<? extends Adapter<?>> getAdapters() {
-			Set<Adapter<?>> result = new HashSet<Adapter<?>>();
+		public AdapterSet getAdapters() {
+			AdapterSet result = new AdapterSet();
 			result.add(new GaussCurvatureLabelAdapter());
 			return result;
 		}

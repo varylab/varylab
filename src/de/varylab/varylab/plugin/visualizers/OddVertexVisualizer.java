@@ -32,12 +32,7 @@ OF SUCH DAMAGE.
 **/
 
 import static de.jtem.halfedgetools.util.HalfEdgeUtilsExtra.getDegree;
-
-import java.util.Collections;
-import java.util.Set;
-
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
@@ -72,8 +67,8 @@ public class OddVertexVisualizer extends VisualizerPlugin {
 	
 	
 	@Override
-	public Set<? extends Adapter<?>> getAdapters() {
-		return Collections.singleton(new OddVertexAdapter());
+	public AdapterSet getAdapters() {
+		return new AdapterSet(new OddVertexAdapter());
 	}
 
 

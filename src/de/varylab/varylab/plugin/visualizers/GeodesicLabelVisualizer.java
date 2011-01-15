@@ -1,14 +1,10 @@
 package de.varylab.varylab.plugin.visualizers;
 
-import static java.util.Collections.singleton;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
@@ -55,8 +51,8 @@ public class GeodesicLabelVisualizer extends VisualizerPlugin {
 	
 	
 	@Override
-	public Set<? extends Adapter<?>> getAdapters() {
-		return singleton(new GeodesicColorsAdapter());
+	public AdapterSet getAdapters() {
+		return new AdapterSet(new GeodesicColorsAdapter());
 	}
 	
 	
