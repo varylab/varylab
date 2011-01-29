@@ -12,7 +12,6 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.projgeom.P5;
-import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
@@ -104,10 +103,10 @@ public class HFaceSurface {
 	}
 
 	private void propagateParametrisation(VEdge e, HFace nextFace) {
-		HFace aktFace = vhMap.get(e.getLeftFace());
-		double[]
-		       pc1 = aktFace.getPluecker(e),
-		       pc2 = aktFace.getParameterLine(e.getPreviousEdge());
+//		HFace aktFace = vhMap.get(e.getLeftFace());
+//		double[]
+//		       pc1 = aktFace.getPluecker(e),
+//		       pc2 = aktFace.getParameterLine(e.getPreviousEdge());
 		//:TODO lineIntersectLineWhileExistenceIsUnchecked() seems to be removed
 		throw new RuntimeException("TODO lineIntersectLineWhileExistenceIsUnchecked() seems to be removed");
 //		nextFace.setParameterLine(e.getOppositeEdge(), PlueckerLineGeometry.lineIntersectLineWhileExistenceIsUnchecked(null, pc1, pc2));
