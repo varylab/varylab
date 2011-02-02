@@ -32,8 +32,8 @@ import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.hds.adapter.LengthRangeAdapter;
 import de.varylab.varylab.hds.adapter.OriginalLength;
-import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 

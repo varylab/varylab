@@ -8,6 +8,7 @@ import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.UndirectedEdgeIndex;
+import de.jtem.halfedgetools.nurbs.NurbsManagerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -122,6 +123,7 @@ public class VaryLab {
 		
 		v.registerPlugin(new OBJExportPlugin());
 		
+		v.registerPlugin(new NurbsManagerPlugin());
 //		v.registerPlugin(new HalfedgeDebuggerPlugin());
 //		v.registerPlugin(new WebContentLoader());
 		

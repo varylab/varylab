@@ -24,15 +24,15 @@ import de.varylab.jpetsc.InsertMode;
 import de.varylab.jpetsc.Mat;
 import de.varylab.jpetsc.Vec;
 import de.varylab.jtao.Tao;
+import de.varylab.jtao.Tao.GetSolutionStatusResult;
 import de.varylab.jtao.TaoAppAddCombinedObjectiveAndGrad;
 import de.varylab.jtao.TaoAppAddHess;
 import de.varylab.jtao.TaoApplication;
-import de.varylab.jtao.Tao.GetSolutionStatusResult;
-import de.varylab.varylab.math.SimpleEnergy;
 import de.varylab.varylab.math.CombinedOptimizableTao.TaoU;
-import de.varylab.varylab.math.functional.SpringFunctional;
+import de.varylab.varylab.math.SimpleEnergy;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.WeightFunction;
+import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.math.tao.TaoGradient;
 import de.varylab.varylab.math.tao.TaoHessian;
 
