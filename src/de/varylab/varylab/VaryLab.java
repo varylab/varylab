@@ -45,6 +45,7 @@ import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
 import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
@@ -180,6 +181,7 @@ public class VaryLab {
 		v.registerPlugin(new ExteriorGeodesicOptimizer());
 		v.registerPlugin(new ReferenceSurfaceOptimizer());
 		v.registerPlugin(new CircularQuadOptimizer());
+		v.registerPlugin(new ConicalOptimizer());
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {
