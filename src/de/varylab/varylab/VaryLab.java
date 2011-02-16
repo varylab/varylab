@@ -7,7 +7,7 @@ import de.jreality.plugin.basic.View;
 import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
-import de.jtem.halfedgetools.adapter.UndirectedEdgeIndex;
+import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.nurbs.NurbsManagerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;

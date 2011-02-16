@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.CircumCenterAdapter;
-import de.jtem.halfedgetools.adapter.UndirectedEdgeIndex;
+import de.jtem.halfedgetools.adapter.generic.CircumCenterAdapter;
+import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.dec.DiscreteDifferentialOperators;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;

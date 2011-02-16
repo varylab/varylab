@@ -9,7 +9,7 @@ import org.junit.Test;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.CircumCenterAdapter;
+import de.jtem.halfedgetools.adapter.generic.CircumCenterAdapter;
 import de.jtem.halfedgetools.adapter.type.CircumCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.functional.FunctionalTestData;

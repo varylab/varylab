@@ -19,7 +19,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.GaussCurvatureAdapter;
+import de.jtem.halfedgetools.adapter.generic.GaussCurvatureAdapter;
 import de.jtem.halfedgetools.adapter.type.EdgeIndex;
 import de.jtem.halfedgetools.dec.DiscreteDifferentialOperators;
 import de.jtem.halfedgetools.dec.VectorFieldMapAdapter;
