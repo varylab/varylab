@@ -37,8 +37,8 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 	private JPanel panel = new JPanel(); 
 	
 	private JRadioButton
-		volButton = new JRadioButton("Volume"),
-		diagButton = new JRadioButton("Diagonal Distance");
+		volButton = new JRadioButton("Volume", false),
+		diagButton = new JRadioButton("Diagonal Distance", true);
 	
 	private ButtonGroup
 		functionalButtonGroup = new ButtonGroup();
@@ -68,7 +68,6 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets = new Insets(2, 2, 2, 2);
 		
-		volButton.setSelected(true);
 		functionalButtonGroup.add(volButton);
 		functionalButtonGroup.add(diagButton);
 		
@@ -122,6 +121,19 @@ public class PlanarQuadsOptimizer extends OptimizerPlugin {
 	public JPanel getOptionPanel() {
 		return panel ;
 	}
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(getClass(), "useVolumeFunctional", volButton.isSelected());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		volButton.setSelected(c.getProperty(getClass(), "useVolumeFunctional", false));
+	}
+	
 	
 	@Override
 	public void install(Controller c) throws Exception {
