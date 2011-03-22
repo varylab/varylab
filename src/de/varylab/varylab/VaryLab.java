@@ -53,6 +53,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
@@ -182,6 +183,7 @@ public class VaryLab {
 		v.registerPlugin(new ReferenceSurfaceOptimizer());
 		v.registerPlugin(new CircularQuadOptimizer());
 		v.registerPlugin(new ConicalOptimizer());
+		v.registerPlugin(new InflateOptimizer());
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {
