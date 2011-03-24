@@ -25,6 +25,7 @@ import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.varylab.discreteconformal.heds.CoVertex;
 import de.varylab.varylab.hds.VFace;
 
@@ -266,6 +267,21 @@ public class RemeshingUtility {
 		return ne2;
 	}
 	
+
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> F findCommonFace(V v1, V v2) {
+		List<F> faceStar1 = HalfEdgeUtilsExtra.getFaceStar(v1);
+		List<F> faceStar2 = HalfEdgeUtilsExtra.getFaceStar(v2);
+		faceStar1.retainAll(faceStar2);
+		if(faceStar1.size() == 0) {
+			return null;
+		} else {
+			return faceStar1.get(0);
+		}
+	}
 	
 	public static <
 		V extends Vertex<V, E, F>,
@@ -653,5 +669,37 @@ public class RemeshingUtility {
 			}
 		}
 		return closest;
+	}
+
+
+
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Map<V, double[]> mapInnerVertices(HDS mesh, Map<F,F> faceMap, HDS remesh, AdapterSet a) {
+		// map inner vertices
+		Map<V, double[]> flatCoordMap = new HashMap<V, double[]>();
+		for (V v : remesh.getVertices()) {
+			double[] patternPoint = a.getD(Position3d.class, v);
+			F f = null;
+			for(F vf : HalfEdgeUtilsExtra.getFaceStar(v)) {
+				f = faceMap.get(vf);
+				if(f != null) {
+					break;
+				}
+			}
+			if (f == null) { 
+				System.err.println("no face containing " + v + " found!");
+				continue;
+			}
+			double[] bary = getBarycentricTexturePoint(patternPoint, f, a);
+			double[] newPos = getPointFromBarycentric(bary, f, a);
+			flatCoordMap.put(v, patternPoint);
+			a.set(Position.class, v, newPos);
+//			System.out.println(v.getIndex() + ": " + Arrays.toString(newPos));
+		}
+		return flatCoordMap;
 	}
 }

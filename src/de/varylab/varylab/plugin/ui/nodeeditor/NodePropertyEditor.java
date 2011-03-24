@@ -222,7 +222,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 			boolean accept = true;
 			for (Object n : listSelection) {
 				accept &= a.canAccept(((Node<?,?,?>)n).getClass());
-				accept &= a.isGetter() && a.isSetter();
+				accept &= a.isGetter(); // && a.isSetter();
 			}
 			if (accept) {
 				compSet.add(a);

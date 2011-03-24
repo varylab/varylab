@@ -49,6 +49,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
+import de.varylab.varylab.plugin.meshoptimizer.ConstantMeanCurvatureFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
@@ -65,11 +66,15 @@ import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
 import de.varylab.varylab.plugin.selection.StripSelection;
+import de.varylab.varylab.plugin.selection.TextureEdgeSelection;
+import de.varylab.varylab.plugin.selection.TextureVertexSelection;
 import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
+import de.varylab.varylab.plugin.topology.CollapseTrianglesPlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
+import de.varylab.varylab.plugin.topology.StitchingPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
@@ -139,6 +144,10 @@ public class VaryLab {
 		v.registerPlugin(new GeodesicSelection());
 		v.registerPlugin(new LatticeSelection());
 		v.registerPlugin(new StripSelection());
+		v.registerPlugin(new TextureVertexSelection());
+		v.registerPlugin(new TextureEdgeSelection());
+		v.registerPlugin(new StitchingPlugin());
+		v.registerPlugin(new CollapseTrianglesPlugin());
 	}
 
 
@@ -178,6 +187,7 @@ public class VaryLab {
 		v.registerPlugin(new GeodesicLaplaceOptimizer());
 		v.registerPlugin(new ANetOptimizer());
 		v.registerPlugin(new ConstantDirectionFieldPlugin());
+		v.registerPlugin(new ConstantMeanCurvatureFieldPlugin());
 		v.registerPlugin(new SpringOptimizer());
 		v.registerPlugin(new ElectrostaticOptimizer());
 		v.registerPlugin(new ElectrostaticSphereOptimizer());
