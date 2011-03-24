@@ -4,6 +4,7 @@ public enum NumericalEngine {
 
 	TAO,
 	MTJ,
-	JTEM
+	JTEM,
+	ParallelCOLT
 	
 }

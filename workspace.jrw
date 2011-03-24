@@ -275,10 +275,6 @@
     <boolean>false</boolean>
   </entry>
   <entry>
-    <string>de.varylab.discreteconformal.plugin.DiscreteConformalPlugin:quantizeMode</string>
-    <de.varylab.discreteconformal.unwrapper.UnwrapUtility_-QuantizationMode>AllAngles</de.varylab.discreteconformal.unwrapper.UnwrapUtility_-QuantizationMode>
-  </entry>
-  <entry>
     <string>de.jreality.plugin.content.ContentAppearance:tubes</string>
     <boolean>true</boolean>
   </entry>

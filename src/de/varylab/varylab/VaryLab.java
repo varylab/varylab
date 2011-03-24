@@ -33,6 +33,8 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.ddg.AssociatedFamily;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransfom;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
@@ -109,6 +111,7 @@ public class VaryLab {
 		addOptimizationPlugins(v);
 		addLnFPlugins(v);
 		addVisualizerPlugins(v);
+		addDDGPlugins(v);
 		
 		v.registerPlugin(new CatmullClarkPlugin());
 		v.registerPlugin(new LoopPlugin());
@@ -193,6 +196,11 @@ public class VaryLab {
 		v.registerPlugin(new CrossPlatformLnF());
 		v.registerPlugin(new NimbusLnF());
 		v.registerPlugin(new SystemLookAndFeel());
+	}
+	
+	private static void addDDGPlugins(JRViewer v) {
+		v.registerPlugin(new ChristoffelTransfom());
+		v.registerPlugin(AssociatedFamily.class);
 	}
 	
 	
