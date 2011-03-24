@@ -187,7 +187,7 @@ public class VaryLab {
 		v.registerPlugin(new GeodesicLaplaceOptimizer());
 		v.registerPlugin(new ANetOptimizer());
 		v.registerPlugin(new ConstantDirectionFieldPlugin());
-		v.registerPlugin(new ConstantMeanCurvatureFieldPlugin());
+//		v.registerPlugin(new ConstantMeanCurvatureFieldPlugin());
 		v.registerPlugin(new SpringOptimizer());
 		v.registerPlugin(new ElectrostaticOptimizer());
 		v.registerPlugin(new ElectrostaticSphereOptimizer());
