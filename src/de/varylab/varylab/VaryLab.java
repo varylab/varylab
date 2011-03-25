@@ -92,12 +92,12 @@ public class VaryLab {
 
 	private static void addVaryLabPlugins(JRViewer v) {
 		HalfedgeInterface hif = new HalfedgeInterface();
-		hif.addGlobalAdapter(new VPositionAdapter(), true);
-		hif.addGlobalAdapter(new VTexturePositionAdapter(), true);
-		hif.addGlobalAdapter(new NodeWeigthAdapter(), true);
-		hif.addGlobalAdapter(new GeodesicLabelAdapter(), true);
-		hif.addGlobalAdapter(new SingularityAdapter(), true);
-		hif.addGlobalAdapter(new UndirectedEdgeIndex(), true);
+		hif.addAdapter(new VPositionAdapter(), true);
+		hif.addAdapter(new VTexturePositionAdapter(), true);
+		hif.addAdapter(new NodeWeigthAdapter(), true);
+		hif.addAdapter(new GeodesicLabelAdapter(), true);
+		hif.addAdapter(new SingularityAdapter(), true);
+		hif.addAdapter(new UndirectedEdgeIndex(), true);
 		
 		v.registerPlugin(hif);
 		v.registerPlugin(new OptimizationPanel());
