@@ -62,15 +62,18 @@ import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
+import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
 import de.varylab.varylab.plugin.selection.StripSelection;
 import de.varylab.varylab.plugin.selection.TextureEdgeSelection;
 import de.varylab.varylab.plugin.selection.TextureVertexSelection;
+import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
+import de.varylab.varylab.plugin.topology.CollapseToNeighborPlugin;
 import de.varylab.varylab.plugin.topology.CollapseTrianglesPlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
@@ -145,6 +148,9 @@ public class VaryLab {
 		v.registerPlugin(new StripSelection());
 		v.registerPlugin(new TextureVertexSelection());
 		v.registerPlugin(new TextureEdgeSelection());
+		v.registerPlugin(new BoundaryEarsSelection());
+		v.registerPlugin(new CollapseToNeighborPlugin());
+		v.registerPlugin(new TextureGeometryGenerator());
 		v.registerPlugin(new StitchingPlugin());
 		v.registerPlugin(new CollapseTrianglesPlugin());
 	}

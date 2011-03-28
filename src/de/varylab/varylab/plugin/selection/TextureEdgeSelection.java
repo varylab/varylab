@@ -12,17 +12,18 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.remeshing.TextureUtility;
+import de.varylab.varylab.plugin.remeshing.QuadTextureUtility;
+import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class TextureEdgeSelection extends AlgorithmPlugin {
 
 	private ContentAppearance contentAppearance;
-
+	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Selection;
+		return AlgorithmCategory.TextureRemeshing;
 	}
-
+	
 	@Override
 	public String getAlgorithmName() {
 		return "TextureEdges";
@@ -41,14 +42,14 @@ public class TextureEdgeSelection extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		HalfedgeSelection hes = hif.getSelection();
-		hes.addAll(TextureUtility.findTextureEdges(hds, a, contentAppearance.getAppearanceInspector().getTextureMatrix()));
+		hes.addAll(QuadTextureUtility.findTextureEdges(hds, a, contentAppearance.getAppearanceInspector().getTextureMatrix()));
 		hif.setSelection(hes);
 	}
-
+	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo();
-//		info.icon = ImageHook.getIcon("geoSel.png",16,16);
+		info.icon = ImageHook.getIcon("textureEdge.png",16,16);
 		return info;
 	}
 	
@@ -57,4 +58,5 @@ public class TextureEdgeSelection extends AlgorithmPlugin {
 		super.install(c);
 		contentAppearance = c.getPlugin(ContentAppearance.class);
 	}
+	
 }

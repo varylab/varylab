@@ -156,13 +156,15 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private void liftMesh() {
 		remesh = hcp.get(new VHDS());
+		HalfedgeSelection selection = hcp.getSelection();
 		RemeshingUtility.alignRemeshBoundary(remesh, surface, hcp.getAdapters());
 		if(newOldFaceMap.isEmpty()) {
 			RemeshingUtility.mapInnerVertices(surface, surfaceKD, remesh, hcp.getAdapters());
 		} else {
-			RemeshingUtility.mapInnerVertices(surface, newOldFaceMap, remesh,hcp.getAdapters());
+			RemeshingUtility.mapInnerVertices(surface, newOldFaceMap, remesh, hcp.getAdapters());
 		}
 		hcp.set(remesh);
+		hcp.setSelection(selection);
 	}
 
 
