@@ -73,9 +73,11 @@ import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
 import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
+import de.varylab.varylab.plugin.topology.Collapse2ValentPlugin;
 import de.varylab.varylab.plugin.topology.CollapseToNeighborPlugin;
 import de.varylab.varylab.plugin.topology.CollapseTrianglesPlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
+import de.varylab.varylab.plugin.topology.StitchCutPathPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
@@ -152,7 +154,9 @@ public class VaryLab {
 		v.registerPlugin(new CollapseToNeighborPlugin());
 		v.registerPlugin(new TextureGeometryGenerator());
 		v.registerPlugin(new StitchingPlugin());
+		v.registerPlugin(new StitchCutPathPlugin());
 		v.registerPlugin(new CollapseTrianglesPlugin());
+		v.registerPlugin(new Collapse2ValentPlugin());
 	}
 
 
