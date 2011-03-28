@@ -53,6 +53,8 @@ public class QuadTextureUtility {
 		for(V v : textureVertices) {
 			V newV = newHDS.addNewVertex();
 			a.set(Position.class, newV, a.getD(Position.class, v));
+			a.set(TexturePosition.class, newV, a.getD(TexturePosition.class, v));
+			// TODO: AdapterSet.transferData 
 			textureVertexMap.put(v, newV);
 		}
 		HashSet<V> newBdVertices = new HashSet<V>();
