@@ -1,5 +1,8 @@
 package de.varylab.varylab;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
@@ -44,6 +47,8 @@ import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
+import de.varylab.varylab.plugin.lnf.SyntheticaBlackEyeLnf;
+import de.varylab.varylab.plugin.lnf.SyntheticaStandardLnf;
 import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
@@ -55,6 +60,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
@@ -63,12 +69,12 @@ import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
+import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
 import de.varylab.varylab.plugin.selection.StripSelection;
 import de.varylab.varylab.plugin.selection.TextureEdgeSelection;
 import de.varylab.varylab.plugin.selection.TextureVertexSelection;
-import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.subdivision.RemoveGeodesicPlugin;
 import de.varylab.varylab.plugin.subdivision.RoofSubdivisionPlugin;
 import de.varylab.varylab.plugin.subdivision.SplitFacePlugin;
@@ -105,125 +111,130 @@ public class VaryLab {
 		hif.addAdapter(new UndirectedEdgeIndex(), true);
 		
 		v.registerPlugin(hif);
-		v.registerPlugin(new OptimizationPanel());
-		v.registerPlugin(new VertexEditorPlugin());
-		v.registerPlugin(new IdentifyVerticesPlugin());
+		v.registerPlugin(OptimizationPanel.class);
+		v.registerPlugin(VertexEditorPlugin.class);
+		v.registerPlugin(IdentifyVerticesPlugin.class);
 
-		v.registerPlugin(new TrivialConnectionPlugin());
+		v.registerPlugin(TrivialConnectionPlugin.class);
 		
 		addGeneratorPlugins(v);
 		
-		v.registerPlugin(new IdentifyVerticesPlugin());
+		v.registerPlugin(IdentifyVerticesPlugin.class);
 		
-		v.registerPlugin(new HeightFieldEditor());
+		v.registerPlugin(HeightFieldEditor.class);
 		
 		addOptimizationPlugins(v);
 		addLnFPlugins(v);
 		addVisualizerPlugins(v);
 		addDDGPlugins(v);
 		
-		v.registerPlugin(new CatmullClarkPlugin());
-		v.registerPlugin(new LoopPlugin());
+		v.registerPlugin(CatmullClarkPlugin.class);
+		v.registerPlugin(LoopPlugin.class);
 		
-		v.registerPlugin(new ConsolePlugin());
+		v.registerPlugin(ConsolePlugin.class);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
-		v.registerPlugin(new RoofSubdivisionPlugin());
-		v.registerPlugin(new StripSubdivisionPlugin());
-		v.registerPlugin(new SplitFacePlugin());
-		v.registerPlugin(new Toolbox());
+		v.registerPlugin(RoofSubdivisionPlugin.class);
+		v.registerPlugin(StripSubdivisionPlugin.class);
+		v.registerPlugin(SplitFacePlugin.class);
+		v.registerPlugin(Toolbox.class);
 		
-		v.registerPlugin(new SurfaceRemeshingPlugin());
-		v.registerPlugin(new DiscreteConformalPlugin());
+		v.registerPlugin(SurfaceRemeshingPlugin.class);
+		v.registerPlugin(DiscreteConformalPlugin.class);
 		
-		v.registerPlugin(new OBJExportPlugin());
+		v.registerPlugin(OBJExportPlugin.class);
 		
-		v.registerPlugin(new NurbsManagerPlugin());
-//		v.registerPlugin(new HalfedgeDebuggerPlugin());
-//		v.registerPlugin(new WebContentLoader());
+		v.registerPlugin(NurbsManagerPlugin.class);
+//		v.registerPlugin(HalfedgeDebuggerPlugin.class);
+//		v.registerPlugin(WebContentLoader.class);
 		
-		v.registerPlugin(new Sky());
-		v.registerPlugin(new AngleCalculatorPlugin());
-		v.registerPlugin(new NodePropertyEditor());
-		v.registerPlugin(new RemoveGeodesicPlugin());
-		v.registerPlugin(new GeodesicSelection());
-		v.registerPlugin(new LatticeSelection());
-		v.registerPlugin(new StripSelection());
-		v.registerPlugin(new TextureVertexSelection());
-		v.registerPlugin(new TextureEdgeSelection());
-		v.registerPlugin(new BoundaryEarsSelection());
-		v.registerPlugin(new CollapseToNeighborPlugin());
-		v.registerPlugin(new TextureGeometryGenerator());
-		v.registerPlugin(new StitchingPlugin());
-		v.registerPlugin(new StitchCutPathPlugin());
-		v.registerPlugin(new CollapseTrianglesPlugin());
-		v.registerPlugin(new Collapse2ValentPlugin());
+		v.registerPlugin(Sky.class);
+		v.registerPlugin(AngleCalculatorPlugin.class);
+		v.registerPlugin(NodePropertyEditor.class);
+		v.registerPlugin(RemoveGeodesicPlugin.class);
+		v.registerPlugin(GeodesicSelection.class);
+		v.registerPlugin(LatticeSelection.class);
+		v.registerPlugin(StripSelection.class);
+		v.registerPlugin(TextureVertexSelection.class);
+		v.registerPlugin(TextureEdgeSelection.class);
+		v.registerPlugin(BoundaryEarsSelection.class);
+		v.registerPlugin(CollapseToNeighborPlugin.class);
+		v.registerPlugin(TextureGeometryGenerator.class);
+		v.registerPlugin(StitchingPlugin.class);
+		v.registerPlugin(StitchCutPathPlugin.class);
+		v.registerPlugin(CollapseTrianglesPlugin.class);
+		v.registerPlugin(Collapse2ValentPlugin.class);
 	}
 
 
 	private static void addGeneratorPlugins(JRViewer v) {
-		v.registerPlugin(new QuadMeshGenerator());
-		v.registerPlugin(new HexMeshGenerator());
-		v.registerPlugin(new SimpleRoofGenerator());
-		v.registerPlugin(new PrimitivesGenerator());
+		v.registerPlugin(QuadMeshGenerator.class);
+		v.registerPlugin(HexMeshGenerator.class);
+		v.registerPlugin(SimpleRoofGenerator.class);
+		v.registerPlugin(PrimitivesGenerator.class);
 	}
 
 
 	private static void addVisualizerPlugins(JRViewer v) {
-		v.registerPlugin(new EdgeLengthVisualizer());
-		v.registerPlugin(new FacePlanarityVisualizer());
-		v.registerPlugin(new DirichletEnergyVisualizer());
-		v.registerPlugin(new OddVertexVisualizer());
-		v.registerPlugin(new NormalVisualizer());
-		v.registerPlugin(new StarPlanarityVisualizer());
-		v.registerPlugin(new HyperbolicPatchVisualizer());
-		v.registerPlugin(new NodeIndexVisualizer());
-		v.registerPlugin(new WeightsVisualizer());
-		v.registerPlugin(new GeodesicLabelVisualizer());
-		v.registerPlugin(new CircularityVisualizer());
-		v.registerPlugin(new GaussCurvatureVisualizer());
-		v.registerPlugin(new AngleDefectVisualizer());
-		v.registerPlugin(new ConnectionVisualizer());
-		v.registerPlugin(new PositiveEdgeVisualizer());
-		v.registerPlugin(new ConicalityVisualizer());
+		v.registerPlugin(EdgeLengthVisualizer.class);
+		v.registerPlugin(FacePlanarityVisualizer.class);
+		v.registerPlugin(DirichletEnergyVisualizer.class);
+		v.registerPlugin(OddVertexVisualizer.class);
+		v.registerPlugin(NormalVisualizer.class);
+		v.registerPlugin(StarPlanarityVisualizer.class);
+		v.registerPlugin(HyperbolicPatchVisualizer.class);
+		v.registerPlugin(NodeIndexVisualizer.class);
+		v.registerPlugin(WeightsVisualizer.class);
+		v.registerPlugin(GeodesicLabelVisualizer.class);
+		v.registerPlugin(CircularityVisualizer.class);
+		v.registerPlugin(GaussCurvatureVisualizer.class);
+		v.registerPlugin(AngleDefectVisualizer.class);
+		v.registerPlugin(ConnectionVisualizer.class);
+		v.registerPlugin(PositiveEdgeVisualizer.class);
+		v.registerPlugin(ConicalityVisualizer.class);
 	}
 
 
 	private static void addOptimizationPlugins(JRViewer v) {
-		v.registerPlugin(new EdgeLengthOptimizer());
-		v.registerPlugin(new PlanarQuadsOptimizer());
-		v.registerPlugin(new WillmoreOptimizer());
-		v.registerPlugin(new GeodesicAngleOptimizer());
-		v.registerPlugin(new GeodesicLaplaceOptimizer());
-		v.registerPlugin(new ANetOptimizer());
-		v.registerPlugin(new ConstantDirectionFieldPlugin());
-//		v.registerPlugin(new ConstantMeanCurvatureFieldPlugin());
-		v.registerPlugin(new SpringOptimizer());
-		v.registerPlugin(new ElectrostaticOptimizer());
-		v.registerPlugin(new ElectrostaticSphereOptimizer());
-		v.registerPlugin(new PlanarNGonsOptimizer());
-		v.registerPlugin(new ExteriorGeodesicOptimizer());
-		v.registerPlugin(new ReferenceSurfaceOptimizer());
-		v.registerPlugin(new CircularQuadOptimizer());
-		v.registerPlugin(new ConicalOptimizer());
-		v.registerPlugin(new InflateOptimizer());
+		v.registerPlugin(EdgeLengthOptimizer.class);
+		v.registerPlugin(PlanarQuadsOptimizer.class);
+		v.registerPlugin(WillmoreOptimizer.class);
+		v.registerPlugin(GeodesicAngleOptimizer.class);
+		v.registerPlugin(GeodesicLaplaceOptimizer.class);
+		v.registerPlugin(ANetOptimizer.class);
+		v.registerPlugin(ConstantDirectionFieldPlugin.class);
+//		v.registerPlugin(ConstantMeanCurvatureFieldPlugin.class);
+		v.registerPlugin(SpringOptimizer.class);
+		v.registerPlugin(ElectrostaticOptimizer.class);
+		v.registerPlugin(ElectrostaticSphereOptimizer.class);
+		v.registerPlugin(PlanarNGonsOptimizer.class);
+		v.registerPlugin(ExteriorGeodesicOptimizer.class);
+		v.registerPlugin(ReferenceSurfaceOptimizer.class);
+		v.registerPlugin(CircularQuadOptimizer.class);
+		v.registerPlugin(ConicalOptimizer.class);
+		v.registerPlugin(InflateOptimizer.class);
+		v.registerPlugin(IncircleOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {
-		v.registerPlugin(new LookAndFeelSwitch());
-		v.registerPlugin(new FHLookAndFeel());
-		v.registerPlugin(new TinyLookAndFeel());
-		v.registerPlugin(new CrossPlatformLnF());
-		v.registerPlugin(new NimbusLnF());
-		v.registerPlugin(new SystemLookAndFeel());
+		v.registerPlugin(LookAndFeelSwitch.class);
+		v.registerPlugin(FHLookAndFeel.class);
+		v.registerPlugin(TinyLookAndFeel.class);
+		v.registerPlugin(CrossPlatformLnF.class);
+		v.registerPlugin(NimbusLnF.class);
+		v.registerPlugin(SystemLookAndFeel.class);
+		v.registerPlugin(SyntheticaStandardLnf.class);
+		v.registerPlugin(SyntheticaBlackEyeLnf.class);
 	}
 	
 	private static void addDDGPlugins(JRViewer v) {
-		v.registerPlugin(new ChristoffelTransfom());
+		v.registerPlugin(ChristoffelTransfom.class);
 		v.registerPlugin(AssociatedFamily.class);
 	}
 	
 	
 	public static void main(String[] args) throws Exception {
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		JDialog.setDefaultLookAndFeelDecorated(true);
 		JRHalfedgeViewer.initHalfedgeFronted();
 		NativePathUtility.set("native");
 		View.setIcon(ImageHook.getIcon("surface.png"));

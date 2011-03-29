@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -59,6 +60,10 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		activateSet = new HashSet<String>();
 	private JCheckBox
 		normalizeEnergies = new JCheckBox("Normalize Energies", true); 
+	private IconCellRenderer
+		iconCellRenderer = new IconCellRenderer();
+	private SpinnerCellEditor
+		spinnerCellEditor = new SpinnerCellEditor();
 	
 	public OptimizerPluginsPanel() {
 		shrinkPanel.setTitle("Optimizer Plugins");
@@ -216,6 +221,10 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			setCoefficient(op, model.getNumber().doubleValue());
 		}
 
+		public JSpinner getSpinner() {
+			return spinner;
+		}
+		
 	}
 	
 	
@@ -262,11 +271,11 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	private void updatePluginTable() {
 		pluginTable.setModel(new PluginTableModel());
 		pluginTable.getColumnModel().getColumn(0).setMaxWidth(30);
-		pluginTable.getColumnModel().getColumn(0).setCellRenderer(new IconCellRenderer());
+		pluginTable.getColumnModel().getColumn(0).setCellRenderer(iconCellRenderer);
 		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
 		pluginTable.getColumnModel().getColumn(3).setMaxWidth(60);
-		pluginTable.getColumnModel().getColumn(3).setCellEditor(new SpinnerCellEditor());
-		pluginTable.getColumnModel().getColumn(3).setCellRenderer(new SpinnerCellEditor());
+		pluginTable.getColumnModel().getColumn(3).setCellEditor(spinnerCellEditor);
+		pluginTable.getColumnModel().getColumn(3).setCellRenderer(spinnerCellEditor);
 	}
 	
 	public void addOptimizerPlugin(OptimizerPlugin op) {
@@ -316,6 +325,13 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
 		return View.class;
+	}
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		super.mainUIChanged(uiClass);
+		SwingUtilities.updateComponentTreeUI(iconCellRenderer);
+		SwingUtilities.updateComponentTreeUI(spinnerCellEditor.getSpinner());
 	}
 
 }
