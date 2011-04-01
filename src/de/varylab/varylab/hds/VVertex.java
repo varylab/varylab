@@ -37,4 +37,13 @@ public class VVertex extends Vertex<VVertex, VEdge, VFace> {
 		}
 	}
 	
+	@Override
+	public void copyData(VVertex v) {
+		super.copyData(v);
+		if (v.position != null) position = v.position.clone();
+		if (v.texcoord != null) texcoord = v.texcoord.clone();
+		variable = v.variable;
+		weight = v.weight;
+	}
+	
 }

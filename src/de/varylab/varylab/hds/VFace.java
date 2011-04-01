@@ -14,4 +14,10 @@ public class VFace extends Face<VVertex, VEdge, VFace> {
 		this.weight = weight;
 	}
 	
+	@Override
+	public void copyData(VFace f) {
+		super.copyData(f);
+		weight = f.weight;
+	}
+	
 }

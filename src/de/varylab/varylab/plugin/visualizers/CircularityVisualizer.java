@@ -26,7 +26,7 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
@@ -169,20 +169,16 @@ public class CircularityVisualizer extends VisualizerPlugin implements ActionLis
 		F extends Face<V, E, F>
 	>double getCircularity(F f, AdapterSet a) {
 		double result = 0.0;
-		double[]
-		       v1 = new double[3], 
-		       v2 = new double[3],
-		       v3 = new double[3],
-		       v4 = new double[3];
 		ArrayList<V> bdVerts = new ArrayList<V>(HalfEdgeUtils.boundaryVertices(f));
 		if(bdVerts.size() != 4) {
 			return -1;
 		} else {
-			v1 = a.get(Position.class, bdVerts.get(0), double[].class);
-			v2 = a.get(Position.class, bdVerts.get(1), double[].class);
-			v3 = a.get(Position.class, bdVerts.get(2), double[].class);
-			v4 = a.get(Position.class, bdVerts.get(3), double[].class);
-			double 
+			final double[] 
+				v1 = a.getD(Position3d.class, bdVerts.get(0)),
+				v2 = a.getD(Position3d.class, bdVerts.get(1)),
+				v3 = a.getD(Position3d.class, bdVerts.get(2)),
+				v4 = a.getD(Position3d.class, bdVerts.get(3));
+			final double 
 				alpha1 = FunctionalUtils.angle(v4, v1, v2),
 				alpha2 = FunctionalUtils.angle(v1, v2, v3),
 				alpha3 = FunctionalUtils.angle(v2, v3, v4),

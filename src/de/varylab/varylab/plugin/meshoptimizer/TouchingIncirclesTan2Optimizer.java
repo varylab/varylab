@@ -6,26 +6,26 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.IncircleFunctional;
+import de.varylab.varylab.math.functional.TouchingIncirclesFunctionalTan2;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 
 /**
  * An optimizer that optimizes a given quad-triangle mesh
- * towards incircles. Together with planar-quads
+ * towards touching incircles. Together with planar-quads
  * these circles can be realized. 
  * @author sechel
  *
  */
-public class IncircleOptimizer extends OptimizerPlugin {
+public class TouchingIncirclesTan2Optimizer extends OptimizerPlugin {
 
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
-		return new IncircleFunctional();
+		return new TouchingIncirclesFunctionalTan2();
 	}
 
 	@Override
 	public String getName() {
-		return "Incircles";
+		return "Tan2 Touching Incircles";
 	}
 
 }

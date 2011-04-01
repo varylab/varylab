@@ -63,7 +63,8 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	private IconCellRenderer
 		iconCellRenderer = new IconCellRenderer();
 	private SpinnerCellEditor
-		spinnerCellEditor = new SpinnerCellEditor();
+		spinnerCellEditor = new SpinnerCellEditor(),
+		spinnerCellRenderer = new SpinnerCellEditor();
 	
 	public OptimizerPluginsPanel() {
 		shrinkPanel.setTitle("Optimizer Plugins");
@@ -275,7 +276,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
 		pluginTable.getColumnModel().getColumn(3).setMaxWidth(60);
 		pluginTable.getColumnModel().getColumn(3).setCellEditor(spinnerCellEditor);
-		pluginTable.getColumnModel().getColumn(3).setCellRenderer(spinnerCellEditor);
+		pluginTable.getColumnModel().getColumn(3).setCellRenderer(spinnerCellRenderer);
 	}
 	
 	public void addOptimizerPlugin(OptimizerPlugin op) {
@@ -332,6 +333,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		super.mainUIChanged(uiClass);
 		SwingUtilities.updateComponentTreeUI(iconCellRenderer);
 		SwingUtilities.updateComponentTreeUI(spinnerCellEditor.getSpinner());
+		SwingUtilities.updateComponentTreeUI(spinnerCellRenderer.getSpinner());
 	}
 
 }

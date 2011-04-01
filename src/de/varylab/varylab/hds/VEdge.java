@@ -23,4 +23,11 @@ public class VEdge extends Edge<VVertex, VEdge, VFace>{
 		this.geodesicLabel = geodesicLabel;
 	}
 	
+	@Override
+	public void copyData(VEdge e) {
+		super.copyData(e);
+		weight = e.weight;
+		geodesicLabel = e.geodesicLabel;
+	}
+	
 }

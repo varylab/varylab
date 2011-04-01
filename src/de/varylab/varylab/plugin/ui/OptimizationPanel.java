@@ -317,7 +317,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				MTJGradient mtjG = new MTJGradient(G);
 				fun.evaluate(hds, x, null, mtjG, null);
 				double gl = G.norm(Norm.TwoRobust);
-				if (gl > 1E-20) {
+				if (gl > 1E-8) {
 					coeff /= gl;
 				}
 			}

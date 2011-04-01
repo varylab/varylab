@@ -8,7 +8,6 @@ import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.ConicalFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class ConicalOptimizer extends OptimizerPlugin {
 
@@ -28,7 +27,7 @@ public class ConicalOptimizer extends OptimizerPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Conical Optimizer", "Thilo Roerig");
-		info.icon = ImageHook.getIcon("angle.png");
+//		info.icon = ImageHook.getIcon("angle.png");
 		return info;
 	}
 

@@ -33,7 +33,6 @@ import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.ReferenceSurfaceFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements ActionListener, UIFlavor {
 
@@ -89,7 +88,7 @@ public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements Action
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Reference Surface Optimizer", "Thilo Roerig");
-		info.icon = ImageHook.getIcon("electro.png");
+//		info.icon = ImageHook.getIcon("electro.png");
 		return info;
 	}
 
