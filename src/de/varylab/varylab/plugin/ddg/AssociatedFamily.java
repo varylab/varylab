@@ -67,7 +67,7 @@ public class AssociatedFamily extends AlgorithmDialogPlugin {
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Geometry;
+		return AlgorithmCategory.DDG;
 	}
 
 	@Override

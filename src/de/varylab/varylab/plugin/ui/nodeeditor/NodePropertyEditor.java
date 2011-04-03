@@ -215,6 +215,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	
 	private void updateInspector() {
 		AdapterSet aSet = hif.getAdapters();
+		aSet.addAll(hif.getActiveAdapters());
 		AdapterSet compSet = new AdapterSet();
 		List<Node<?,?,?>> listSelection = getSelectedNodes();
 		for (Adapter<?> a : aSet) {

@@ -1,5 +1,9 @@
 package de.varylab.varylab.plugin.ddg;
 
+import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,7 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
 import de.jreality.math.Rn;
+import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -24,10 +35,37 @@ import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
+import de.jtem.jrworkspace.plugin.Controller;
 
-public class ChristoffelTransfom extends AlgorithmPlugin {
+public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 
+	private CentralExtensionSubdivision
+		ceSubdivider = null;
+	private JPanel
+		panel = new JPanel();
+	private JCheckBox
+		useCentralExtensionChecker = new JCheckBox("Use Central Extension");
+	private SpinnerNumberModel
+		associateModel = new SpinnerNumberModel(0.0, 0.0, 360.0, 0.1);
+	private JSpinner
+		associateSpinner = new JSpinner(associateModel);
+	private HalfedgeInterface hif = null;
+	
+	public ChristoffelTransfom() {
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
+		GridBagConstraints cr = LayoutFactory.createRightConstraint();
+		panel.add(useCentralExtensionChecker, cr);
+		panel.add(new JLabel("Associaled Family"), cl);
+		panel.add(associateSpinner, cr);
+	}
+	
+	@Override
+	public JPanel getDialogPanel() {
+		return panel;
+	}
+	
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	public @interface EdgeSign {}
@@ -107,6 +145,7 @@ public class ChristoffelTransfom extends AlgorithmPlugin {
 		if (edge0.getRightFace() != null) {
 			edgeStack.push(edge0.getOppositeEdge());
 		}
+		int count = 0;
 		while (!edgeStack.isEmpty()){
 			E edge = edgeStack.pop();
 			labelFaceOf(edge, a);
@@ -118,7 +157,9 @@ public class ChristoffelTransfom extends AlgorithmPlugin {
 					pendingEdges.remove(e);
 				}
 			}
+			count++;
 		}
+		System.out.println("labelled " + count + " faces");
 	}
 	
 	
@@ -134,7 +175,8 @@ public class ChristoffelTransfom extends AlgorithmPlugin {
 		V v0 = hds.getVertex(0);
 		vertexQueue.offer(v0);
 		//vertex 0 in 0.0;
-		newCoordsMap.put(v0, new double[3]);
+		double[] v0Pos = a.getD(Position3d.class, v0);
+		newCoordsMap.put(v0, v0Pos.clone());
 		while (!vertexQueue.isEmpty()){
 			V v = vertexQueue.poll();
 			double[] startCoord = newCoordsMap.get(v);
@@ -175,9 +217,24 @@ public class ChristoffelTransfom extends AlgorithmPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void transfom(HDS hds, AdapterSet a) {
-		a.add(new EdgeSignAdapter());
-		createEdgeLabels(hds, a);
-		dualize(hds, a);
+		EdgeSignAdapter esa = new EdgeSignAdapter();
+		a.add(esa);
+		if (useCentralExtensionChecker.isSelected()) {
+			Map<F, V> oldFnewVMap = new HashMap<F, V>();
+			Map<E, V> oldEnewVMap = new HashMap<E, V>();
+			Map<V, V> oldVnewVMap = new HashMap<V, V>();
+			HDS ce = ceSubdivider.subdivide(hds, a, oldFnewVMap, oldEnewVMap, oldVnewVMap);
+			createEdgeLabels(ce, a);
+			dualize(ce, a);
+			for (V v : hds.getVertices()) {
+				V newV = oldVnewVMap.get(v);
+				a.set(Position.class, v, a.getD(Position3d.class, newV));
+			}
+		} else {
+			createEdgeLabels(hds, a);
+			dualize(hds, a);
+			hif.addLayerAdapter(esa, false);
+		}
 	}
 	
 	
@@ -187,19 +244,59 @@ public class ChristoffelTransfom extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		transfom(hds, a);
 		hif.update();
 	}
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Geometry;
+		return AlgorithmCategory.DDG;
 	}
 
 	@Override
 	public String getAlgorithmName() {
 		return "Christoffel Transfom";
+	}
+
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		ceSubdivider = c.getPlugin(CentralExtensionSubdivision.class);
+		hif = c.getPlugin(HalfedgeInterface.class);
+	}
+
+	public static < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double[] getIncircle(F f, AdapterSet as) {
+		List<V> bd = boundaryVertices(f);
+		if (bd.size() != 4) return new double[] {0,0,0,1};
+		double[] p1 = as.getD(Position3d.class, bd.get(0));
+		double[] p2 = as.getD(Position3d.class, bd.get(1));
+		double[] p3 = as.getD(Position3d.class, bd.get(2));
+		double[] p4 = as.getD(Position3d.class, bd.get(3));
+		double p = Rn.euclideanDistance(p1, p3);
+		double q = Rn.euclideanDistance(p2, p4);
+		double a = Rn.euclideanDistance(p1, p2);
+		double b = Rn.euclideanDistance(p2, p3);
+		double c = Rn.euclideanDistance(p3, p4);
+		double d = Rn.euclideanDistance(p4, p1);
+		double[] v2 = Rn.subtract(null, p2, p1);
+		double[] v4 = Rn.subtract(null, p4, p1);
+		double alpha = Rn.euclideanAngle(v2, v4) / 2;
+		double s = 0.5 * (a+b+c+d);
+		double r = p*p*q*q - (a-b)*(a-b)*(a+b-s)*(a+b-s);
+		r = Math.sqrt(r) / (2*s);
+		double len = r / Math.sin(alpha);
+		Rn.normalize(v2, v2);
+		Rn.normalize(v4, v4);
+		double[] dir = Rn.average(null, new double[][] {v2, v4});
+		Rn.setToLength(dir, dir, len);
+		double[] m = Rn.add(null, p1, dir);
+		return new double[] {m[0], m[1], m[2], r};
 	}
 
 }
