@@ -70,6 +70,7 @@ import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesTan2Optimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
+import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
@@ -163,6 +164,7 @@ public class VaryLab {
 		v.registerPlugin(BoundaryEarsSelection.class);
 		v.registerPlugin(CollapseToNeighborPlugin.class);
 		v.registerPlugin(TextureGeometryGenerator.class);
+		v.registerPlugin(FitTexturePlugin.class);
 		v.registerPlugin(StitchingPlugin.class);
 		v.registerPlugin(StitchCutPathPlugin.class);
 		v.registerPlugin(CollapseTrianglesPlugin.class);
