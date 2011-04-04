@@ -159,7 +159,6 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			}
 			count++;
 		}
-		System.out.println("labelled " + count + " faces");
 	}
 	
 	
@@ -192,9 +191,12 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 				double[] pv = a.getD(Position3d.class, v);
 				double[] pv2 = a.getD(Position3d.class, v2);
 				double[] vec = Rn.subtract(null, pv2, pv);
-				double norm2 = Rn.euclideanDistanceSquared(pv, pv2);
+				//double factor = Rn.euclideanDistanceSquared(pv, pv2);
+				E de = e.getLeftFace() != null ? e : e.getOppositeEdge();
+				double[] r12 = decomposeEdgeLength(de, a);
+				double factor = r12[0] * r12[1];
 				boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
-				double scale = (edgeSign ? -1 : 1) / norm2;
+				double scale = (edgeSign ? -1 : 1) / factor;
 				vec[0] *= scale;
 				vec[1] *= scale;
 				vec[2] *= scale;
@@ -298,5 +300,31 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		double[] m = Rn.add(null, p1, dir);
 		return new double[] {m[0], m[1], m[2], r};
 	}
+	
+	public static < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double[] decomposeEdgeLength(E e, AdapterSet a) {
+		F f = e.getLeftFace();
+		double[] c = ChristoffelTransfom.getIncircle(f, a);
+		double r = c[3];
+		double[] p0 = a.getD(Position3d.class, e.getStartVertex());
+		double[] p1 = a.getD(Position3d.class, e.getTargetVertex());
+		double[] p2 = a.getD(Position3d.class, e.getPreviousEdge().getStartVertex());
+		double[] p3 = a.getD(Position3d.class, e.getNextEdge().getTargetVertex());
+		double[] vec1 = Rn.subtract(null, p1, p0);
+		double[] vec2 = Rn.subtract(null, p2, p0);
+		double alpha = Rn.euclideanAngle(vec1, vec2);
+		double r1 = r / Math.tan(alpha / 2);
+		
+		vec1 = Rn.subtract(null, p0, p1);
+		vec2 = Rn.subtract(null, p3, p1);
+		alpha = Rn.euclideanAngle(vec1, vec2);
+		double r2 = r / Math.tan(alpha / 2);
+		return new double[] {r1, r2};
+	}
+	
 
 }
