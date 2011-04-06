@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.ddg;
 
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
+import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryEdge;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -134,7 +135,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	}
 	
 	
-	public <
+	private <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
@@ -169,7 +170,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	}
 	
 	
-	public <
+	private <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
@@ -226,11 +227,10 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void transfom(HDS hds, AdapterSet a) {
+	> void transfom(HDS hds, AdapterSet a, double phi, boolean useCentralExtension) {
 		EdgeSignAdapter esa = new EdgeSignAdapter();
 		a.add(esa);
-		double phi = associateModel.getNumber().doubleValue() * PI / 180.0;
-		if (useCentralExtensionChecker.isSelected()) {
+		if (useCentralExtension) {
 			Map<F, V> oldFnewVMap = new HashMap<F, V>();
 			Map<E, V> oldEnewVMap = new HashMap<E, V>();
 			Map<V, V> oldVnewVMap = new HashMap<V, V>();
@@ -256,7 +256,9 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		transfom(hds, a);
+		double phi = associateModel.getNumber().doubleValue() * PI / 180.0;
+		boolean useCentralExtension = useCentralExtensionChecker.isSelected();
+		transfom(hds, a, phi, useCentralExtension);
 		hif.update();
 	}
 	
@@ -343,8 +345,26 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> double[] getAssociatedNormal(E e, AdapterSet a) {
-		F fr = e.getRightFace();
-		F fl = e.getLeftFace();
+		// find an edge that is a non-boundary edge
+		if (e.getLeftFace() == null && e.getRightFace() == null) {
+			return null;
+		}
+		if (e.getLeftFace() == null) {
+			e = e.getOppositeEdge();
+		}
+		E ne = e;
+		if (isBoundaryEdge(ne)) {
+			List<E> b = HalfEdgeUtils.boundaryEdges(ne.getLeftFace());
+			for (E be : b) {
+				if (be.getRightFace() != null) {
+					ne = be;
+					break;
+				}
+			}
+		}
+		assert !HalfEdgeUtils.isBoundaryEdge(ne);
+		F fr = ne.getRightFace();
+		F fl = ne.getLeftFace();
 		double[] cr = getIncircle(fr, a);
 		double[] cl = getIncircle(fl, a);
 		double[] nr = a.getD(Normal.class, fr);
@@ -379,12 +399,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	> double[] getAssociatedEdgeVector(E e, double phi, AdapterSet a) {
 		if (phi == 0) return a.getD(EdgeVector.class, e);
 		double[] ne = a.getD(Normal.class, e);
-		double[] vn = null;
-		if (HalfEdgeUtils.isBoundaryEdge(e)) {
-			vn = a.getD(Normal.class, e);
-		} else {
-			vn = getAssociatedNormal(e, a);
-		}
+		double[] vn = getAssociatedNormal(e, a);
 		Rn.normalize(vn, vn);
 		if (Rn.innerProduct(ne, vn) < 0) {
 			Rn.times(vn, -1, vn);

@@ -32,7 +32,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
@@ -136,7 +135,6 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 		
 		@Override
 		public double[] getEdgeValue(VEdge e, AdapterSet a) {
-			if (HalfEdgeUtils.isBoundaryEdge(e)) return null;
 			return ChristoffelTransfom.getAssociatedNormal(e, a);
 		}
 		
@@ -156,8 +154,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 		
 		@Override
 		public double[] getEdgeValue(VEdge e, AdapterSet a) {
-			if (HalfEdgeUtils.isBoundaryEdge(e)) return null;
-			return ChristoffelTransfom.getAssociatedEdgeVector(e, PI/4, a);
+			return ChristoffelTransfom.getAssociatedEdgeVector(e, PI/8, a);
 		}
 		
 		@Override
