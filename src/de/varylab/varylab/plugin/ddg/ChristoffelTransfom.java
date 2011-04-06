@@ -1,6 +1,9 @@
 package de.varylab.varylab.plugin.ddg;
 
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
+import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
@@ -31,12 +35,15 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 
@@ -167,7 +174,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void dualize(HDS hds, AdapterSet a) {
+	> void dualize(HDS hds, double phi, AdapterSet a) {
 		HashMap<V, double[]> newCoordsMap = new HashMap<V, double[]>();
 		HashSet<V> readyVertices = new HashSet<V>();
 		LinkedList<V> vertexQueue = new LinkedList<V>();
@@ -188,9 +195,10 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 					vertexQueue.offer(v2);
 					readyVertices.add(v2);
 				}
-				double[] pv = a.getD(Position3d.class, v);
-				double[] pv2 = a.getD(Position3d.class, v2);
-				double[] vec = Rn.subtract(null, pv2, pv);
+//				double[] pv = a.getD(Position3d.class, v);
+//				double[] pv2 = a.getD(Position3d.class, v2);
+//				double[] vec = Rn.subtract(null, pv2, pv);
+				double[] vec = getAssociatedEdgeVector(e, phi, a);
 				//double factor = Rn.euclideanDistanceSquared(pv, pv2);
 				E de = e.getLeftFace() != null ? e : e.getOppositeEdge();
 				double[] r12 = decomposeEdgeLength(de, a);
@@ -221,20 +229,21 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	> void transfom(HDS hds, AdapterSet a) {
 		EdgeSignAdapter esa = new EdgeSignAdapter();
 		a.add(esa);
+		double phi = associateModel.getNumber().doubleValue() * PI / 180.0;
 		if (useCentralExtensionChecker.isSelected()) {
 			Map<F, V> oldFnewVMap = new HashMap<F, V>();
 			Map<E, V> oldEnewVMap = new HashMap<E, V>();
 			Map<V, V> oldVnewVMap = new HashMap<V, V>();
 			HDS ce = ceSubdivider.subdivide(hds, a, oldFnewVMap, oldEnewVMap, oldVnewVMap);
 			createEdgeLabels(ce, a);
-			dualize(ce, a);
+			dualize(ce, phi, a);
 			for (V v : hds.getVertices()) {
 				V newV = oldVnewVMap.get(v);
 				a.set(Position.class, v, a.getD(Position3d.class, newV));
 			}
 		} else {
 			createEdgeLabels(hds, a);
-			dualize(hds, a);
+			dualize(hds, phi, a);
 			hif.addLayerAdapter(esa, false);
 		}
 	}
@@ -324,6 +333,69 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		alpha = Rn.euclideanAngle(vec1, vec2);
 		double r2 = r / Math.tan(alpha / 2);
 		return new double[] {r1, r2};
+	}
+	
+	
+	
+	public static < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double[] getAssociatedNormal(E e, AdapterSet a) {
+		F fr = e.getRightFace();
+		F fl = e.getLeftFace();
+		double[] cr = getIncircle(fr, a);
+		double[] cl = getIncircle(fl, a);
+		double[] nr = a.getD(Normal.class, fr);
+		double[] nl = a.getD(Normal.class, fl);
+		cr[3] = 1;
+		cl[3] = 1;
+		nr = Pn.homogenize(null, nr);
+		nl = Pn.homogenize(null, nl);
+		nr[3] = 0;
+		nl[3] = 0;
+		double[] linel = PlueckerLineGeometry.lineFromPoints(null, cl, nl);
+		double[] liner = PlueckerLineGeometry.lineFromPoints(null, cr, nr);
+		double[] inter = PlueckerLineGeometry.intersectionPointUnchecked(null, linel, liner);
+		Pn.dehomogenize(inter, inter);
+		double[] r12 = decomposeEdgeLength(e, a);
+		double[] pstart = a.getD(Position3d.class, e.getStartVertex());
+		double[] pend = a.getD(Position3d.class, e.getTargetVertex());
+		double rsum = r12[0] + r12[1];
+		double[] p0 = Rn.linearCombination(null, r12[1] / rsum, pstart, r12[0] / rsum, pend);
+		p0 = Pn.homogenize(null, p0);
+		if ( Math.abs(inter[3]) < 1E-10) return inter;
+		double[] N = Rn.subtract(null, p0, inter);
+		return Rn.normalize(N, N);
+	}
+	
+	
+	public static < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double[] getAssociatedEdgeVector(E e, double phi, AdapterSet a) {
+		if (phi == 0) return a.getD(EdgeVector.class, e);
+		double[] ne = a.getD(Normal.class, e);
+		double[] vn = null;
+		if (HalfEdgeUtils.isBoundaryEdge(e)) {
+			vn = a.getD(Normal.class, e);
+		} else {
+			vn = getAssociatedNormal(e, a);
+		}
+		Rn.normalize(vn, vn);
+		if (Rn.innerProduct(ne, vn) < 0) {
+			Rn.times(vn, -1, vn);
+		}
+		double[] vx = a.getD(EdgeVector.class, e);
+		double length = Rn.euclideanNorm(vx);
+		Rn.normalize(vx, vx);
+		double[] vy = Rn.crossProduct(null, vn, vx);
+		Rn.normalize(vy, vy);
+		double[] vr = Rn.linearCombination(null, cos(phi), vx, sin(phi), vy);
+		return Rn.setToLength(vr, vr, length);
 	}
 	
 

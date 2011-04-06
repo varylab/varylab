@@ -36,7 +36,6 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
-import de.varylab.varylab.plugin.ddg.AssociatedFamily;
 import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
 import de.varylab.varylab.plugin.ddg.ChristoffelTransfom;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
@@ -237,7 +236,6 @@ public class VaryLab {
 	
 	private static void addDDGPlugins(JRViewer v) {
 		v.registerPlugin(ChristoffelTransfom.class);
-		v.registerPlugin(AssociatedFamily.class);
 		v.registerPlugin(CentralExtensionSubdivision.class);
 	}
 	
