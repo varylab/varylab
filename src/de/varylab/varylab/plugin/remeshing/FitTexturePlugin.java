@@ -11,8 +11,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition4d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -48,12 +48,16 @@ public class FitTexturePlugin extends AlgorithmPlugin {
 			    tex2 = a.getD(TexturePosition2d.class,v2),
 			    dir  = Rn.subtract(null, tex2, tex1);
 			
-			Matrix T = MatrixBuilder.euclidean().translate(Rn.negate(null, new double[]{tex1[0],tex1[1],0.0})).rotateFromTo(new double[]{dir[0],dir[1],0,1}, new double[]{1,0,0,1}).getMatrix();
+			MatrixBuilder mb = MatrixBuilder.euclidean();
+			mb.scale(1.0/Rn.euclideanNorm(dir));
+			mb.rotateFromTo(new double[]{dir[0],dir[1],0}, new double[]{1,0,0});
+			mb.translate(Rn.negate(null, new double[]{tex1[0],tex1[1],0.0})).getMatrix();
 			
+			Matrix T = mb.getMatrix();
 			for(V v : hds.getVertices()) {
-				double[] coord = a.getD(TexturePosition.class, v);
+				double[] coord = a.getD(TexturePosition4d.class, v);
 				T.transformVector(coord);
-				a.set(TexturePosition.class, v, coord);
+				a.set(TexturePosition4d.class, v, coord);
 			}
 			
 		} else { //do something

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -17,6 +18,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 
 public class LocalQuadRemesher <
@@ -28,11 +30,13 @@ public class LocalQuadRemesher <
 
 	private Set<V>
 		textureVertices = new HashSet<V>();
+
+	private static double EPS = 1E-6;
 	
 	public LocalQuadRemesher() {
 	}
 	
-	public Map<F,F> remesh(HDS surface, HDS remesh, AdapterSet a) {
+	public Map<F,F> remesh(HDS surface, HDS remesh, AdapterSet a, boolean projective) {
 		surface.createCombinatoriallyEquivalentCopy(remesh);
 		
 //		Triangulator.triangulate(surface);
@@ -40,8 +44,8 @@ public class LocalQuadRemesher <
 			a.set(Position.class,remesh.getVertex(v.getIndex()),a.getD(TexturePosition.class, v));
 			a.set(TexturePosition.class,remesh.getVertex(v.getIndex()),a.getD(TexturePosition.class, v));
 		}
-		Map<F,F> newOldMap0 = subdivideInDirection(remesh, 0, a);
-		Map<F,F> newOldMap1 = subdivideInDirection(remesh, 1, a);
+		Map<F,F> newOldMap0 = subdivideInDirection(remesh, 0, a, projective);
+		Map<F,F> newOldMap1 = subdivideInDirection(remesh, 1, a, projective);
 		Map<F,F> newOldMap = new HashMap<F, F>();
 		for(F f : remesh.getFaces()) {
 			F f1 = newOldMap1.get(f);
@@ -73,14 +77,20 @@ public class LocalQuadRemesher <
 		return newOldMap;
 	}
 
-	private Map<F,F> subdivideInDirection(HDS remesh, int direction, AdapterSet a) {
+	private Map<F,F> subdivideInDirection(HDS remesh, int direction, AdapterSet a, boolean projective) {
 		List<E> oldEdges = new LinkedList<E>();
 		for(E e : remesh.getPositiveEdges()) {
 			oldEdges.add(e);
 		}
 		for(E e : oldEdges) {
-			insertVerticesInDirection(e, direction, a);
+			insertVerticesInDirection(e, direction, a, projective);
 		}
+//		for(V v : remesh.getVertices()) {
+//			System.out.println(
+//					v.getIndex() + ":" 
+//						+ Arrays.toString(a.getD(Position.class, v)) + ", " 
+//						+ Arrays.toString(a.getD(TexturePosition.class,v)));
+//		}
 		return splitFacesInDirection(remesh, direction, a);
 	}
 	
@@ -94,11 +104,11 @@ public class LocalQuadRemesher <
 			Map<Long,V> coordinateVertexMap = new HashMap<Long, V>();
 			for(V v : faceVertexMap.get(f)) {
 				double[] coord = as.getD(Position.class, v);
-				if(Math.abs(coord[direction]*2.0-Math.round(coord[direction]*2.0)) > 1E-6) {
+				if(Math.abs(coord[direction]/coord[3]*2.0-Math.round(coord[direction]/coord[3]*2.0)) > EPS) {
 					continue;
 				}
 				textureVertices.add(v);
-				long approxCoord = Math.round(coord[direction]*2.0E6);
+				long approxCoord = Math.round(coord[direction]/coord[3]*2.0);
 				if(!coordinateVertexMap.containsKey(approxCoord)) {
 					coordinateVertexMap.put(approxCoord, v);
 				} else {
@@ -115,40 +125,74 @@ public class LocalQuadRemesher <
 		return newOldMap;
 	}
 
-	private void insertVerticesInDirection(E rEdge, int direction, AdapterSet as) {
+	private void insertVerticesInDirection(E rEdge, int dir, AdapterSet as, boolean projective) {
 		
-		int otherDirection = (direction+1)%2;
 		V 	target = rEdge.getTargetVertex(),
 			start  = rEdge.getStartVertex();
 		
-		double[] 	
-		       texStart = as.getD(TexturePosition2d.class, start),
-		       texTarget = as.getD(TexturePosition2d.class, target),
-		       texDir = Rn.subtract(null, texTarget, texStart);
+		int otherDir = (dir+1)%2;
 		
-		if(texDir[direction] != 0) { // non-horizontal
-			double[] 
-			       texStep = Rn.times(null, 0.5/Math.abs(texDir[direction]), texDir);
+		if(projective) {
+			double[] 	
+			       texStart = as.getD(TexturePosition4d.class, start),
+			       texTarget = as.getD(TexturePosition4d.class, target);
 			
-			double[] first = new double[2];
-			first[direction] = ((texDir[direction]>0)?Math.ceil(2*texStart[direction]):Math.floor(2*texStart[direction]))/2.0;
-			
-			first[otherDirection] = (first[direction]-texStart[direction])/texDir[direction]*texDir[otherDirection]+texStart[otherDirection];
-			int i = 0;
-			if(first[direction] == texStart[direction]) {
-				++i;
+			if(Math.abs(texStart[dir]*texTarget[3]-texTarget[dir]*texStart[3]) < EPS) { //horizontal
+				return;
 			}
-			while(texDir[direction]*(first[direction]+i*texStep[direction] - texTarget[direction]) < 0) {
-				V newVertex = TopologyAlgorithms.splitEdge(rEdge);
-				double[] newCoord = new double[4];
-				double[] newTexCoord = Rn.linearCombination(null, 1.0, first, i, texStep);
-				newCoord[0] = newTexCoord[0];
-				newCoord[1] = newTexCoord[1];
-				newCoord[3] = 1.0;
-				as.set(TexturePosition.class, newVertex, newCoord);
-				as.set(Position.class,newVertex,newCoord);
-				rEdge = rEdge.getNextEdge();
-				++i;
+			
+			double
+				min = 2.0*texStart[dir]/texStart[3],
+				max = 2.0*texTarget[dir]/texTarget[3];
+			
+			boolean reverse = min > max;
+
+			int k = (int)(reverse?Math.floor(min):Math.ceil(min));
+			int stop = (int)(reverse?Math.ceil(max):Math.floor(max));
+			
+			while((reverse && (k >= stop)) || (!reverse && (k <= stop)) ) {
+				double lambda = (k*texTarget[3]-2.0*texTarget[dir])/( 2.0*(texStart[dir]-texTarget[dir])-k*(texStart[3]-texTarget[3]));
+				double[] newTexCoord = Rn.linearCombination(null, lambda, texStart, 1-lambda, texTarget);
+				if( (Pn.distanceBetween(newTexCoord,texStart, Pn.EUCLIDEAN) >= EPS) &&
+						(Pn.distanceBetween(newTexCoord,texTarget, Pn.EUCLIDEAN) >= EPS) ) {
+					V newVertex = TopologyAlgorithms.splitEdge(rEdge);
+					as.set(TexturePosition.class, newVertex, newTexCoord);
+					as.set(Position.class,newVertex,newTexCoord);
+					rEdge = rEdge.getNextEdge();
+				}
+				k = (reverse?k-1:k+1);
+			}
+			       
+		} else {
+			double[] 	
+			       texStart = as.getD(TexturePosition2d.class, start),
+			       texTarget = as.getD(TexturePosition2d.class, target),
+			       texDir = Rn.subtract(null, texTarget, texStart);
+
+			if(texDir[dir] != 0) { // non-horizontal
+				double[] 
+				       texStep = Rn.times(null, 0.5/Math.abs(texDir[dir]), texDir);
+
+				double[] first = new double[2];
+				first[dir] = ((texDir[dir]>0)?Math.ceil(2*texStart[dir]):Math.floor(2*texStart[dir]))/2.0;
+
+				first[otherDir] = (first[dir]-texStart[dir])/texDir[dir]*texDir[otherDir]+texStart[otherDir];
+				int i = 0;
+				if(first[dir] == texStart[dir]) {
+					++i;
+				}
+				while(texDir[dir]*(first[dir]+i*texStep[dir] - texTarget[dir]) < 0) {
+					V newVertex = TopologyAlgorithms.splitEdge(rEdge);
+					double[] newCoord = new double[4];
+					double[] newTexCoord = Rn.linearCombination(null, 1.0, first, i, texStep);
+					newCoord[0] = newTexCoord[0];
+					newCoord[1] = newTexCoord[1];
+					newCoord[3] = 1.0;
+					as.set(TexturePosition.class, newVertex, newCoord);
+					as.set(Position.class,newVertex,newCoord);
+					rEdge = rEdge.getNextEdge();
+					++i;
+				}
 			}
 		}
 	}

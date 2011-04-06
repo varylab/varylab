@@ -78,7 +78,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		quantOptsPanel = new JPanel();
 	private JCheckBox
 		newVerticesBox = new JCheckBox("Insert new Vertices"),
-		forceOnLatticeBox = new JCheckBox("Force corners on Lattice");
+		forceOnLatticeBox = new JCheckBox("Force corners on Lattice"),
+		projectiveCoordsBox = new JCheckBox("Use projective texture");
 	
 	private VHDS 
 		surface = new VHDS(),
@@ -107,10 +108,13 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		shrinkPanel.add(patternCombo, gbc2);
 		shrinkPanel.add(meshingButton, gbc2);
 
-		quantOptsPanel.setLayout(new GridLayout(3, 1));
+		quantOptsPanel.setLayout(new GridLayout(4, 1));
+		quantOptsPanel.add(projectiveCoordsBox);
+		projectiveCoordsBox.setSelected(true);
 		quantOptsPanel.add(newVerticesBox);
 		quantOptsPanel.add(forceOnLatticeBox);
 		quantOptsPanel.add(liftingButton);
+		
 		shrinkPanel.add(quantOptsPanel, gbc2);
 		
 		meshingButton.addActionListener(this);
@@ -236,7 +240,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		case QuadsSingularities:
 			LocalQuadRemesher<VVertex, VEdge, VFace, VHDS> localQuadRemesher =
 				new LocalQuadRemesher<VVertex, VEdge, VFace, VHDS>();
-			newOldFaceMap = localQuadRemesher.remesh(surface,remesh,a);
+			newOldFaceMap = localQuadRemesher.remesh(surface,remesh,a, projectiveCoordsBox.isSelected());
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
 				double[] coord = a.getD(Position.class,v);
@@ -355,6 +359,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		c.storeProperty(getClass(), "pattern", patternCombo.getSelectedIndex());
 		c.storeProperty(getClass(), "newVertices", newVerticesBox.isSelected());
 		c.storeProperty(getClass(), "forceLattice", forceOnLatticeBox.isSelected());
+		c.storeProperty(getClass(), "useProjectiveCoords", projectiveCoordsBox.isSelected());
 	}
 	
 	@Override
@@ -363,6 +368,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		patternCombo.setSelectedIndex(c.getProperty(getClass(), "pattern", 0));
 		newVerticesBox.setSelected(c.getProperty(getClass(), "newVertices", true));
 		forceOnLatticeBox.setSelected(c.getProperty(getClass(), "forceLattice", true));
+		projectiveCoordsBox.setSelected(c.getProperty(getClass(), "useProjectiveCoords", true));
 	}
 	
 	@Override

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jreality.math.Matrix;
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -58,7 +57,10 @@ public class QuadTextureUtility {
 			textureVertexMap.put(v, newV);
 		}
 		HashSet<V> newBdVertices = new HashSet<V>();
-		for(V v : bdVertices) { 
+		for(V v : bdVertices) {
+			if(textureVertices.contains(v)) {
+				continue;
+			}
 			V newV = newHDS.addNewVertex();
 			a.set(Position.class, newV, a.getD(Position.class, v));
 			textureVertexMap.put(v, newV);
@@ -177,7 +179,7 @@ public class QuadTextureUtility {
 		for(V v : hds.getVertices()) {
 			TextureDirection tDir = onTextureDirection(v, a, texMatrix);
 			if((verticesOnly && tDir == TextureDirection.both) ||
-			   (!verticesOnly && (tDir == TextureDirection.horizontal || tDir == TextureDirection.vertical))) {
+			   (!verticesOnly && (tDir != TextureDirection.none ) ) ) {
 				textureVertices.add(v);
 			}
 		}
@@ -193,8 +195,8 @@ public class QuadTextureUtility {
 		double[] texCoord = new double[4];
 		System.arraycopy(a.getD(TexturePosition.class, v),0,texCoord,0,4);
 		texMatrix.transformVector(texCoord);
-		boolean onHorizontalEdge = Math.abs(texCoord[0]*2.0-Math.round(texCoord[0]*2.0)) < EPS;
-		boolean onVerticalEdge = Math.abs(texCoord[1]*2.0-Math.round(texCoord[1]*2.0)) < EPS;
+		boolean onHorizontalEdge = Math.abs(texCoord[0]*2.0/texCoord[3]-Math.round(texCoord[0]/texCoord[3]*2.0)) < EPS;
+		boolean onVerticalEdge = Math.abs(texCoord[1]*2.0/texCoord[3]-Math.round(texCoord[1]*2.0/texCoord[3])) < EPS;
 		if(onHorizontalEdge && onVerticalEdge) { 
 			return TextureDirection.both;
 		} else if(onHorizontalEdge) {
@@ -237,11 +239,9 @@ public class QuadTextureUtility {
 		System.arraycopy(a.getD(TexturePosition.class, sv), 0, ttex, 0, 4);
 		texMatrix.transformVector(stex);
 		texMatrix.transformVector(ttex);
-		double[]
-		       evec = Rn.subtract(null, ttex, stex);
 		
-		if( ((Math.abs(evec[0]) < 1E-6) && (Math.abs(stex[0]*2.0-Math.round(stex[0]*2.0)) < EPS)) ||
-			((Math.abs(evec[1]) < 1E-6) && (Math.abs(stex[1]*2.0-Math.round(stex[1]*2.0)) < EPS)) ){
+		if( ((Math.abs(ttex[0]*stex[3]-stex[0]*ttex[3]) < 1E-6) && (Math.abs(stex[0]/stex[3]*2.0-Math.round(stex[0]/stex[3]*2.0)) < EPS)) ||
+			((Math.abs(ttex[1]*stex[3]-stex[1]*ttex[3]) < 1E-6) && (Math.abs(stex[1]/stex[3]*2.0-Math.round(stex[1]/stex[3]*2.0)) < EPS)) ){
 			return true;
 		}
 		return false;
