@@ -5,6 +5,7 @@ import static java.lang.Math.PI;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -14,6 +15,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.jreality.math.Matrix;
+import de.jreality.math.MatrixBuilder;
+import de.jreality.math.Pn;
+import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -21,6 +26,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -52,6 +58,14 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 	private VHDS
 		dualSurface = null,
 		surface = null;
+	private double[][]
+		fixingPoints = new double[3][]; 
+	private int[]
+	    fixingIndices = new int[3];
+	private HalfedgeSelection
+		sel = null;
+	private Random
+		rnd = new Random();
 	
 	public AssociatedFamily() {
 		shrinkPanel.setTitle("Associated Family");
@@ -82,10 +96,25 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			aSet.set(Position.class, v, pos);
 		}
 		christoffelTransfom.transfom(dualSurface, aSet, 0, false);
-		phiModel.setValue(0);
 		phiSlider.setEnabled(true);
 		angleLabel.setEnabled(true);
 		phiSpinner.setEnabled(true);
+		
+		int numVerts = surface.numVertices();
+		fixingIndices[0] = rnd.nextInt(numVerts);
+		fixingIndices[1] = rnd.nextInt(numVerts);
+		fixingIndices[2] = rnd.nextInt(numVerts);
+		fixingPoints[0] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[0]));
+		fixingPoints[1] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[1]));
+		fixingPoints[2] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[2]));
+		
+		sel = new HalfedgeSelection();
+		for (int i : fixingIndices) {
+			sel.add(surface.getVertex(i));
+		}
+		
+		phiModel.setValue(0);
+		hif.setSelection(sel);
 	}
 
 	@Override
@@ -116,12 +145,33 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			aSet.set(Position.class, v, pos);
 		}
 		christoffelTransfom.transfom(tmpSurface, aSet, phi, false);
+		
+		double[][] newfixingPoints = new double[3][];
+		newfixingPoints[0] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[0]));
+		newfixingPoints[1] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[1]));
+		newfixingPoints[2] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[2]));
+		
+		MatrixBuilder mb = MatrixBuilder.euclidean();
+		double[] vec1 = Rn.subtract(null, newfixingPoints[1], newfixingPoints[0]);
+		double[] vec2 = Rn.subtract(null, newfixingPoints[2], newfixingPoints[0]);
+		double[] vec3 = Rn.subtract(null, fixingPoints[1], fixingPoints[0]);
+		double[] vec4 = Rn.subtract(null, fixingPoints[2], fixingPoints[0]);
+		double[] zero = Rn.negate(null, newfixingPoints[0]);
+//		mb.rotateFromTo(vec2, vec4);
+		mb.translate(fixingPoints[0]);
+		mb.rotateFromTo(vec1, vec3);
+		mb.translate(zero);
+		Matrix T = mb.getMatrix();
+		
 		for (VVertex v : surface.getVertices()) {
 			VVertex vv = tmpSurface.getVertex(v.getIndex());
 			double[] pos = aSet.getD(Position3d.class, vv);
+			pos = Pn.homogenize(null, pos);
+			T.transformVector(pos);
 			aSet.set(Position.class, v, pos);
 		}
 		hif.set(surface);
+		hif.setSelection(sel);
 	}
 	
 	

@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.ddg;
 
+import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryEdges;
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
-import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryEdge;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -352,32 +352,30 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		if (e.getLeftFace() == null) {
 			e = e.getOppositeEdge();
 		}
-		E ne = e;
-		if (isBoundaryEdge(ne)) {
-			List<E> b = HalfEdgeUtils.boundaryEdges(ne.getLeftFace());
-			for (E be : b) {
-				if (be.getRightFace() != null) {
-					ne = be;
-					break;
-				}
+		List<E> bList = boundaryEdges(e.getLeftFace());
+		double[] inter = {0,0,0,0};
+		for (E ne : bList) {
+			if (ne.getRightFace() == null) {
+				continue;
 			}
+			F fr = ne.getRightFace();
+			F fl = ne.getLeftFace();
+			double[] cr = getIncircle(fr, a);
+			double[] cl = getIncircle(fl, a);
+			double[] nr = a.getD(Normal.class, fr);
+			double[] nl = a.getD(Normal.class, fl);
+			cr[3] = 1;
+			cl[3] = 1;
+			nr = Pn.homogenize(null, nr);
+			nl = Pn.homogenize(null, nl);
+			nr[3] = 0;
+			nl[3] = 0;
+			double[] linel = PlueckerLineGeometry.lineFromPoints(null, cl, nl);
+			double[] liner = PlueckerLineGeometry.lineFromPoints(null, cr, nr);
+			double[] edgeInter = PlueckerLineGeometry.intersectionPointUnchecked(null, linel, liner);
+			Pn.dehomogenize(edgeInter, edgeInter);
+			Rn.add(inter, inter, edgeInter);
 		}
-		assert !HalfEdgeUtils.isBoundaryEdge(ne);
-		F fr = ne.getRightFace();
-		F fl = ne.getLeftFace();
-		double[] cr = getIncircle(fr, a);
-		double[] cl = getIncircle(fl, a);
-		double[] nr = a.getD(Normal.class, fr);
-		double[] nl = a.getD(Normal.class, fl);
-		cr[3] = 1;
-		cl[3] = 1;
-		nr = Pn.homogenize(null, nr);
-		nl = Pn.homogenize(null, nl);
-		nr[3] = 0;
-		nl[3] = 0;
-		double[] linel = PlueckerLineGeometry.lineFromPoints(null, cl, nl);
-		double[] liner = PlueckerLineGeometry.lineFromPoints(null, cr, nr);
-		double[] inter = PlueckerLineGeometry.intersectionPointUnchecked(null, linel, liner);
 		Pn.dehomogenize(inter, inter);
 		double[] r12 = decomposeEdgeLength(e, a);
 		double[] pstart = a.getD(Position3d.class, e.getStartVertex());
@@ -399,7 +397,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	> double[] getAssociatedEdgeVector(E e, double phi, AdapterSet a) {
 		if (phi == 0) return a.getD(EdgeVector.class, e);
 		double[] ne = a.getD(Normal.class, e);
-		double[] vn = getAssociatedNormal(e, a);
+		double[] vn = ne;//getAssociatedNormal(e, a);
 		Rn.normalize(vn, vn);
 		if (Rn.innerProduct(ne, vn) < 0) {
 			Rn.times(vn, -1, vn);
