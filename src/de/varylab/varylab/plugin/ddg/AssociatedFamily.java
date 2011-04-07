@@ -43,9 +43,9 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 	private JButton
 		loadGeometryButton = new JButton("Initialize");
 	private JSlider
-		phiSlider = new JSlider(0, 180, 0);
+		phiSlider = new JSlider(0, 179, 0);
 	private SpinnerNumberModel
-		phiModel = new SpinnerNumberModel(0, 0, 180, 0.1);
+		phiModel = new SpinnerNumberModel(0, 0, 179, 0.1);
 	private JSpinner
 		phiSpinner = new JSpinner(phiModel);
 	private JLabel
@@ -58,6 +58,8 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 	private VHDS
 		dualSurface = null,
 		surface = null;
+	private int
+		rootIndex = 0;
 	private double[][]
 		fixingPoints = new double[3][]; 
 	private int[]
@@ -95,7 +97,9 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			double[] pos = aSet.getD(Position3d.class, vv);
 			aSet.set(Position.class, v, pos);
 		}
-		christoffelTransfom.transfom(dualSurface, aSet, 0, false);
+		VVertex v0 = christoffelTransfom.guessRootVertex(dualSurface, 100);
+		rootIndex = v0.getIndex();
+		christoffelTransfom.transfom(dualSurface, v0, aSet, 0, false);
 		phiSlider.setEnabled(true);
 		angleLabel.setEnabled(true);
 		phiSpinner.setEnabled(true);
@@ -113,7 +117,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			sel.add(surface.getVertex(i));
 		}
 		
-		phiModel.setValue(0);
+		phiModel.setValue(0.0);
 		hif.setSelection(sel);
 	}
 
@@ -144,7 +148,8 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			double[] pos = aSet.getD(Position3d.class, vv);
 			aSet.set(Position.class, v, pos);
 		}
-		christoffelTransfom.transfom(tmpSurface, aSet, phi, false);
+		VVertex v0 = tmpSurface.getVertex(rootIndex);
+		christoffelTransfom.transfom(tmpSurface, v0, aSet, phi, false);
 		
 		double[][] newfixingPoints = new double[3][];
 		newfixingPoints[0] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[0]));
@@ -153,12 +158,12 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		
 		MatrixBuilder mb = MatrixBuilder.euclidean();
 		double[] vec1 = Rn.subtract(null, newfixingPoints[1], newfixingPoints[0]);
-		double[] vec2 = Rn.subtract(null, newfixingPoints[2], newfixingPoints[0]);
+//		double[] vec2 = Rn.subtract(null, newfixingPoints[2], newfixingPoints[0]);
 		double[] vec3 = Rn.subtract(null, fixingPoints[1], fixingPoints[0]);
-		double[] vec4 = Rn.subtract(null, fixingPoints[2], fixingPoints[0]);
+//		double[] vec4 = Rn.subtract(null, fixingPoints[2], fixingPoints[0]);
 		double[] zero = Rn.negate(null, newfixingPoints[0]);
-//		mb.rotateFromTo(vec2, vec4);
 		mb.translate(fixingPoints[0]);
+//		mb.rotateFromTo(vec2, vec4);
 		mb.rotateFromTo(vec1, vec3);
 		mb.translate(zero);
 		Matrix T = mb.getMatrix();

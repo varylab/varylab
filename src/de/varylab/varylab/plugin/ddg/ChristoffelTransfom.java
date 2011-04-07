@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.ddg;
 
-import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryEdges;
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
+import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryEdge;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -17,7 +17,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -45,6 +48,8 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.projgeom.PlueckerLineGeometry;
+import de.varylab.discreteconformal.util.NodeIndexComparator;
+import de.varylab.discreteconformal.util.Search;
 
 public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 
@@ -170,16 +175,87 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	}
 	
 	
+	
+	/**
+	 * Implements a heuristic for finding a root vertex for the
+	 * hyperbolic layout. Its numerically best to have equal distance to the boundary. 
+	 * @param hds
+	 * @param lMap
+	 * @param mcSamples
+	 * @return
+	 */
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> V guessRootVertex(
+		HDS hds, 
+		int mcSamples
+	) {
+		// deterministic random numbers
+		Random rnd = new Random();
+		rnd.setSeed(hds.numVertices());
+		
+		Set<V> boundary = new TreeSet<V>(new NodeIndexComparator<V>());
+		boundary.addAll(HalfEdgeUtils.boundaryVertices(hds));
+		
+		Map<V, Double> sMap = new HashMap<V, Double>();
+		
+		Set<V> mcSet = new HashSet<V>();
+		for (int i = 0; i < Math.min(mcSamples, hds.numVertices()); i++) {
+			int sampleIndex = rnd.nextInt(hds.numVertices());
+			V sampleVertex = hds.getVertex(sampleIndex);
+			if (!HalfEdgeUtils.isBoundaryVertex(sampleVertex)) {
+				mcSet.add(sampleVertex);				
+			}
+		}
+		
+		for (V v : mcSet) {
+			double mean = 0;
+			Map<V, Double> distMap = new HashMap<V, Double>();
+			Map<V, List<E>> pathMap = Search.getAllShortestPaths(v, boundary, null, new HashSet<V>());
+			for (V bv : boundary) {
+				List<E> path = pathMap.get(bv);
+				double length = path.size();
+				mean += length;
+				distMap.put(bv, length);
+			}
+			mean /= boundary.size();
+			double s = 0.0;
+			for (V bv : distMap.keySet()) {
+				double dist = distMap.get(bv);
+				s += (mean - dist) * (mean - dist);
+			}
+			s /= boundary.size();
+			sMap.put(v, s);
+		}
+		V root = mcSet.iterator().next();
+		double minS = Double.MAX_VALUE; 
+		for (V v : sMap.keySet()) {
+			double s = sMap.get(v);
+			if (s < minS) {
+				minS = s;
+				root = v;
+			}
+		}
+		return root;
+	}
+	
+	
+	
+	
 	private <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void dualize(HDS hds, double phi, AdapterSet a) {
+	> void dualize(HDS hds, V v0, double phi, AdapterSet a) {
 		HashMap<V, double[]> newCoordsMap = new HashMap<V, double[]>();
 		HashSet<V> readyVertices = new HashSet<V>();
 		LinkedList<V> vertexQueue = new LinkedList<V>();
-		V v0 = hds.getVertex(0);
+//		V v0 = hds.getVertex(0);
+//		V v0 = guessRootVertex(hds, 100);
 		vertexQueue.offer(v0);
 		//vertex 0 in 0.0;
 		double[] v0Pos = a.getD(Position3d.class, v0);
@@ -227,7 +303,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void transfom(HDS hds, AdapterSet a, double phi, boolean useCentralExtension) {
+	> void transfom(HDS hds, V v0, AdapterSet a, double phi, boolean useCentralExtension) {
 		EdgeSignAdapter esa = new EdgeSignAdapter();
 		a.add(esa);
 		if (useCentralExtension) {
@@ -236,14 +312,14 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			Map<V, V> oldVnewVMap = new HashMap<V, V>();
 			HDS ce = ceSubdivider.subdivide(hds, a, oldFnewVMap, oldEnewVMap, oldVnewVMap);
 			createEdgeLabels(ce, a);
-			dualize(ce, phi, a);
+			dualize(ce, v0, phi, a);
 			for (V v : hds.getVertices()) {
 				V newV = oldVnewVMap.get(v);
 				a.set(Position.class, v, a.getD(Position3d.class, newV));
 			}
 		} else {
 			createEdgeLabels(hds, a);
-			dualize(hds, phi, a);
+			dualize(hds, v0, phi, a);
 			hif.addLayerAdapter(esa, false);
 		}
 	}
@@ -258,7 +334,8 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		double phi = associateModel.getNumber().doubleValue() * PI / 180.0;
 		boolean useCentralExtension = useCentralExtensionChecker.isSelected();
-		transfom(hds, a, phi, useCentralExtension);
+		V v0 = guessRootVertex(hds, 100);
+		transfom(hds, v0, a, phi, useCentralExtension);
 		hif.update();
 	}
 	
@@ -352,10 +429,18 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		if (e.getLeftFace() == null) {
 			e = e.getOppositeEdge();
 		}
-		List<E> bList = boundaryEdges(e.getLeftFace());
 		double[] inter = {0,0,0,0};
-		for (E ne : bList) {
-			if (ne.getRightFace() == null) {
+		
+		// left face parameter line
+		int count = 0;
+		E ne = e;
+		do {
+			if (count++ % 2 != 0) {
+				ne = ne.getNextEdge();
+				continue;
+			}
+			if (isBoundaryEdge(ne)) {
+				ne = ne.getNextEdge();
 				continue;
 			}
 			F fr = ne.getRightFace();
@@ -375,13 +460,47 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			double[] edgeInter = PlueckerLineGeometry.intersectionPointUnchecked(null, linel, liner);
 			Pn.dehomogenize(edgeInter, edgeInter);
 			Rn.add(inter, inter, edgeInter);
-		}
+			ne = ne.getNextEdge();
+		} while (ne != e);
+		
+		// right face parameter line
+		count = 0;
+		ne = e.getOppositeEdge();
+		do {
+			if (count++ % 2 != 0) {
+				ne = ne.getNextEdge();
+				continue;
+			}
+			if (isBoundaryEdge(ne)) {
+				ne = ne.getNextEdge();
+				continue;
+			}
+			F fr = ne.getRightFace();
+			F fl = ne.getLeftFace();
+			double[] cr = getIncircle(fr, a);
+			double[] cl = getIncircle(fl, a);
+			double[] nr = a.getD(Normal.class, fr);
+			double[] nl = a.getD(Normal.class, fl);
+			cr[3] = 1;
+			cl[3] = 1;
+			nr = Pn.homogenize(null, nr);
+			nl = Pn.homogenize(null, nl);
+			nr[3] = 0;
+			nl[3] = 0;
+			double[] linel = PlueckerLineGeometry.lineFromPoints(null, cl, nl);
+			double[] liner = PlueckerLineGeometry.lineFromPoints(null, cr, nr);
+			double[] edgeInter = PlueckerLineGeometry.intersectionPointUnchecked(null, linel, liner);
+			Pn.dehomogenize(edgeInter, edgeInter);
+			Rn.add(inter, inter, edgeInter);
+			ne = ne.getNextEdge();
+		} while (ne != e.getOppositeEdge());
+		
 		Pn.dehomogenize(inter, inter);
 		double[] r12 = decomposeEdgeLength(e, a);
 		double[] pstart = a.getD(Position3d.class, e.getStartVertex());
 		double[] pend = a.getD(Position3d.class, e.getTargetVertex());
 		double rsum = r12[0] + r12[1];
-		double[] p0 = Rn.linearCombination(null, r12[1] / rsum, pstart, r12[0] / rsum, pend);
+		double[] p0 = Rn.linearCombination(null, r12[0] / rsum, pstart, r12[1] / rsum, pend);
 		p0 = Pn.homogenize(null, p0);
 		if ( Math.abs(inter[3]) < 1E-10) return inter;
 		double[] N = Rn.subtract(null, p0, inter);
