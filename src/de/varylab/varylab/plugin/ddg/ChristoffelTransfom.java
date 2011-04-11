@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import de.jreality.math.Matrix;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.ui.LayoutFactory;
@@ -158,7 +159,6 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		if (edge0.getRightFace() != null) {
 			edgeStack.push(edge0.getOppositeEdge());
 		}
-		int count = 0;
 		while (!edgeStack.isEmpty()){
 			E edge = edgeStack.pop();
 			labelFaceOf(edge, a);
@@ -170,7 +170,6 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 					pendingEdges.remove(e);
 				}
 			}
-			count++;
 		}
 	}
 	
@@ -209,6 +208,10 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			if (!HalfEdgeUtils.isBoundaryVertex(sampleVertex)) {
 				mcSet.add(sampleVertex);				
 			}
+		}
+		
+		if (mcSet.isEmpty()) {
+			return hds.getVertex(rnd.nextInt(hds.numVertices()));
 		}
 		
 		for (V v : mcSet) {
@@ -264,7 +267,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			V v = vertexQueue.poll();
 			double[] startCoord = newCoordsMap.get(v);
 			List<E> star = HalfEdgeUtils.incomingEdges(v);
-			for (E e : star){
+			for (E e : star) {
 				V v2 = e.getStartVertex();
 				if (readyVertices.contains(v2))
 					continue;
@@ -286,15 +289,49 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 				vec[1] *= scale;
 				vec[2] *= scale;
 				Rn.add(vec, vec, startCoord);
+				vec = Pn.homogenize(null, vec);
 				newCoordsMap.put(v2, vec);
 			}
 		}
+		
+		// transfom to have offset edges in the CMC case
+		Matrix T = findOffsetTransfom(hds, newCoordsMap, a);
+		for (double[] p : newCoordsMap.values()) {
+			T.transformVector(p);			
+		}
+		
 		for (V v : hds.getVertices()){
 			double[] p = newCoordsMap.get(v);
 			if (p != null) {
 				a.set(Position.class, v, p);
 			}
 		}	
+	}
+	
+	
+	
+	
+	/**
+	 * Find a translation and uniform scaling such that the new positions
+	 * form a edge offset mesh the CMC case.
+	 * @param <V>
+	 * @param <E>
+	 * @param <F>
+	 * @param <HDS>
+	 * @param hds1
+	 * @param posMap
+	 * @param a
+	 * @return
+	 */
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Matrix findOffsetTransfom(HDS hds1, HashMap<V, double[]> posMap, AdapterSet a) {
+		
+		
+		return new Matrix();
 	}
 	
 	
@@ -368,14 +405,21 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		double[] p2 = as.getD(Position3d.class, bd.get(1));
 		double[] p3 = as.getD(Position3d.class, bd.get(2));
 		double[] p4 = as.getD(Position3d.class, bd.get(3));
+		double[] v2 = Rn.subtract(null, p2, p1);
+		double[] v4 = Rn.subtract(null, p4, p1);
+		if (Math.abs(Rn.euclideanAngle(v2, v4) - PI) < 1E-2) { // rotate
+			double[] tmp = p1;
+			p1 = p2; p2 = p3; p3 = p4; p4 = tmp;
+			v2 = Rn.subtract(null, p2, p1);
+			v4 = Rn.subtract(null, p4, p1);
+			System.out.println("rotate");
+		}
 		double p = Rn.euclideanDistance(p1, p3);
 		double q = Rn.euclideanDistance(p2, p4);
 		double a = Rn.euclideanDistance(p1, p2);
 		double b = Rn.euclideanDistance(p2, p3);
 		double c = Rn.euclideanDistance(p3, p4);
 		double d = Rn.euclideanDistance(p4, p1);
-		double[] v2 = Rn.subtract(null, p2, p1);
-		double[] v4 = Rn.subtract(null, p4, p1);
 		double alpha = Rn.euclideanAngle(v2, v4) / 2;
 		double s = 0.5 * (a+b+c+d);
 		double r = p*p*q*q - (a-b)*(a-b)*(a+b-s)*(a+b-s);
@@ -432,13 +476,13 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		double[] inter = {0,0,0,0};
 		
 		// left face parameter line
-		int count = 0;
+//		int count = 0;
 		E ne = e;
 		do {
-			if (count++ % 2 != 0) {
-				ne = ne.getNextEdge();
-				continue;
-			}
+//			if (count++ % 2 != 0) {
+//				ne = ne.getNextEdge();
+//				continue;
+//			}
 			if (isBoundaryEdge(ne)) {
 				ne = ne.getNextEdge();
 				continue;
@@ -464,13 +508,13 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		} while (ne != e);
 		
 		// right face parameter line
-		count = 0;
+//		count = 0;
 		ne = e.getOppositeEdge();
 		do {
-			if (count++ % 2 != 0) {
-				ne = ne.getNextEdge();
-				continue;
-			}
+//			if (count++ % 2 != 0) {
+//				ne = ne.getNextEdge();
+//				continue;
+//			}
 			if (isBoundaryEdge(ne)) {
 				ne = ne.getNextEdge();
 				continue;

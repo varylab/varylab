@@ -68,6 +68,7 @@ import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizerCot;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesTan2Optimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
@@ -96,6 +97,7 @@ import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConicalityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConnectionVisualizer;
+import de.varylab.varylab.plugin.visualizers.DiagonalLengthVisualizer;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
@@ -198,6 +200,7 @@ public class VaryLab {
 		v.registerPlugin(PositiveEdgeVisualizer.class);
 		v.registerPlugin(ConicalityVisualizer.class);
 		v.registerPlugin(IncircleVisualizer.class);
+		v.registerPlugin(DiagonalLengthVisualizer.class);
 	}
 
 
@@ -221,6 +224,7 @@ public class VaryLab {
 		v.registerPlugin(InflateOptimizer.class);
 		v.registerPlugin(IncircleOptimizer.class);
 		v.registerPlugin(TouchingIncirclesOptimizer.class);
+		v.registerPlugin(TouchingIncirclesOptimizerCot.class);
 		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
 	}
 	

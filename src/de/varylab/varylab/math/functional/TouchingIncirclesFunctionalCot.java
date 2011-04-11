@@ -16,7 +16,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
 
-public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, VFace> {
+public class TouchingIncirclesFunctionalCot implements Functional<VVertex, VEdge, VFace> {
 
 	private double[]
 	    p1 = new double[3],
@@ -27,7 +27,7 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 		p6 = new double[3];
 	
 	
-	public TouchingIncirclesFunctional() {
+	public TouchingIncirclesFunctionalCot() {
 	}
 
 	@Override
@@ -63,10 +63,10 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 				double[] e2 = Rn.subtract(null, p1, p2);
 				double[] as = Rn.subtract(null, p5, p1);
 				double[] bs = Rn.subtract(null, p6, p2);
-				double ta = tan2(a, e1);
-				double tb = tan2(b, e2);
-				double tas = tan2(as, e1);
-				double tbs = tan2(bs, e2);
+				double ta = cot2(a, e1);
+				double tb = cot2(b, e2);
+				double tas = cot2(as, e1);
+				double tbs = cot2(bs, e2);
 				double energy = ta*tbs - tas*tb;
 				energy = filterSingular(energy, 0.0);
 				E.add(energy * energy);
@@ -265,13 +265,13 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	}
 	
 	
-	private double tan2(double[] x, double[] e) {
+	private double cot2(double[] x, double[] e) {
 		double[] cr = Rn.crossProduct(null, x, e);
 		double crcr = Rn.innerProduct(cr, cr);
 		double xe = Rn.innerProduct(x, e);
 		double ee = Rn.innerProduct(e, e);
 		double xx = Rn.innerProduct(x, x);
-		double div = xe + sqrt(xx*ee);
+		double div = sqrt(xx*ee) - xe;
 		return sqrt(crcr) / div;
 	}
 	
@@ -302,36 +302,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	            (v13 - v23 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v63))/
+	            (-v13 + v23 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v63))/
 	               Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	          (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	            Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(v11 - v21)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63)) + 2*(-v12 + v22)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -347,36 +347,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	            (v12 - v22 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v62))/
+	            (-v12 + v22 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v62))/
 	               Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	          (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	            Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(-v11 + v21)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(v13 - v23)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -392,36 +392,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	            (v11 - v21 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v61))/
+	            (-v11 + v21 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v61))/
 	               Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	          (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	            Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(v12 - v22)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(-v13 + v23)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -440,36 +440,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          (-v13 + v23 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v53))/
+		          (v13 - v23 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v53))/
 		             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-		        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 		       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          (2*(-v11 + v21)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53)) + 2*(v12 - v22)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-		        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -485,36 +485,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          (-v12 + v22 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v52))/
+		          (v12 - v22 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v52))/
 		             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-		        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 		       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          (2*(v11 - v21)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(-v13 + v23)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-		        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -530,36 +530,36 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          (-v11 + v21 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v51))/
+		          (v11 - v21 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v51))/
 		             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-		        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 		       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		          (2*(-v12 + v22)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(v13 - v23)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53))))/
-		        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -576,38 +576,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          (v13 - v23 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v43))/
+		          (-v13 + v23 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v43))/
 		             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 		       ((2*(v11 - v21)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)) + 2*(-v12 + v22)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 		        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -621,38 +621,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          (v12 - v22 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v42))/
+		          (-v12 + v22 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v42))/
 		             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 		       ((2*(-v11 + v21)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(v13 - v23)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 		        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -666,38 +666,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		          Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          (v11 - v21 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v41))/
+		          (-v11 + v21 + ((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v41))/
 		             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 		       ((2*(v12 - v22)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(-v13 + v23)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)))*
 		          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 		        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-		          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))*
 		     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 		              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 		            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 		              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-		          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+		          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 		              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-		            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+		            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 		              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 		       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 		            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 		          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 		            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-		        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+		        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 		            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-		          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+		          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 		            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -714,38 +714,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*(-((Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	            (-v13 + v23 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v33))/
+	            (v13 - v23 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v33))/
 	               Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	          (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	            ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))) + 
 	       ((2*(-v11 + v21)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)) + 2*(v12 - v22)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -759,38 +759,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*(-((Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	            (-v12 + v22 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v32))/
+	            (v12 - v22 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v32))/
 	               Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	          (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	            ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))) + 
 	       ((2*(v11 - v21)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(-v13 + v23)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -804,38 +804,38 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	) {
 		return 2*(-((Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	            (-v11 + v21 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v31))/
+	            (v11 - v21 + ((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v31))/
 	               Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	            Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	              Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	          (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	            ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	            (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))) + 
 	       ((2*(-v12 + v22)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(v13 - v23)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	              Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -854,95 +854,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     ((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (-v13 + v53 + ((-v13 + v23)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
+	          (v13 - v53 + ((-v13 + v23)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          (2*(v11 - v51)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53)) + 2*(-v12 + v52)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(-v11 + v41)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)) + 2*(v12 - v42)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v13 + 2*v23 - v43 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v43) - 
+	          (v13 - 2*v23 + v43 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v43) - 
 	               2*(v13 - v23)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(-v11 + v61)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63)) + 2*(v12 - v62)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (-v13 + v33 + ((-v13 + v23)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
+	          (v13 - v33 + ((-v13 + v23)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(v11 - v31)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)) + 2*(-v12 + v32)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v13 + 2*v23 - v63 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v63) - 
+	          (v13 - 2*v23 + v63 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v23 + v63) - 
 	               2*(v13 - v23)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)));
 	}
 	
@@ -958,95 +958,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     ((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (-v12 + v52 + ((-v12 + v22)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
+	          (v12 - v52 + ((-v12 + v22)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          (2*(-v11 + v51)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(v13 - v53)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(v11 - v41)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(-v13 + v43)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v12 + 2*v22 - v42 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v42) - 
+	          (v12 - 2*v22 + v42 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v42) - 
 	               2*(v12 - v22)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(v11 - v61)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(-v13 + v63)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (-v12 + v32 + ((-v12 + v22)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
+	          (v12 - v32 + ((-v12 + v22)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(-v11 + v31)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(v13 - v33)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v12 + 2*v22 - v62 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v62) - 
+	          (v12 - 2*v22 + v62 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v22 + v62) - 
 	               2*(v12 - v22)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)));
 	}
 	
@@ -1062,95 +1062,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     ((Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (-v11 + v51 + ((-v11 + v21)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
+	          (v11 - v51 + ((-v11 + v21)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          (2*(v12 - v52)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(-v13 + v53)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(-v12 + v42)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(v13 - v43)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v11 + 2*v21 - v41 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v41) - 
+	          (v11 - 2*v21 + v41 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v41) - 
 	               2*(v11 - v21)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(-v12 + v62)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(v13 - v63)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (-v11 + v31 + ((-v11 + v21)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
+	          (v11 - v31 + ((-v11 + v21)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(v12 - v32)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(-v13 + v33)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v11 + 2*v21 - v61 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v61) - 
+	          (v11 - 2*v21 + v61 + (-2*(Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(-v21 + v61) - 
 	               2*(v11 - v21)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             (2.*Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)));
 	}
 	
@@ -1170,95 +1170,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-(Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	             Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	           (2*(-v21 + v51)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53)) + 2*(v22 - v52)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v23 + v43 + ((v13 - v23)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
+	          (v23 - v43 + ((v13 - v23)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(v21 - v41)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)) + 2*(-v22 + v42)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (2*v13 - v23 - v53 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v53) - 
+	          (-2*v13 + v23 + v53 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v53) - 
 	               2*(-v13 + v23)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v23 + v63 + ((v13 - v23)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
+	          (v23 - v63 + ((v13 - v23)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(v21 - v61)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63)) + 2*(-v22 + v62)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(-v21 + v31)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)) + 2*(v22 - v32)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (2*v13 - v23 - v33 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v33) - 
+	          (-2*v13 + v23 + v33 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v13 + v33) - 
 	               2*(-v13 + v23)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -1274,95 +1274,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-(Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	             Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	           (2*(v21 - v51)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(-v23 + v53)*((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v22 + v42 + ((v12 - v22)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
+	          (v22 - v42 + ((v12 - v22)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(-v21 + v41)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(v23 - v43)*((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (2*v12 - v22 - v52 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v52) - 
+	          (-2*v12 + v22 + v52 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v52) - 
 	               2*(-v12 + v22)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v22 + v62 + ((v12 - v22)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
+	          (v22 - v62 + ((v12 - v22)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(-v21 + v61)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(v23 - v63)*((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(v21 - v31)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(-v23 + v33)*((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (2*v12 - v22 - v32 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v32) - 
+	          (-2*v12 + v22 + v32 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v12 + v32) - 
 	               2*(-v12 + v22)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
@@ -1378,95 +1378,95 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	            Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	              Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	          (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	              Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	            ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	            (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	              Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))))) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))))*
 	     (-(Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	             Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	           (2*(-v22 + v52)*((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52)) + 2*(v23 - v53)*(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53))))/
-	        (2.*((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (2.*(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          (-v21 + v41 + ((v11 - v21)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
+	          (v21 - v41 + ((v11 - v21)*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
-	        (Power((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        (Power(-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))),2)*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) - 
 	       ((2*(v22 - v42)*((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42)) + 2*(-v23 + v43)*(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43)))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2)))/
 	        (2.*Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
-	          ((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	          (-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          ((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          (-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))) + 
 	       (Sqrt(Power((v12 - v22)*(-v21 + v41) - (v11 - v21)*(-v22 + v42),2) + Power(-((v13 - v23)*(-v21 + v41)) + (v11 - v21)*(-v23 + v43),2) + 
 	            Power((v13 - v23)*(-v22 + v42) - (v12 - v22)*(-v23 + v43),2))*
 	          Sqrt(Power((-v12 + v22)*(-v11 + v51) - (-v11 + v21)*(-v12 + v52),2) + Power(-((-v13 + v23)*(-v11 + v51)) + (-v11 + v21)*(-v13 + v53),2) + 
 	            Power((-v13 + v23)*(-v12 + v52) - (-v12 + v22)*(-v13 + v53),2))*
-	          (2*v11 - v21 - v51 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v51) - 
+	          (-2*v11 + v21 + v51 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v51) - 
 	               2*(-v11 + v21)*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))))))/
-	        (((v11 - v21)*(-v21 + v41) + (v12 - v22)*(-v22 + v42) + (v13 - v23)*(-v23 + v43) + 
+	        ((-((v11 - v21)*(-v21 + v41)) - (v12 - v22)*(-v22 + v42) - (v13 - v23)*(-v23 + v43) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v41,2) + Power(-v22 + v42,2) + Power(-v23 + v43,2))))*
-	          Power((-v11 + v21)*(-v11 + v51) + (-v12 + v22)*(-v12 + v52) + (-v13 + v23)*(-v13 + v53) + 
+	          Power(-((-v11 + v21)*(-v11 + v51)) - (-v12 + v22)*(-v12 + v52) - (-v13 + v23)*(-v13 + v53) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v51,2) + Power(-v12 + v52,2) + Power(-v13 + v53,2))),2)) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          (-v21 + v61 + ((v11 - v21)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
+	          (v21 - v61 + ((v11 - v21)*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))/
 	             Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2)))))/
-	        (((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        ((-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          Power((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          Power(-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))),2)) + 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
 	          (2*(v22 - v62)*((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62)) + 2*(-v23 + v63)*(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63))))/
-	        (2.*((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (2.*(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) + 
 	       ((2*(-v22 + v32)*((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32)) + 2*(v23 - v33)*(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33)))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
 	        (2.*Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          ((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	          (-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))))*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))) - 
 	       (Sqrt(Power((-v12 + v22)*(-v11 + v31) - (-v11 + v21)*(-v12 + v32),2) + Power(-((-v13 + v23)*(-v11 + v31)) + (-v11 + v21)*(-v13 + v33),2) + 
 	            Power((-v13 + v23)*(-v12 + v32) - (-v12 + v22)*(-v13 + v33),2))*
-	          (2*v11 - v21 - v31 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v31) - 
+	          (-2*v11 + v21 + v31 + (-2*(Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(-v11 + v31) - 
 	               2*(-v11 + v21)*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))/
 	             (2.*Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2)))))*
 	          Sqrt(Power((v12 - v22)*(-v21 + v61) - (v11 - v21)*(-v22 + v62),2) + Power(-((v13 - v23)*(-v21 + v61)) + (v11 - v21)*(-v23 + v63),2) + 
 	            Power((v13 - v23)*(-v22 + v62) - (v12 - v22)*(-v23 + v63),2)))/
-	        (Power((-v11 + v21)*(-v11 + v31) + (-v12 + v22)*(-v12 + v32) + (-v13 + v23)*(-v13 + v33) + 
+	        (Power(-((-v11 + v21)*(-v11 + v31)) - (-v12 + v22)*(-v12 + v32) - (-v13 + v23)*(-v13 + v33) + 
 	            Sqrt((Power(-v11 + v21,2) + Power(-v12 + v22,2) + Power(-v13 + v23,2))*(Power(-v11 + v31,2) + Power(-v12 + v32,2) + Power(-v13 + v33,2))),2)*
-	          ((v11 - v21)*(-v21 + v61) + (v12 - v22)*(-v22 + v62) + (v13 - v23)*(-v23 + v63) + 
+	          (-((v11 - v21)*(-v21 + v61)) - (v12 - v22)*(-v22 + v62) - (v13 - v23)*(-v23 + v63) + 
 	            Sqrt((Power(v11 - v21,2) + Power(v12 - v22,2) + Power(v13 - v23,2))*(Power(-v21 + v61,2) + Power(-v22 + v62,2) + Power(-v23 + v63,2))))));
 	}
 	
