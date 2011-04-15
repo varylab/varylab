@@ -393,6 +393,16 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 
+	/**
+	 * TODO: Generalize to work triangles
+	 * @param <V>
+	 * @param <E>
+	 * @param <F>
+	 * @param <HDS>
+	 * @param f
+	 * @param as
+	 * @return
+	 */
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
