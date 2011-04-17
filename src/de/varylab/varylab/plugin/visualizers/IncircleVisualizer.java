@@ -119,7 +119,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 			MatrixBuilder mb = MatrixBuilder.euclidean();
 			mb.translate(c[0], c[1], c[2]);
 			mb.rotateFromTo(new double[] {0,0,1}, N);
-			mb.scale(c[3], c[3], 1);
+			mb.scale(c[3], c[3], useDisks.isSelected() ? 1 : c[3]);
 			mb.assignTo(comp);
 			root.addChild(comp);
 		}
