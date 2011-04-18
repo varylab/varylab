@@ -58,7 +58,7 @@ public class KoebeSphereProjection extends AlgorithmPlugin {
 	}
 	
 	
-	private <
+	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>

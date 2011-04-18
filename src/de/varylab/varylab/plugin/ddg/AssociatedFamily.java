@@ -7,7 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
@@ -33,6 +35,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransfom.NormalMethod;
 
 public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
@@ -68,6 +71,8 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		sel = null;
 	private Random
 		rnd = new Random();
+	private JComboBox
+		methodCombo = new JComboBox(NormalMethod.values());
 	
 	public AssociatedFamily() {
 		shrinkPanel.setTitle("Associated Family");
@@ -77,6 +82,8 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		shrinkPanel.add(angleLabel, lc);
 		shrinkPanel.add(phiSpinner, rc);
 		shrinkPanel.add(phiSlider, rc);
+		shrinkPanel.add(new JLabel("Method:"));
+		shrinkPanel.add(methodCombo,rc);
 		phiSlider.setEnabled(false);
 		angleLabel.setEnabled(false);
 		phiSpinner.setEnabled(false);
@@ -99,7 +106,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		}
 		VVertex v0 = christoffelTransfom.guessRootVertex(dualSurface, 100);
 		rootIndex = v0.getIndex();
-		christoffelTransfom.transfom(dualSurface, v0, aSet, 0, false);
+		christoffelTransfom.transfom(dualSurface, v0, aSet, 0, false, (NormalMethod)methodCombo.getSelectedItem());
 		phiSlider.setEnabled(true);
 		angleLabel.setEnabled(true);
 		phiSpinner.setEnabled(true);
@@ -149,7 +156,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			aSet.set(Position.class, v, pos);
 		}
 		VVertex v0 = tmpSurface.getVertex(rootIndex);
-		christoffelTransfom.transfom(tmpSurface, v0, aSet, phi, false);
+		christoffelTransfom.transfom(tmpSurface, v0, aSet, phi, false, (NormalMethod)methodCombo.getSelectedItem());
 		
 		double[][] newfixingPoints = new double[3][];
 		newfixingPoints[0] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[0]));

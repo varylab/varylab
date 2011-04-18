@@ -54,6 +54,12 @@ import de.varylab.discreteconformal.util.Search;
 
 public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 
+	public static enum NormalMethod {
+		LS_Sphere,
+		Face_Average,
+		Face_Sphere
+	}
+
 	private CentralExtensionSubdivision
 		ceSubdivider = null;
 	private JPanel
@@ -65,6 +71,11 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	private JSpinner
 		associateSpinner = new JSpinner(associateModel);
 	private HalfedgeInterface hif = null;
+	
+	private LeastSquaresSphere
+		lsSphere = null;
+	private static double[]
+	    lsSphereCoords = null;
 	
 	public ChristoffelTransfom() {
 		panel.setLayout(new GridBagLayout());
@@ -253,7 +264,8 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void dualize(HDS hds, V v0, double phi, AdapterSet a) {
+	> void dualize(HDS hds, V v0, double phi, AdapterSet a, NormalMethod method) {
+		lsSphereCoords = lsSphere.getSphereCenter(hds, a);
 		HashMap<V, double[]> newCoordsMap = new HashMap<V, double[]>();
 		HashSet<V> readyVertices = new HashSet<V>();
 		LinkedList<V> vertexQueue = new LinkedList<V>();
@@ -278,7 +290,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 //				double[] pv = a.getD(Position3d.class, v);
 //				double[] pv2 = a.getD(Position3d.class, v2);
 //				double[] vec = Rn.subtract(null, pv2, pv);
-				double[] vec = getAssociatedEdgeVector(e, phi, a);
+				double[] vec = getAssociatedEdgeVector(e, phi, a, method);
 				//double factor = Rn.euclideanDistanceSquared(pv, pv2);
 				E de = e.getLeftFace() != null ? e : e.getOppositeEdge();
 				double[] r12 = decomposeEdgeLength(de, a);
@@ -340,7 +352,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void transfom(HDS hds, V v0, AdapterSet a, double phi, boolean useCentralExtension) {
+	> void transfom(HDS hds, V v0, AdapterSet a, double phi, boolean useCentralExtension, NormalMethod method) {
 		EdgeSignAdapter esa = new EdgeSignAdapter();
 		a.add(esa);
 		if (useCentralExtension) {
@@ -349,14 +361,14 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 			Map<V, V> oldVnewVMap = new HashMap<V, V>();
 			HDS ce = ceSubdivider.subdivide(hds, a, oldFnewVMap, oldEnewVMap, oldVnewVMap);
 			createEdgeLabels(ce, a);
-			dualize(ce, v0, phi, a);
+			dualize(ce, v0, phi, a, method);
 			for (V v : hds.getVertices()) {
 				V newV = oldVnewVMap.get(v);
 				a.set(Position.class, v, a.getD(Position3d.class, newV));
 			}
 		} else {
 			createEdgeLabels(hds, a);
-			dualize(hds, v0, phi, a);
+			dualize(hds, v0, phi, a, method);
 			hif.addLayerAdapter(esa, false);
 		}
 	}
@@ -372,7 +384,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		double phi = associateModel.getNumber().doubleValue() * PI / 180.0;
 		boolean useCentralExtension = useCentralExtensionChecker.isSelected();
 		V v0 = guessRootVertex(hds, 100);
-		transfom(hds, v0, a, phi, useCentralExtension);
+		transfom(hds, v0, a, phi, useCentralExtension, NormalMethod.Face_Average);
 		hif.update();
 	}
 	
@@ -390,6 +402,7 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		ceSubdivider = c.getPlugin(CentralExtensionSubdivision.class);
+		lsSphere = c.getPlugin(LeastSquaresSphere.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 
@@ -561,16 +574,30 @@ public class ChristoffelTransfom extends AlgorithmDialogPlugin {
 		return Rn.normalize(N, N);
 	}
 	
-	
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> double[] getAssociatedEdgeVector(E e, double phi, AdapterSet a) {
+	> double[] getAssociatedEdgeVector(E e, double phi, AdapterSet a, NormalMethod method) {
 		if (phi == 0) return a.getD(EdgeVector.class, e);
 		double[] ne = a.getD(Normal.class, e);
-		double[] vn = ne;//getAssociatedNormal(e, a);
+		double[] vn = null;
+		switch (method) {
+		case LS_Sphere:
+			double[] ctp = KoebeSphereProjection.getCircleTouchPoint((e.getLeftFace()==null)?e.getOppositeEdge():e, a);
+			Pn.dehomogenize(ctp, ctp);
+			double[] center = new double[]{lsSphereCoords[0],lsSphereCoords[1],lsSphereCoords[2],1.0};
+			vn = Rn.subtract(null, ctp, center);
+			vn[3] = 1.0;
+			break;
+		case Face_Sphere:
+			vn = getAssociatedNormal(e, a);
+			break;
+		default:
+			vn = ne;
+			break;
+		}
 		Rn.normalize(vn, vn);
 		if (Rn.innerProduct(ne, vn) < 0) {
 			Rn.times(vn, -1, vn);
