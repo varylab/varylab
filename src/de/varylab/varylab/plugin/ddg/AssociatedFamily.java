@@ -5,9 +5,10 @@ import static java.lang.Math.PI;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -24,7 +25,9 @@ import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -33,15 +36,17 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.varylab.varylab.hds.VEdge;
+import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.ddg.ChristoffelTransfom.NormalMethod;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransform.NormalMethod;
 
 public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
 	private HalfedgeInterface
 		hif = null;
-	private ChristoffelTransfom
+	private ChristoffelTransform
 		christoffelTransfom = null;
 	private JButton
 		loadGeometryButton = new JButton("Initialize");
@@ -61,8 +66,12 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 	private VHDS
 		dualSurface = null,
 		surface = null;
-	private int
-		rootIndex = 0;
+	private Map<Integer, Double>
+		initialLengthMap = new HashMap<Integer, Double>();
+	private IsometryMeasureAdapter
+		isometryMeasureAdapter = new IsometryMeasureAdapter();
+//	private int
+//		rootIndex = 0;
 	private double[][]
 		fixingPoints = new double[3][]; 
 	private int[]
@@ -79,11 +88,11 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 		GridBagConstraints rc = LayoutFactory.createRightConstraint();
 		shrinkPanel.add(loadGeometryButton, rc);
+		shrinkPanel.add(new JLabel("Method"));
+		shrinkPanel.add(methodCombo,rc);
 		shrinkPanel.add(angleLabel, lc);
 		shrinkPanel.add(phiSpinner, rc);
 		shrinkPanel.add(phiSlider, rc);
-		shrinkPanel.add(new JLabel("Method:"));
-		shrinkPanel.add(methodCombo,rc);
 		phiSlider.setEnabled(false);
 		angleLabel.setEnabled(false);
 		phiSpinner.setEnabled(false);
@@ -104,9 +113,10 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			double[] pos = aSet.getD(Position3d.class, vv);
 			aSet.set(Position.class, v, pos);
 		}
-		VVertex v0 = christoffelTransfom.guessRootVertex(dualSurface, 100);
-		rootIndex = v0.getIndex();
-		christoffelTransfom.transfom(dualSurface, v0, aSet, 0, false, (NormalMethod)methodCombo.getSelectedItem());
+//		VVertex v0 = christoffelTransfom.guessRootVertex(dualSurface, 100);
+//		rootIndex = v0.getIndex();
+		NormalMethod method = (NormalMethod)methodCombo.getSelectedItem();
+		christoffelTransfom.transform(dualSurface, aSet, 0, false, method);
 		phiSlider.setEnabled(true);
 		angleLabel.setEnabled(true);
 		phiSpinner.setEnabled(true);
@@ -122,6 +132,12 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		sel = new HalfedgeSelection();
 		for (int i : fixingIndices) {
 			sel.add(surface.getVertex(i));
+		}
+		
+		initialLengthMap.clear();
+		for (VEdge edge : surface.getEdges()) {
+			Double l = aSet.get(Length.class, edge, Double.class);
+			initialLengthMap.put(edge.getIndex(), l);
 		}
 		
 		phiModel.setValue(0.0);
@@ -155,8 +171,9 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			double[] pos = aSet.getD(Position3d.class, vv);
 			aSet.set(Position.class, v, pos);
 		}
-		VVertex v0 = tmpSurface.getVertex(rootIndex);
-		christoffelTransfom.transfom(tmpSurface, v0, aSet, phi, false, (NormalMethod)methodCombo.getSelectedItem());
+//		VVertex v0 = tmpSurface.getVertex(rootIndex);
+		NormalMethod method = (NormalMethod)methodCombo.getSelectedItem();
+		christoffelTransfom.transform(tmpSurface, aSet, phi, false, method);
 		
 		double[][] newfixingPoints = new double[3][];
 		newfixingPoints[0] = aSet.getD(Position3d.class, tmpSurface.getVertex(fixingIndices[0]));
@@ -182,8 +199,24 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 			T.transformVector(pos);
 			aSet.set(Position.class, v, pos);
 		}
+		hif.addLayerAdapter(isometryMeasureAdapter, false);
 		hif.set(surface);
 		hif.setSelection(sel);
+	}
+	
+	private class IsometryMeasureAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, Double> {
+
+		protected IsometryMeasureAdapter() {
+			super(null, VEdge.class, null, Double.class, true, false);
+		}
+
+		@Override
+		public Double getEdgeValue(VEdge e, AdapterSet a) {
+			double initL = initialLengthMap.get(e.getIndex());
+			double l = a.get(Length.class, e, Double.class);
+			return l - initL;
+		}
+		
 	}
 	
 	
@@ -191,7 +224,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		christoffelTransfom = c.getPlugin(ChristoffelTransfom.class);
+		christoffelTransfom = c.getPlugin(ChristoffelTransform.class);
 	}
 	
 	@Override

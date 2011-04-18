@@ -60,7 +60,7 @@ public class CentralExtensionSubdivision extends AlgorithmPlugin {
 		);
 		for (F oldF : oldFnewVMap.keySet()) {
 			V v = oldFnewVMap.get(oldF);
-			double[] c = ChristoffelTransfom.getIncircle(oldF, a);
+			double[] c = ChristoffelTransform.getIncircle(oldF, a);
 			a.set(Position.class, v, new double[]{c[0], c[1], c[2]});
 		}
 		for (E e : oldEnewVMap.keySet()) {
@@ -70,7 +70,7 @@ public class CentralExtensionSubdivision extends AlgorithmPlugin {
 			}
 			F oldF = e.getLeftFace();
 			assert oldF != null;
-			double[] c = ChristoffelTransfom.getIncircle(oldF, a);
+			double[] c = ChristoffelTransform.getIncircle(oldF, a);
 			double r = c[3];
 			double[] p0 = a.getD(Position3d.class, e.getStartVertex());
 			double[] p1 = a.getD(Position3d.class, e.getTargetVertex());

@@ -6,6 +6,7 @@ import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_SHADER;
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
+import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.NormalMethod.Face_Sphere;
 import static java.lang.Math.PI;
 
 import java.awt.GridBagConstraints;
@@ -41,7 +42,7 @@ import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.ddg.ChristoffelTransfom;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.utilities.Disk;
 
 public class IncircleVisualizer extends VisualizerPlugin implements ActionListener,ChangeListener {
@@ -114,7 +115,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 			if (bd.size() != 4) continue;
 			SceneGraphComponent comp = new SceneGraphComponent("circle " + f.getIndex());
 			comp.setGeometry(geometry);
-			double[] c = ChristoffelTransfom.getIncircle(f, a);
+			double[] c = ChristoffelTransform.getIncircle(f, a);
 			double[] N = a.getD(Normal.class, f);
 			MatrixBuilder mb = MatrixBuilder.euclidean();
 			mb.translate(c[0], c[1], c[2]);
@@ -135,7 +136,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 		
 		@Override
 		public double[] getEdgeValue(VEdge e, AdapterSet a) {
-			return ChristoffelTransfom.getAssociatedNormal(e, a);
+			return ChristoffelTransform.getAssociatedNormal(e, a);
 		}
 		
 		@Override
@@ -154,7 +155,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 		
 		@Override
 		public double[] getEdgeValue(VEdge e, AdapterSet a) {
-			return ChristoffelTransfom.getAssociatedEdgeVector(e, PI/8, a);
+			return ChristoffelTransform.getAssociatedEdgeVector(e, PI/8, a, Face_Sphere);
 		}
 		
 		@Override

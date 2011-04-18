@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.ddg;
 
-import static de.varylab.varylab.plugin.ddg.ChristoffelTransfom.decomposeEdgeLength;
-import static de.varylab.varylab.plugin.ddg.ChristoffelTransfom.getIncircle;
+import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.decomposeEdgeLength;
+import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.getIncircle;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;

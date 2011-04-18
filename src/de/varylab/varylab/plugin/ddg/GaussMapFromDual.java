@@ -13,12 +13,12 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransform.NormalMethod;
 
 public class GaussMapFromDual extends AlgorithmPlugin {
 
-	private ChristoffelTransform christoffelTransform;
+	private ChristoffelTransform 
+		christoffelTransform = null;
 
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
@@ -37,14 +37,14 @@ public class GaussMapFromDual extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet aSet, HalfedgeInterface hif) {
-		VHDS dualSurface = new VHDS();
+		HDS dualSurface = hif.createEmpty(hds);
 		HalfEdgeUtils.copy(hds, dualSurface);
-		for (VVertex v : dualSurface.getVertices()) {
+		for (V v : dualSurface.getVertices()) {
 			V vv = hds.getVertex(v.getIndex());
 			double[] pos = aSet.getD(Position3d.class, vv);
 			aSet.set(Position.class, v, pos);
 		}
-		christoffelTransform.transform(dualSurface, aSet, 0, false);
+		christoffelTransform.transform(dualSurface, aSet, 0.0, false, NormalMethod.Face_Sphere);
 		for(V v : hds.getVertices()) {
 			double[] 
 			       pos = aSet.getD(Position3d.class,v),

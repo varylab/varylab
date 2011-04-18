@@ -38,11 +38,12 @@ import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
 import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
-import de.varylab.varylab.plugin.ddg.ChristoffelTransfom;
+import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.plugin.ddg.GaussMapFromDual;
 import de.varylab.varylab.plugin.ddg.KoebeSphereProjection;
 import de.varylab.varylab.plugin.ddg.LeastSquaresSphere;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
+import de.varylab.varylab.plugin.editor.DehomogenizeTexture;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
@@ -174,6 +175,8 @@ public class VaryLab {
 		v.registerPlugin(StitchCutPathPlugin.class);
 		v.registerPlugin(CollapseTrianglesPlugin.class);
 		v.registerPlugin(Collapse2ValentPlugin.class);
+		
+		v.registerPlugin(DehomogenizeTexture.class);
 	}
 
 
@@ -243,7 +246,7 @@ public class VaryLab {
 	}
 	
 	private static void addDDGPlugins(JRViewer v) {
-		v.registerPlugin(ChristoffelTransfom.class);
+		v.registerPlugin(ChristoffelTransform.class);
 		v.registerPlugin(CentralExtensionSubdivision.class);
 		v.registerPlugin(GaussMapFromDual.class);
 		v.registerPlugin(AssociatedFamily.class);
