@@ -101,6 +101,7 @@ import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConicalityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConnectionVisualizer;
+import de.varylab.varylab.plugin.visualizers.CurvatureLinesQualityVisualizer;
 import de.varylab.varylab.plugin.visualizers.DiagonalLengthVisualizer;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
@@ -252,6 +253,7 @@ public class VaryLab {
 		v.registerPlugin(AssociatedFamily.class);
 		v.registerPlugin(KoebeSphereProjection.class);
 		v.registerPlugin(LeastSquaresSphere.class);
+		v.registerPlugin(CurvatureLinesQualityVisualizer.class);
 	}
 	
 	
