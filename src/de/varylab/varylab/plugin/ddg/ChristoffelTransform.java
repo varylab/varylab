@@ -273,8 +273,9 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void dualize(HDS hds, double phi, AdapterSet a, NormalMethod method) {
-		lsSphereCoords = lsSphere.getSphereCenter(hds, a);
-		
+		if (method == NormalMethod.LS_Sphere) {
+			lsSphereCoords = lsSphere.getSphereCenter(hds, a);
+		}
 		List<Map<V, double[]>> newCoordsMaps = new LinkedList<Map<V, double[]>>();
 		Set<V> rootSet = getRadomInnerPoints(hds, 10);
 		for (V v0 : rootSet) {
