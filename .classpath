@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/MTJOptimization"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
 	<classpathentry kind="lib" path="lib/jPETScTaoV1.7jPETScTao.jar"/>
 	<classpathentry kind="lib" path="lib/fhlaf_1.0b2_bin.jar"/>
@@ -13,8 +12,8 @@
 	<classpathentry kind="lib" path="lib/synthetica.jar"/>
 	<classpathentry kind="lib" path="lib/syntheticaBlackEye.jar"/>
 	<classpathentry kind="lib" path="lib/syntheticaBatik.jar"/>
+	<classpathentry kind="lib" path="lib/mtj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
-	<classpathentry kind="lib" path="/MTJOptimization/lib/mtj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DiscreteConformalLab"/>
