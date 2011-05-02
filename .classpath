@@ -13,6 +13,8 @@
 	<classpathentry kind="lib" path="lib/syntheticaBlackEye.jar"/>
 	<classpathentry kind="lib" path="lib/syntheticaBatik.jar"/>
 	<classpathentry kind="lib" path="lib/mtj.jar"/>
+	<classpathentry kind="lib" path="lib/vmm.jar"/>
+	<classpathentry kind="lib" path="lib/xploremathplugin.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedgetools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
