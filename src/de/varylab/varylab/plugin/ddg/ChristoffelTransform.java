@@ -460,12 +460,11 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 		double[] p4 = as.getD(Position3d.class, bd.get(3));
 		double[] v2 = Rn.subtract(null, p2, p1);
 		double[] v4 = Rn.subtract(null, p4, p1);
-		if (Math.abs(Rn.euclideanAngle(v2, v4) - PI) < 1E-2) { // rotate
+		if (Math.abs(Rn.euclideanAngle(v2, v4) - PI) < 1E-1) { // rotate
 			double[] tmp = p1;
 			p1 = p2; p2 = p3; p3 = p4; p4 = tmp;
 			v2 = Rn.subtract(null, p2, p1);
 			v4 = Rn.subtract(null, p4, p1);
-			System.out.println("rotate");
 		}
 		double p = Rn.euclideanDistance(p1, p3);
 		double q = Rn.euclideanDistance(p2, p4);
