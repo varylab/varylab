@@ -15,6 +15,8 @@ import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
 public class DiagonalLengthVisualizer extends VisualizerPlugin {
 
+	private DiagonalLengthDifAdapter
+		adapter = new DiagonalLengthDifAdapter();
 	
 	private class DiagonalLengthDifAdapter extends AbstractAdapter<Double> {
 		
@@ -49,6 +51,11 @@ public class DiagonalLengthVisualizer extends VisualizerPlugin {
 			double dif = l1 - l2;
 			return dif * dif;
 		}
+		
+		@Override
+		public String toString() {
+			return "Diagonal Lengths Difference";
+		}
 	}
 
 	
@@ -59,9 +66,7 @@ public class DiagonalLengthVisualizer extends VisualizerPlugin {
 
 	@Override
 	public AdapterSet getAdapters() {
-		AdapterSet result = new AdapterSet();
-		result.add(new DiagonalLengthDifAdapter());
-		return result;
+		return new AdapterSet(adapter);
 	}
 
 }

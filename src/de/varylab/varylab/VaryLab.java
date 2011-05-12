@@ -62,6 +62,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.EqualDiagonalsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
@@ -233,6 +234,7 @@ public class VaryLab {
 		v.registerPlugin(TouchingIncirclesOptimizer.class);
 		v.registerPlugin(TouchingIncirclesOptimizerCot.class);
 		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
+		v.registerPlugin(EqualDiagonalsOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {
