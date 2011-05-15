@@ -15,18 +15,18 @@ import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
-import de.varylab.varylab.math.functional.EdgeLengthFunctional;
+import de.varylab.varylab.math.functional.MeanEdgeLengthFunctional;
 import de.varylab.varylab.plugin.OptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class EdgeLengthOptimizer extends OptimizerPlugin {
+public class MeanEdgeLengthOptimizer extends OptimizerPlugin {
 
 	private JPanel
 		panel = new JPanel();
 	private JCheckBox
 		ignoreBoundaryChecker = new JCheckBox("Ignore Boundary");
 	
-	public EdgeLengthOptimizer() {
+	public MeanEdgeLengthOptimizer() {
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		panel.add(ignoreBoundaryChecker, c);
@@ -44,17 +44,17 @@ public class EdgeLengthOptimizer extends OptimizerPlugin {
 		
 		ConstantLengthAdapter la = new ConstantLengthAdapter(l);
 		ConstantWeight wa = new ConstantWeight(1.0, ignoreBoundaryChecker.isSelected());
-		return new EdgeLengthFunctional<VVertex, VEdge, VFace>(la, wa);
+		return new MeanEdgeLengthFunctional<VVertex, VEdge, VFace>(la, wa);
 	}
 	
 	@Override
 	public String getName() {
-		return "Edge Length Equalizer";
+		return "Mean Edge Length";
 	}
 
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Edge Length Optimizer", "Stefan Sechelmann");
+		PluginInfo info = new PluginInfo("Mean Edge Length Optimizer", "Stefan Sechelmann");
 		info.icon = ImageHook.getIcon("edgelength.png");
 		return info;
 	}

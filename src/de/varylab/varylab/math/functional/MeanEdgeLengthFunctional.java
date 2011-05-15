@@ -50,7 +50,7 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.WeightFunction;
 
-public class EdgeLengthFunctional <
+public class MeanEdgeLengthFunctional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
 	F extends Face<V, E, F>
@@ -61,7 +61,7 @@ public class EdgeLengthFunctional <
 	private WeightFunction<E> 
 		w = null;
 	
-	public EdgeLengthFunctional(Length<E> l0, WeightFunction<E> w) {
+	public MeanEdgeLengthFunctional(Length<E> l0, WeightFunction<E> w) {
 		this.l0 = l0;
 		this.w = w;
 	}

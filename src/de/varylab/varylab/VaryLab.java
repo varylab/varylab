@@ -59,7 +59,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
-import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.EqualDiagonalsOptimizer;
@@ -68,13 +68,12 @@ import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.MeanEdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizerCot;
-import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesTan2Optimizer;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
@@ -213,7 +212,7 @@ public class VaryLab {
 
 
 	private static void addOptimizationPlugins(JRViewer v) {
-		v.registerPlugin(EdgeLengthOptimizer.class);
+		v.registerPlugin(MeanEdgeLengthOptimizer.class);
 		v.registerPlugin(PlanarQuadsOptimizer.class);
 		v.registerPlugin(WillmoreOptimizer.class);
 		v.registerPlugin(GeodesicAngleOptimizer.class);
@@ -231,10 +230,11 @@ public class VaryLab {
 		v.registerPlugin(ConicalOptimizer.class);
 		v.registerPlugin(InflateOptimizer.class);
 		v.registerPlugin(IncircleOptimizer.class);
-		v.registerPlugin(TouchingIncirclesOptimizer.class);
+//		v.registerPlugin(TouchingIncirclesOptimizer.class);
 		v.registerPlugin(TouchingIncirclesOptimizerCot.class);
-		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
+//		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
 		v.registerPlugin(EqualDiagonalsOptimizer.class);
+		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {

@@ -41,9 +41,9 @@ import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
-import de.varylab.varylab.math.functional.EdgeLengthFunctional;
+import de.varylab.varylab.math.functional.MeanEdgeLengthFunctional;
 
-public class EdgeLengthFunctionalTest extends FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {
+public class MeanEdgeLengthFunctionalTest extends FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {
 
 	
 	@Override
@@ -77,7 +77,7 @@ public class EdgeLengthFunctionalTest extends FunctionalTest<DefaultJRVertex, De
 		setXGradient(pos);
 		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new EdgeLengthFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(l0, w));
+		setFuctional(new MeanEdgeLengthFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(l0, w));
 	}
 	
 	
