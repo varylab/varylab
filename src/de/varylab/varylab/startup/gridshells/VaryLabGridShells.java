@@ -195,8 +195,8 @@ public class VaryLabGridShells {
 	
 	
 	public static void main(String[] args) throws Exception {
-		JRHalfedgeViewer.initHalfedgeFronted();
 		NativePathUtility.set("native");
+		JRHalfedgeViewer.initHalfedgeFronted();
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();

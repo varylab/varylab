@@ -260,10 +260,10 @@ public class VaryLab {
 	
 	
 	public static void main(String[] args) throws Exception {
+		NativePathUtility.set("native");
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		JRHalfedgeViewer.initHalfedgeFronted();
-		NativePathUtility.set("native");
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
