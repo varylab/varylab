@@ -22,11 +22,12 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
+import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
+import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
-import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
@@ -40,9 +41,9 @@ public class VaryLabGridShells {
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new VPositionAdapter(), true);
 		hif.addAdapter(new VTexturePositionAdapter(), true);
-//		hif.addAdapter(new NodeWeigthAdapter(), true);
-//		hif.addAdapter(new GeodesicLabelAdapter(), true);
-//		hif.addAdapter(new SingularityAdapter(), true);
+		hif.addAdapter(new NodeWeigthAdapter(), true);
+		hif.addAdapter(new GeodesicLabelAdapter(), true);
+		hif.addAdapter(new SingularityAdapter(), true);
 		hif.addAdapter(new UndirectedEdgeIndex(), true);
 		
 		v.registerPlugin(hif);
@@ -147,10 +148,10 @@ public class VaryLabGridShells {
 
 	private static void addOptimizationPlugins(JRViewer v) {
 //		v.registerPlugin(MeanEdgeLengthOptimizer.class);
-		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
+//		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
 //		v.registerPlugin(PlanarQuadsOptimizer.class);
 //		v.registerPlugin(WillmoreOptimizer.class);
-		v.registerPlugin(GeodesicAngleOptimizer.class);
+//		v.registerPlugin(GeodesicAngleOptimizer.class);
 //		v.registerPlugin(GeodesicLaplaceOptimizer.class);
 //		v.registerPlugin(ANetOptimizer.class);
 //		v.registerPlugin(ConstantDirectionFieldPlugin.class);

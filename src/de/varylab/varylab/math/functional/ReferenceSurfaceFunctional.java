@@ -223,7 +223,7 @@ implements Functional<V, E, F> {
 	> void setReferenceSurface(HDS refSurface, AdapterSet as) {
 		this.refSurface = refSurface;
 		Triangulator.triangulate(refSurface);
-		kdtree = new KdTree<V, E, F>(refSurface, as, 5 ,false);
+		kdtree = new KdTree<V, E, F>(refSurface, as, 10, false);
 		refas = as;
 	}
 }
