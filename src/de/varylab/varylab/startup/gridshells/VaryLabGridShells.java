@@ -10,7 +10,7 @@ import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
-import de.jtem.halfedgetools.plugin.data.HalfedgeDataInterface;
+import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
@@ -112,7 +112,7 @@ public class VaryLabGridShells {
 //		v.registerPlugin(DehomogenizeTexture.class);
 		
 		v.registerPlugin(HalfedgePreferencePage.class);
-		v.registerPlugin(HalfedgeDataInterface.class);
+		v.registerPlugin(VisualizationInterface.class);
 	}
 
 
