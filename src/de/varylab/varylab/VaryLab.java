@@ -1,8 +1,5 @@
 package de.varylab.varylab;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
