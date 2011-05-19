@@ -261,8 +261,6 @@ public class VaryLab {
 	
 	public static void main(String[] args) throws Exception {
 		NativePathUtility.set("native");
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		JDialog.setDefaultLookAndFeelDecorated(true);
 		JRHalfedgeViewer.initHalfedgeFronted();
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
