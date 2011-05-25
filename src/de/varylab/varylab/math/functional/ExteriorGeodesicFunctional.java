@@ -57,19 +57,23 @@ public class ExteriorGeodesicFunctional<
 	 * @param v 
 	 * @return a map which maps one edge of each pair onto its partner
 	 */
-	private Map<E, E> findGeodesicPairs(V v, boolean manualOnly) {
+	public static<
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	>  Map<E, E> findGeodesicPairs(V v, boolean manualOnly, AdapterSet a) {
 		Map<E, E> r = new HashMap<E, E>();
 		List<E> star = HalfEdgeUtils.incomingEdges(v);
 		Set<Integer> geodesicsSet = new HashSet<Integer>();
 		for (E e : star) {
-			Integer index = adapters.getDefault(GeodesicLabel.class, e, -1);
+			Integer index = a.getDefault(GeodesicLabel.class, e, -1);
 			geodesicsSet.add(index);
 		}
 		for (Integer index : geodesicsSet) {
 			if (index == -1) continue;
 			List<E> gSet = new LinkedList<E>();
 			for (E e : star) {
-				Integer i = adapters.getDefault(GeodesicLabel.class, e, -1);
+				Integer i = a.getDefault(GeodesicLabel.class, e, -1);
 				if (i.equals(index)) {
 					gSet.add(e);
 				}
@@ -79,7 +83,7 @@ public class ExteriorGeodesicFunctional<
 			}
 			star.removeAll(gSet);
 		}
-		if (manualOnly || star.size() % 2 != 0) return r;
+		if (manualOnly || star.size() % 2 != 0 || star.size() < 4) return r;
 		int nn = star.size();
 		for (int i = 0; i < nn/2; i++) {
 			E e1 = star.get(i);
@@ -100,7 +104,7 @@ public class ExteriorGeodesicFunctional<
 		       vt = new double[3];
 		for (V v : hds.getVertices()) {
 			FunctionalUtils.getPosition(v, x, vv);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v,HalfEdgeUtils.isBoundaryVertex(v));
+			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, adapters);
 
 			double[] angles = new double[geodesicPairs.size()];
 			int i = 0;
@@ -133,7 +137,7 @@ public class ExteriorGeodesicFunctional<
 		for (V v : hds.getVertices()) {
 				FunctionalUtils.getPosition(v, x, vv);
 				int vi = v.getIndex();
-				Map<E, E> geodesicPairs = findGeodesicPairs(v,HalfEdgeUtils.isBoundaryVertex(v));
+				Map<E, E> geodesicPairs = findGeodesicPairs(v, false, adapters);
 				double[] angles = new double[geodesicPairs.size()];
 				int i = 0;
 				for (E e : geodesicPairs.keySet()) {

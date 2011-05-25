@@ -12,7 +12,6 @@ import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
-import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
 import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.halfedgetools.plugin.widget.ViewSwitchWidget;
@@ -27,6 +26,7 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.data.GeodesicEdgeCurvature;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
@@ -72,6 +72,7 @@ public class VaryLabGridShells {
 		v.registerPlugins(HalfedgePluginFactory.createSelectionPlugins());
 		v.registerPlugins(HalfedgePluginFactory.createSubdivisionPlugins());
 		v.registerPlugins(HalfedgePluginFactory.createEditingPlugins());
+		v.registerPlugins(HalfedgePluginFactory.createDataVisualizationPlugins());
 		v.registerPlugin(new MarqueeWidget());
 		v.registerPlugin(new ViewSwitchWidget());
 		v.registerPlugin(new ContextMenuWidget());
@@ -113,6 +114,7 @@ public class VaryLabGridShells {
 		
 		v.registerPlugin(HalfedgePreferencePage.class);
 		v.registerPlugin(VisualizationInterface.class);
+		v.registerPlugin(GeodesicEdgeCurvature.class);
 	}
 
 
@@ -125,7 +127,7 @@ public class VaryLabGridShells {
 
 
 	private static void addVisualizerPlugins(JRViewer v) {
-		v.registerPlugin(EdgeLengthVisualizer.class);
+//		v.registerPlugin(EdgeLengthVisualizer.class);
 //		v.registerPlugin(FacePlanarityVisualizer.class);
 //		v.registerPlugin(DirichletEnergyVisualizer.class);
 //		v.registerPlugin(OddVertexVisualizer.class);
