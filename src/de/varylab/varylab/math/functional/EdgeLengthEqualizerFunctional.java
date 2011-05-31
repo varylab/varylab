@@ -102,7 +102,7 @@ public class EdgeLengthEqualizerFunctional <
 		return hds.numVertices() * 3;
 	}
 
-	
+	@Override
 	public <HDS extends de.jtem.halfedge.HalfEdgeDataStructure<V,E,F>> int[][] getNonZeroPattern(HDS hds) {
 		return null;
 	};
