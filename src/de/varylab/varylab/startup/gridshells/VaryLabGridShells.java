@@ -12,6 +12,7 @@ import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
 import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.halfedgetools.plugin.widget.ViewSwitchWidget;
@@ -127,7 +128,7 @@ public class VaryLabGridShells {
 
 
 	private static void addVisualizerPlugins(JRViewer v) {
-//		v.registerPlugin(EdgeLengthVisualizer.class);
+		v.registerPlugin(EdgeLengthVisualizer.class);
 //		v.registerPlugin(FacePlanarityVisualizer.class);
 //		v.registerPlugin(DirichletEnergyVisualizer.class);
 //		v.registerPlugin(OddVertexVisualizer.class);
