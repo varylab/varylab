@@ -31,6 +31,7 @@ import de.varylab.varylab.plugin.data.GeodesicEdgeCurvature;
 import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
+import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
@@ -105,7 +106,7 @@ public class VaryLabGridShells {
 //		v.registerPlugin(BoundaryEarsSelection.class);
 //		v.registerPlugin(CollapseToNeighborPlugin.class);
 //		v.registerPlugin(TextureGeometryGenerator.class);
-//		v.registerPlugin(FitTexturePlugin.class);
+		v.registerPlugin(FitTexturePlugin.class);
 //		v.registerPlugin(StitchingPlugin.class);
 //		v.registerPlugin(StitchCutPathPlugin.class);
 //		v.registerPlugin(CollapseTrianglesPlugin.class);
