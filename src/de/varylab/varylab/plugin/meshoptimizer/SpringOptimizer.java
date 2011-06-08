@@ -141,7 +141,7 @@ public class SpringOptimizer extends OptimizerPlugin implements ChangeListener, 
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
-		if(updateLength.isSelected()){
+		if(updateLength.isSelected() || constantButton.isSelected()){
 			updateLength(hds);
 		}
 		functional.setDiagonals(diagonalsBox.isSelected());
