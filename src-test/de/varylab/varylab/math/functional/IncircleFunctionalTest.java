@@ -42,7 +42,7 @@ public class IncircleFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new IncircleFunctional());
+		setFunctional(new IncircleFunctional());
 	}
 	
 }

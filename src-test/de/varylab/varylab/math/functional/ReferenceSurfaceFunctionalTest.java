@@ -50,7 +50,7 @@ public class ReferenceSurfaceFunctionalTest extends FunctionalTest<VVertex, VEdg
 		as.add(new VPositionAdapter());
 		as.add(new NormalAdapter());
 		functional.setReferenceSurface(refSurface, as);
-		setFuctional(functional);
+		setFunctional(functional);
 	}
 	
 }

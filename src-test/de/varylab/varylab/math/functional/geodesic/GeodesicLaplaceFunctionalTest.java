@@ -35,7 +35,7 @@ public class GeodesicLaplaceFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new GeodesicLaplaceFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new GeodesicLaplaceFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

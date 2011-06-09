@@ -35,7 +35,7 @@ public class GeodesicAngleFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new GeodesicAngleFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new GeodesicAngleFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

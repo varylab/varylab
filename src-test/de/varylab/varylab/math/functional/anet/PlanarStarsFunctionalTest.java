@@ -33,6 +33,6 @@ public class PlanarStarsFunctionalTest extends
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new PlanarStarFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1.0));
+		setFunctional(new PlanarStarFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1.0));
 	}
 }

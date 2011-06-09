@@ -38,7 +38,7 @@ public class ConstantDirectionFieldTest extends FunctionalTest<DefaultJRVertex, 
 		setXGradient(pos);
 //		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new ConstantDirectionFieldFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1,new double[]{0,0,1}));		
+		setFunctional(new ConstantDirectionFieldFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1,new double[]{0,0,1}));		
 	}
 	
 	@Override

@@ -45,7 +45,7 @@ public class CircularFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace
 		setHDS(hds);
 		CircularFunctional<VVertex, VEdge, VFace> functional =
 			new CircularFunctional<VVertex, VEdge, VFace>();
-		setFuctional(functional);
+		setFunctional(functional);
 	}
 	
 	@Override

@@ -35,7 +35,7 @@ public class WillmoreFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new WillmoreFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new WillmoreFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

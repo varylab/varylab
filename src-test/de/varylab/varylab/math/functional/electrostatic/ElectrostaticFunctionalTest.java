@@ -33,7 +33,7 @@ public class ElectrostaticFunctionalTest extends
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new ElectrostaticFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new ElectrostaticFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

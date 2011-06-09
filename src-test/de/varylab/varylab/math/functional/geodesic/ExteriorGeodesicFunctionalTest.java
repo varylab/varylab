@@ -35,7 +35,7 @@ public class ExteriorGeodesicFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new ExteriorGeodesicFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new ExteriorGeodesicFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

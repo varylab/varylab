@@ -46,7 +46,7 @@ public class EqualDiagonalsFunctionalTest
 		setXGradient(pos);
 		setHDS(hds);
 		AdapterSet aSet = new AdapterSet();
-		setFuctional(new EqualDiagonalsFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(aSet));
+		setFunctional(new EqualDiagonalsFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(aSet));
 	}
 
 }

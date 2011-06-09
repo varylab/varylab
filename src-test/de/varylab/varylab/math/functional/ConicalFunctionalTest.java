@@ -44,7 +44,7 @@ public class ConicalFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new ConicalFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new ConicalFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

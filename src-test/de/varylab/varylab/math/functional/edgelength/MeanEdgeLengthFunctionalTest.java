@@ -77,7 +77,7 @@ public class MeanEdgeLengthFunctionalTest extends FunctionalTest<DefaultJRVertex
 		setXGradient(pos);
 		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new MeanEdgeLengthFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(l0, w));
+		setFunctional(new MeanEdgeLengthFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(l0, w));
 	}
 	
 	

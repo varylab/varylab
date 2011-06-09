@@ -34,7 +34,7 @@ public class ElectrostaticSphereFunctionalTest extends
 		setXGradient(pos);
 		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new ElectrostaticSphereFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new ElectrostaticSphereFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

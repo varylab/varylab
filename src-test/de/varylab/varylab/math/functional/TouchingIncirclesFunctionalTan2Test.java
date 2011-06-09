@@ -47,7 +47,7 @@ public class TouchingIncirclesFunctionalTan2Test extends FunctionalTest<VVertex,
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFuctional(new TouchingIncirclesFunctionalTan2());
+		setFunctional(new TouchingIncirclesFunctionalTan2());
 	}
 	
 }

@@ -65,7 +65,7 @@ public class EdgeLengthEqualizerFunctionalTest extends FunctionalTest<DefaultJRV
 		setXGradient(pos);
 		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new EdgeLengthEqualizerFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new EdgeLengthEqualizerFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 	
 	

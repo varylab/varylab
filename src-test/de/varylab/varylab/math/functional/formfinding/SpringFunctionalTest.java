@@ -42,7 +42,7 @@ public class SpringFunctionalTest extends FunctionalTest<DefaultJRVertex, Defaul
 		setXHessian(pos);
 		setHDS(hds);
 		LengthAdapter la = new LengthAdapter(0.0);
-		setFuctional(new SpringFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(
+		setFunctional(new SpringFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(
 			la, new ConstantWeightAdapter(1),false)
 		);
 	}
