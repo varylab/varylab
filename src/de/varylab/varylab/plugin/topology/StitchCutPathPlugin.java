@@ -1,9 +1,8 @@
 package de.varylab.varylab.plugin.topology;
 
-import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryEdge;
 import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryVertex;
-import static de.varylab.varylab.plugin.topology.StitchingUtility.stitch;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import de.jtem.halfedge.Edge;
@@ -38,31 +37,62 @@ public class StitchCutPathPlugin extends AlgorithmPlugin{
 		HalfedgeSelection selection = hi.getSelection();
 		Set<V> vSel = selection.getVertices(hds);
 		Set<E> eSel = selection.getEdges(hds);
-		if(vSel.size() != 1) throw new RuntimeException("Please select one boundary vertex and edge");
 		
-		V startV = vSel.iterator().next();
-		E endE = eSel.iterator().next();
-
-		if (!isBoundaryVertex(startV)) throw new RuntimeException("No boundary Vertex as Start");
-		if (!isBoundaryEdge(endE)) throw new RuntimeException("No Boundary Edge as End");
-		
-		E e1 = startV.getIncomingEdge();
-		while (e1.getLeftFace() != null) {
-			e1 = e1.getNextEdge().getOppositeEdge();
+		if (vSel.size() != 2 || eSel.size() == 0) {
+			throw new RuntimeException("Please select two boundary vertices to identify and a boundary edge on the stitch path.");
 		}
-		E e2 = e1.getNextEdge();
-		while (true) {
-			V v1 = e1.getStartVertex();
-			V v2 = e2.getTargetVertex();
-			E nextE1 = e1.getPreviousEdge();
-			E nextE2 = e2.getNextEdge();
-			stitch(hds, a.querySet(double[].class), v1, v2);
-			if (eSel.contains(e1) || eSel.contains(e2)) {
-				break;
+		Iterator<V> vIt = vSel.iterator();
+		V vs1 = vIt.next();
+		V vs2 = vIt.next();
+		if (!isBoundaryVertex(vs1) || !isBoundaryVertex(vs2)) {
+			throw new RuntimeException("Please select two boundary vertices");
+		}
+		E be = eSel.iterator().next();
+		if (be.getLeftFace() != null) {
+			be = be.getOppositeEdge();
+		}
+		if (be.getLeftFace() != null) {
+			throw new RuntimeException("Please select a boundary edge.");
+		}
+		// find edges at end-vertices
+		E walker = be;
+		E es1 = null;
+		E es2 = null;
+		int counter = 0;
+		boolean count = false;
+		do {
+			if ((walker.getTargetVertex() == vs1 || walker.getTargetVertex() == vs2) && es2 == null) {
+				es2 = walker;
+				if (walker.getTargetVertex() == vs1) { // wrong labelling 
+					V tmpV = vs2;
+					vs2 = vs1;
+					vs1 = tmpV;
+				}
 			}
-			e1 = nextE1;
-			e2 = nextE2;
+			if (walker.getStartVertex() == vs1 && es2 != null) {
+				es1 = walker;
+				count = true;
+				counter = 1;
+			}
+			if (count) {
+				counter++;
+			}
+			walker = walker.getNextEdge();
+		} while (walker != es2); 
+		System.out.println("start edges: " + es1 + ", " + es2);
+		System.out.println("Stitch Set size: " + counter);
+		if (es1 == null || es2 == null) {
+			throw new RuntimeException("Cannot find end edges");
 		}
+		if (counter % 2 != 0) {
+			throw new RuntimeException("Odd number of edges on stitch path");
+		}
+		walker = es1;
+		for (int i = 0; i < counter / 2; i++) {
+			walker = walker.getNextEdge();
+		}
+		V v = walker.getStartVertex();
+		StitchingUtility.stitch(hds, v, counter / 2, a);
 		hi.set(hds);
 	}
 }

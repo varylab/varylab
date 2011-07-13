@@ -39,7 +39,7 @@ public class StitchingPlugin extends AlgorithmPlugin{
 		}
 		Iterator<V> si = vertices.iterator();
 		V v1 = si.next(), v2 = si.next();
-		StitchingUtility.stitch(hds, a.querySet(double[].class), v1, v2);
+		StitchingUtility.stitch(hds, v1, v2, a);
 		hi.set(hds);
 	}
 }

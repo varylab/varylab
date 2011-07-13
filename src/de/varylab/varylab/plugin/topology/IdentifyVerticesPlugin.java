@@ -131,7 +131,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 
 				Vertex<?,?,?> w = identificationMap.get(v);
 
-				StitchingUtility.stitch(hds, da, (V)v, (V)w);
+				StitchingUtility.stitch(hds, (V)v, (V)w, da);
 				alreadyMerged.add(v);
 				alreadyMerged.add(w);
 			}
