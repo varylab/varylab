@@ -350,6 +350,9 @@ public class RemeshingUtility {
 			lastEdge = e2;
 		}
 		assert lastEdge != null;
+		if (lastEdge == null) {
+			throw new RuntimeException("Cannot link last and first edge in insertVertexStellar()");
+		}
 		lastEdge.linkOppositeEdge(firstEdge);
 		return v;
 	}

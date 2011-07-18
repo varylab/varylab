@@ -67,10 +67,10 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			MTJGradient grad = G == null ? null : G2;
 			MTJHessian hess = H == null ? null : new MTJHessian(new DenseMatrix(dim, dim));;
 			fun.evaluate(hds, x, ener, grad, hess);
-			if (E != null) {
+			if (E != null && ener != null) {
 				E.add(coeff * ener.E);
 			}
-			if (G != null) {
+			if (G != null && grad != null) {
 				for (int i = 0; i < dim; i++) {
 					double val = coeff * grad.G.get(i);
 					if (val != 0.0) {
@@ -78,7 +78,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 					}
 				}
 			}
-			if (H != null) {
+			if (H != null && hess != null) {
 				for (int i = 0; i < dim; i++) {
 					for (int j = 0; j < dim; j++) {
 						double val = coeff * hess.H.get(i, j);

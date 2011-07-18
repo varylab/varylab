@@ -89,6 +89,9 @@ public class FixingConstraint implements Constraint{
 					}
 				}
 				assert v1 != null;
+				if (v1 == null) {
+					throw new RuntimeException("cannot find next vertex on boundary in editGradient()");
+				}
 				double[] w1 = Rn.subtract(null, v1.position, v.position);
 				double[] grad = new double[] {G.get(i * 3 + 0), G.get(i * 3 + 1), G.get(i * 3 + 2)};
 				Rn.projectOnto(grad, grad, w1);
