@@ -1,7 +1,5 @@
 package de.varylab.varylab.plugin.remeshing;
 
-import static de.varylab.jtao.TaoAppAddHess.PreconditionerType.SAME_NONZERO_PATTERN;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,14 +18,14 @@ import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.jpetsc.InsertMode;
-import de.varylab.jpetsc.Mat;
-import de.varylab.jpetsc.Vec;
-import de.varylab.jtao.Tao;
-import de.varylab.jtao.Tao.GetSolutionStatusResult;
-import de.varylab.jtao.TaoAppAddCombinedObjectiveAndGrad;
-import de.varylab.jtao.TaoAppAddHess;
-import de.varylab.jtao.TaoApplication;
+import de.jtem.jpetsc.InsertMode;
+import de.jtem.jpetsc.Mat;
+import de.jtem.jpetsc.Vec;
+import de.jtem.jtao.Tao;
+import de.jtem.jtao.Tao.GetSolutionStatusResult;
+import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
+import de.jtem.jtao.TaoAppAddHess;
+import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.math.CombinedOptimizableTao.TaoU;
 import de.varylab.varylab.math.SimpleEnergy;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
@@ -382,7 +380,7 @@ public class SpringRemeshingUtility {
 			fun.evaluate(hds, u, null, null, taoHess);
 			applyConstraints(u, null, taoHess);
 			H.assemble();
-			return SAME_NONZERO_PATTERN;
+			return PreconditionerType.SAME_NONZERO_PATTERN;
 		}
 		
 		

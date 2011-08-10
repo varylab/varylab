@@ -1,8 +1,5 @@
 package de.varylab.varylab.math;
 
-import static de.varylab.jpetsc.InsertMode.INSERT_VALUES;
-import static de.varylab.jtao.TaoAppAddHess.PreconditionerType.SAME_NONZERO_PATTERN;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,11 +7,12 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.jpetsc.Mat;
-import de.varylab.jpetsc.Vec;
-import de.varylab.jtao.TaoAppAddCombinedObjectiveAndGrad;
-import de.varylab.jtao.TaoAppAddHess;
-import de.varylab.jtao.TaoApplication;
+import de.jtem.jpetsc.InsertMode;
+import de.jtem.jpetsc.Mat;
+import de.jtem.jpetsc.Vec;
+import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
+import de.jtem.jtao.TaoAppAddHess;
+import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.VertexDomainValueAdapter;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
@@ -65,7 +63,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 
 		@Override
 		public void set(int i, double value) {
-			u.setValue(i, value, INSERT_VALUES);
+			u.setValue(i, value, InsertMode.INSERT_VALUES);
 		}
 
 		@Override
@@ -97,7 +95,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 
 		@Override
 		public void set(int i, double value) {
-			G.setValue(i, value, INSERT_VALUES);
+			G.setValue(i, value, InsertMode.INSERT_VALUES);
 		}
 		
 		@Override
@@ -134,7 +132,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 
 		@Override
 		public void set(int i, int j, double value) {
-			H.setValue(i, j, value, INSERT_VALUES);
+			H.setValue(i, j, value, InsertMode.INSERT_VALUES);
 		}
 		
 		@Override
@@ -181,7 +179,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		fun.evaluate(hds, u, null, null, taoHess);
 		applyConstraints(u, null, taoHess);
 		H.assemble();
-		return SAME_NONZERO_PATTERN;
+		return PreconditionerType.SAME_NONZERO_PATTERN;
 	}
 
 	

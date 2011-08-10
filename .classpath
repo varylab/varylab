@@ -6,7 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
-	<classpathentry kind="lib" path="lib/jPETScTaoV1.7jPETScTao.jar"/>
 	<classpathentry kind="lib" path="lib/fhlaf_1.0b2_bin.jar"/>
 	<classpathentry kind="lib" path="lib/tinylaf-1.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/synthetica.jar"/>
@@ -23,5 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
 	<classpathentry kind="src" path="/jrworkspace"/>
 	<classpathentry kind="lib" path="lib/HyperbolicNets.jar"/>
+	<classpathentry kind="lib" path="lib/jPETScTao.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

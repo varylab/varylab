@@ -3,7 +3,7 @@ package de.varylab.varylab.hds.adapter;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
-import de.varylab.jpetsc.Vec;
+import de.jtem.jpetsc.Vec;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;

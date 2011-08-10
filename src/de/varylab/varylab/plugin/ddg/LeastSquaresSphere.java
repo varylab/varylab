@@ -13,9 +13,9 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
-import de.varylab.jpetsc.InsertMode;
-import de.varylab.jpetsc.Vec;
-import de.varylab.jtao.Tao;
+import de.jtem.jpetsc.InsertMode;
+import de.jtem.jpetsc.Vec;
+import de.jtem.jtao.Tao;
 import de.varylab.varylab.math.LeastSquaresSphereTao;
 
 public class LeastSquaresSphere extends AlgorithmPlugin {

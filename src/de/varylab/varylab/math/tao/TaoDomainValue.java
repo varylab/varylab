@@ -3,9 +3,9 @@
  */
 package de.varylab.varylab.math.tao;
 
-import static de.varylab.jpetsc.InsertMode.INSERT_VALUES;
 import de.jtem.halfedgetools.functional.DomainValue;
-import de.varylab.jpetsc.Vec;
+import de.jtem.jpetsc.InsertMode;
+import de.jtem.jpetsc.Vec;
 
 public class TaoDomainValue implements DomainValue {
 
@@ -23,7 +23,7 @@ public class TaoDomainValue implements DomainValue {
 
 	@Override
 	public void set(int i, double value) {
-		u.setValue(i, value, INSERT_VALUES);
+		u.setValue(i, value, InsertMode.INSERT_VALUES);
 	}
 
 	@Override
