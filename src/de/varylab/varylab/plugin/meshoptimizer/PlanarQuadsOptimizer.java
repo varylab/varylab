@@ -23,10 +23,10 @@ import de.varylab.varylab.hds.adapter.AdaptedFaceWeightFunction;
 import de.varylab.varylab.math.functional.DiagonalDistanceFunctional;
 import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.math.functional.VolumeFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class PlanarQuadsOptimizer extends OptimizerPlugin {
+public class PlanarQuadsOptimizer extends VarylabOptimizerPlugin {
 
 	private VolumeFunctional<VVertex, VEdge, VFace>
 		volFunctional = new VolumeFunctional<VVertex, VEdge, VFace>(new ConstantWeight(1.0), 1, 1.0);

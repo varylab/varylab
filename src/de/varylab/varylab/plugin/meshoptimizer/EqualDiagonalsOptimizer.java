@@ -10,9 +10,9 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.EqualDiagonalsFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
-public class EqualDiagonalsOptimizer extends OptimizerPlugin {
+public class EqualDiagonalsOptimizer extends VarylabOptimizerPlugin {
 
 	private HalfedgeInterface
 		hi = null;

@@ -34,10 +34,10 @@ import de.varylab.varylab.hds.adapter.LengthRangeAdapter;
 import de.varylab.varylab.hds.adapter.OriginalLength;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.SpringFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class SpringOptimizer extends OptimizerPlugin implements ChangeListener, ActionListener { 
+public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeListener, ActionListener { 
 	
 	private final String AVERAGE = "average";
 

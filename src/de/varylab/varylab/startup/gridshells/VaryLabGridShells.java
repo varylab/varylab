@@ -36,6 +36,7 @@ import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
+import de.varylab.varylab.startup.StaticSetup;
 
 public class VaryLabGridShells {
 
@@ -201,6 +202,7 @@ public class VaryLabGridShells {
 	public static void main(String[] args) throws Exception {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
+		StaticSetup.includePluginJars();
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();

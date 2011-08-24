@@ -34,9 +34,9 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.ReferenceSurfaceFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
-public class ReferenceSurfaceOptimizer extends OptimizerPlugin implements ActionListener, UIFlavor {
+public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements ActionListener, UIFlavor {
 
 
 	private ReferenceSurfaceFunctional<VVertex, VEdge, VFace>

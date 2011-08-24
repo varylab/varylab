@@ -7,10 +7,10 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class ElectrostaticSphereOptimizer extends OptimizerPlugin {
+public class ElectrostaticSphereOptimizer extends VarylabOptimizerPlugin {
 
 	private ElectrostaticSphereFunctional<VVertex, VEdge, VFace>
 		functional = new ElectrostaticSphereFunctional<VVertex, VEdge, VFace>();

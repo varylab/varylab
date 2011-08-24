@@ -7,7 +7,7 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.IncircleFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 /**
  * An optimizer that optimizes a given quad-triangle mesh
@@ -16,7 +16,7 @@ import de.varylab.varylab.plugin.OptimizerPlugin;
  * @author sechel
  *
  */
-public class IncircleOptimizer extends OptimizerPlugin {
+public class IncircleOptimizer extends VarylabOptimizerPlugin {
 
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {

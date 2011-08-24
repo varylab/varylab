@@ -8,10 +8,10 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.PlanarStarFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class ANetOptimizer extends OptimizerPlugin {
+public class ANetOptimizer extends VarylabOptimizerPlugin {
 
 	private PlanarStarFunctional<VVertex, VEdge, VFace>
 		functional = new PlanarStarFunctional<VVertex, VEdge, VFace>(1.0);
@@ -42,7 +42,7 @@ public class ANetOptimizer extends OptimizerPlugin {
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("A Net Optimizer", "Thilo Rörig");
+		PluginInfo info = new PluginInfo("A Net Optimizer", "Thilo RÃ¶rig");
 		info.icon = ImageHook.getIcon("combinatorics.png");
 		return info;
 	}

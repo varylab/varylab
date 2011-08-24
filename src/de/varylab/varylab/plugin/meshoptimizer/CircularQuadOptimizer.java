@@ -7,9 +7,9 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.CircularFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
-public class CircularQuadOptimizer extends OptimizerPlugin {
+public class CircularQuadOptimizer extends VarylabOptimizerPlugin {
 
 	private CircularFunctional<VVertex, VEdge, VFace>
 		functional = new CircularFunctional<VVertex, VEdge, VFace>();

@@ -16,10 +16,10 @@ import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.hds.adapter.ConstantWeight;
 import de.varylab.varylab.math.functional.MeanEdgeLengthFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class MeanEdgeLengthOptimizer extends OptimizerPlugin {
+public class MeanEdgeLengthOptimizer extends VarylabOptimizerPlugin {
 
 	private JPanel
 		panel = new JPanel();

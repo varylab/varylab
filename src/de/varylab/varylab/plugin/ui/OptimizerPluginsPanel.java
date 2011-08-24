@@ -40,14 +40,14 @@ import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSelectionListener {
 
 	private Map<String, Double>
 		coefficientMap = new HashMap<String, Double>();
-	private List<OptimizerPlugin>
-		optimizerPlugins = new LinkedList<OptimizerPlugin>();
+	private List<VarylabOptimizerPlugin>
+		optimizerPlugins = new LinkedList<VarylabOptimizerPlugin>();
 	private JTable
 		pluginTable = new JTable();
 	private JPanel
@@ -105,7 +105,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		}
 		if (row < 0 || row >= optimizerPlugins.size()) return;
 		pluginOptionsPanel.removeAll();
-		OptimizerPlugin p = optimizerPlugins.get(row);
+		VarylabOptimizerPlugin p = optimizerPlugins.get(row);
 		if (p.getOptionPanel() == null) {
 			pluginOptionsPanel.add(new JLabel("No Options"));
 			pluginOptionsPanel.updateUI();
@@ -137,7 +137,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			switch (columnIndex) {
 				case 0: return Icon.class;
 				case 1: return Boolean.class;
-				case 2: return OptimizerPlugin.class;
+				case 2: return VarylabOptimizerPlugin.class;
 				case 3: return Double.class;
 				default: return String.class;
 			}
@@ -148,7 +148,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			if (row < 0 || row >= optimizerPlugins.size()) {
 				return "-";
 			}
-			OptimizerPlugin op = optimizerPlugins.get(row);
+			VarylabOptimizerPlugin op = optimizerPlugins.get(row);
 			Object value = null;
 			switch (column) {
 				case 0:
@@ -218,7 +218,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			OptimizerPlugin op = optimizerPlugins.get(activeRow);
+			VarylabOptimizerPlugin op = optimizerPlugins.get(activeRow);
 			setCoefficient(op, model.getNumber().doubleValue());
 		}
 
@@ -241,27 +241,27 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			if (pluginTable.getRowSorter() != null) {
 				row = pluginTable.getRowSorter().convertRowIndexToModel(row);
 			}
-			OptimizerPlugin op = optimizerPlugins.get(row);
+			VarylabOptimizerPlugin op = optimizerPlugins.get(row);
 			setActive(op, !isActive(op));
 		}
 		
 	}
 
-	public double getCoefficient(OptimizerPlugin op) {
+	public double getCoefficient(VarylabOptimizerPlugin op) {
 		if (!coefficientMap.containsKey(op.getName())) {
 			coefficientMap.put(op.getName(), 1.0);
 		}
 		return coefficientMap.get(op.getName());
 	}
-	private void setCoefficient(OptimizerPlugin op, double coeff) {
+	private void setCoefficient(VarylabOptimizerPlugin op, double coeff) {
 		coefficientMap.put(op.getName(), coeff);
 	}
 	
-	public boolean isActive(OptimizerPlugin op) {
+	public boolean isActive(VarylabOptimizerPlugin op) {
 		return activateSet.contains(op.getName());
 	}
 	
-	private void setActive(OptimizerPlugin op, boolean active) {
+	private void setActive(VarylabOptimizerPlugin op, boolean active) {
 		if (!active) {
 			activateSet.remove(op.getName());
 		} else {
@@ -279,12 +279,12 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		pluginTable.getColumnModel().getColumn(3).setCellRenderer(spinnerCellRenderer);
 	}
 	
-	public void addOptimizerPlugin(OptimizerPlugin op) {
+	public void addOptimizerPlugin(VarylabOptimizerPlugin op) {
 		optimizerPlugins.add(op);
 		updatePluginTable();
 	}
 	
-	public void removeOptimizerPlugin(OptimizerPlugin op) {
+	public void removeOptimizerPlugin(VarylabOptimizerPlugin op) {
 		optimizerPlugins.remove(op);
 		pluginTable.revalidate();
 		updatePluginTable();
@@ -305,13 +305,13 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		coefficientMap = c.getProperty(getClass(), "coefficientsMap", coefficientMap);
 	}
 	
-	public List<OptimizerPlugin> getAllOptimizers() {
+	public List<VarylabOptimizerPlugin> getAllOptimizers() {
 		return optimizerPlugins;
 	}
 	
-	public List<OptimizerPlugin> getActiveOptimizers() {
-		List<OptimizerPlugin> result = new LinkedList<OptimizerPlugin>();
-		for (OptimizerPlugin p : getAllOptimizers()) {
+	public List<VarylabOptimizerPlugin> getActiveOptimizers() {
+		List<VarylabOptimizerPlugin> result = new LinkedList<VarylabOptimizerPlugin>();
+		for (VarylabOptimizerPlugin p : getAllOptimizers()) {
 			if (isActive(p)) {
 				result.add(p);
 			}

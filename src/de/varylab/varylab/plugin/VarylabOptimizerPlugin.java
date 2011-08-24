@@ -13,7 +13,7 @@ import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.ui.OptimizerPluginsPanel;
 
-public abstract class OptimizerPlugin extends Plugin implements UIFlavor {
+public abstract class VarylabOptimizerPlugin extends Plugin implements UIFlavor {
 
 	protected OptimizerPluginsPanel
 		manager = null;

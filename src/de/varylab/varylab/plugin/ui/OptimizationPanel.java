@@ -56,7 +56,7 @@ import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableTao;
 import de.varylab.varylab.math.FixingConstraint;
 import de.varylab.varylab.math.TangentialConstraint;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
@@ -307,7 +307,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		DomainValue x = createPositionValue(hds);
 		List<Functional<VVertex, VEdge, VFace>> funs = new LinkedList<Functional<VVertex,VEdge,VFace>>();
 		Map<Functional<?, ?, ?>, Double> coeffs = new HashMap<Functional<?,?,?>, Double>();
-		for (OptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
 			Functional<VVertex, VEdge, VFace> fun = op.getFunctional(hds);
 			funs.add(fun);
 			

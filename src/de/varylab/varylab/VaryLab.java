@@ -107,6 +107,7 @@ import de.varylab.varylab.plugin.visualizers.IncircleVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
+import de.varylab.varylab.startup.StaticSetup;
 
 public class VaryLab {
 
@@ -259,6 +260,7 @@ public class VaryLab {
 	public static void main(String[] args) throws Exception {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
+		StaticSetup.includePluginJars();
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();

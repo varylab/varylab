@@ -7,9 +7,9 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.ConicalFunctional;
-import de.varylab.varylab.plugin.OptimizerPlugin;
+import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
-public class ConicalOptimizer extends OptimizerPlugin {
+public class ConicalOptimizer extends VarylabOptimizerPlugin {
 
 	private ConicalFunctional<VVertex, VEdge, VFace>
 		functional = new ConicalFunctional<VVertex, VEdge, VFace>();
