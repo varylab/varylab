@@ -19,6 +19,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	public VarylabSplashScreen() {
 		super();
+		setIconImage(ImageHook.getImage("main_03.png"));
 		setLayout(new BorderLayout());
 		add(image, BorderLayout.CENTER);
 		add(progressBar, BorderLayout.SOUTH);

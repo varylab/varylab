@@ -21,7 +21,6 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
-import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
@@ -34,13 +33,17 @@ import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
+import de.varylab.varylab.plugin.ui.VarylabMain;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.startup.StaticSetup;
+import de.varylab.varylab.startup.VarylabSplashScreen;
 
 public class VaryLabGridShells {
 
 	private static void addVaryLabPlugins(JRViewer v) {
+		v.registerPlugin(VarylabMain.class);
+		
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new VPositionAdapter(), true);
 		hif.addAdapter(new VTexturePositionAdapter(), true);
@@ -202,10 +205,14 @@ public class VaryLabGridShells {
 	public static void main(String[] args) throws Exception {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
+		StaticSetup.includeLibraryJars();
 		StaticSetup.includePluginJars();
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
+		VarylabSplashScreen splash = new VarylabSplashScreen();
+		splash.setVisible(true);
+		v.setSplashScreen(splash);
 		v.getController().setManageLookAndFeel(true);
 		v.setPropertiesFile("VaryLabGridShells.xml");
 		v.setPropertiesResource(VaryLabGridShells.class, "VaryLabGridShells.xml");
@@ -217,7 +224,7 @@ public class VaryLabGridShells {
 		v.addContentUI();
 		addVaryLabPlugins(v);
 		v.startup();
-		v.getPlugin(HalfedgeInterface.class).set(new VHDS());
+		splash.setVisible(false);
 	}
 
 }

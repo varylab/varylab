@@ -54,4 +54,20 @@ public class StaticSetup {
 		}
 	}
 	
+	public static void includeLibraryJars() {
+		File libraryFolder = new File("bin");
+		if (!libraryFolder.exists()) return;
+		String[] jars = libraryFolder.list(new JarFilter());
+		for (String jarName : jars) {
+			String jarPath = libraryFolder.getAbsolutePath() + "/" + jarName;
+			File f = new File(jarPath);
+			try {
+				URL url = f.toURI().toURL();
+				addURL(url);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 }

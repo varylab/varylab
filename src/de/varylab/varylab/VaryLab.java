@@ -27,7 +27,6 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
-import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
@@ -49,6 +48,7 @@ import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
+import de.varylab.varylab.plugin.lnf.SubstanceLnF;
 import de.varylab.varylab.plugin.lnf.SyntheticaBlackEyeLnf;
 import de.varylab.varylab.plugin.lnf.SyntheticaStandardLnf;
 import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
@@ -93,6 +93,7 @@ import de.varylab.varylab.plugin.topology.StitchCutPathPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
 import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
+import de.varylab.varylab.plugin.ui.VarylabMain;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.plugin.ui.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
@@ -113,6 +114,8 @@ import de.varylab.varylab.startup.VarylabSplashScreen;
 public class VaryLab {
 
 	private static void addVaryLabPlugins(JRViewer v) {
+		v.registerPlugin(VarylabMain.class);
+		
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new VPositionAdapter(), true);
 		hif.addAdapter(new VTexturePositionAdapter(), true);
@@ -245,6 +248,7 @@ public class VaryLab {
 		v.registerPlugin(SystemLookAndFeel.class);
 		v.registerPlugin(SyntheticaStandardLnf.class);
 		v.registerPlugin(SyntheticaBlackEyeLnf.class);
+		v.registerPlugin(SubstanceLnF.class);
 	}
 	
 	private static void addDDGPlugins(JRViewer v) {
@@ -262,7 +266,8 @@ public class VaryLab {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
 		StaticSetup.includePluginJars();
-		View.setIcon(ImageHook.getIcon("surface.png"));
+		StaticSetup.includeLibraryJars();
+		View.setIcon(ImageHook.getIcon("main_03.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
 		VarylabSplashScreen splash = new VarylabSplashScreen();
@@ -280,7 +285,6 @@ public class VaryLab {
 		addVaryLabPlugins(v);
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
-		v.getPlugin(HalfedgeInterface.class).set(new VHDS());
 		splash.setVisible(false);
 	}
 
