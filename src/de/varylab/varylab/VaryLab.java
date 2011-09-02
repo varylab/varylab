@@ -108,6 +108,7 @@ import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
 import de.varylab.varylab.startup.StaticSetup;
+import de.varylab.varylab.startup.VarylabSplashScreen;
 
 public class VaryLab {
 
@@ -264,6 +265,9 @@ public class VaryLab {
 		View.setIcon(ImageHook.getIcon("surface.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
+		VarylabSplashScreen splash = new VarylabSplashScreen();
+		splash.setVisible(true);
+		v.setSplashScreen(splash);
 		v.getController().setManageLookAndFeel(true);
 		v.setPropertiesFile("VaryLab.xml");
 		v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
@@ -277,6 +281,7 @@ public class VaryLab {
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
 		v.getPlugin(HalfedgeInterface.class).set(new VHDS());
+		splash.setVisible(false);
 	}
 
 }
