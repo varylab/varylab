@@ -26,8 +26,8 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
-import de.varylab.varylab.plugin.data.GeodesicEdgeCurvature;
-import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
+import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
+import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
@@ -120,7 +120,7 @@ public class VaryLabGridShells {
 		
 		v.registerPlugin(HalfedgePreferencePage.class);
 		v.registerPlugin(VisualizationInterface.class);
-		v.registerPlugin(GeodesicEdgeCurvature.class);
+		v.registerPlugin(OppositeEdgesCurvature.class);
 	}
 
 
@@ -168,7 +168,7 @@ public class VaryLabGridShells {
 //		v.registerPlugin(ElectrostaticOptimizer.class);
 //		v.registerPlugin(ElectrostaticSphereOptimizer.class);
 //		v.registerPlugin(PlanarNGonsOptimizer.class);
-		v.registerPlugin(ExteriorGeodesicOptimizer.class);
+		v.registerPlugin(OppositeEdgesCurvatureOptimizer.class);
 		v.registerPlugin(ReferenceSurfaceOptimizer.class);
 //		v.registerPlugin(CircularQuadOptimizer.class);
 //		v.registerPlugin(ConicalOptimizer.class);

@@ -32,6 +32,7 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
 import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
 import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
@@ -60,8 +61,8 @@ import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.EqualDiagonalsOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.ExteriorGeodesicOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.GeodesicAngleOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
@@ -210,6 +211,9 @@ public class VaryLab {
 		v.registerPlugin(ConicalityVisualizer.class);
 		v.registerPlugin(IncircleVisualizer.class);
 		v.registerPlugin(DiagonalLengthVisualizer.class);
+		
+		// new data visualization interface
+		v.registerPlugin(OppositeEdgesCurvature.class);
 	}
 
 
@@ -217,7 +221,7 @@ public class VaryLab {
 		v.registerPlugin(MeanEdgeLengthOptimizer.class);
 		v.registerPlugin(PlanarQuadsOptimizer.class);
 		v.registerPlugin(WillmoreOptimizer.class);
-		v.registerPlugin(GeodesicAngleOptimizer.class);
+		v.registerPlugin(OppositeAnglesCurvatureOptimizer.class);
 		v.registerPlugin(GeodesicLaplaceOptimizer.class);
 		v.registerPlugin(ANetOptimizer.class);
 		v.registerPlugin(ConstantDirectionFieldPlugin.class);
@@ -226,7 +230,7 @@ public class VaryLab {
 		v.registerPlugin(ElectrostaticOptimizer.class);
 		v.registerPlugin(ElectrostaticSphereOptimizer.class);
 		v.registerPlugin(PlanarNGonsOptimizer.class);
-		v.registerPlugin(ExteriorGeodesicOptimizer.class);
+		v.registerPlugin(OppositeEdgesCurvatureOptimizer.class);
 		v.registerPlugin(ReferenceSurfaceOptimizer.class);
 		v.registerPlugin(CircularQuadOptimizer.class);
 		v.registerPlugin(ConicalOptimizer.class);

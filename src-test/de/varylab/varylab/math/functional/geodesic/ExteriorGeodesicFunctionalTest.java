@@ -11,7 +11,7 @@ import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
-import de.varylab.varylab.math.functional.ExteriorGeodesicFunctional;
+import de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional;
 
 public class ExteriorGeodesicFunctionalTest
 		extends
@@ -35,7 +35,7 @@ public class ExteriorGeodesicFunctionalTest
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		setFunctional(new ExteriorGeodesicFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+		setFunctional(new OppositeEdgesCurvatureFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 
 }

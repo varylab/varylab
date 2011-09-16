@@ -8,16 +8,16 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.ExteriorGeodesicFunctional;
+import de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class ExteriorGeodesicOptimizer extends VarylabOptimizerPlugin {
+public class OppositeEdgesCurvatureOptimizer extends VarylabOptimizerPlugin {
 
 	private HalfedgeInterface	
 		hif = null;
-	private ExteriorGeodesicFunctional<VVertex, VEdge, VFace>
-		functional = new ExteriorGeodesicFunctional<VVertex, VEdge, VFace>();
+	private OppositeEdgesCurvatureFunctional<VVertex, VEdge, VFace>
+		functional = new OppositeEdgesCurvatureFunctional<VVertex, VEdge, VFace>();
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
@@ -34,12 +34,12 @@ public class ExteriorGeodesicOptimizer extends VarylabOptimizerPlugin {
 	
 	@Override
 	public String getName() {
-		return "Exterior Geodesic Angle";
+		return "Opposite Edges Curvature";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Exterior Geodesic Angle Energy Optimizer", "Thilo Roerig");
+		PluginInfo info = new PluginInfo("Opposite Edges Curvature Optimizer", "Thilo Roerig");
 		info.icon = ImageHook.getIcon("angle.png");
 		return info;
 	}

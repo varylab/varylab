@@ -1,7 +1,7 @@
-package de.varylab.varylab.plugin.data;
+package de.varylab.varylab.plugin.datasource;
 
 import static de.jtem.halfedgetools.functional.FunctionalUtils.angle;
-import static de.varylab.varylab.math.functional.ExteriorGeodesicFunctional.findGeodesicPairs;
+import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
 import static java.lang.Math.PI;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public class GeodesicEdgeCurvature extends Plugin implements DataSourceProvider {
+public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider {
 
 	private GeodesicEdgeCurvatureAdapter
 		adapter = new GeodesicEdgeCurvatureAdapter();
@@ -55,7 +55,7 @@ public class GeodesicEdgeCurvature extends Plugin implements DataSourceProvider 
 		
 		@Override
 		public String toString() {
-			return "Exterior Geodesic Curvature";
+			return "Opposite Edges Curvature";
 		}
 		
 	}

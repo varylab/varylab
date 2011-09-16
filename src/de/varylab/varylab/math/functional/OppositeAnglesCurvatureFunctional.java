@@ -16,7 +16,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
-public class GeodesicAngleFunctional<
+public class OppositeAnglesCurvatureFunctional<
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>> 

@@ -22,7 +22,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.adapter.GeodesicLabel;
 
-public class ExteriorGeodesicFunctional<
+public class OppositeEdgesCurvatureFunctional<
 	V extends Vertex<V, E, F>, 
 	E extends Edge<V, E, F>, 
 	F extends Face<V, E, F>
