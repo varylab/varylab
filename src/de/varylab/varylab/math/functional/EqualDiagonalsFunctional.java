@@ -20,7 +20,7 @@ import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 
-public class EqualDiagonalsFunctional<
+public class EqualDiagonalsFunctional <
 	V extends Vertex<V, E, F>, 
 	E extends Edge<V, E, F>, 
 	F extends Face<V, E, F>> 

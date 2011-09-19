@@ -3,6 +3,7 @@ package de.varylab.varylab.math.functional;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -15,6 +16,9 @@ import de.varylab.varylab.hds.VVertex;
 
 public class CircularFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace> {
 
+	public CircularFunctional<VVertex, VEdge, VFace> 
+		functional = new CircularFunctional<VVertex, VEdge, VFace>();
+	
 	@Override
 	public void init() {
 		VHDS hds = new VHDS();
@@ -39,27 +43,14 @@ public class CircularFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace
 		}
 		
 		MyDomainValue pos = new MyDomainValue(result);
-		
 		setXGradient(pos);
-//		setXHessian(pos);
 		setHDS(hds);
-		CircularFunctional<VVertex, VEdge, VFace> functional =
-			new CircularFunctional<VVertex, VEdge, VFace>();
 		setFunctional(functional);
 	}
 	
-	@Override
-	@Test
-	public void testGradient() throws Exception {
-		super.testGradient();
-	}
-	
-	@Override
-	@Test
+	@Test@Override@Ignore
 	public void testHessian() throws Exception {
 		super.testHessian();
 	}
-	
-	
 
 }

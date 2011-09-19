@@ -4,9 +4,6 @@ import java.util.Random;
 
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
-
-import org.junit.Test;
-
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.functional.MyDomainValue;
@@ -46,19 +43,5 @@ public class SpringFunctionalTest extends FunctionalTest<DefaultJRVertex, Defaul
 			la, new ConstantWeightAdapter(1),false)
 		);
 	}
-	
-	@Override
-	@Test
-	public void testGradient() throws Exception {
-		super.testGradient();
-	}
-	
-	@Override
-	@Test
-	public void testHessian() throws Exception {
-		super.testHessian();
-	}
-	
-	
 
 }

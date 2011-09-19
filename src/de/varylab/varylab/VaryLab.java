@@ -32,6 +32,7 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
 import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
@@ -61,12 +62,12 @@ import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.EqualDiagonalsOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
-import de.varylab.varylab.plugin.meshoptimizer.GeodesicLaplaceOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.GeodesicCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.MeanEdgeLengthOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
@@ -214,6 +215,7 @@ public class VaryLab {
 		
 		// new data visualization interface
 		v.registerPlugin(OppositeEdgesCurvature.class);
+		v.registerPlugin(OppositeAnglesCurvature.class);
 	}
 
 
@@ -222,7 +224,7 @@ public class VaryLab {
 		v.registerPlugin(PlanarQuadsOptimizer.class);
 		v.registerPlugin(WillmoreOptimizer.class);
 		v.registerPlugin(OppositeAnglesCurvatureOptimizer.class);
-		v.registerPlugin(GeodesicLaplaceOptimizer.class);
+//		v.registerPlugin(GeodesicLaplaceOptimizer.class); // gradient not yet correctly implemented
 		v.registerPlugin(ANetOptimizer.class);
 		v.registerPlugin(ConstantDirectionFieldPlugin.class);
 //		v.registerPlugin(ConstantMeanCurvatureFieldPlugin.class);
@@ -241,6 +243,7 @@ public class VaryLab {
 //		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
 		v.registerPlugin(EqualDiagonalsOptimizer.class);
 		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
+		v.registerPlugin(GeodesicCurvatureOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(JRViewer v) {

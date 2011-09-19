@@ -2,6 +2,9 @@ package de.varylab.varylab.math.functional.anet;
 
 import java.util.Random;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -35,4 +38,10 @@ public class PlanarStarsFunctionalTest extends
 		setHDS(hds);
 		setFunctional(new PlanarStarFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1.0));
 	}
+	
+	@Test@Override@Ignore
+	public void testHessian() throws Exception {
+		super.testHessian();
+	}
+	
 }

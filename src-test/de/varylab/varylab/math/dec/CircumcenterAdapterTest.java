@@ -30,15 +30,6 @@ public class CircumcenterAdapterTest {
 		for (DefaultJRVertex v : hds.getVertices()) {
 			v.position = new double[] {random.nextDouble(), random.nextDouble(), random.nextDouble()};
 		}
-//		DefaultJRVertex 
-//			v1 = hds.addNewVertex(),
-//			v2 = hds.addNewVertex(),
-//			v3 = hds.addNewVertex();
-//	
-//		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v3);
-//		v1.position = new double[] {0.0,0.0,0.0};
-//		v2.position = new double[] {1.0,0.0,0.0};
-//		v3.position = new double[] {0.0,1.0,0.0};
 		
 		AdapterSet as = AdapterSet.createGenericAdapters();
 		as.add(new JRPositionAdapter());

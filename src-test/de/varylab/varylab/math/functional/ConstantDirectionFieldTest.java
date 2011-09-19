@@ -5,6 +5,7 @@ import java.util.Random;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.jtem.halfedgetools.functional.FunctionalTest;
@@ -36,23 +37,15 @@ public class ConstantDirectionFieldTest extends FunctionalTest<DefaultJRVertex, 
 		MyDomainValue pos = new MyDomainValue(result);
 		
 		setXGradient(pos);
-//		setXHessian(pos);
 		setHDS(hds);
 		setFunctional(new ConstantDirectionFieldFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(1,new double[]{0,0,1}));		
 	}
 	
 	@Override
 	@Test
-	public void testGradient() throws Exception {
-		super.testGradient();
-	}
-	
-	@Override
-	@Test
+	@Ignore
 	public void testHessian() throws Exception {
 		super.testHessian();
 	}
-	
-	
 
 }

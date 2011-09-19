@@ -2,6 +2,9 @@ package de.varylab.varylab.math.functional.geodesic;
 
 import java.util.Random;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedgetools.functional.FunctionalTest;
@@ -36,6 +39,11 @@ public class GeodesicAngleFunctionalTest
 		setXGradient(pos);
 		setHDS(hds);
 		setFunctional(new OppositeAnglesCurvatureFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+	}
+	
+	@Test@Override@Ignore
+	public void testHessian() throws Exception {
+		super.testHessian();
 	}
 
 }

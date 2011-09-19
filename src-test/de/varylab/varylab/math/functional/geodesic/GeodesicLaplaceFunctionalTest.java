@@ -4,6 +4,10 @@ import java.util.Random;
 
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.functional.MyDomainValue;
@@ -36,6 +40,11 @@ public class GeodesicLaplaceFunctionalTest
 		setXGradient(pos);
 		setHDS(hds);
 		setFunctional(new GeodesicLaplaceFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
+	}
+	
+	@Test@Override@Ignore
+	public void testHessian() throws Exception {
+		super.testHessian();
 	}
 
 }

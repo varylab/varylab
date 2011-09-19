@@ -31,6 +31,9 @@ OF SUCH DAMAGE.
 
 package de.varylab.varylab.math.functional.edgelength;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -63,10 +66,13 @@ public class EdgeLengthEqualizerFunctionalTest extends FunctionalTest<DefaultJRV
 		MyDomainValue pos = new MyDomainValue(result);
 		
 		setXGradient(pos);
-		setXHessian(pos);
 		setHDS(hds);
 		setFunctional(new EdgeLengthEqualizerFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>());
 	}
 	
+	@Test@Override@Ignore
+	public void testHessian() throws Exception {
+		super.testHessian();
+	}
 	
 }

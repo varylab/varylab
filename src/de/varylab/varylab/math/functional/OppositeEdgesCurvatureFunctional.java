@@ -57,7 +57,7 @@ public class OppositeEdgesCurvatureFunctional<
 	 * @param v 
 	 * @return a map which maps one edge of each pair onto its partner
 	 */
-	public static<
+	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>

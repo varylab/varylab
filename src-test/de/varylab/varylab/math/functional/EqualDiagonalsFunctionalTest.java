@@ -2,6 +2,9 @@ package de.varylab.varylab.math.functional;
 
 import java.util.Random;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -47,6 +50,11 @@ public class EqualDiagonalsFunctionalTest
 		setHDS(hds);
 		AdapterSet aSet = new AdapterSet();
 		setFunctional(new EqualDiagonalsFunctional<DefaultJRVertex, DefaultJREdge, DefaultJRFace>(aSet));
+	}
+	
+	@Test@Override@Ignore
+	public void testHessian() throws Exception {
+		super.testHessian();
 	}
 
 }
