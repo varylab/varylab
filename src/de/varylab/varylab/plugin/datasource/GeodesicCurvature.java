@@ -1,8 +1,11 @@
 package de.varylab.varylab.plugin.datasource;
 
-import static de.jtem.halfedgetools.functional.FunctionalUtils.angle;
+import static de.jreality.math.Rn.euclideanAngle;
+import static de.jreality.math.Rn.innerProduct;
+import static de.jreality.math.Rn.subtract;
+import static de.jreality.math.Rn.times;
 import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
-import static java.lang.Math.PI;
+import static java.lang.Math.sin;
 
 import java.util.Map;
 
@@ -11,8 +14,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -21,6 +26,11 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 
 	private GeodesicEdgeCurvatureAdapter
 		adapter = new GeodesicEdgeCurvatureAdapter();
+	private double[]	
+		vec1 = new double[3],
+		vec2 = new double[3],
+		vec3 = new double[3],
+		vec4 = new double[3];
 	
 	private class GeodesicEdgeCurvatureAdapter extends AbstractAdapter<Double> {
 
@@ -28,24 +38,37 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 			super(Double.class, true, false);
 		}
 
+		/**
+		 * Uses the radius of the circumcircle as discrete curvature.
+		 */
 		@Override
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> Double getV(V v, AdapterSet a) {
-			double[] p = a.getD(Position3d.class, v);
-			Map<E, E> geoMap = findGeodesicPairs(v, false, a);
-			double[] angles = new double[geoMap.size()];
-			if (angles.length == 0) return null; // unknown curvature
-			int i = 0;
-			for (E e : geoMap.keySet()) {
-				E ee = geoMap.get(e);
-				double[] p1 = a.getD(Position3d.class, e.getStartVertex());
-				double[] p2 = a.getD(Position3d.class, ee.getStartVertex());
-				angles[i++] = PI - angle(p1, p, p2); 
+			double[] vv = a.getD(Position3d.class, v);
+			double[] nv = a.getD(Normal.class, v);
+			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, a);
+			if (geodesicPairs.isEmpty() || HalfEdgeUtils.isBoundaryVertex(v)) {
+				return null;
 			}
-			return Rn.euclideanNormSquared(angles);
+			double curvature = 0.0;
+			for (E e : geodesicPairs.keySet()) {
+				E ee = geodesicPairs.get(e);
+				double[] s = a.getD(Position3d.class, e.getStartVertex());
+				double[] t = a.getD(Position3d.class, ee.getStartVertex());
+				subtract(vec1, s, vv);
+				subtract(vec2, t, vv);
+				subtract(vec1, vec1, times(vec3, innerProduct(nv, vec1), nv)); 
+				subtract(vec2, vec2, times(vec4, innerProduct(nv, vec2), nv));
+				double alpha = euclideanAngle(vec1, vec2);
+				Rn.subtract(vec3, vec1, vec2);
+				double la = Rn.euclideanNorm(vec3);
+				double r = la / 2.0 / sin(alpha);
+				curvature += 1 / r; 
+			}
+			return curvature;
 		}
 		
 		@Override
@@ -55,7 +78,7 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 		
 		@Override
 		public String toString() {
-			return "Exterior Geodesic Curvature";
+			return "Geodesic Curvature";
 		}
 		
 	}
