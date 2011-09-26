@@ -16,7 +16,7 @@ import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional;
 
-public class ExteriorGeodesicFunctionalTest
+public class OppositeEdgesCurvatureFunctionalTest
 		extends
 		FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {
 

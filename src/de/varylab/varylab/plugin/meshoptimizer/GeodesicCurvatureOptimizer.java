@@ -14,10 +14,11 @@ import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class GeodesicCurvatureOptimizer extends VarylabOptimizerPlugin {
 
-	private HalfedgeInterface	
+	private HalfedgeInterface
 		hif = null;
 	private GeodesicCurvatureFunctional<VVertex, VEdge, VFace>
 		functional = new GeodesicCurvatureFunctional<VVertex, VEdge, VFace>();
+	
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {

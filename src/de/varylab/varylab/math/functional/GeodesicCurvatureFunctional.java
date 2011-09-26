@@ -1,16 +1,14 @@
 package de.varylab.varylab.math.functional;
 
-import static de.jreality.math.Rn.euclideanAngle;
-import static de.jreality.math.Rn.euclideanNormSquared;
 import static de.jreality.math.Rn.innerProduct;
 import static de.jreality.math.Rn.subtract;
 import static de.jreality.math.Rn.times;
 import static de.jtem.halfedgetools.functional.FunctionalUtils.getPosition;
 import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
-import static java.lang.Math.PI;
 
 import java.util.Map;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -32,10 +30,13 @@ public class GeodesicCurvatureFunctional <
 	private AdapterSet
 		aSet = new AdapterSet();
 	private double[]	
+		T1 = new double[3],
+		T2 = new double[3],
 		vec1 = new double[3],
 		vec2 = new double[3],
-		vec3 = new double[3],
-		vec4 = new double[3];		
+		vv = new double[3],
+		vs = new double[3],
+		vt = new double[3];
 	
 	public void setAdapters(AdapterSet aSet) {
 		this.aSet = aSet;
@@ -44,39 +45,33 @@ public class GeodesicCurvatureFunctional <
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
-		if (E != null) {
-			E.set(evaluateEnergy(hds, x));
-		}
-		if (G != null) {
-			
-		}
-	}
-	
-	public double evaluateEnergy(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
-		double result = 0.0;
-		final double[] 
-			vv = new double[3],
-			vs = new double[3],
-			vt = new double[3];
+		if (E != null) E.setZero();
+		if (G != null) G.setZero();
 		for (V v : hds.getVertices()) {
 			getPosition(v, x, vv);
 			double[] n = aSet.getD(Normal.class, v);
 			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, aSet);
-			double[] angles = new double[geodesicPairs.size()];
-			int i = 0;
 			for (E e : geodesicPairs.keySet()) {
 				E ee = geodesicPairs.get(e);
 				getPosition(e.getStartVertex(), x, vs);
 				getPosition(ee.getStartVertex(), x, vt);
-				subtract(vec1, vs, vv);
-				subtract(vec2, vt, vv);
-				subtract(vec1, vec1, times(vec3, innerProduct(n, vec1), n));
-				subtract(vec2, vec2, times(vec4, innerProduct(n, vec2), n));
-				angles[i++] = PI - euclideanAngle(vec1, vec2); 
+				subtract(T1, vs, vv);
+				subtract(T2, vt, vv);
+				subtract(T1, T1, times(vec1, innerProduct(n, T1), n));
+				subtract(T2, T2, times(vec2, innerProduct(n, T2), n));
+				double dot2 = Rn.innerProduct(T1, T2);
+				dot2 *= dot2;
+				double T1T1 = Rn.euclideanNormSquared(T1);
+				double T2T2 = Rn.euclideanNormSquared(T2);
+				if (E != null) {
+					double dif = dot2 - T1T1*T2T2;
+					E.add(dif * dif);
+				}
+				if (G != null) {
+					
+				}
 			}
-			result += euclideanNormSquared(angles);
 		}
-		return result;
 	}
 	
 	

@@ -1,5 +1,11 @@
 package de.varylab.varylab;
 
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import org.jvnet.substance.skin.SubstanceRavenGraphiteGlassLookAndFeel;
+
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
@@ -21,10 +27,6 @@ import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
-import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
-import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
-import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
-import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
@@ -50,11 +52,6 @@ import de.varylab.varylab.plugin.generator.PrimitivesGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
-import de.varylab.varylab.plugin.lnf.FHLookAndFeel;
-import de.varylab.varylab.plugin.lnf.SubstanceLnF;
-import de.varylab.varylab.plugin.lnf.SyntheticaBlackEyeLnf;
-import de.varylab.varylab.plugin.lnf.SyntheticaStandardLnf;
-import de.varylab.varylab.plugin.lnf.TinyLookAndFeel;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
@@ -141,7 +138,7 @@ public class VaryLab {
 		v.registerPlugin(HeightFieldEditor.class);
 		
 		addOptimizationPlugins(v);
-		addLnFPlugins(v);
+//		addLnFPlugins(v);
 		addVisualizerPlugins(v);
 		addDDGPlugins(v);
 		
@@ -248,17 +245,17 @@ public class VaryLab {
 		v.registerPlugin(GeodesicCurvatureOptimizer.class);
 	}
 	
-	private static void addLnFPlugins(JRViewer v) {
-		v.registerPlugin(LookAndFeelSwitch.class);
-		v.registerPlugin(FHLookAndFeel.class);
-		v.registerPlugin(TinyLookAndFeel.class);
-		v.registerPlugin(CrossPlatformLnF.class);
-		v.registerPlugin(NimbusLnF.class);
-		v.registerPlugin(SystemLookAndFeel.class);
-		v.registerPlugin(SyntheticaStandardLnf.class);
-		v.registerPlugin(SyntheticaBlackEyeLnf.class);
-		v.registerPlugin(SubstanceLnF.class);
-	}
+//	private static void addLnFPlugins(JRViewer v) {
+//		v.registerPlugin(LookAndFeelSwitch.class);
+//		v.registerPlugin(FHLookAndFeel.class);
+//		v.registerPlugin(TinyLookAndFeel.class);
+//		v.registerPlugin(CrossPlatformLnF.class);
+//		v.registerPlugin(NimbusLnF.class);
+//		v.registerPlugin(SystemLookAndFeel.class);
+//		v.registerPlugin(SyntheticaStandardLnf.class);
+//		v.registerPlugin(SyntheticaBlackEyeLnf.class);
+//		v.registerPlugin(SubstanceLnF.class);
+//	}
 	
 	private static void addDDGPlugins(JRViewer v) {
 		v.registerPlugin(ChristoffelTransform.class);
@@ -271,7 +268,15 @@ public class VaryLab {
 	}
 	
 	
-	public static void main(String[] args) throws Exception {
+	public static void installLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void startup() {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
 		StaticSetup.includePluginJars();
@@ -279,10 +284,14 @@ public class VaryLab {
 		View.setIcon(ImageHook.getIcon("main_03.png"));
 		View.setTitle("VaryLab");
 		JRViewer v = new JRViewer();
+		installLookAndFeel();
 		VarylabSplashScreen splash = new VarylabSplashScreen();
 		splash.setVisible(true);
 		v.setSplashScreen(splash);
-		v.getController().setManageLookAndFeel(true);
+		v.getController().setManageLookAndFeel(false);
+		v.getController().setSaveOnExit(true);
+		v.getController().setAskBeforeSaveOnExit(false);
+		v.getController().setLoadFromUserPropertyFile(true);
 		v.setPropertiesFile("VaryLab.xml");
 		v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
 		v.setShowPanelSlots(true, true, true, true);
@@ -295,6 +304,17 @@ public class VaryLab {
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
 		splash.setVisible(false);
+		System.out.println("Welcome to Varylab.");
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				startup();
+			}
+		});
 	}
 
 }

@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.ui;
 
+import de.jreality.plugin.menu.BackgroundColor;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -13,6 +14,9 @@ public class VarylabMain extends Plugin {
 		HalfedgeInterface hif = c.getPlugin(HalfedgeInterface.class);
 		hif.setTemplateHDS(new VHDS());
 		hif.set(new VHDS());
+		BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
+		bgColorPlugin.setColor("UI Background");
 	}
+	
 	
 }
