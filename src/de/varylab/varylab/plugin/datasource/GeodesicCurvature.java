@@ -66,6 +66,9 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 				Rn.subtract(vec3, vec1, vec2);
 				double la = Rn.euclideanNorm(vec3);
 				double r = la / 2.0 / sin(alpha);
+				if (1 / r < 0) {
+					System.out.println("negative geodesic curvature!");
+				}
 				curvature += 1 / r; 
 			}
 			return curvature;

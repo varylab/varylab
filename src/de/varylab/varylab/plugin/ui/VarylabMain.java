@@ -14,8 +14,11 @@ public class VarylabMain extends Plugin {
 		HalfedgeInterface hif = c.getPlugin(HalfedgeInterface.class);
 		hif.setTemplateHDS(new VHDS());
 		hif.set(new VHDS());
-		BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
-		bgColorPlugin.setColor("UI Background");
+		String color = c.getProperty(BackgroundColor.class, "color", "");
+		if (color.equals("")) {
+			BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
+			bgColorPlugin.setColor("UI Background");
+		}
 	}
 	
 	

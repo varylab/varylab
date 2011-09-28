@@ -282,7 +282,7 @@ public class VaryLab {
 		StaticSetup.includePluginJars();
 		StaticSetup.includeLibraryJars();
 		View.setIcon(ImageHook.getIcon("main_03.png"));
-		View.setTitle("VaryLab");
+		View.setTitle("VaryLab[Ultimate]");
 		JRViewer v = new JRViewer();
 		installLookAndFeel();
 		VarylabSplashScreen splash = new VarylabSplashScreen();
