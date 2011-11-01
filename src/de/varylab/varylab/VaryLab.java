@@ -309,6 +309,8 @@ public class VaryLab {
 	
 	
 	public static void main(String[] args) throws Exception {
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "VaryLab[Ultimate]");
+		JRViewer.setApplicationIcon(ImageHook.getImage("main_03.png"));
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

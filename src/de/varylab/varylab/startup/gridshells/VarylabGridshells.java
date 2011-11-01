@@ -251,6 +251,8 @@ public class VarylabGridshells {
 	
 	
 	public static void main(String[] args) throws Exception {
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "VaryLab[Gridshells]");
+		JRViewer.setApplicationIcon(ImageHook.getImage("surface.png"));
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
