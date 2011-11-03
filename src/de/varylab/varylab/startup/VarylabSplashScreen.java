@@ -29,13 +29,13 @@ public class VarylabSplashScreen extends SplashScreen {
 	@Override
 	public void setStatus(String status) {
 		progressBar.setString(status);
-		paint(getGraphics());
+		progressBar.paint(getGraphics());
 	}
 
 	@Override
 	public void setProgress(double progress) {
 		progressBar.setValue((int)(progress * 100));
-		paint(getGraphics());
+		progressBar.paint(getGraphics());
 	}
 
 }
