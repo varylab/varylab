@@ -1,4 +1,4 @@
-package de.varylab.varylab.startup.gridshells;
+package de.varylab.varylab.startup.nurbs;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
