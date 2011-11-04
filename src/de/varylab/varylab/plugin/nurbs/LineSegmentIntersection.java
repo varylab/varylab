@@ -212,6 +212,7 @@ public class LineSegmentIntersection {
 
 	public static LinkedList<HalfedgePoint> findAllNbrs(LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
+//		boolean cyclic = false;
 //		System.out.println();
 //		System.out.println("START findAllNbrs");
 //		System.out.println();
@@ -262,7 +263,7 @@ public class LineSegmentIntersection {
 //			System.out.println("all curves intersecting this point ordered");
 			
 			for (IndexedCurveList icl : iP1CurveList) {
-				
+				boolean cyclic = getCyclicFromCurveIndexAndIntersectionPoint(icl.index, iP1);
 				// sorting each curveList(i.e. all IntersectionPoints contained in this curve) w.r.t. indexOnCurve
 				
 				IntersectionPointIndexComparator ipic = new IntersectionPointIndexComparator();
@@ -272,9 +273,9 @@ public class LineSegmentIntersection {
 				//only debugging
 				System.out.println();
 				System.out.println("index: " + icl.getIndex());
-				for (IntersectionPoint ip : icl.curveList){
-					System.out.println(Arrays.toString(ip.point) + " indexOnCurve " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), ip));
-				}
+//				for (IntersectionPoint ip : icl.curveList){
+//					System.out.println(Arrays.toString(ip.point) + " indexOnCurve " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), ip));
+//				}
 				//
 				
 				// add for each indexOnCurve all IntersectionPoints with same index in a list
@@ -343,17 +344,34 @@ public class LineSegmentIntersection {
 				if(index < mapList.size()){
 					nbrs.add(inverseMap.get(index + 1));
 				}
+				if(index == mapList.size() && cyclic){
+					System.out.println();
+					System.out.println("cyclic " + cyclic);
+					System.out.println("index is max: iP1 " + Arrays.toString(iP1.point) + " next "+ Arrays.toString(inverseMap.get(1).point));
+					nbrs.add(inverseMap.get(1));
+				}
+				if(index == 1 && cyclic){
+					System.out.println();
+					System.out.println("cyclic " + cyclic);
+					System.out.println("index is 1: iP1 " + Arrays.toString(iP1.point) + " before "+ Arrays.toString(inverseMap.get(mapList.size()).point));
+					nbrs.add(inverseMap.get(mapList.size()));
+				}
 			}
 			HalfedgePoint hp = new HalfedgePoint(iP1, nbrs);
-//			System.out.println(hp.toString());
 			iP1.setParentHP(hp);
 			points.add(hp);
 		}
-//		System.out.println("HalfedgePoints");
-//		for (HalfedgePoint hp : points) {
-//			System.out.println(hp.toString());
-//		}
 		return points;
+	}
+	
+	private static boolean getCyclicFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
+		boolean cyclic = false;
+		for (LineSegment ls : iP.intersectingSegments) {
+			if(curveIndex == ls.curveIndex){
+				cyclic = ls.cyclic;
+			}
+		}
+		return cyclic;
 	}
 	
 	private static int getIndexOnCurveFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
@@ -384,25 +402,6 @@ public class LineSegmentIntersection {
 		Collections.sort(sameIndexList, new IntersectionPointDistanceComparator());
 		return sameIndexList;
 	}
-
-//	private static double[] getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
-//		for (LineSegment seg : iP.intersectingSegments) {
-//			if(seg.curveIndex == curveIndex){
-//				return seg.segment[0];			
-//			}
-//		}
-//		return null;
-//	}
-//	
-//	private static LinkedList<IntersectionPoint> sortSameIndex(LinkedList<IntersectionPoint> sameIndexList, int curveIndex){
-//		for (IntersectionPoint iP : sameIndexList) {
-//			double[] firstCoordFromIndexedSegment = getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(curveIndex, iP);
-//			iP.sameIndexDist = Rn.euclideanDistance(iP.point, firstCoordFromIndexedSegment);
-//			System.out.println("firstCoord "+Arrays.toString(firstCoordFromIndexedSegment)+" iP "+Arrays.toString(iP.point)+" iP.sameIndexDist " + iP.sameIndexDist);
-//		}
-//		Collections.sort(sameIndexList, new IntersectionPointDistanceComparator());
-//		return sameIndexList;
-//	}
 
 	
 	private static LinkedList<Integer> getIndexListFromIntersectionPoint(IntersectionPoint iP){
