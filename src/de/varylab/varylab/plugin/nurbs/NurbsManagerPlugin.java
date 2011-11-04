@@ -614,6 +614,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			all.addAll(intObj.getPoints());
 			noSegment = all.size();
 			System.out.println("first size" + noSegment);
+			boolean cyclic = false;
 			if(!intObj.isNearby()){
 				all.pollLast();
 				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics);
@@ -623,7 +624,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				all.addAll(intObj.getPoints());
 			}else{
 				//add the first element of a closed curve
-				intObj.setCyclic(true);
+				cyclic = true;
 				System.out.println("add first");
 				double[] first = new double [2];
 				first[0] = all.getFirst()[0];
@@ -643,6 +644,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					ls.indexOnCurve = index ;
 					ls.segment = seg;
 					ls.curveIndex = curveIndex;
+					ls.cyclic = cyclic;
 //					ls.max = maxMin;
 //					if(index != noSegment + 1){
 						segments.add(ls);
