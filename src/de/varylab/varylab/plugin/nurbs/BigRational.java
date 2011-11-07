@@ -766,7 +766,7 @@ public class BigRational
 
 		// [null and empty string check]
 		final int length = (s == null ? 0 : s.length());
-		if (length < 1) {
+		if (length < 1 || s == null) {
 			return;
 		}
 
