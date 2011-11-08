@@ -227,6 +227,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
 			}
 			updateStates();
+			if(vectorFieldBox.isSelected()){
+				Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
+				for (Vertex<?, ?, ?> v : verts) {
+					
+				}
+			}
 		}
 	}
 	
