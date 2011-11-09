@@ -293,7 +293,7 @@ public class LineSegmentIntersection {
 			}
 			
 			// only debugging
-			System.out.println("all curves intersecting this point index ordered");
+//			System.out.println("all curves intersecting this point index ordered");
 			
 //			System.out.println(iP1.toString());
 //			for (IndexedCurveList icl : iP1CurveList) {
@@ -317,8 +317,8 @@ public class LineSegmentIntersection {
 				Collections.sort(icl.curveList, ipic);
 				
 				//only debugging
-				System.out.println();
-				System.out.println("index: " + icl.getIndex());
+//				System.out.println();
+//				System.out.println("index: " + icl.getIndex());
 //				for (IntersectionPoint ip : icl.curveList){
 //					System.out.println(Arrays.toString(ip.point) + " indexOnCurve " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), ip));
 //				}
@@ -391,15 +391,15 @@ public class LineSegmentIntersection {
 					nbrs.add(inverseMap.get(index + 1));
 				}
 				if(index == mapList.size() && cyclic){
-					System.out.println();
-					System.out.println("cyclic " + cyclic);
-					System.out.println("index is max: iP1 " + Arrays.toString(iP1.point) + " next "+ Arrays.toString(inverseMap.get(1).point));
+//					System.out.println();
+//					System.out.println("cyclic " + cyclic);
+//					System.out.println("index is max: iP1 " + Arrays.toString(iP1.point) + " next "+ Arrays.toString(inverseMap.get(1).point));
 					nbrs.add(inverseMap.get(1));
 				}
 				if(index == 1 && cyclic){
-					System.out.println();
-					System.out.println("cyclic " + cyclic);
-					System.out.println("index is 1: iP1 " + Arrays.toString(iP1.point) + " before "+ Arrays.toString(inverseMap.get(mapList.size()).point));
+//					System.out.println();
+//					System.out.println("cyclic " + cyclic);
+//					System.out.println("index is 1: iP1 " + Arrays.toString(iP1.point) + " before "+ Arrays.toString(inverseMap.get(mapList.size()).point));
 					nbrs.add(inverseMap.get(mapList.size()));
 				}
 			}
