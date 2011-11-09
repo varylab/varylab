@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.adapter;
 
 import java.util.HashMap;
 import java.util.Map;

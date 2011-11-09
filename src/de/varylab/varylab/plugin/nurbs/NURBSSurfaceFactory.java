@@ -6,6 +6,7 @@ import java.util.Map;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.scene.IndexedFaceSet;
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.varylab.varylab.plugin.nurbs.adapter.IndexedVectorField;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 /**
@@ -45,14 +46,14 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 				
 				indexUVMap.put(index, new double[]{u,v});
 				if(i == 0 || j == 0 || i == getULineCount()-1 || j == getVLineCount()-1) { // boundary of patch
-					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0,1.0});
-					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0,1.0});
+					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
+					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
 				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, u, v);
 				if(ci.getMinCurvature() == ci.getMaxCurvature()) { //umbillic point
-					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0,1.0});
-					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0,1.0});
+					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
+					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
 				minCurvatureVFMap.put(index, ci.getCurvatureDirectionsManifold()[0]);
