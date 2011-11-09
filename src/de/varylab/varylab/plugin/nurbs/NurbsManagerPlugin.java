@@ -535,10 +535,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				}
 //				System.out.println("PRINT OUT END");
 				
-				for (LineSegment s : allSegments) {
-					System.out.println(Arrays.toString(s.segment[0]) +"  "+ Arrays.toString(s.segment[1]) + " index: " + s.curveIndex + " indexOnCurve " + s.indexOnCurve);
-					
-				}
+//				for (LineSegment s : allSegments) {
+//					System.out.println(Arrays.toString(s.segment[0]) +"  "+ Arrays.toString(s.segment[1]) + " index: " + s.curveIndex + " indexOnCurve " + s.indexOnCurve);
+//					
+//				}
 //				Map<RPoint2D, Set<RLineSegment2D>> SetIntersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
 //				System.out.println("Start of my algorithm");
 //				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
