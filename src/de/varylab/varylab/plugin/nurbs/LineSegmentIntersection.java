@@ -1,6 +1,5 @@
 package de.varylab.varylab.plugin.nurbs;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +12,6 @@ import java.util.TreeSet;
 
 import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
-import compgeom.Rational;
 import compgeom.algorithms.BentleyOttmann;
 
 import de.jreality.math.Rn;

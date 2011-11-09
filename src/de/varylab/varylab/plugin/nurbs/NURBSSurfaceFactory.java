@@ -6,6 +6,7 @@ import java.util.Map;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.scene.IndexedFaceSet;
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 /**
  * A Factory for Bezier patches of arbitrary degree

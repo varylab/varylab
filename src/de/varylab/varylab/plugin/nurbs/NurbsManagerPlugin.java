@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -228,10 +227,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			updateStates();
 			if(vectorFieldBox.isSelected()){
-				Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
-				for (Vertex<?, ?, ?> v : verts) {
-					
-				}
+//				Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
+//				for (Vertex<?, ?, ?> v : verts) {
+//					
+//				}
 			}
 		}
 	}

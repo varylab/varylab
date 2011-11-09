@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.adapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 
 @NurbsUVCoordinate
 public class NurbsUVAdapter extends AbstractAdapter<double[]> {
