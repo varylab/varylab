@@ -8,6 +8,7 @@ import de.jreality.scene.IndexedFaceSet;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.varylab.varylab.plugin.nurbs.adapter.IndexedVectorField;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 /**
  * A Factory for Bezier patches of arbitrary degree

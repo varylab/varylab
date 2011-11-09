@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.LinkedList;
 
+
 public class EventPointSegmentList {
 	
 	protected EventPoint p;

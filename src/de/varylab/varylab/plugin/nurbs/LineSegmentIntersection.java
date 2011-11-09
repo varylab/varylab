@@ -256,26 +256,10 @@ public class LineSegmentIntersection {
 
 	public static LinkedList<HalfedgePoint> findAllNbrs(LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
-//		boolean cyclic = false;
-//		System.out.println();
-//		System.out.println("START findAllNbrs");
-//		System.out.println();
+		
 		for (IntersectionPoint iP1 : intersectionPoints) {
 			LinkedList<IndexedCurveList> iP1CurveList = new LinkedList<IndexedCurveList>();
 			LinkedList<Integer> indexList = getIndexListFromIntersectionPoint(iP1);
-			
-			
-			//only debugging
-//			System.out.println();
-//			System.out.println("IntersectionPoint " + Arrays.toString(iP1.point));
-//			for (LineSegment ls : iP1.intersectingSegments) {
-//				System.out.println("curveIndex " + ls.curveIndex + " indexOnCurve " + ls.indexOnCurve);
-//				System.out.println("indexOnCurveFromIntersectionPointAndCurveIndex " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(ls.curveIndex, iP1));
-//				
-//			}
-			
-			//
-			
 	
 			// add for each curve intersecting this intersectionPoint all IntersectionPoints contained in this curve
 
@@ -290,37 +274,17 @@ public class LineSegmentIntersection {
 				}
 			}
 			
-			// only debugging
-//			System.out.println("all curves intersecting this point index ordered");
-			
-//			System.out.println(iP1.toString());
-//			for (IndexedCurveList icl : iP1CurveList) {
-//				System.out.println("index: " + icl.getIndex() );
-//				for (IntersectionPoint ip : icl.curveList) {
-//					System.out.println(Arrays.toString(ip.point)+ " indexOnCurve " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), ip));
-//				}
-//			}
-			//
-	
 			LinkedList<IntersectionPoint> nbrs = new LinkedList<IntersectionPoint>();
-			
-//			System.out.println("all curves intersecting this point ordered");
 			
 			for (IndexedCurveList icl : iP1CurveList) {
 				boolean cyclic = getCyclicFromCurveIndexAndIntersectionPoint(icl.index, iP1);
+				
 				// sorting each curveList(i.e. all IntersectionPoints contained in this curve) w.r.t. indexOnCurve
 				
 				IntersectionPointIndexComparator ipic = new IntersectionPointIndexComparator();
 				ipic.curveIndex = icl.index;
 				Collections.sort(icl.curveList, ipic);
 				
-				//only debugging
-//				System.out.println();
-//				System.out.println("index: " + icl.getIndex());
-//				for (IntersectionPoint ip : icl.curveList){
-//					System.out.println(Arrays.toString(ip.point) + " indexOnCurve " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), ip));
-//				}
-				//
 				
 				// add for each indexOnCurve all IntersectionPoints with same index in a list
 				
@@ -335,15 +299,6 @@ public class LineSegmentIntersection {
 					indexOrderList.getLast().add(iP);
 				}
 				
-				//only debugging
-//				System.out.println("index: " + icl.getIndex());
-//					for (LinkedList<IntersectionPoint> linkedList : indexOrderList) {
-//						for (IntersectionPoint iP : linkedList) {
-//							System.out.println("indexOnCurve: " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), iP));
-//							System.out.println(Arrays.toString(iP.point));
-//						}
-//					}
-				//
 				
 				// sort all same indexed IntersectionPoints w.r.t. euclidian distance
 				
@@ -359,14 +314,6 @@ public class LineSegmentIntersection {
 				for (LinkedList<IntersectionPoint> list : indexOrderList) {
 					mapList.addAll(list);
 				}
-				
-				//only debugging
-//				System.out.println("after distancesorting");
-//				System.out.println("index: " + icl.getIndex());
-//				for (IntersectionPoint ip : mapList) {
-//					System.out.println(Arrays.toString(ip.point));
-//				}
-				//
 				
 				// fill the map
 				
@@ -389,15 +336,9 @@ public class LineSegmentIntersection {
 					nbrs.add(inverseMap.get(index + 1));
 				}
 				if(index == mapList.size() && cyclic){
-//					System.out.println();
-//					System.out.println("cyclic " + cyclic);
-//					System.out.println("index is max: iP1 " + Arrays.toString(iP1.point) + " next "+ Arrays.toString(inverseMap.get(1).point));
 					nbrs.add(inverseMap.get(1));
 				}
 				if(index == 1 && cyclic){
-//					System.out.println();
-//					System.out.println("cyclic " + cyclic);
-//					System.out.println("index is 1: iP1 " + Arrays.toString(iP1.point) + " before "+ Arrays.toString(inverseMap.get(mapList.size()).point));
 					nbrs.add(inverseMap.get(mapList.size()));
 				}
 			}
@@ -649,10 +590,6 @@ public class LineSegmentIntersection {
 		for (HalfedgePoint hP : orientedNbrs) {
 			while(!hP.unusedNbrs.isEmpty()){
 				LinkedList<IntersectionPoint> facePoints = allAjacentNbrs(hP, orientedNbrs);
-//				System.out.println("face");
-//				for (IntersectionPoint ip : facePoints) {
-//					System.out.println(Arrays.toString(ip.point));
-//				}
 				LinkedList<Integer> ind = new LinkedList<Integer>();
 				for (IntersectionPoint fP : facePoints) {
 					for (int i = 0; i < verts.length; i++) {
@@ -809,14 +746,6 @@ public class LineSegmentIntersection {
 			while(eventPointSegmentList.peekFirst().p.point[1] != p.point[1]){
 				eventPointSegmentList.pollFirst();
 			}
-//			System.out.println("EventPointSegmentList:");
-//			for (EventPointSegmentList epsl : eventPointSegmentList) {
-//				System.out.println("EventPoint " + Arrays.toString(epsl.p.point));
-//				for (LineSegment ls : epsl.allSegments) {
-//					System.out.println(ls.toString());
-//				}
-//			}
-			
 		}
 		
 		

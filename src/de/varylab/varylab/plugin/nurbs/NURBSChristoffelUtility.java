@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.nurbs;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
 
 public class NURBSChristoffelUtility {
 	
@@ -48,27 +49,27 @@ public class NURBSChristoffelUtility {
 		
 		// partial derivatives of the metric tensor
 		
-		double Eu = 2 * Rn.innerProduct(cI.Suu, cI.Su);
-		double Ev = 2 * Rn.innerProduct(cI.Suv, cI.Su);
-		double Fu = Rn.innerProduct(cI.Suu, cI.Sv) + Rn.innerProduct(cI.Su, cI.Suv);
-		double Fv = Rn.innerProduct(cI.Svv, cI.Su) + Rn.innerProduct(cI.Sv, cI.Suv);
-		double Gu = 2 * Rn.innerProduct(cI.Suv, cI.Sv);
-		double Gv = 2 * Rn.innerProduct(cI.Svv, cI.Sv);
+		double Eu = 2 * Rn.innerProduct(cI.getSuu(), cI.getSu());
+		double Ev = 2 * Rn.innerProduct(cI.getSuv(), cI.getSu());
+		double Fu = Rn.innerProduct(cI.getSuu(), cI.getSv()) + Rn.innerProduct(cI.getSu(), cI.getSuv());
+		double Fv = Rn.innerProduct(cI.getSvv(), cI.getSu()) + Rn.innerProduct(cI.getSv(), cI.getSuv());
+		double Gu = 2 * Rn.innerProduct(cI.getSuv(), cI.getSv());
+		double Gv = 2 * Rn.innerProduct(cI.getSvv(), cI.getSv());
 		
 		// inverse of the metric tensor
 		
-		double detMetric = Rn.innerProduct(cI.Su, cI.Su) * Rn.innerProduct(cI.Sv, cI.Sv) - 2 * Rn.innerProduct(cI.Su, cI.Sv);
-		double g11 = 1/detMetric * Rn.innerProduct(cI.Sv, cI.Sv);
-		double g12 = -1/detMetric * Rn.innerProduct(cI.Su, cI.Sv);
-		double g21 = -1/detMetric * Rn.innerProduct(cI.Su, cI.Sv);
-		double g22 = 1/detMetric * Rn.innerProduct(cI.Su, cI.Su);
+		double detMetric = Rn.innerProduct(cI.getSu(), cI.getSu()) * Rn.innerProduct(cI.getSv(), cI.getSv()) - 2 * Rn.innerProduct(cI.getSu(), cI.getSv());
+		double g11 = 1/detMetric * Rn.innerProduct(cI.getSv(), cI.getSv());
+		double g12 = -1/detMetric * Rn.innerProduct(cI.getSu(), cI.getSv());
+		double g21 = -1/detMetric * Rn.innerProduct(cI.getSu(), cI.getSv());
+		double g22 = 1/detMetric * Rn.innerProduct(cI.getSu(), cI.getSu());
 		
 		cI.setG111(0.5 * (g11 * Eu + g12 * (2 *Fu - Ev)));
 		cI.setG121(0.5 * (g11 * Ev + g12 * Gu));
 		cI.setG112(0.5 * (g21 * Eu + g22 * (2 *Fu - Ev)));
 		cI.setG122(0.5 * (g21 * Ev + g22 * Gu));
-		cI.setG211(cI.G121);
-		cI.setG212(cI.G122);
+		cI.setG211(cI.getG121());
+		cI.setG212(cI.getG122());
 		cI.setG221(0.5 * (g11 * (2 * Fv - Gu) + g12 * Gv));
 		cI.setG222(0.5 * (g21 * (2 * Fv - Gu) + g22 * Gv));
 //		System.out.println("G111: "+ cI.G111);

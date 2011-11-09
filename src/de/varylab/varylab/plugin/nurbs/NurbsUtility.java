@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.nurbs;
 import java.util.Arrays;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NurbsUtility {
 		

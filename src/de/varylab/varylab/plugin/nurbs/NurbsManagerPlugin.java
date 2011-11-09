@@ -85,6 +85,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private CurvatureLinesPanel
 		curvatureLinesPanel = new CurvatureLinesPanel();
 	
+	private PolygonalCurvePanel
+		polygonalCurvePanel = new PolygonalCurvePanel();
+	
 	private JButton
 		importButton = new JButton(importAction),
 		updateButton = new JButton("update");
@@ -156,6 +159,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		shrinkPanel.add(curvatureLinesPanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(geodesicPanel, c);
+		c.weighty = 0.0;
+		shrinkPanel.add(polygonalCurvePanel, c);
 	}
 
 	private void configureFileChooser() {
@@ -226,12 +231,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
 			}
 			updateStates();
-			if(vectorFieldBox.isSelected()){
-//				Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
-//				for (Vertex<?, ?, ?> v : verts) {
-//					
-//				}
-			}
 		}
 	}
 	
@@ -315,7 +314,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					double[] S = new double[4];
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
 					surfacePoints[i] = S;
-//						System.out.println(Arrays.toString(surfacePoints[i]));
 				}
 				psf.setVertexCoordinates(surfacePoints);
 				psf.update();
@@ -361,7 +359,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					double[] S = new double[4];
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
 					surfacePoints[i] = S;
-//						System.out.println(Arrays.toString(surfacePoints[i]));
 				}
 				psf.setVertexCoordinates(surfacePoints);
 				psf.update();
@@ -388,12 +385,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 			epsExpModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
-			stepSizeModel = new SpinnerNumberModel(-3, -30.0, 0, 1);
+			stepSizeModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
+			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1);
 			
 		private JSpinner
 			tolSpinner = new JSpinner(tolExpModel),
 			epsSpinner = new JSpinner(epsExpModel),
-			stepSizeSpinner = new JSpinner(stepSizeModel);
+			stepSizeSpinner = new JSpinner(stepSizeModel),
+			nearUmbilicSpinner = new JSpinner(nearUmbilicModel);
 		private JButton
 			goButton = new JButton("Go");
 		private JRadioButton
@@ -414,6 +413,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(epsSpinner, rc);
 			add(new JLabel("Step Size Exp"), lc);
 			add(stepSizeSpinner, rc);
+			add(new JLabel("Near Umbilic Exp"), lc);
+			add(nearUmbilicSpinner, rc);
 			add(maxButton, rc);
 			add(minButton, rc);
 			add(intersectionButton, rc);
@@ -431,6 +432,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			eps = Math.pow(10, eps);
 			double stepSize = stepSizeModel.getNumber().doubleValue();
 			stepSize = Math.pow(10, stepSize);
+			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
+			umbilicStop = Math.pow(10, umbilicStop);
 			Set<Vertex<?,?,?>> verticies = hif.getSelection().getVertices();
 			LinkedList<Vertex<?,?,?>> verts = new LinkedList<Vertex<?,?,?>>(verticies);
 			Collections.sort(verts, new VertexComparator());
@@ -478,39 +481,39 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
 					if (max){
 						curveIndex = curveLine(tol, eps, stepSize, umbilics, p, q,
-								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, true);
+								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, true, umbilicStop);
 					}
 					if (min){
 						curveIndex = curveLine(tol, eps, stepSize, umbilics, p, q,
-								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, false);
+								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, false, umbilicStop);
 					}
 			}
 			segments.addAll(currentSegments);
 
 			hif.clearSelection();
+			
+			
+			
 			if(inter){
 				// default patch
+				
 				List<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
 				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-//				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
 				double[][] seg1 = {{0,0},{1,0}};
 				LineSegment b1 = new LineSegment(seg1, 1, 1);
-//				double[][] seg2 = {{0.999,0.001},{0.999,0.999}};
 				double[][] seg2 = {{1,0},{1,1}};
 				LineSegment b2 = new LineSegment(seg2, 1, 2);
-//				double[][] seg3 = {{0.999,0.999},{0.001,0.999}};
 				double[][] seg3 = {{1,1},{0,1}};
 				LineSegment b3 = new LineSegment(seg3, 1, 3);
-//				double[][] seg4 = {{0.001,0.999},{0.001,0.001}};
 				double[][] seg4 = {{0,1},{0,0}};
 				LineSegment b4 = new LineSegment(seg4, 1, 4);
 				boundarySegments.add(b1);
 				boundarySegments.add(b2);
 				boundarySegments.add(b3);
 				boundarySegments.add(b4);
-				int shiftedIndex = boundarySegments.size();
-				for (LineSegment s : allSegments) {
-					s.setCurveIndex(s.curveIndex + shiftedIndex);
+				int shiftedIndex = allSegments.size();
+				for (LineSegment bs : boundarySegments) {
+					bs.setCurveIndex(bs.curveIndex + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);
 //				try {
@@ -521,37 +524,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				} catch (Exception e1) {
 //					e1.printStackTrace();
 //				}
-//				for (LineSegment s : allSegments){
-//					System.out.println();
-//					System.out.println("LineSegment seg"+s.curveIndex+s.indexOnCurve+" = new LineSegment();");
-//					System.out.println("double[] s"+s.curveIndex+s.indexOnCurve+0+" = {"+s.segment[0][0]+", "+s.segment[0][1]+"};");
-//					System.out.println("double[] s"+s.curveIndex+s.indexOnCurve+1+" = {"+s.segment[1][0]+", "+s.segment[1][1]+"};");
-//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment = new double[2][];");
-//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment[0] = s"+s.curveIndex+s.indexOnCurve+0+";");
-//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment[1] = s"+s.curveIndex+s.indexOnCurve+1+";");
-//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".curveIndex = "+s.curveIndex+";");
-//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".indexOnCurve = "+s.indexOnCurve+";");
-//				}
-//				System.out.println("PRINT OUT END");
 				
-//				for (LineSegment s : allSegments) {
-//					System.out.println(Arrays.toString(s.segment[0]) +"  "+ Arrays.toString(s.segment[1]) + " index: " + s.curveIndex + " indexOnCurve " + s.indexOnCurve);
-//					
-//				}
-//				Map<RPoint2D, Set<RLineSegment2D>> SetIntersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
-//				System.out.println("Start of my algorithm");
-//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
-//				for (IntersectionPoint ip : intersections) {
-//					System.out.println("intersectionpoint " + Arrays.toString(ip.point));
-//					System.out.println("Segments");
-//					for (LineSegment ls : ip.intersectingSegments) {
-//						System.out.println(Arrays.toString(ls.segment[0]) +"  " + Arrays.toString(ls.segment[1]) + "index: " + ls.curveIndex + " indexOnCurve " + ls.indexOnCurve);
-//					}
-//				}
+				allSegments.clear();
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
-				System.out.println("INTERSECTION SIZE "+intersections.size());
 				FaceSet fS = LineSegmentIntersection.createFaceSet(H);
 				for (int i = 0; i < fS.verts.length; i++) {
 					double[] S = new double[4];
@@ -607,11 +584,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				LinkedList<double[]> umbilics, int p, int q, double[] U,
 				double[] V, double[][][] Pw,
 				LinkedList<LineSegment> segments, int curveIndex,
-				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin) {
+				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop) {
 			IntObjects intObj;
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
-			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,stepSize,umbilics);
+			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,stepSize,umbilics, umbilicStop);
 			if(intObj.umbilicIndex != 0){
 				umbilicIndex.add(intObj.umbilicIndex);
 			}
@@ -622,7 +599,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean cyclic = false;
 			if(!intObj.isNearby()){
 				all.pollLast();
-				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics);
+				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics, umbilicStop);
 				if(intObj.umbilicIndex != 0){
 					umbilicIndex.add(intObj.umbilicIndex);
 				}
@@ -650,25 +627,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					ls.segment = seg;
 					ls.curveIndex = curveIndex;
 					ls.cyclic = cyclic;
-//					ls.max = maxMin;
-//					if(index != noSegment + 1){
-						segments.add(ls);
-//						if(index == noSegment){
-//							System.out.println("last segment " + segments.getLast().toString());
-//						}
-//					}else{
-//						System.out.println("count "+index+ " stelle " + noSegment);
-//					}
+					segments.add(ls);
 					firstcurvePoint = secondCurvePoint;
 				}
 			}
-			
-			//only debugging
-//			for (LineSegment s : segments) {
-//				System.out.println("curveIndex: " + s.curveIndex + " indexOnCurve: " + s.indexOnCurve);
-//				System.out.println("first " + Arrays.toString(s.segment[0]) + " last " + Arrays.toString(s.segment[1]));
-//			}
-			//
 			
 			curveIndex ++;
 			PointSetFactory psf = new PointSetFactory();
@@ -701,6 +663,25 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			hif.getActiveLayer().addTemporaryGeometry(sgc);
 			return curveIndex;
 		}
+	}
+	
+	private class PolygonalCurvePanel extends ShrinkPanel implements ActionListener{
+		
+		private static final long 
+		serialVersionUID = 1L;
+		
+		public PolygonalCurvePanel() {
+			super("Polygonal Curves");
+			setShrinked(true);
+			setLayout(new GridBagLayout());
+			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+		}
+		
+		public void actionPerformed(ActionEvent e){
+			
+		}
+		
 	}
 	
 
@@ -806,43 +787,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			segments.clear();
 		} 
 
-//			int n = 151;
-//			LinkedList<double[]> umb = IntegralCurves.umbilicPoints1(surfaces.get(surfacesTable.getSelectedRow()), n);
-//			double[][]umbPoints = new double[umb.size()][];
-//			for (int i = 0; i < umb.size(); i++) {
-//				//System.out.println(Arrays.toString(umb.get(i)));
-//
-//				umbPoints[i] = umb.get(i);
-//				
-//			}
-//			if(umbPoints.length > 0){
-//				PointSetFactory psfu = new PointSetFactory();
-//				int pu = surfaces.get(surfacesTable.getSelectedRow()).p;
-//				int qu = surfaces.get(surfacesTable.getSelectedRow()).q;
-//				double[] Uu = surfaces.get(surfacesTable.getSelectedRow()).U;
-//				double[] Vu = surfaces.get(surfacesTable.getSelectedRow()).V;
-//				double[][][]Pwu = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
-//				double[][] surfaceUmbilics = new double[umb.size()][];
-//				psfu.setVertexCount(umbPoints.length);
-//				for (int i = 0; i < umbPoints.length; i++) {
-//					double[] S = new double[4];
-//					NURBSAlgorithm.SurfacePoint(pu, Uu, qu, Vu, Pwu, umbPoints[i][0], umbPoints[i][1], S);
-//					surfaceUmbilics[i] = S;
-//				}
-//				psfu.setVertexCoordinates(surfaceUmbilics);
-//				psfu.update();
-//				SceneGraphComponent sgcu = new SceneGraphComponent("Umbilics");
-//				SceneGraphComponent uPointComp = new SceneGraphComponent("U points");
-//				sgcu.addChild(uPointComp);
-//				sgcu.setGeometry(psfu.getGeometry());
-//				Appearance labelApu = new Appearance();
-//				sgcu.setAppearance(labelApu);
-//				DefaultGeometryShader dgsu = ShaderUtility.createDefaultGeometryShader(labelApu, false);
-//				DefaultPointShader pointShaderu = (DefaultPointShader)dgsu.getPointShader();
-//				pointShaderu.setDiffuseColor(Color.black);
-//				pointShaderu.setPointRadius(0.08);
-//				hif.getActiveLayer().addTemporaryGeometry(sgcu);
-//			}
+
 	}
 	
 	@Override

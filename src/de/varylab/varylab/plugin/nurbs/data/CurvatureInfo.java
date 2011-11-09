@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.Arrays;
 
@@ -9,6 +9,7 @@ public class CurvatureInfo {
 	protected double [] Suu;
 	protected double [] Suv;
 	protected double [] Svv;
+	protected double [] normal;
 
 	protected double [][] curvatureDirectionsManifold;
 	protected double [][] curvatureDirectionsDomain;
@@ -60,6 +61,22 @@ public class CurvatureInfo {
 		Svv = svv;
 	}
 
+	public double[][] getWeingartenoperator() {
+		return Weingartenoperator;
+	}
+
+	public void setWeingartenoperator(double[][] weingartenoperator) {
+		Weingartenoperator = weingartenoperator;
+	}
+
+	public double getMainCurvature() {
+		return MainCurvature;
+	}
+
+	public void setMainCurvature(double mainCurvature) {
+		MainCurvature = mainCurvature;
+	}
+
 	public double[] getSu() {
 		return Su;
 	}
@@ -76,6 +93,16 @@ public class CurvatureInfo {
 		Sv = sv;
 	}
 	
+	
+	
+	public double[] getNormal() {
+		return normal;
+	}
+
+	public void setNormal(double[] normal) {
+		this.normal = normal;
+	}
+
 	public double[][] getCurvatureDirectionsManifold() {
 		return curvatureDirectionsManifold;
 	}

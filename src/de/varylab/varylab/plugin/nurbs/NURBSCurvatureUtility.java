@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.nurbs;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NURBSCurvatureUtility {
 		
@@ -62,6 +63,8 @@ public class NURBSCurvatureUtility {
 	
 		Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
 		Rn.normalize(normal, normal);
+		
+		dG.setNormal(normal);
 		
 		double l = Rn.innerProduct(normal,dG.getSuu());
 		double m = Rn.innerProduct(normal, SKL[1][1]);

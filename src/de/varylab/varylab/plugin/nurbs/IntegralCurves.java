@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
 
 public class IntegralCurves {
 
@@ -25,7 +26,7 @@ public class IntegralCurves {
 	 * @param eps --> if we obtain a closed curve then eps is the maximal distance between the start point and the last point
 	 * @return
 	 */
-	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, double stepSize, LinkedList<double[]> umbilics) {
+	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, double stepSize, LinkedList<double[]> umbilics, double umbilicStop) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
@@ -115,7 +116,7 @@ public class IntegralCurves {
 				if (tau <= tol * vau) {
 					u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
 					for (double[] umb : umbilics) {
-						if(Rn.euclideanDistance(u.getLast(), umb) < 0.001){
+						if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
 							IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 							intObj.umbilicIndex = umbilics.indexOf(umb);
 							System.out.println("near umbilic");
@@ -219,8 +220,8 @@ public class IntegralCurves {
 			ChristoffelInfo c0 = NURBSChristoffelUtility.christoffel(ns, v[0], v[1]);
 			k[0][0] = v[2];
 			k[0][1] = v[3];
-			k[0][2] = -(c0.G111 * v[2] * v[2] + 2 * c0.G121 * v[2] * v[3] + c0.G221 * v[3] * v[3]);
-			k[0][3] = -(c0.G112 * v[2] * v[2] + 2 * c0.G122 * v[2] * v[3] + c0.G222 * v[3] * v[3]);
+			k[0][2] = -(c0.getG111() * v[2] * v[2] + 2 * c0.getG121() * v[2] * v[3] + c0.getG221() * v[3] * v[3]);
+			k[0][3] = -(c0.getG112() * v[2] * v[2] + 2 * c0.getG122() * v[2] * v[3] + c0.getG222() * v[3] * v[3]);
 			for (int l = 1; l < b.length; l++) {
 				sumA = Rn.times(null, A[l][0], k[0]);
 				for (int m = 1; m < l - 1; m++) {
@@ -233,8 +234,8 @@ public class IntegralCurves {
 				ChristoffelInfo cl = NURBSChristoffelUtility.christoffel(ns, v[0] + h * sumA[0], v[1] + h * sumA[1]);
 				k[l][0] = v[2] + h * sumA[2];
 				k[l][1] = v[3] + h * sumA[3];
-				k[l][2] = -(cl.G111 * (v[2] + h * sumA[2]) * (v[2] + h * sumA[2]) + 2 * cl.G121 * (v[2] + h * sumA[2]) * (v[3] + h * sumA[3]) + cl.G221 * (v[3] + h * sumA[3]) * (v[3] + h * sumA[3]));
-				k[l][3] = -(cl.G112 * (v[2] + h * sumA[2]) * (v[2] + h * sumA[2]) + 2 * cl.G122 * (v[2] + h * sumA[2]) * (v[3] + h * sumA[3]) + cl.G222 * (v[3] + h * sumA[3]) * (v[3] + h * sumA[3]));
+				k[l][2] = -(cl.getG111() * (v[2] + h * sumA[2]) * (v[2] + h * sumA[2]) + 2 * cl.getG121() * (v[2] + h * sumA[2]) * (v[3] + h * sumA[3]) + cl.getG221() * (v[3] + h * sumA[3]) * (v[3] + h * sumA[3]));
+				k[l][3] = -(cl.getG112() * (v[2] + h * sumA[2]) * (v[2] + h * sumA[2]) + 2 * cl.getG122() * (v[2] + h * sumA[2]) * (v[3] + h * sumA[3]) + cl.getG222() * (v[3] + h * sumA[3]) * (v[3] + h * sumA[3]));
 			}
 			double[] Phi1 = new double[dim];
 			double[] Phi2 = new double[dim];
@@ -451,7 +452,7 @@ public class IntegralCurves {
 				if(umb[i][j] < umb[i-1][j-1] && umb[i][j] < umb[i-1][j] && umb[i][j] < umb[i-1][j+1] && umb[i][j] < umb[i][j-1] &&
 				   umb[i][j] < umb[i][j+1] && umb[i][j] < umb[i+1][j-1] && umb[i][j] < umb[i+1][j] && umb[i][j] < umb[i+1][j+1]){
 					double[] uPoint = {u1 + hu * (i+1),v1 + hv * (j+1),umb[i][j]};
-					if(Math.abs(NURBSCurvatureUtility.curvatureAndDirections(ns, uPoint[0], uPoint[1]).GaussCurvature) > 1E-6 && umb[i][j] < 1E-5){
+					if(Math.abs(NURBSCurvatureUtility.curvatureAndDirections(ns, uPoint[0], uPoint[1]).getGaussCurvature()) > 1E-6 && umb[i][j] < 1E-5){
 						umbilics.add(uPoint);
 						System.out.println("umbilic: "+Arrays.toString(uPoint));
 					}
@@ -504,7 +505,7 @@ public class IntegralCurves {
 		}
 		LinkedList<double[]> finalUmbilics = new LinkedList<double[]>();
 		for (int i = 0; i < umbilics.size(); i++) {
-			if(Math.abs(NURBSCurvatureUtility.curvatureAndDirections(ns, umbilics.get(i)[0],umbilics.get(i)[1]).GaussCurvature) > 1E-6 && umbilics.get(i)[2]<eps){
+			if(Math.abs(NURBSCurvatureUtility.curvatureAndDirections(ns, umbilics.get(i)[0],umbilics.get(i)[1]).getGaussCurvature()) > 1E-6 && umbilics.get(i)[2]<eps){
 				finalUmbilics.add(umbilics.get(i));
 //				System.out.println(+umbilics.get(i)[2]);
 			}
@@ -610,93 +611,4 @@ public class IntegralCurves {
 		
 	}
 	
-//private static Refinement refineUmbilics1(Refinement umb){
-//		
-//		LinkedList<double[]>umbilics = umb.umbilcs;
-//		NURBSSurface ns = umb.ns;
-//		double [][]points = umb.point;
-//		double hu = umb.hu;
-//		double hv = umb.hv;
-//		int depth = umb.depth;
-//		int counter = umb.counter;
-//		int i =umb.indexI;
-//		int j = umb.indexJ;
-//		double u1 = umb.u1;
-//		double v1 = umb.v1;
-//		LinkedList<double[]> u = new LinkedList<double[]>();
-////		System.out.println("Tiefe: "+ counter);
-////		System.out.println("input points");
-////		for (int k = 0; k < points.length; k++) {
-////			System.out.println(points[k][0]+" "+points[k][1]+" "+points[k][2]);
-////		}
-//	
-//		if(counter == depth) {
-//			double [][]shapeOp = NURBSCurvatureUtility.curvatureAndDirections(ns ,u1 + hu * (i + 1) , v1 + hv* (j + 1)).getWeingartenOperator();
-//			double min = Math.abs((shapeOp[0][0] * shapeOp[0][0] + 2 * shapeOp[0][0]*shapeOp[1][1] + shapeOp[1][1] * shapeOp[1][1])/4 - shapeOp[0][0]*shapeOp[1][1] + shapeOp[0][1] * shapeOp[1][0]);
-//			double[] possibleUmbilic = {u1 + hu * (i + 1) , v1 + hv* (j + 1),min};
-//			umbilics.add(possibleUmbilic);
-//			return umb;
-////		}
-//		}
-//		//1. step: create the refinement points
-//		else{
-//			counter++;
-////			System.out.println("new refinement");
-//			double[][] newPoints = new double[7][7];
-//			for (int k = 0; k < 7; k++) {
-//				for (int l = 0; l < 7; l++) {
-////					if(k%2 == 0 && l%2 == 0){
-////						newPoints[k][l] = points[k/2][l/2]; //pick up all old points
-////					}else{
-////						//compute the new points
-//						double [][]shapeOp = NURBSCurvatureUtility.curvatureAndDirections(ns ,u1 + hu * i + (k-1) * hu/2 , v1 + hv * j + (l-1) * hv/2).getWeingartenOperator();
-//						newPoints[k][l] = Math.abs((shapeOp[0][0] * shapeOp[0][0] + 2 * shapeOp[0][0]*shapeOp[1][1] + shapeOp[1][1] * shapeOp[1][1])/4 - shapeOp[0][0]*shapeOp[1][1] + shapeOp[0][1] * shapeOp[1][0]);
-////					}
-////					System.out.println("k "+k+" l "+l+" :"+newPoints[k][l]);
-//				}
-//			}
-////			System.out.println();
-//			//2. step: search in all 9 squares 
-//			int c = 0;
-//			for (int k = 0; k < 5; k++) {
-//				for (int l = 0; l < 5; l++) {
-//				
-//					if(newPoints[k+1][l+1] < newPoints[k][l] && newPoints[k+1][l+1] < newPoints[k][l+1] && newPoints[k+1][l+1] < newPoints[k][l+2]&&
-//							newPoints[k+1][l+1] < newPoints[k+1][l] && newPoints[k+1][l+1] < newPoints[k+1][l+2]&& 
-//							newPoints[k+1][l+1] < newPoints[k+2][l] &&newPoints[k+1][l+1] < newPoints[k+2][l+1] && newPoints[k+1][l+1] < newPoints[k+2][l+2]){
-//						
-//						//create the points for the new recursion
-//						double[][]rfPoints = new double[3][3];
-//						for (int m = 0; m < 3; m++) {
-//							for (int n = 0; n < 3; n++) {
-//								rfPoints[m][n] = newPoints[k+m][l+n];
-//								//System.out.println("rf "+rfPoints[m][n]);
-//							}
-//						}
-//						//give the umbilic point coords(in our domain) and the value H^2 - K
-//						double[] possibleUmbilic = {u1 + hu * i + (k+1) * hu/2 , v1 + hv * j + (l+1) * hv/2,rfPoints[1][1]};
-//						System.out.println("k: "+(k+1)+" l "+(l+1));
-//						System.out.println(counter);
-//						System.out.println("possible "+ Arrays.toString(possibleUmbilic));
-//						System.out.println(rfPoints[0][0]+" "+rfPoints[0][1]+" "+rfPoints[0][2]);
-//						System.out.println(rfPoints[1][0]+" "+rfPoints[1][1]+" "+rfPoints[1][2]);
-//						System.out.println(rfPoints[2][0]+" "+rfPoints[2][1]+" "+rfPoints[2][2]);
-//						System.out.println();
-//						Refinement rf = new Refinement(umbilics, ns, u1, v1, rfPoints, hu/2, hv/2, depth, 2*i+k, 2*j+l, counter);
-//						IntegralCurves.refineUmbilics(rf);	
-//					}else{
-//						c++;
-//						if(c == 25){
-//							double [][]shapeOp = NURBSCurvatureUtility.curvatureAndDirections(ns ,u1 + hu * (i + 1) , v1 + hv* (j + 1)).getWeingartenOperator();
-//							double min = Math.abs((shapeOp[0][0] * shapeOp[0][0] + 2 * shapeOp[0][0]*shapeOp[1][1] + shapeOp[1][1] * shapeOp[1][1])/4 - shapeOp[0][0]*shapeOp[1][1] + shapeOp[0][1] * shapeOp[1][0]);
-//							double[] possibleUmbilic = {u1 + hu * (i + 1) , v1 + hv* (j + 1),min};
-//							umbilics.add(possibleUmbilic);
-//							return umb;
-//						}
-//					}
-//				}
-//			}	
-//			return umb;
-//		}	
-//	}	
 }

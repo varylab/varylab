@@ -7,9 +7,9 @@ import de.jtem.halfedgetools.adapter.type.PrincipalCurvatureMin;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.nurbs.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 @PrincipalCurvatureMin
 public class NurbsNormalAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
