@@ -25,7 +25,7 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
-import de.varylab.varylab.plugin.nurbs.NurbsManagerPlugin;
+import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.ui.VarylabMain;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.startup.StaticSetup;
