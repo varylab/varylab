@@ -71,7 +71,7 @@ import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizerCot;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
-import de.varylab.varylab.plugin.nurbs.NurbsManagerPlugin;
+import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
