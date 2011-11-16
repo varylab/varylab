@@ -1,6 +1,6 @@
 package de.varylab.varylab.plugin.nurbs.adapter;
 
-import static de.varylab.varylab.plugin.nurbs.NURBSCurvatureUtility.curvatureAndDirections;
+import static de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility.curvatureAndDirections;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.PrincipalCurvatureMin;

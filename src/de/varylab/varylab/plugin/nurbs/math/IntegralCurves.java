@@ -1,10 +1,13 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.Refinement;
 import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
+import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 
 public class IntegralCurves {
 
@@ -37,8 +40,8 @@ public class IntegralCurves {
 		double tau;
 		double vau;
 		u.add(y0);
-		double[] Udomain = { ns.U[0], ns.U[ns.U.length - 1] };
-		double[] Vdomain = { ns.V[0], ns.V[ns.V.length - 1] };
+		double[] Udomain = { ns.getUKnotVector()[0], ns.getUKnotVector()[ns.getUKnotVector().length - 1] };
+		double[] Vdomain = { ns.getVKnotVector()[0], ns.getVKnotVector()[ns.getVKnotVector().length - 1] };
 		double u1 = Udomain[0];
 		double u2 = Udomain[1];
 		double v1 = Vdomain[0];
@@ -118,7 +121,7 @@ public class IntegralCurves {
 					for (double[] umb : umbilics) {
 						if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
 							IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-							intObj.umbilicIndex = umbilics.indexOf(umb);
+							intObj.setUmbilicIndex(umbilics.indexOf(umb));
 							System.out.println("near umbilic");
 							System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 							return intObj;
@@ -169,7 +172,7 @@ public class IntegralCurves {
 				}
 			}
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-		System.out.println("letzter Punkt: "+Arrays.toString(intObj.points.getLast()));
+		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 		return intObj;
 	}
 	
@@ -199,8 +202,8 @@ public class IntegralCurves {
 		double tau;
 		double vau;
 		u.add(y0);
-		double[] Udomain = { ns.U[0], ns.U[ns.U.length - 1] };
-		double[] Vdomain = { ns.V[0], ns.V[ns.V.length - 1] };
+		double[] Udomain = { ns.getUKnotVector()[0], ns.getUKnotVector()[ns.getUKnotVector().length - 1] };
+		double[] Vdomain = { ns.getVKnotVector()[0], ns.getVKnotVector()[ns.getVKnotVector().length - 1] };
 		double u1 = Udomain[0];
 		double u2 = Udomain[1];
 		double v1 = Vdomain[0];
@@ -432,8 +435,8 @@ public class IntegralCurves {
 	
 	public static LinkedList<double[]> umbilicPoints(NURBSSurface ns, int n){
 		LinkedList<double[]> umbilics = new LinkedList<double[]>();
-		double[] Udomain = { ns.U[0], ns.U[ns.U.length - 1] };
-		double[] Vdomain = { ns.V[0], ns.V[ns.V.length - 1] };
+		double[] Udomain = { ns.getUKnotVector()[0], ns.getUKnotVector()[ns.getUKnotVector().length - 1] };
+		double[] Vdomain = { ns.getVKnotVector()[0], ns.getVKnotVector()[ns.getVKnotVector().length - 1] };
 		double u1 = Udomain[0];
 		double u2 = Udomain[1];
 		double v1 = Vdomain[0];
@@ -466,8 +469,8 @@ public class IntegralCurves {
 		double eps = 1E-6;
 		
 		LinkedList<double[]> umbilics = new LinkedList<double[]>();
-		double[] Udomain = { ns.U[0], ns.U[ns.U.length - 1] };
-		double[] Vdomain = { ns.V[0], ns.V[ns.V.length - 1] };
+		double[] Udomain = { ns.getUKnotVector()[0], ns.getUKnotVector()[ns.getUKnotVector().length - 1] };
+		double[] Vdomain = { ns.getVKnotVector()[0], ns.getVKnotVector()[ns.getVKnotVector().length - 1] };
 		double u1 = Udomain[0];
 		double u2 = Udomain[1];
 		double v1 = Vdomain[0];
@@ -499,7 +502,7 @@ public class IntegralCurves {
 					}
 					Refinement rf = new Refinement(umbilics, ns, u1, v1, rfPoints, hu, hv, depth, i, j, 1);
 //					System.out.println("die liste "+IntegralCurves.refineUmbilics(rf).umbilcs);
-					umbilics.addAll(IntegralCurves.refineUmbilics(rf).umbilcs);
+					umbilics.addAll(IntegralCurves.refineUmbilics(rf).getUmbilcs());
 				}
 			}
 		}
@@ -520,17 +523,17 @@ public class IntegralCurves {
 	
 	private static Refinement refineUmbilics(Refinement umb){
 		
-		LinkedList<double[]>umbilics = umb.umbilcs;
-		NURBSSurface ns = umb.ns;
+		LinkedList<double[]>umbilics = umb.getUmbilcs();
+		NURBSSurface ns = umb.getNs();
 //		double [][]points = umb.point;
-		double hu = umb.hu;
-		double hv = umb.hv;
-		int depth = umb.depth;
-		int counter = umb.counter;
-		int i =umb.indexI;
-		int j = umb.indexJ;
-		double u1 = umb.u1;
-		double v1 = umb.v1;
+		double hu = umb.getHu();
+		double hv = umb.getHv();
+		int depth = umb.getDepth();
+		int counter = umb.getCounter();
+		int i =umb.getIndexI();
+		int j = umb.getIndexJ();
+		double u1 = umb.getU1();
+		double v1 = umb.getV1();
 //		LinkedList<double[]> u = new LinkedList<double[]>();
 //		System.out.println("Tiefe: "+ counter);
 //		System.out.println("input points");

@@ -65,6 +65,13 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.plugin.io.NurbsIO;
+import de.varylab.varylab.plugin.nurbs.data.FaceSet;
+import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
+import de.varylab.varylab.plugin.nurbs.data.IntObjects;
+import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
+import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
 	
@@ -513,7 +520,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				boundarySegments.add(b4);
 				int shiftedIndex = allSegments.size();
 				for (LineSegment bs : boundarySegments) {
-					bs.setCurveIndex(bs.curveIndex + shiftedIndex);
+					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);
 //				try {
@@ -530,10 +537,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
 				FaceSet fS = LineSegmentIntersection.createFaceSet(H);
-				for (int i = 0; i < fS.verts.length; i++) {
+				for (int i = 0; i < fS.getVerts().length; i++) {
 					double[] S = new double[4];
-					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, fS.verts[i][0], fS.verts[i][1], S);
-					fS.verts[i] = S;
+					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, fS.getVerts()[i][0], fS.getVerts()[i][1], S);
+					fS.getVerts()[i] = S;
 				}
 				System.out.println("FACESET:");
 				System.out.println(fS.toString());
@@ -553,7 +560,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				double[][] ipoints = new double[intersections.size()][];
 				int c = 0;
 				for (IntersectionPoint ip : intersections) {
-					iu[c] = ip.point;
+					iu[c] = ip.getPoint();
 					c++;
 				}
 				psfi.setVertexCount(iu.length);
@@ -589,8 +596,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
 			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,stepSize,umbilics, umbilicStop);
-			if(intObj.umbilicIndex != 0){
-				umbilicIndex.add(intObj.umbilicIndex);
+			if(intObj.getUmbilicIndex() != 0){
+				umbilicIndex.add(intObj.getUmbilicIndex());
 			}
 			Collections.reverse(intObj.getPoints());
 			all.addAll(intObj.getPoints());
@@ -600,8 +607,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			if(!intObj.isNearby()){
 				all.pollLast();
 				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics, umbilicStop);
-				if(intObj.umbilicIndex != 0){
-					umbilicIndex.add(intObj.umbilicIndex);
+				if(intObj.getUmbilicIndex() != 0){
+					umbilicIndex.add(intObj.getUmbilicIndex());
 				}
 				all.addAll(intObj.getPoints());
 			}else{
@@ -623,10 +630,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					seg[0] = firstcurvePoint;
 					seg[1] = secondCurvePoint;
 					LineSegment ls = new  LineSegment();
-					ls.indexOnCurve = index ;
-					ls.segment = seg;
-					ls.curveIndex = curveIndex;
-					ls.cyclic = cyclic;
+					ls.setIndexOnCurve(index) ;
+					ls.setSegment(seg);
+					ls.setCurveIndex(curveIndex);
+					ls.setCyclic(cyclic);
 					segments.add(ls);
 					firstcurvePoint = secondCurvePoint;
 				}

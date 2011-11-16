@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.Arrays;
 

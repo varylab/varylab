@@ -2,6 +2,8 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.LinkedList;
 
+import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+
 	public class NURBSSurface {
 
 		protected double[] U;

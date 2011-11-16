@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.LinkedList;
 
@@ -36,7 +36,6 @@ public class IntObjects {
 		orientation = o;
 		nearby = n;
 	}
-	
 
 	public LinkedList<double[]> getPoints() {
 		return points;
@@ -62,8 +61,22 @@ public class IntObjects {
 		this.nearby = nearby;
 	}
 
-	public void setCyclic(boolean b) {
-		cyclic = b;
+	public boolean isMaxMin() {
+		return maxMin;
 	}
 
+	public void setMaxMin(boolean maxMin) {
+		this.maxMin = maxMin;
+	}
+
+	public boolean isCyclic() {
+		return cyclic;
+	}
+
+	public void setCyclic(boolean cyclic) {
+		this.cyclic = cyclic;
+	}
+	
+
+	
 }

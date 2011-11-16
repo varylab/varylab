@@ -1,6 +1,7 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.math;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
 
 public class NURBSChristoffelUtility {
@@ -8,17 +9,17 @@ public class NURBSChristoffelUtility {
 	public static ChristoffelInfo christoffel(NURBSSurface ns, double u, double v){
 		
 		ChristoffelInfo cI = new ChristoffelInfo();
-		double[] U = ns.U;
-		double[] V = ns.V;
-		int p = ns.p;
-		int q = ns.q;
+		double[] U = ns.getUKnotVector();
+		double[] V = ns.getVKnotVector();
+		int p = ns.getUDegree();
+		int q = ns.getVDegree();
 		
 		double[][][]SKL1 = new double[p+1][q+1][4];
 		double[][][]SKL = new double[p+1][q+1][3];
 
-		int nl = ns.controlMesh.length-1;
-		int ml = ns.controlMesh[0].length-1;
-		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.controlMesh, u, v, 4, SKL1);		
+		int nl = ns.getControlMesh().length-1;
+		int ml = ns.getControlMesh()[0].length-1;
+		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
 		for (int i = 0; i < SKL1.length; i++) {
@@ -43,9 +44,6 @@ public class NURBSChristoffelUtility {
 		} else {
 			cI.setSvv(SKL[0][2]);
 		}
-//		System.out.println("Suu: "+ Arrays.toString(cI.Suu));
-//		System.out.println("Svv: "+ Arrays.toString(cI.Svv));
-//		System.out.println("Suv: "+ Arrays.toString(cI.Suv));
 		
 		// partial derivatives of the metric tensor
 		
@@ -72,13 +70,7 @@ public class NURBSChristoffelUtility {
 		cI.setG212(cI.getG122());
 		cI.setG221(0.5 * (g11 * (2 * Fv - Gu) + g12 * Gv));
 		cI.setG222(0.5 * (g21 * (2 * Fv - Gu) + g22 * Gv));
-//		System.out.println("G111: "+ cI.G111);
-//		System.out.println("G112: "+ cI.G112);
-//		System.out.println("G121: "+ cI.G121);
-//		System.out.println("G122: "+ cI.G122);
-//		System.out.println("G211: "+ cI.G211);
-//		System.out.println("G222: "+ cI.G222);
-		
+
 		return cI;
 	}
 

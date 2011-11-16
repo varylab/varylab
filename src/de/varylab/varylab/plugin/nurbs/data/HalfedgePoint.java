@@ -1,7 +1,8 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+
 
 public class HalfedgePoint {
 	
@@ -65,9 +66,9 @@ public class HalfedgePoint {
 
 	@Override
 	public String toString() {
-		System.out.println("HalfedgePoint:" + Arrays.toString(point.point));
+		System.out.println("HalfedgePoint:" + Arrays.toString(point.getPoint()));
 		for (IntersectionPoint n : nbrs) {
-			System.out.println(Arrays.toString(n.point));
+			System.out.println(Arrays.toString(n.getPoint()));
 		}
 		return "";
 	}

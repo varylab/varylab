@@ -1,6 +1,7 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.math;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NURBSCurvatureUtility {
@@ -17,18 +18,18 @@ public class NURBSCurvatureUtility {
 		CurvatureInfo dG = new CurvatureInfo();
 		
 		double[] FFs = new double[6];
-		double[] U = ns.U;
-		double[] V = ns.V;
-		int p = ns.p;
-		int q = ns.q;
+		double[] U = ns.getUKnotVector();
+		double[] V = ns.getVKnotVector();
+		int p = ns.getUDegree();
+		int q = ns.getVDegree();
 		
 		double[][][]SKL1 = new double[p+1][q+1][4];
 		double[][][]SKL = new double[p+1][q+1][3];
 
 		
-		int nl = ns.controlMesh.length-1;
-		int ml = ns.controlMesh[0].length-1;
-		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.controlMesh, u, v, 4, SKL1);		
+		int nl = ns.getControlMesh().length-1;
+		int ml = ns.getControlMesh()[0].length-1;
+		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
 		for (int i = 0; i < SKL1.length; i++) {

@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.nurbs;
 
 import de.varylab.varylab.plugin.nurbs.LineSegmentIntersection.PointStatus;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 
 public class EventPoint {

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 
 public class TreeSegmentComparator implements Comparator<LineSegment>{
@@ -24,27 +25,27 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 		double c2;
 		double d1;
 		double d2;
-		if(s2.segment[0][1] < s2.segment[1][1] || (s2.segment[0][1] == s2.segment[1][1] && s2.segment[0][0] > s2.segment[1][0])){
-			b1 = s2.segment[0][0];
-			b2 = s2.segment[0][1];
-			a1 = s2.segment[1][0];
-			a2 = s2.segment[1][1];
+		if(s2.getSegment()[0][1] < s2.getSegment()[1][1] || (s2.getSegment()[0][1] == s2.getSegment()[1][1] && s2.getSegment()[0][0] > s2.getSegment()[1][0])){
+			b1 = s2.getSegment()[0][0];
+			b2 = s2.getSegment()[0][1];
+			a1 = s2.getSegment()[1][0];
+			a2 = s2.getSegment()[1][1];
 		}else{
-			a1 = s2.segment[0][0];
-			a2 = s2.segment[0][1];
-			b1 = s2.segment[1][0];
-			b2 = s2.segment[1][1];
+			a1 = s2.getSegment()[0][0];
+			a2 = s2.getSegment()[0][1];
+			b1 = s2.getSegment()[1][0];
+			b2 = s2.getSegment()[1][1];
 		}
-		if(s1.segment[0][1] < s1.segment[1][1] || (s1.segment[0][1] == s1.segment[1][1] && s1.segment[0][0] > s1.segment[1][0])){
-			d1 = s1.segment[0][0];
-			d2 = s1.segment[0][1];
-			c1 = s1.segment[1][0];
-			c2 = s1.segment[1][1];
+		if(s1.getSegment()[0][1] < s1.getSegment()[1][1] || (s1.getSegment()[0][1] == s1.getSegment()[1][1] && s1.getSegment()[0][0] > s1.getSegment()[1][0])){
+			d1 = s1.getSegment()[0][0];
+			d2 = s1.getSegment()[0][1];
+			c1 = s1.getSegment()[1][0];
+			c2 = s1.getSegment()[1][1];
 		}else{
-			c1 = s1.segment[0][0];
-			c2 = s1.segment[0][1];
-			d1 = s1.segment[1][0];
-			d2 = s1.segment[1][1];
+			c1 = s1.getSegment()[0][0];
+			c2 = s1.getSegment()[0][1];
+			d1 = s1.getSegment()[1][0];
+			d2 = s1.getSegment()[1][1];
 		}
 		
 //		if(isHorizontal(s1)){
