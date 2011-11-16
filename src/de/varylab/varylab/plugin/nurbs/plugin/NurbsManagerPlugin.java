@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.plugin;
 
 import static java.awt.GridBagConstraints.BOTH;
 import static javax.swing.JFileChooser.FILES_ONLY;
@@ -65,6 +65,11 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.plugin.io.NurbsIO;
+import de.varylab.varylab.plugin.nurbs.LineSegmentIntersection;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
+import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
+import de.varylab.varylab.plugin.nurbs.VertexComparator;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
@@ -306,10 +311,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			if(segmentButton.isSelected()){
 				LinkedList<double[]> points = IntegralCurves.geodesicSegmentBetweenTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), a, b, eps, tol,nearby);
 				PointSetFactory psf = new PointSetFactory();
-				int p = surfaces.get(surfacesTable.getSelectedRow()).p;
-				int q = surfaces.get(surfacesTable.getSelectedRow()).q;
-				double[] U = surfaces.get(surfacesTable.getSelectedRow()).U;
-				double[] V = surfaces.get(surfacesTable.getSelectedRow()).V;
+				int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
+				int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
+				double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
+				double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
 				double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
 				double[][] u = new double[points.size()][];
 				double[][] surfacePoints = new double[points.size()][];
@@ -351,10 +356,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				LinkedList<double[]> points = IntegralCurves.geodesicExponentialGivenByTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), a, b, eps, tol,nearby);
 				points.addAll(IntegralCurves.geodesicExponentialGivenByTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), b, a, eps, tol, nearby));
 				PointSetFactory psf = new PointSetFactory();
-				int p = surfaces.get(surfacesTable.getSelectedRow()).p;
-				int q = surfaces.get(surfacesTable.getSelectedRow()).q;
-				double[] U = surfaces.get(surfacesTable.getSelectedRow()).U;
-				double[] V = surfaces.get(surfacesTable.getSelectedRow()).V;
+				int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
+				int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
+				double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
+				double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
 				double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
 				double[][] u = new double[points.size()][];
 				double[][] surfacePoints = new double[points.size()][];
@@ -448,10 +453,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			int n = 201;
 			LinkedList<double[]> umbilics = IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n);
 			PointSetFactory psfu = new PointSetFactory();
-			int p = surfaces.get(surfacesTable.getSelectedRow()).p;
-			int q = surfaces.get(surfacesTable.getSelectedRow()).q;
-			double[] U = surfaces.get(surfacesTable.getSelectedRow()).U;
-			double[] V = surfaces.get(surfacesTable.getSelectedRow()).V;
+			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
+			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
+			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
+			double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
 			double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
 			double[][] uu = new double[umbilics.size()][];
 			double[][] upoints = new double[umbilics.size()][];
@@ -681,8 +686,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			super("Polygonal Curves");
 			setShrinked(true);
 			setLayout(new GridBagLayout());
-			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
-			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+//			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+//			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 		}
 		
 		public void actionPerformed(ActionEvent e){
