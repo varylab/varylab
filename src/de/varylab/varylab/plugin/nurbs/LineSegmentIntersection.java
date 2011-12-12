@@ -486,21 +486,21 @@ public class LineSegmentIntersection {
 		}
 		
 //		System.out.println("HalfedgePoints");
-		int zwei = 0;
-		int drei = 0;
-		int vier = 0;
-		for (HalfedgePoint hp : halfPoints) {
-			if(hp.getNbrs().size() == 3){
-				zwei++;
-			}
-			if(hp.getNbrs().size() == 4){
-				drei++;
-			}
-			if(hp.getNbrs().size() == 5){
-				vier++;
-			}
-			System.out.println(hp.toString());
-		}
+//		int zwei = 0;
+//		int drei = 0;
+//		int vier = 0;
+//		for (HalfedgePoint hp : halfPoints) {
+//			if(hp.getNbrs().size() == 3){
+//				zwei++;
+//			}
+//			if(hp.getNbrs().size() == 4){
+//				drei++;
+//			}
+//			if(hp.getNbrs().size() == 5){
+//				vier++;
+//			}
+//			System.out.println(hp.toString());
+//		}
 //		System.out.println("zwei" + zwei);
 //		System.out.println("drei" + drei);
 //		System.out.println("vier" + vier);
