@@ -100,6 +100,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private PolygonalCurvePanel
 		polygonalCurvePanel = new PolygonalCurvePanel();
 	
+	private PointDistancePanel
+		pointDistancePanel = new PointDistancePanel();
+	
 	private JButton
 		importButton = new JButton(importAction),
 		updateButton = new JButton("update");
@@ -173,6 +176,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		shrinkPanel.add(geodesicPanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(polygonalCurvePanel, c);
+		c.weighty = 0.0;
+		shrinkPanel.add(pointDistancePanel, c);
 	}
 
 	private void configureFileChooser() {
@@ -410,7 +415,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private JRadioButton
 			maxButton = new JRadioButton("Max Curvature (red)"),
 			minButton = new JRadioButton("Min Curvature (cyan)"),
-			intersectionButton = new JRadioButton("discrete curvature parametrization");
+			intersectionButton = new JRadioButton("Bentley Ottmann");
 		
 		 
 		public CurvatureLinesPanel() {
@@ -536,8 +541,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				} catch (Exception e1) {
 //					e1.printStackTrace();
 //				}
-				
+				double firstTimeDouble = System.currentTimeMillis();
+				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
+				double lastTimeDouble = System.currentTimeMillis();
+				System.out.println("Double Time: " + (lastTimeDouble - firstTimeDouble));
+				double firstTimeBentley = System.currentTimeMillis();
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
+				double lastTimeBentley = System.currentTimeMillis();
+				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
@@ -547,8 +558,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, fS.getVerts()[i][0], fS.getVerts()[i][1], S);
 					fS.getVerts()[i] = S;
 				}
-				System.out.println("FACESET:");
-				System.out.println(fS.toString());
+//				System.out.println("FACESET:");
+//				System.out.println(fS.toString());
 				HalfedgeLayer hel = new HalfedgeLayer(hif);
 				hel.setName("Curvature Geometry");
 				try {
@@ -696,7 +707,24 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 	}
 	
-
+	private class PointDistancePanel extends ShrinkPanel implements ActionListener{
+		
+		private static final long 
+		serialVersionUID = 1L;
+		
+		public PointDistancePanel() {
+			super("Point Distance");
+			setShrinked(true);
+			setLayout(new GridBagLayout());
+//			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+//			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+		}
+		
+		public void actionPerformed(ActionEvent e){
+			
+		}
+		
+	}
 
 	private class SurfaceTableModel extends DefaultTableModel {
 
