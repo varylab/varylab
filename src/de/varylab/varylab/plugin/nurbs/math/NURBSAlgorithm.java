@@ -381,4 +381,77 @@ public class NURBSAlgorithm {
 				}
 		}
 	}
+	
+	
+	/**
+	 * Algorithm A5.6 from the NURBS Book
+	 * 
+	 * @param n
+	 * @param p
+	 * @param U
+	 * @param Pw
+	 * @param nb
+	 * @param Qw
+	 */
+	public static void DecomposeCurve(int n, int p, double[] U, double[]Pw, int nb, double[][]Qw){
+		int m = n + p + 1;
+		int a = p;
+		int b = p + 1;
+		nb = 0;
+		for(int i = 0; i <= p; i++){
+			Qw[nb][i] = Pw[i];
+		}
+		while(b < m){
+			int i = b;
+			while(b < m && U[b + 1] == U[b]){
+				int mult = b - i + 1;
+				if(mult < p){
+					double numer = U[b] - U[a]; // Numerator of alpha
+					double[] alphas = new double[p - mult];
+					// Compute and store alphas
+					for (int j = p; j > mult; j--) {
+						alphas[j - mult + 1 ] = numer / (U[a + j] - U[a]);
+					}
+					int r = p - mult; // Insert knot r times
+					for (int j = 1; j <= r; j++) {
+						int save = r - j;
+						int s = mult + j; /* This many new points*/
+						for (int k = p; k >= s; k--) {
+							double alpha = alphas[k - s];
+							Qw[nb][k] = alpha * Qw[nb][k] + (1.0 - alpha) * Qw[nb][k - 1];
+						}
+						if(b < m){ /* Control point of*/
+							Qw[nb + 1][save] = Qw[nb][p]; /* next segment */
+						}
+					}
+				}
+				nb = nb + 1;
+				if(b < m){
+					for(i = p - mult; i <= p; i++){
+						Qw[nb][i] = Pw[b - p + i];
+					}
+					a = b;
+					b = b + 1;
+				}
+			}
+		}
+		
+		
+	}
+	
+	public static void DecomposeSurface(int n, int p, double[] U,int m, int q, double [] V,double[][]Pw, boolean dir, int nb, double[][][]Qw){
+		if(dir == true){
+			int a = p; 
+			int b = p + 1;
+			nb = 0;
+			for(int i = 0; i <= p; i++){
+				for(int row = 0; row <= m; row++){
+					Qw[nb][i][row] = Pw[i][row];
+				}
+			}
+			while (b < m){
+				
+			}
+		}
+	}
 }
