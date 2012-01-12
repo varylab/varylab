@@ -1,5 +1,4 @@
 package de.varylab.varylab.plugin.nurbs;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,77 +19,55 @@ import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.data.LineSegmentsInBoxDomain;
 
 public class LineSegmentIntersection {
 	
-
-//	public static LinkedList<IntersectionPoint> BentleyOttmannAlgoritm(List<LineSegment> segments){
-//		Set<RLineSegment2D> RSegments = new HashSet<RLineSegment2D>();
-//		Map<RLineSegment2D, LineSegment> inverseMap = new HashMap<RLineSegment2D, LineSegment>();
-//		
-//		System.out.println("START TO CONVERT TO RATIONAL");
-//		for (LineSegment ls : segments) {			
-//			
-//			BigRational BigP1X = new BigRational(ls.segment[0][0]);
-//			BigRational BigP1Y = new BigRational(ls.segment[0][1]);
-//			BigRational BigP2X = new BigRational(ls.segment[1][0]);
-//			BigRational BigP2Y = new BigRational(ls.segment[1][1]);
-//			
-//			Rational p1X = new Rational(BigP1X.getNumerator(), BigP1X.getDenominator());
-//			Rational p1Y = new Rational(BigP1Y.getNumerator(), BigP1Y.getDenominator());
-//			Rational p2X = new Rational(BigP2X.getNumerator(), BigP2X.getDenominator());
-//			Rational p2Y = new Rational(BigP2Y.getNumerator(), BigP2Y.getDenominator());
-//			
-//			RPoint2D p1 = new RPoint2D(p1X, p1Y);
-//			RPoint2D p2 = new RPoint2D(p2X, p2Y);
-//			
-//			RLineSegment2D rSeg = new RLineSegment2D(p1, p2, ls.curveIndex, ls.indexOnCurve);
-//			if(p1.isLeftOf(p2) || (!p1.isLeftOf(p2) && !p1.isRightOf(p2) && p1.isBelow(p2))){
-//			}
-//			else{
-//				rSeg = new RLineSegment2D(p2, p1,  ls.curveIndex, ls.indexOnCurve);
-//			}
-//			inverseMap.put(rSeg, ls);
-//			RSegments.add(rSeg);
-//		}
-//		System.out.println("START TO COMPUTE INTERSECTIONS");
-//		LinkedList<IntersectionPoint> intersectionPoints = new LinkedList<IntersectionPoint>();
-//		Map<RPoint2D, Set<RLineSegment2D>> intersections = BentleyOttmann.intersectionsMap(RSegments);
-//		for(RPoint2D point : intersections.keySet()){
-//			LinkedList<LineSegment> segList = new LinkedList<LineSegment>();
-//			for (RLineSegment2D lS2D : intersections.get(point)) {
-//				segList.add(inverseMap.get(lS2D));
-//			}
-//			IntersectionPoint ip = new IntersectionPoint();
-//			double x = point.x.doubleValue();
-//			double y = point.y.doubleValue();
-//			ip.point = new double[2];
-//			ip.point[0] = x;
-//			ip.point[1] = y;
-//			ip.intersectingSegments = segList;
-//			
-//			intersectionPoints.add(ip);
-//		}
-//		System.out.println("BentleyOttmannAlgoritm IntersectionSize: " + intersections.size());
-////		for (IntersectionPoint ip : intersectionPoints) {
-////			System.out.println();
-////			System.out.println("IntersectionPoint " + Arrays.toString(ip.point));
-////			for (LineSegment ls : ip.intersectingSegments) {
-////				System.out.println("curveIndex " + ls.curveIndex + " indexOnCurve " + ls.indexOnCurve);
-////				System.out.println("indexOnCurveFromIntersectionPointAndCurveIndex " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(ls.curveIndex, ip));
-////				
-////			}
-////			
-////		}
-//		return intersectionPoints;
-//	}
+	
+	private static List<LineSegment> searchForIntersectionDomains(List<LineSegment> segments, int numberOfCurves, double []xDomain, double[]yDomain){
+		int refine = numberOfCurves * 5;
+		LineSegmentsInBoxDomain[][] domains = new LineSegmentsInBoxDomain[refine][refine];
+		//j for x and i for y
+		for (int i = 0; i < refine; i++) {
+			for (int j = 0; j < refine; j++) {
+				domains[i][j].setSegmentList(new LinkedList<LineSegment>());
+				domains[i][j].setCurveIndicies(new LinkedList<Integer>());
+				double[] xBoxDomain = new double[2];
+				xBoxDomain[0] = xDomain[0] + j *(xDomain[1] - xDomain[0]) / refine;
+				xBoxDomain[1] = xDomain[0] + (j + 1) *(xDomain[1] - xDomain[0]) / refine;
+				domains[i][j].setxBoxDomain(xBoxDomain);
+				double[] yBoxDomain = new double[2];
+				yBoxDomain[0] = yDomain[0] + i *(yDomain[1] - yDomain[0]) / refine;
+				yBoxDomain[1] = yDomain[0] + (i + 1) *(yDomain[1] - yDomain[0]) / refine;
+				domains[i][j].setyBoxDomain(yBoxDomain);
+				if(j == 0){
+					domains[i][j].setLowerXBound(true);
+				}
+				if(j == refine - 1){
+					domains[i][j].setUpperXBound(true);
+				}
+				if(i == 0){
+					domains[i][j].setLowerYBound(true);
+				}
+				if(i == refine - 1){
+					domains[i][j].setUpperYBound(true);
+				}
+			}
+		}
+		for (LineSegment ls : segments) {
+			
+		}
+		return null;
+	}
 	
 	
 	public static LinkedList<IntersectionPoint> BentleyOttmannAlgoritm(List<LineSegment> segments){
 		Set<RLineSegment2D> RSegments = new HashSet<RLineSegment2D>();
 		Map<RLineSegment2D, LineSegment> inverseMap = new HashMap<RLineSegment2D, LineSegment>();
 		
-		for (LineSegment ls : segments) {			
+		int segmentCounter = 0;
+		for (LineSegment ls : segments) {	
+			segmentCounter++;
 			long p1X = (long)(ls.getSegment()[0][0] * 100000000) / 1;
 			long p1Y = (long)(ls.getSegment()[0][1] * 100000000) / 1;
 			long p2X = (long)(ls.getSegment()[1][0] * 100000000) / 1;
@@ -109,6 +86,7 @@ public class LineSegmentIntersection {
 			RSegments.add(rSeg);
 			
 		}
+		System.out.println("# segments = " + segmentCounter);
 		System.out.println("START TO COMPUTE INTERSECTIONS");
 		LinkedList<IntersectionPoint> intersectionPoints = new LinkedList<IntersectionPoint>();
 		Map<RPoint2D, Set<RLineSegment2D>> intersections = BentleyOttmann.intersectionsMap(RSegments);
@@ -485,25 +463,6 @@ public class LineSegmentIntersection {
 			hP.setNbrs(ori);
 		}
 		
-//		System.out.println("HalfedgePoints");
-//		int zwei = 0;
-//		int drei = 0;
-//		int vier = 0;
-//		for (HalfedgePoint hp : halfPoints) {
-//			if(hp.getNbrs().size() == 3){
-//				zwei++;
-//			}
-//			if(hp.getNbrs().size() == 4){
-//				drei++;
-//			}
-//			if(hp.getNbrs().size() == 5){
-//				vier++;
-//			}
-//			System.out.println(hp.toString());
-//		}
-//		System.out.println("zwei" + zwei);
-//		System.out.println("drei" + drei);
-//		System.out.println("vier" + vier);
 		
 		return halfPoints;
 	}
@@ -725,10 +684,10 @@ public class LineSegmentIntersection {
 				}
 			}
 		}
-		System.out.println("Intersections: ");
-		for (IntersectionPoint ip : interPoints) {
-			System.out.println(ip.toString());
-		}
+//		System.out.println("Intersections: ");
+//		for (IntersectionPoint ip : interPoints) {
+//			System.out.println(ip.toString());
+//		}
 		return interPoints;
 	}
 	
