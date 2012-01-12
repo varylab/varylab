@@ -13,6 +13,8 @@ import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 
 @NurbsUVCoordinate
 public class NurbsUVAdapter extends AbstractAdapter<double[]> {
+	
+	
 
 	Map<Integer,double[]>
 		indexUVMap = null;
