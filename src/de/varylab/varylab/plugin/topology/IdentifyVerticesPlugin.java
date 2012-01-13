@@ -219,7 +219,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 						System.out.println(v +" - "+w+": "+dist);
 						if(dist <= distance) {
 							if(noEdgeCollapseChecker.isSelected()) {
-								if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)w) != null) {
+								if(HalfEdgeUtils.findEdgeBetweenVertices(v, w) != null) {
 									continue;
 								}
 							}

@@ -24,6 +24,7 @@ import de.varylab.varylab.plugin.nurbs.data.LineSegmentsInBoxDomain;
 public class LineSegmentIntersection {
 	
 	
+	@SuppressWarnings("unused")
 	private static List<LineSegment> searchForIntersectionDomains(List<LineSegment> segments, int numberOfCurves, double []xDomain, double[]yDomain){
 		int refine = numberOfCurves * 5;
 		LineSegmentsInBoxDomain[][] domains = new LineSegmentsInBoxDomain[refine][refine];

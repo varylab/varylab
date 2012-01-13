@@ -43,12 +43,14 @@ public class TaoExample {
 		extends TaoApplication	
 		implements TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess 
 	{	
+		@Override
 		public double evaluateObjectiveAndGradient(Vec xv, Vec gv) {
 			double x = xv.getValue(0);
 			gv.setValue(0, 2*x, INSERT_VALUES);
 			gv.assemble();
 			return x*x;
 		}
+		@Override
 		public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {
 			H.setValue(0, 0, 2, INSERT_VALUES);
 			H.assemble();

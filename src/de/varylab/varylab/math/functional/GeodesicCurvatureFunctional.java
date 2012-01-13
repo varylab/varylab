@@ -42,6 +42,7 @@ public class GeodesicCurvatureFunctional <
 		this.aSet = aSet;
 	}
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
@@ -75,16 +76,19 @@ public class GeodesicCurvatureFunctional <
 	}
 	
 	
+	@Override
 	public boolean hasHessian() {
 		return false;
 	}
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int getDimension(HDS hds) {
 		return hds.getVertices().size() * 3;
 	}
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int[][] getNonZeroPattern(HDS hds) {return null;}

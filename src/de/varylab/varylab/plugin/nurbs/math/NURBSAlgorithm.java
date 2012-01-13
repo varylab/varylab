@@ -441,7 +441,7 @@ public class NURBSAlgorithm {
 	
 	public static void DecomposeSurface(int n, int p, double[] U,int m, int q, double [] V,double[][]Pw, boolean dir, int nb, double[][][]Qw){
 		if(dir == true){
-			int a = p; 
+//			int a = p; 
 			int b = p + 1;
 			nb = 0;
 			for(int i = 0; i <= p; i++){

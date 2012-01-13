@@ -57,24 +57,16 @@ import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
-import de.jtem.jpetsc.Mat;
-import de.jtem.jpetsc.Vec;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
-import de.jtem.jtao.Tao;
-import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
-import de.jtem.jtao.TaoAppAddHess;
-import de.jtem.jtao.TaoApplication;
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariables;
 import de.jtem.numericalMethods.calculus.minimizing.Info;
 import de.jtem.numericalMethods.calculus.minimizing.NelderMead;
@@ -88,7 +80,6 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.VertexComparator;
 import de.varylab.varylab.plugin.nurbs.adapter.FlatIndexFormAdapter;
-import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
@@ -100,7 +91,6 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointDistanceCalculator;
-import de.varylab.varylab.plugin.nurbs.type.CurvatureLineField;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
 	
@@ -501,7 +491,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 			
 
-			int n = 201;
+//			int n = 201;
 			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
 			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
 			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
@@ -556,7 +546,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //					e1.printStackTrace();
 //				}
 				double firstTimeDouble = System.currentTimeMillis();
-				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
+//				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
 				System.out.println("Double Time: " + (lastTimeDouble - firstTimeDouble));
 				double firstTimeBentley = System.currentTimeMillis();
@@ -715,6 +705,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			
 		}
@@ -738,6 +729,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		}
 		
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			double[] point = new double[3];
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());

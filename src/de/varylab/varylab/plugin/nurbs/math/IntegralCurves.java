@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.Refinement;
 import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 
