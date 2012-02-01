@@ -74,7 +74,6 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.io.NurbsIO;
-import de.varylab.varylab.plugin.nurbs.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
@@ -88,12 +87,12 @@ import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
+import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointDistanceCalculator;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
-	
 	
 
 	private HalfedgeInterface 
@@ -489,9 +488,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				System.out.println();
 			}
 			
-			
 
-//			int n = 201;
 			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
 			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
 			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
@@ -502,6 +499,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean inter = intersectionButton.isSelected();
 			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
+			
+
 			for(VVertex v : vSet) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
 					if (max){
@@ -518,7 +517,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 			if(inter){
 				// default patch
-				List<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
+				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
 				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
 				double[][] seg1 = {{0,0},{1,0}};
 				LineSegment b1 = new LineSegment(seg1, 1, 1);
@@ -537,14 +536,35 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);
+//				String str = new String();
 //				try {
 //					System.out.println("PRINT OUT START");
-//					FileWriter testOut = new FileWriter("testSegments.xml");
-//					XStream xStream = new XStream();
-//					xStream.toXML(allSegments, testOut);
+//					FileWriter testOut = new FileWriter("testSegmentsNew.txt");
+//					int ijk = 0;
+//					for (LineSegment ls : allSegments) {
+//						++ijk;
+//						str = ls.getSegment()[0][0] + " " + ls.getSegment()[0][1] + " " + ls.getSegment()[1][0] + " " + ls.getSegment()[1][1] + "\n";
+//						testOut.write(str);
+//						if(ijk%10000 == 0) {
+//							System.out.print(".");
+//						}
+//					}
+//					testOut.close();
 //				} catch (Exception e1) {
 //					e1.printStackTrace();
 //				}
+//				double firstTimeDouble = System.currentTimeMillis();
+//				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
+//				double lastTimeDouble = System.currentTimeMillis();
+//				System.out.println("Double Time: " + (lastTimeDouble - firstTimeDouble));
+//				double firstTimeBentley = System.currentTimeMillis();
+//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
+//				double lastTimeBentley = System.currentTimeMillis();
+//				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
+				
+				System.out.println("mit preSelection");
+				
+				allSegments = LineSegmentIntersection.preSelection(0, 1, 0, 1, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
@@ -701,8 +721,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			super("Polygonal Curves");
 			setShrinked(true);
 			setLayout(new GridBagLayout());
-//			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
-//			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 		}
 		
 		@Override
@@ -719,50 +737,54 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private JButton
 		goButton = new JButton("Go");
 		
+		private JRadioButton
+		bezierPatches = new JRadioButton("divide into Bezier Patches");
+		
 		public PointDistancePanel() {
 			super("Point Distance");
 			setShrinked(true);
 			setLayout(new GridBagLayout());
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+			add(bezierPatches, rc);
 			add(goButton, rc);
 			goButton.addActionListener(this);
+			
+			
 		}
-		
-		
+	
 		@Override
 		public void actionPerformed(ActionEvent e){
 			double[] point = new double[3];
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
+			System.out.println(ns.toString());
 			double[] surfacePoint = PointDistanceCalculator.surfacePoint(point, ns);
 			
-			HalfedgeLayer hel = new HalfedgeLayer(hif);
-			hel.setName("Point Distance");
+			HalfedgeLayer helPoint = new HalfedgeLayer(hif);
+			helPoint.setName("Point Distance");
 //			try {
 //				FileOutputStream fos = new FileOutputStream("test.obj");
 //				WriterOBJ.write(fS.getIndexedFaceSet(), fos);
 //				fos.close();
 //			} catch (Exception e2) {}
 //			hel.set(fS.getIndexedFaceSet());
-			hif.addLayer(hel);
+			hif.addLayer(helPoint);
 			hif.update();
 			PointSetFactory psfi = new PointSetFactory();
 			
-			
 			psfi.setVertexCount(1);
-
 			
-				psfi.setVertexCoordinates(surfacePoint);
-				psfi.update();
-				SceneGraphComponent sgci = new SceneGraphComponent("point distance");
-				SceneGraphComponent distancePointComp = new SceneGraphComponent("Intersection");
-				sgci.addChild(distancePointComp);
-				sgci.setGeometry(psfi.getGeometry());
-				Appearance iAp = new Appearance();
-				sgci.setAppearance(iAp);
-				DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
-				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-				ipointShader.setDiffuseColor(Color.orange);
-				hif.getActiveLayer().addTemporaryGeometry(sgci);
+			psfi.setVertexCoordinates(surfacePoint);
+			psfi.update();
+			SceneGraphComponent sgci = new SceneGraphComponent("point distance");
+			SceneGraphComponent distancePointComp = new SceneGraphComponent("Intersection");
+			sgci.addChild(distancePointComp);
+			sgci.setGeometry(psfi.getGeometry());
+			Appearance iAp = new Appearance();
+			sgci.setAppearance(iAp);
+			DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
+			DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
+			ipointShader.setDiffuseColor(Color.orange);
+			hif.getActiveLayer().addTemporaryGeometry(sgci);
 			
 		}
 		
@@ -909,11 +931,22 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 	
 	private LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
+		NURBSSurface ns = getSelectedSurface();
+		double u0 = ns.getUKnotVector()[0];
+		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
+		double v0 = ns.getVKnotVector()[0];
+		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
 		for (VVertex v : hds.getVertices()) {
 			double[] NurbsuvCoordinate = as.get(NurbsUVCoordinate.class, v, double[].class);
 			double uCoord = NurbsuvCoordinate[0];
 			double vCoord = NurbsuvCoordinate[1];
-			NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
+			if(uCoord < u0 || uCoord > u1){
+				System.out.println("uCoord is out of domain " + uCoord);
+			}
+			if(vCoord < v0 || vCoord > v1){
+				System.out.println("uCoord is out of domain " + vCoord);
+			}
+			
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, uCoord, vCoord);
 			double[] vector = ci.getCurvatureDirectionsDomain()[0];
 			linefield.set(v, vector, as);
@@ -925,14 +958,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
 		for (VFace f : hds.getFaces()){
 			double result = indexAdapter.get(f, as);
-			if(Math.abs(Math.abs(result) - 1) < 0.01){
+			if(Math.abs(Math.abs(result) - 1) < 0.001){
 				umbFaces.add(result);
 				umbilicFaces.add(f);
 			}
 		}
-		for (Double d : umbFaces) {
-			System.out.println(" FaceValue: " + d);
-		}
+
 		RealFunctionOfSeveralVariables fun = new RealFunctionOfSeveralVariables() {
 			@Override
 			public int getNumberOfVariables() {
@@ -948,10 +979,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				if(p[0] < u0 || p[0] > u1){
 					System.out.println("Nelder-Mead out of domain");
 					System.out.println("p[0]: " + p[0]);
+					return 10000;
 				}
 				if(p[1] < v0 || p[1] > v1){
 					System.out.println("Nelder-Mead out of domain");
 					System.out.println("p[1]: " + p[1]);
+					return 10000;
 				}
 				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
 				double H = ci.getMeanCurvature();

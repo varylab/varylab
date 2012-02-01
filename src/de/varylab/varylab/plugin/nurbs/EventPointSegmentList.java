@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.LinkedList;
 
+import de.varylab.varylab.plugin.nurbs.data.EventPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 

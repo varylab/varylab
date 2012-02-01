@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.XStream;
 
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 
 public class IntersectionTests {
 	

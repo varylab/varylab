@@ -1,7 +1,50 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
-import de.jreality.math.Rn;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+
+/**
+ *<p><strong>Some useful definitions and explanations</strong></p>
+ * 
+ * <strong>1.Knot vector</strong><br/>
+ * The knot vector is defined by U:={u[0],u[1],...u[m-1],u[m]} where u[i]is a
+ * double value and u[i] <= u[j] for all i < j. <br/> 
+ * A special case (and this is what we use) is a clamped knot vector.<br/>
+ * This vector has the following property: 
+ * if u[0] = u[1] = ...= u[i] != u[i+1] then u[m-i-1] != u[m-i] =...= u[m-1] = u[m].<br/>
+ * For example U:={0,0,0,1,2,2,2} is clamped.<br/>
+ * The B-spline representation with a knot vector of the form U={0,...,0,1,...,1} ,
+ * where 0 and 1 appear p + 1 times, is a generalization<br/> of the Bezier
+ * representation.<br/>
+ * More general we define the Bezier representation as U:={a,...,a,b,...,b} a < b(used in decomposeSurface)<br/>
+ * This is a translation 0 -> a and a dilation 1 -> (b - a) of the Bernstein polynomials.
+ * <p></p>
+ * 
+ * <strong>2.Degree</strong><br/>
+ * The degree:=p is the degree of the basis functions. If U is clamped and defined 
+ * like above, then p = i.<br/><br/>
+ * 
+ * <strong>3.Control  mesh</strong><br/>
+ * The control polygon of a curve (or control mesh of a surface) Pw are the control
+ * points corresponding to the basis functions.<br/><br/>
+ * 
+ * <strong>4.Formulas</strong><br/>
+ * Everything is defined like above.<br/>
+ * m = U.length - 1<br/>
+ * n = Pw.length - 1<br/>
+ * n = m - p - 1 <==> p = m - n - 1 <==> n = U.length - p - 2  (this fact is used in FindSpan)<br/>
+ * hence a NURBS-surface is completely determined by U,V,Pw
+ * 
+ * 
+ * <p>
+ * @author seidel
+ * 
+ * 
+ */
 public class NURBSAlgorithm {
 	
 	private static long binomialCoefficient(int n, int k) {
@@ -25,8 +68,8 @@ public class NURBSAlgorithm {
 
 	/**
 	 * Algorithm A2.1 from the NURBS Book
-	 * uses that U is a clamped knot vector uses binary search
-	 * @param n = U.length - 2
+	 * 
+	 * @param n = U.length - p - 2 or number of control points - 1  (see page 82 proposition 3.2 NURBS Book)
 	 * @param p = degree
 	 * @param u = parameter
 	 * @param U = knot vector
@@ -293,7 +336,10 @@ public class NURBSAlgorithm {
 	public static void SurfaceDerivatives(int n, int p, double[] U,int m, int q, double [] V,double[][][]P,double u, double v, int d, double[][][]SKL){
 
 		int du = Math.min(d, p);
-
+		for(int k=p+1;k<=d;k++){
+			for(int l=0;l<=d-k;l++){
+			}
+		}
 		int dv = Math.min(d, q);
 
 		int uspan = FindSpan(n,p,u,U);
@@ -351,6 +397,7 @@ public class NURBSAlgorithm {
 			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
 		}
 	}
+	
 
 	/**
 	 * Algorithm A4.4 from the NURBS Book
@@ -384,74 +431,548 @@ public class NURBSAlgorithm {
 	
 	
 	/**
-	 * Algorithm A5.6 from the NURBS Book
+	 * Algorithm A5.1 from the NURBS Book
 	 * 
-	 * @param n
-	 * @param p
-	 * @param U
-	 * @param Pw
-	 * @param nb
-	 * @param Qw
+	 * @param np = Pw.length -1
+	 * @param p  = Up degree
+	 * @param UP = given knot vector
+	 * @param Pw = given control mesh
+	 * @param u  = new knot
+	 * @param k  = FindSpan(UP.length - 2, p, u, UP);
+	 * @param s  = the given multiplicity of u (i.e. u exits in UP s times)
+	 * @param r  = multiplicity of u
+	 * @param nq = UQ.length = np + r
+	 * @param UQ = new knot vector
+	 * @param Qw = new control mesh
 	 */
-	public static void DecomposeCurve(int n, int p, double[] U, double[]Pw, int nb, double[][]Qw){
-		int m = n + p + 1;
-		int a = p;
-		int b = p + 1;
-		nb = 0;
-		for(int i = 0; i <= p; i++){
-			Qw[nb][i] = Pw[i];
+	
+	public static void CurveKnotIns(int np, int p, double[] UP, double[][]Pw, double u, int k, int s, int r, int nq, double[] UQ, double[][]Qw){
+		
+		int mp = np + p + 1; // == UP.length - 1
+		nq = np + r;
+		int L = 0;
+		double[][] Rw = new double[p + 1][];
+		/* Load the knot vector */
+		for(int i = 0; i <= k; i++){
+			UQ[i] = UP[i];
 		}
-		while(b < m){
-			int i = b;
-			while(b < m && U[b + 1] == U[b]){
-				int mult = b - i + 1;
-				if(mult < p){
-					double numer = U[b] - U[a]; // Numerator of alpha
-					double[] alphas = new double[p - mult];
-					// Compute and store alphas
-					for (int j = p; j > mult; j--) {
-						alphas[j - mult + 1 ] = numer / (U[a + j] - U[a]);
-					}
-					int r = p - mult; // Insert knot r times
-					for (int j = 1; j <= r; j++) {
-						int save = r - j;
-						int s = mult + j; /* This many new points*/
-						for (int k = p; k >= s; k--) {
-							double alpha = alphas[k - s];
-							Qw[nb][k] = alpha * Qw[nb][k] + (1.0 - alpha) * Qw[nb][k - 1];
-						}
-						if(b < m){ /* Control point of*/
-							Qw[nb + 1][save] = Qw[nb][p]; /* next segment */
-						}
-					}
-				}
-				nb = nb + 1;
-				if(b < m){
-					for(i = p - mult; i <= p; i++){
-						Qw[nb][i] = Pw[b - p + i];
-					}
-					a = b;
-					b = b + 1;
-				}
+		for(int i = 0; i <= r; i++){
+			UQ[k + i] = u;
+		}
+		for(int i = k + 1; i <= mp; i++){
+			UQ[i + r] = UP[i];
+		}
+		/* Save unaltered control points*/
+		for(int i = 0; i <= k - p; i++){
+			Qw[i] = Pw[i];
+		}
+		for(int i = k - s; i <= np; i++){
+			Qw[i + r] = Pw[i];
+		}
+		for(int i = 0; i <= p - s; i++){
+			Rw[i] = Pw[k - p + i];
+		}
+		/* insert the knot r times */
+		for(int j = 1; j <= r; j++){
+			L = k - p + j;
+			for(int i = 0; i <= p - j - s; i++){
+				double alpha = (u - UP[L + i]) / (UP[i + k + 1] - UP[L + i]);
+				Rw[i] = Rn.add(null, Rn.times(null, alpha, Rw[i + 1]), Rn.times(null, 1.0 - alpha, Rw[i]));
 			}
+			Qw[L] = Rw[0];
+			Qw[k + r - j - s] = Rw[p - j - s];
 		}
-		
-		
+		/* Load remaining control points */
+		for(int i =  L + 1; i <= k - s; i++){
+			Qw[i] = Rw[i - L];
+		}
 	}
 	
-	public static void DecomposeSurface(int n, int p, double[] U,int m, int q, double [] V,double[][]Pw, boolean dir, int nb, double[][][]Qw){
-		if(dir == true){
-//			int a = p; 
-			int b = p + 1;
-			nb = 0;
-			for(int i = 0; i <= p; i++){
-				for(int row = 0; row <= m; row++){
-					Qw[nb][i][row] = Pw[i][row];
+	
+	
+	
+	/**
+	 * Algorithm A5.3 from the NURBS Book
+	 * 
+	 * @param np  = length of the original control mesh in u direction - 1
+	 * @param p   = UP degree 
+	 * @param UP  = original knot vector U
+	 * @param mp  = length of the original control mesh in v direction - 1
+	 * @param q   = UV degree
+	 * @param VP  = original knot vector V
+	 * @param Pw  = original control mesh
+	 * @param dir = u/v direction
+	 * @param uv  = new knot
+	 * @param k   = FindSpan(UP.length - 2, p, uv, UP); / VP
+	 * @param s   = original multiplicity of uv (i.e. uv exits already in UP/UQ s times)
+	 * @param r   = insert uv r times (s + r <= p)
+	 * @param nq  = length of the new control mesh in u direction - 1
+	 * @param UQ  = new knot vector U
+	 * @param mq  = length of the new control mesh in v direction - 1
+	 * @param VQ  = new knot vector V
+	 * @param Qw  = new control mesh
+	 */
+	
+	public static void SurfaceKnotIns(int np, int p, double[] UP,int mp, int q, double[] VP, double[][][]Pw, boolean dir, double uv, int k ,int s, int r, int nq, double[]UQ, int mq, double[]VQ, double[][][]Qw){
+		if(dir){ //u direction
+			/* Load the u-knot vector into UQ */
+			for(int i = 0; i <= k; i++){
+				UQ[i] = UP[i];
+			}
+			for(int i = 1; i <= r; i++){
+				UQ[k + i] = uv; /* uv is in U */
+			}
+			for(int i = k + 1; i <= np + p + 1; i++){
+				UQ[i + r] = UP[i];
+			}
+			System.out.println("new UQ " + Arrays.toString(UQ));
+			System.out.println("s = " + s);
+			/* copy the v-knot vector into VQ */
+			for (int i = 0; i <= mp + q + 1; i++) {
+				VQ[i] = VP[i];
+			}
+			double[][] alpha = new double[p - s][r + 1]; // ??????
+			/* save the alphas */
+			for(int j = 1; j <= r; j++){
+				/**
+				 * 			     { 1 if: i <= k-p+r-1
+				 * alpha[i][r] = { (uv - UP[i]) / (UP[i+p-r+1] - UP[i]) if: k-p+r <= i <= k-s
+				 * 			     { 0 if: >= k-s+1
+				 */					
+				int L = k - p + j; 
+				for(int i = 0; i <= p - j - s; i++ ){
+					alpha[i][j] = (uv - UP[L + i])/(UP[i + k + 1] - UP[L + i]);
 				}
 			}
-			while (b < m){
+			for(int row = 0; row <= mp; row++){ /* for each row do */
+				/* save unaltered control points */
+				for(int i = 0; i <= k - p; i++){ // 0 ... k-p
+					Qw[i][row] = Pw[i][row];
+				}
+				for(int i = k ; i <= np; i++){ // k + r ... Qw.length
+					Qw[i + r][row] = Pw[i][row];
+				}
+				/* Load auxiliary  control points */
+				double[][] Rw = new double[p + 1][]; // length = p + 1
+				for(int i = 0; i <= p ; i++){ // hier liegt der Fehler
+					Rw[i] = Pw[k - p + i][row];
+//					System.out.println("UEBERTRAGEN Rw["+i+"] " + Arrays.toString(Rw[i]));
+				}
+				for(int j = 1; j <= r; j++){
+					int L = k - p + j;
+					for(int i = 0; i <= p - j - s ; i++ ){
+						Rw[i] = Rn.add(null, Rn.times(null, alpha[i][j], Rw[i + 1]), Rn.times(null, 1.0 - alpha[i][j], Rw[i]));
+//						System.out.println(" INNEN Rw["+i+"] " + Arrays.toString(Rw[i]));
+					}
+					for (int i = 0; i < Rw.length; i++) {
+//						System.out.println("FERTIG Rw["+i+"] " + Arrays.toString(Rw[i]));
+					}
+					Qw[L][row] = Rw[0];
+					Qw[k + r - j][row] = Rw[p - j];
+				}
+			
+				int L = k - p + r;
+				for (int i = L + 1; i < k; i++) {
+					Qw[i][row] = Rw[i - L];
+				}
 				
 			}
 		}
+		if(!dir){  //v direction
+			/* Load the v-knot vector */
+			for(int i = 0; i <= k; i++){
+				VQ[i] = VP[i];
+			}
+			for(int i = 1; i <= r; i++){
+				VQ[k + i] = uv; //uv is in U
+			}
+			for(int i = k + 1; i <= mp + q + 1; i++){
+				VQ[i + r] = VP[i];
+			}
+			/* copy the v-knot vector into VQ */
+			for (int i = 0; i < UP.length; i++) {
+				UQ[i] = UP[i];
+			}
+//			System.out.println("UQ "+Arrays.toString(UQ));
+//			System.out.println("VQ "+Arrays.toString(VQ));
+			double[][] alpha = new double[q - s][r + 1];
+			/* save the alphas */
+			for(int j = 1; j <= r; j++){
+				int L = k - q + j;
+				for(int i = 0; i <= q - j - s; i++ ){
+					alpha[i][j] = (uv - VP[L + i])/(VP[i + k + 1] - VP[L + i]);
+				}
+			}
+			for(int column = 0; column <= np; column++){ /* for each column do */
+				/* save unaltered control points */
+				for(int j = 0; j <= k - q; j++){
+					Qw[column][j] = Pw[column][j];
+				}
+				for(int j = k - s; j <= mp; j++){
+					Qw[column][j + r] = Pw[column][j];
+				}
+				/* Load auxiliary  control points */
+				double[][] Rw = new double[q + 1][];
+				for(int j = 0; j <= q; j++){
+					Rw[j] = Pw[column][k - q + j];
+				}
+				for(int j = 0; j <= k - q; j++){
+					Qw[column][j] = Pw[column][j];
+				}
+				for(int j = 1; j <= r; j++){
+					int L = k - q + j;
+					for(int i = 0; i <= q - j - s; i++ ){
+						Rw[i] = Rn.add(null, Rn.times(null, alpha[i][j], Rw[i + 1]), Rn.times(null, 1.0 - alpha[i][j], Rw[i]));
+					}
+					Qw[column][L] = Rw[0];
+					Qw[column][r + k - j] = Rw[q - j];
+				}
+				int L = k - q + r;
+				for (int i = L + 1; i < k - s; i++) {
+					Qw[column][i] = Rw[i - L];
+				}
+			}
+		}
+//		NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
+//		System.out.println(ns.toString());
+
 	}
+	
+	
+	
+	private static int getMultiplicity(double knot, double[] knotVector){
+		int counter = 0;
+		for (int i = 0; i < knotVector.length; i++) {
+			if(knot == knotVector[i]){
+				counter++;
+			}
+		}
+		return counter;
+	}
+	
+	/**
+	 * this is SurfaceKnotIns with smaller input
+	 * @param UP
+	 * @param VP
+	 * @param Pw
+	 * @param dir
+	 * @param uv
+	 * @param r
+	 * @return
+	 */
+	public static NURBSSurface SurfaceKnotInsertion(double[] UP, double[] VP, double[][][]Pw, boolean dir, double uv, int r){
+		int mult; // = s
+		int k;
+		int np = Pw.length - 1;
+		int p = UP.length - np - 2;
+		int mp = Pw[0].length - 1;
+		int q = VP.length - mp - 2;
+		int nq = np;
+		int mq = mp;
+		if(dir){
+			mult = getMultiplicity(uv, UP);
+			k = FindSpan(np, p, uv, UP);
+			nq = np + r;
+		}
+		else{
+			mult = getMultiplicity(uv, VP);
+			k = FindSpan(mp, q, uv, VP);
+			mq = mp + r;
+		}
+		double[] UQ = new double[nq + p + 2];
+		double[] VQ = new double[mq + q + 2];
+		double[][][]Qw = new double[nq + 1][mq + 1][4];
+		SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
+		NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
+		return ns;
+	}
+	
+	
+	public static NURBSSurface decomposeSurface(NURBSSurface ns){
+//		System.out.println();
+//		System.out.println("DECOMPOSE");
+		double[]U = ns.getUKnotVector();
+		double[]V = ns.getVKnotVector();
+		double[][][]Pw = ns.getControlMesh();
+		ArrayList<Double> newUKnots = new ArrayList<Double>();
+		ArrayList<Integer> Umult = new ArrayList<Integer>();
+		
+		getAllNewKnots(U, newUKnots, Umult);
+//		System.out.println("U " + Arrays.toString(U));
+//		System.out.println("newUKnots " + newUKnots.toString());
+//		System.out.println("Umult " + Umult.toString());
+		ArrayList<Double> newVKnots = new ArrayList<Double>();
+		ArrayList<Integer> Vmult = new ArrayList<Integer>();
+		getAllNewKnots(V, newVKnots, Vmult);
+		NURBSSurface nsReturn = new NURBSSurface();
+		boolean dir = true;
+		for (int i = 0; i < newUKnots.size(); i++) {
+			nsReturn = SurfaceKnotInsertion(U, V, Pw, dir, newUKnots.get(i), Umult.get(i));
+//			System.out.println("UUUUUUUU ns u direction " + nsReturn.toString());
+			U = nsReturn.getUKnotVector();
+			V = nsReturn.getVKnotVector();
+			Pw = nsReturn.getControlMesh();
+		}
+		dir = false;
+		for (int i = 0; i < newVKnots.size(); i++) {
+			nsReturn = SurfaceKnotInsertion(U, V, Pw, dir, newVKnots.get(i), Vmult.get(i));
+//			System.out.println("VVVVVVVV ns v direction " + ns.toString());
+			U = nsReturn.getUKnotVector();
+			V = nsReturn.getVKnotVector();
+			Pw = nsReturn.getControlMesh();
+		}
+		return nsReturn;
+	}
+	
+	
+//	/**
+//	 * Algorithm A5.6 from the NURBS Book
+//	 * 
+//	 * @param n = U.length
+//	 * @param p = degree
+//	 * @param U = given knot vector
+//	 * @param Pw = given control points
+//	 * @param nb = number of Bezier segments
+//	 * @param Qw = Qw[j][k] is the k-th control point of the j-th segment
+//	 * 
+//	 * the lokal array alphas[] contains tha alphas, with their indices shifted to start at 0
+//	 */
+//	
+//	public static void DecomposeCurve(int n, int p, double[] U, double[]Pw, int nb, double[][]Qw){
+//		int m = n + p + 1;
+//		int a = p;
+//		int b = p + 1;
+//		nb = 0;
+//		for(int i = 0; i <= p; i++){
+//			Qw[nb][i] = Pw[i];
+//		}
+//		while(b < m){
+//			int i = b;
+//			while(b < m && U[b + 1] == U[b]){
+//				int mult = b - i + 1;
+//				if(mult < p){
+//					double numer = U[b] - U[a]; // Numerator of alpha
+//					double[] alphas = new double[p - mult];
+//					// Compute and store alphas
+//					for (int j = p; j > mult; j--) {
+//						alphas[j - mult + 1 ] = numer / (U[a + j] - U[a]);
+//					}
+//					int r = p - mult; // Insert knot r times
+//					for (int j = 1; j <= r; j++) {
+//						int save = r - j;
+//						int s = mult + j; /* This many new points*/
+//						for (int k = p; k >= s; k--) {
+//							double alpha = alphas[k - s];
+//							Qw[nb][k] = alpha * Qw[nb][k] + (1.0 - alpha) * Qw[nb][k - 1];
+//						}
+//						if(b < m){ /* Control point of*/
+//							Qw[nb + 1][save] = Qw[nb][p]; /* next segment */
+//						}
+//					}
+//				}
+//				nb = nb + 1;
+//				if(b < m){
+//					for(i = p - mult; i <= p; i++){
+//						Qw[nb][i] = Pw[b - p + i];
+//					}
+//					a = b;
+//					b = b + 1;
+//				}
+//			}
+//		}
+//		
+//		
+//	}
+	
+	private static int getDegreeFromClampedKnotVector(double[] knotVector){
+		int count = 0;
+		double before = knotVector[0];
+		for (int i = 1; i < knotVector.length; i++) {
+			if(before == knotVector[i]){
+				count++;
+				before = knotVector[i];
+			}
+			else{
+				break;
+			}
+		}
+		return count;
+	}
+	
+	private static void getAllNewKnots(double[] knotVector,ArrayList<Double> newKnots, ArrayList<Integer> multiplicity){
+		int p = getDegreeFromClampedKnotVector(knotVector);
+//		System.out.println("p " + p);
+		double before = knotVector[p];
+		int count = 1;
+		for (int i = p + 1; i < knotVector.length - p ; i++) {
+			if(before == knotVector[i]){
+//				System.out.println("equal before " + before + " knotVector["+i+"]" + knotVector[i]);
+				count++;
+			}
+			else{
+//				System.out.println("not equal before " + before + " knotVector["+i+"]" + knotVector[i]);
+				if(count != p + 1 && count != p && knotVector[p] != knotVector[i - 1]){
+					newKnots.add(knotVector[i - 1]);
+					multiplicity.add(p - count);
+					count = 1;
+				}
+				else{
+					count = 1;
+				}
+			}
+			before = knotVector[i];
+		}
+	
+	}
+	
+
+	
+//	/**
+//	 * Algorithm A5.7 from the NURBS Book
+//	 * 
+//	 * @param n = length of control mesh in u direction
+//	 * @param p = degree of U
+//	 * @param U 
+//	 * @param m = length of control mesh in v direction
+//	 * @param q = degree of V
+//	 * @param V
+//	 * @param Pw = control mesh
+//	 * @param dir 
+//	 * @param nb
+//	 * @param Qw
+//	 */
+//	
+//	public static void DecomposeSurface(int p, double[] U,int q, double [] V,double[][]Pw, boolean dir, int nb, double[][][]Qw){
+//		int n = Pw.length - 1;
+//		int m = Pw[0].length - 1;
+//		if(dir == true){
+////			int a = p; 
+//			int b = p + 1;
+//			nb = 0;
+//			for(int i = 0; i <= p; i++){
+//				for(int row = 0; row <= m; row++){
+//					Qw[nb][i][row] = Pw[i][row];
+//				}
+//			}
+//			while (b < m){
+//				int mult = 0; //get mult;
+//				if(mult < p){
+//					// get the numerator of the alphas
+//					for(int j = 1; j <= p - mult; j++){
+//						int save = 0;// save = ...
+//						int s = mult + j;//s = ...
+//						for(int k = p; k >= s; k--){
+//							double alpha = 0.0; // get alpha
+//							for(int row = 0; row <= m; row++){
+//								Qw[nb][k][row] = alpha * Qw[nb][k][row] + (1.0 - alpha) * Qw[nb][k -1][row];
+//							}
+//						}
+//						if(b < m){
+//							for(int row = 0; row <= m; row++){
+//								Qw[nb + 1][save][row] = Qw[nb][p][row];
+//							}
+//						}
+//					}
+//				}
+//				nb = nb + 1;
+//				if( b < m){
+//					for(int i = p - mult; i <= p; i++){
+//						for(int row = 0; row <= m; row++){
+//							Qw[nb][i][row] = Pw[b - p + i][row];
+//						}
+//					}
+////					a = b;
+//					b = b + 1;
+//				}
+//			}
+//		}
+//	}
+	
+	public static void main(String[] agrs){
+		
+
+
+//		double[] Utest = {0,0,0,0,1,2,2,2,2,3,3,4,4,4,5,5,5,5};
+//		System.out.println("Utest " + Arrays.toString(Utest));
+//		ArrayList<Double> newKnots = new ArrayList<Double>();
+//		ArrayList<Integer> multiplicity = new ArrayList<Integer>();
+//		getAllNewKnots(Utest, newKnots, multiplicity);
+//		System.out.println("newKnots "+ newKnots.toString());
+//		System.out.println("mult "+ multiplicity.toString());
+		 /**
+		  * initialize first surface
+		  */
+		double[] uv = {0.1234, 0.1234};
+		double[] uInsertion = {0.11, 0.22, 0.33, 0.44, 0.55, 0.66, 0.77, 0.88, 0.99};
+		double[] vInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+		double[]U = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
+		double[] V = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
+		int p = 3;
+		int q = 3;
+		double[][][]Pw0 = {{{-16.84591428200644, 9.165210069137606, 0.0, 1.0}, {-15.36140842573768, 3.743536507112545, -5.35712982914381, 1.0}, {-14.52233989828141, -1.484505856268766, 3.743536507112545, 1.0}, {-18.26587640539396, -5.550761027787562, 0.0, 1.0}}, 
+						{{-8.84249140473135, 12.39239671320014, 10.06882232947512, 1.0}, {-6.454373288125074, 4.711692500331306, 6.045596313210488, 1.0}, {-4.066255171518796, -1.871768253556271, 4.582605034568804, 1.0}, {-8.455229007443846, -8.197054075918842, 0.0, 1.0}}, 
+						{{6.389829555243823, 12.39239671320014, 0.0, 1.0}, {10.56365761489803, 4.973453194794152, 1.742680787793771, 1.0}, {10.28396810574596, -2.78972356564517, -5.851965114566728, 1.0}, {7.938879144393841, -8.00342287727509, -6.841635685412578, 1.0}}, 
+						{{17.1686329464127, 7.938879144393843, 0.0, 1.0}, {18.65313880268147, 0.839068527456261, 8.713403938968852, 1.0}, {18.65313880268147, -1.419962123387515, -3.808080239993792, 1.0}, {17.62043907658145, -7.164354349818831, 0.0, 1.0}}};
+		double[] s0 = new double[3];
+		NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw0, uv[0], uv[1], s0);
+		System.out.println("s0 " + Arrays.toString(s0));
+		
+		/**
+		 * insert uInsertion into surface
+		 */
+		NURBSSurface ns1 = new NURBSSurface();
+		double[]U1 = U;
+		double[]V1 = V;
+		double[][][]Pw1 = Pw0;
+		
+		for (int i = 0; i < uInsertion.length; i++) {
+			ns1 = SurfaceKnotInsertion(U1, V1, Pw1, true, uInsertion[i], 1);
+			System.out.println("ns1 " + ns1.toString());
+			U1 = ns1.getUKnotVector();
+			V1 = ns1.getVKnotVector();
+			Pw1 = ns1.getControlMesh();
+		}
+		for (int i = 0; i < vInsertion.length; i++) {
+			ns1 = SurfaceKnotInsertion(U1, V1, Pw1, false, vInsertion[i], 1);
+			System.out.println("ns1 " + ns1.toString());
+			U1 = ns1.getUKnotVector();
+			V1 = ns1.getVKnotVector();
+			Pw1 = ns1.getControlMesh();
+		}
+		
+		
+		double[] s1 = new double[3];
+		NURBSAlgorithm.SurfacePoint(p, U1, q, V1, Pw1, uv[0], uv[1], s1);
+		System.out.println("s1 " + Arrays.toString(s1));
+		
+		NURBSSurface decomposed = decomposeSurface(ns1);
+		System.out.println("decomposed " + decomposed.toString());
+		double[] Ud = ns1.getUKnotVector();
+		double[] Vd = ns1.getVKnotVector();
+		double[][][]Pwd = ns1.getControlMesh();
+
+		double[] sDecomposed = new double[3];
+		NURBSAlgorithm.SurfacePoint(p, Ud, q, Vd, Pwd, uv[0], uv[1], sDecomposed);
+		System.out.println("sDecomdosed " + Arrays.toString(sDecomposed));
+		
+		
+		
+//		double[] s2 = new double[3];
+//		NURBSAlgorithm.SurfacePoint(p, U2, q, V2, Pw2, uv[0], uv[1], s2);
+//		
+//		System.out.println("VERSCHIEDENE PUNKTE: " );
+//		System.out.println("s0 " + Arrays.toString(s0));
+//		System.out.println("s1 " + Arrays.toString(s1));
+//		System.out.println("s2 " + Arrays.toString(s2));
+//		decomposeSurface(ns2);
+//		double[] s3 = new double[3];
+//		NURBSAlgorithm.SurfacePoint(p, U2, q, V2, Pw2, uv[0], uv[1], s3);
+//		System.out.println("s3 " + Arrays.toString(s3));
+//		NURBSSurface decomposed = decomposeSurface(ns2);
+//		System.out.println("decomposed " + decomposed.toString());
+
+
+	}
+	
+
 }

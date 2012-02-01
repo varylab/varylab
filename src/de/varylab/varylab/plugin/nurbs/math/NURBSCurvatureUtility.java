@@ -149,4 +149,8 @@ public class NURBSCurvatureUtility {
 		return dG;
 	}
 	
+	public static void main(String[] args){
+		
+	}
+	
 }

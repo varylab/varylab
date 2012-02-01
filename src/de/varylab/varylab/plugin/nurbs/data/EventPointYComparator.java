@@ -1,6 +1,7 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.Comparator;
+
 
 public class EventPointYComparator implements Comparator<EventPoint> {
 	

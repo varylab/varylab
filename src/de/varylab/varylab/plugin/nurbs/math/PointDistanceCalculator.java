@@ -6,7 +6,7 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 public class PointDistanceCalculator {
 	
 	public static double[] surfacePoint(double[] point, NURBSSurface ns){
-		double[] p = {0,0,0};
+		double[] p = {1,0,0};
 		return p;
 	}
 	

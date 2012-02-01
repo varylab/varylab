@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.nurbs;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
@@ -8,7 +9,6 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 		protected double[] U;
 		protected double[] V;
-		protected double[] surfDomain = new double[4];
 		protected LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
 		protected LinkedList<NURBSTrimLoop> holeC = new LinkedList<NURBSTrimLoop>();
 		protected double[][][] controlMesh;
@@ -17,6 +17,14 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 		public NURBSSurface() {
 			
+		}
+		
+		public NURBSSurface(double[] UVec, double[] VVec, double[][][] cm, int pDegree, int qDegree){
+			U = UVec;
+			V = VVec;
+			controlMesh = cm;
+			p = pDegree;
+			q = qDegree;
 		}
 
 		public void getSurfacePoint(double u, double v, double[] S) {
@@ -33,10 +41,6 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 		public LinkedList<NURBSTrimLoop> getHoleCurves() {
 			return holeC;
-		}
-
-		public double[] getSurfDomain() {
-			return surfDomain;
 		}
 
 		public double[] getUKnotVector() {
@@ -61,10 +65,6 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 		public void setHoleCurves(LinkedList<NURBSTrimLoop> hc) {
 			holeC = hc;
-		}
-
-		public void setSurfDomain(double[] sd) {
-			surfDomain = sd;
 		}
 
 		public void setUKnotVector(double[] u) {
@@ -148,6 +148,26 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 		public String getName() {
 			return name;
+		}
+		
+		public String toString() {
+			String str = new String();
+			str = str + "NURBSSurface" + '\n' + "U knot vector" + '\n';
+			for (int i = 0; i < U.length; i++) {
+				str = str + U[i] + ", ";
+			}
+			str = str + '\n' + "V knot vector" + '\n';
+			for (int i = 0; i < V.length; i++) {
+				str = str + V[i] + ", ";
+			}
+			str = str + '\n' + "control mesh";
+			for (int i = 0; i < controlMesh.length; i++) {
+				str = str + '\n';
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					str = str + Arrays.toString(controlMesh[i][j]) + " ";
+				}
+			}
+			return str;
 		}
 	
 }

@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.nurbs;
+package de.varylab.varylab.plugin.nurbs.math;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,51 +14,91 @@ import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
+import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
+import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
+import de.varylab.varylab.plugin.nurbs.TreeSegmentComparator;
+import de.varylab.varylab.plugin.nurbs.data.EventPoint;
+import de.varylab.varylab.plugin.nurbs.data.EventPointYComparator;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
-import de.varylab.varylab.plugin.nurbs.data.LineSegmentsInBoxDomain;
+import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
+import de.varylab.varylab.plugin.nurbs.data.Partition;
 
 public class LineSegmentIntersection {
 	
 	
-	@SuppressWarnings("unused")
-	private static List<LineSegment> searchForIntersectionDomains(List<LineSegment> segments, int numberOfCurves, double []xDomain, double[]yDomain){
-		int refine = numberOfCurves * 5;
-		LineSegmentsInBoxDomain[][] domains = new LineSegmentsInBoxDomain[refine][refine];
-		//j for x and i for y
-		for (int i = 0; i < refine; i++) {
-			for (int j = 0; j < refine; j++) {
-				domains[i][j].setSegmentList(new LinkedList<LineSegment>());
-				domains[i][j].setCurveIndicies(new LinkedList<Integer>());
-				double[] xBoxDomain = new double[2];
-				xBoxDomain[0] = xDomain[0] + j *(xDomain[1] - xDomain[0]) / refine;
-				xBoxDomain[1] = xDomain[0] + (j + 1) *(xDomain[1] - xDomain[0]) / refine;
-				domains[i][j].setxBoxDomain(xBoxDomain);
-				double[] yBoxDomain = new double[2];
-				yBoxDomain[0] = yDomain[0] + i *(yDomain[1] - yDomain[0]) / refine;
-				yBoxDomain[1] = yDomain[0] + (i + 1) *(yDomain[1] - yDomain[0]) / refine;
-				domains[i][j].setyBoxDomain(yBoxDomain);
-				if(j == 0){
-					domains[i][j].setLowerXBound(true);
-				}
-				if(j == refine - 1){
-					domains[i][j].setUpperXBound(true);
-				}
-				if(i == 0){
-					domains[i][j].setLowerYBound(true);
-				}
-				if(i == refine - 1){
-					domains[i][j].setUpperYBound(true);
+	public static LinkedList<LineSegment> preSelection
+	(double u0, double u1, double v0, double v1, LinkedList<LineSegment> segList){
+		System.out.println("START");
+		int curves = segList.getLast().getCurveIndex();
+		curves = 1200;
+		double uFactor = curves / (u1 - u0);
+		double vFactor = curves / (v1 - v0);
+		
+		Partition[][] partition = new Partition[curves + 1][curves + 1];
+		System.out.println("Start ini");
+		double startIni = System.currentTimeMillis();
+		for (int i = 0; i < partition.length; i++) {
+			for (int j = 0; j < partition.length; j++) {
+				partition[i][j] = new Partition();
+			}
+		}
+		double endIni = System.currentTimeMillis();
+		System.out.println("time for initializing: " + (startIni - endIni));
+		for(LineSegment ls : segList){
+			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
+			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
+			double uEnd = uFactor * (ls.getSegment()[1][0] - u0);
+			double vEnd = vFactor * (ls.getSegment()[1][1] - v0);
+			int uS = (int)uStart;
+			int vS = (int)vStart;
+			int uE = (int)uEnd;
+			int vE = (int)vEnd;
+			
+			
+			if(uS > uE){
+				int temp = uS;
+				uS = uE;
+				uE = temp;
+			}
+			if(vS > vE){
+				int temp = vS;
+				vS = vE;
+				vE = temp;
+			}
+			
+			for (int i = uS; i <= uE; i++) {
+				for (int j = vS; j <= vE; j++) {
+					partition[i][j].getSegList().add(ls);
+					if(!partition[i][j].getIndexList().contains(ls.getCurveIndex())){
+						partition[i][j].getIndexList().add(ls.getCurveIndex());
+					}
 				}
 			}
 		}
-		for (LineSegment ls : segments) {
-			
+		System.out.println("END");
+		TreeSet<LineSegment> finalSegmentTree = new TreeSet<LineSegment>(new PartitionComparator());
+		for (int i = 0; i < partition.length; i++) {
+			for (int j = 0; j < partition.length; j++) {
+				if(partition[i][j].getIndexList().size() >= 2){
+					for(LineSegment ls : partition[i][j].getSegList()){
+						finalSegmentTree.add(ls);
+					}
+				}
+			}
 		}
-		return null;
+
+		System.out.println("anfanglänge: " + segList.size());
+		System.out.println("endlänge: " + finalSegmentTree.size());
+		LinkedList<LineSegment> finalSegmentList = new LinkedList<LineSegment>();
+		for (LineSegment ls : finalSegmentTree) {
+			finalSegmentList.add(ls);
+		}
+		return finalSegmentList;
 	}
 	
 	
@@ -69,10 +109,11 @@ public class LineSegmentIntersection {
 		int segmentCounter = 0;
 		for (LineSegment ls : segments) {	
 			segmentCounter++;
-			long p1X = (long)(ls.getSegment()[0][0] * 100000000) / 1;
-			long p1Y = (long)(ls.getSegment()[0][1] * 100000000) / 1;
-			long p2X = (long)(ls.getSegment()[1][0] * 100000000) / 1;
-			long p2Y = (long)(ls.getSegment()[1][1] * 100000000) / 1;
+
+			long p1X = (long)(ls.getSegment()[0][0] * 100000000);
+			long p1Y = (long)(ls.getSegment()[0][1] * 100000000);
+			long p2X = (long)(ls.getSegment()[1][0] * 100000000);
+			long p2Y = (long)(ls.getSegment()[1][1] * 100000000);
 			
 			RPoint2D p1 = new RPoint2D(p1X, p1Y);
 			RPoint2D p2 = new RPoint2D(p2X, p2Y);
@@ -106,7 +147,7 @@ public class LineSegmentIntersection {
 			
 			intersectionPoints.add(ip);
 		}
-
+		System.out.println("# intersections: " + intersectionPoints.size());
 		return intersectionPoints;
 	}
 
@@ -162,22 +203,22 @@ public class LineSegmentIntersection {
 //			System.out.println("second "+ Arrays.toString(second.segment[0]) + " " + Arrays.toString(second.segment[1]));
 //			System.out.println("horizontal second");
 			result = new double[2];
-			result[0] = s1 + ((t1 - s1) * (s2 - p.point[1]) / (s2 - t2));
-			if(result[0] < p.point[0]){
-				result[0] = p.point[0];
+			result[0] = s1 + ((t1 - s1) * (s2 - p.getPoint()[1]) / (s2 - t2));
+			if(result[0] < p.getPoint()[0]){
+				result[0] = p.getPoint()[0];
 			}
-			result[1] = p.point[1];
+			result[1] = p.getPoint()[1];
 			return result;
 		}
 		else if(isClosedToHorizontal(first)){
 //			System.out.println("first "+ Arrays.toString(first.segment[0]) + " " + Arrays.toString(first.segment[1]));
 //			System.out.println("horizontal first");
 			result = new double[2];
-			result[0] = p1 + ((q1 - p1) * (p2 - p.point[1]) / (p2 - q2));
-			if(result[0] < p.point[0]){
-				result[0] = p.point[0];
+			result[0] = p1 + ((q1 - p1) * (p2 - p.getPoint()[1]) / (p2 - q2));
+			if(result[0] < p.getPoint()[0]){
+				result[0] = p.getPoint()[0];
 			}
-			result[1] = p.point[1];
+			result[1] = p.getPoint()[1];
 			return result;
 		}
 		else{
@@ -185,9 +226,9 @@ public class LineSegmentIntersection {
 			result = Rn.add(null, second.getSegment()[0],Rn.times(null, lambda, Rn.add(null, second.getSegment()[1], Rn.times(null, -1, second.getSegment()[0]))));
 			//new
 			double currEps = Math.min(conditionalEps(first), conditionalEps(second)) ;
-			if(p.point[1] < result[1] && (result[1] - p.point[1]) < currEps){
+			if(p.getPoint()[1] < result[1] && (result[1] - p.getPoint()[1]) < currEps){
 				System.out.println("hier passierts");
-				result[1] = p.point[1] - result[1];
+				result[1] = p.getPoint()[1] - result[1];
 			}
 			//
 			return result;
@@ -655,33 +696,33 @@ public class LineSegmentIntersection {
 //			System.out.println("EventPoint: " + Arrays.toString(p.point) + " curveIndex = " + p.segment.curveIndex + " indexOnCurve = " + p.segment.indexOnCurve);
 			tsc.p = p;
 			EventPoint next = eventPoints.peek();
-			if(next == null || p.point[0] != next.point[0] || p.point[1] != next.point[1]){
-				if(p.status == PointStatus.upper){
-					Up.add(p.segment);
+			if(next == null || p.getPoint()[0] != next.getPoint()[0] || p.getPoint()[1] != next.getPoint()[1]){
+				if(p.getStatus() == PointStatus.upper){
+					Up.add(p.getSegment());
 					testPoint = p;
 				}
-				else if(p.status == PointStatus.containsInterior){
-					Cp.add(p.segment);
+				else if(p.getStatus() == PointStatus.containsInterior){
+					Cp.add(p.getSegment());
 					testPoint = p;
 				}
 				else{
-					Lp.add(p.segment);
+					Lp.add(p.getSegment());
 				}
 				handleEventPoint(p,testPoint, T, eventPoints, Up, Cp, Lp, interPoints, currentIntersections, eventPointSegmentList);
 				Up.clear();
 				Cp.clear();
 				Lp.clear();
 			}else{
-				if(p.status == PointStatus.upper){
-					Up.add(p.segment);
+				if(p.getStatus() == PointStatus.upper){
+					Up.add(p.getSegment());
 					testPoint = p;
 				}
-				else if(p.status == PointStatus.containsInterior){
-					Cp.add(p.segment);
+				else if(p.getStatus() == PointStatus.containsInterior){
+					Cp.add(p.getSegment());
 					testPoint = p;
 				}
 				else{
-					Lp.add(p.segment);
+					Lp.add(p.getSegment());
 				}
 			}
 		}
@@ -703,12 +744,12 @@ public class LineSegmentIntersection {
 			segments.addAll(Up);
 //			segments.addAll(Lp);
 			EventPointSegmentList pSegments = new EventPointSegmentList();
-			pSegments.p = p;
-			pSegments.allSegments = new LinkedList<LineSegment>();
-			pSegments.allSegments.addAll(segments);
+			pSegments.setP(p);
+			pSegments.setAllSegments(new LinkedList<LineSegment>());
+			pSegments.getAllSegments().addAll(segments);
 			eventPointSegmentList.add(pSegments);
 			
-			while(eventPointSegmentList.peekFirst().p.point[1] != p.point[1]){
+			while(eventPointSegmentList.peekFirst().getP().getPoint()[1] != p.getPoint()[1]){
 				eventPointSegmentList.pollFirst();
 			}
 		}
@@ -757,14 +798,14 @@ public class LineSegmentIntersection {
 //		System.out.println("EventPoint " + Arrays.toString(p.point));
 //		System.out.println("tree: " + T.toString());
 		if(Up.size() + Cp.size() == 0){
-			if(T.lower(p.segment) != null && T.higher(p.segment) != null){
-				LineSegment sl = T.lower(p.segment);
-				LineSegment sr = T.higher(p.segment);
+			if(T.lower(p.getSegment()) != null && T.higher(p.getSegment()) != null){
+				LineSegment sl = T.lower(p.getSegment());
+				LineSegment sr = T.higher(p.getSegment());
 				findNewEvent(sl, sr, p, currentIntersections, eventPoints);
 			}
 		}
 		else{
-			LineSegment leftmost = testPoint.segment;
+			LineSegment leftmost = testPoint.getSegment();
 			
 			while(T.lower(leftmost) != null && (Up.contains(T.lower(leftmost)) || Cp.contains(T.lower(leftmost)))){
 				leftmost = T.lower(leftmost);
@@ -773,7 +814,7 @@ public class LineSegmentIntersection {
 				LineSegment sl = T.lower(leftmost);
 				findNewEvent(sl, leftmost, p, currentIntersections, eventPoints);
 			}
-			LineSegment rightmost = testPoint.segment;
+			LineSegment rightmost = testPoint.getSegment();
 			while(T.higher(rightmost) != null && (Up.contains(T.higher(rightmost)) || Cp.contains(T.higher(rightmost)))){
 				rightmost = T.higher(rightmost);
 			}
@@ -786,42 +827,12 @@ public class LineSegmentIntersection {
 	
 	public static void findNewEvent(LineSegment sl, LineSegment sr, EventPoint p, LinkedList<double[]> currentIntersections, PriorityQueue<EventPoint> eventPoints){
 		boolean intersection = twoSegmentIntersection(sl, sr);
-//		System.out.println("for intersection checked segments:");
-//		System.out.println("sr " + sr.toString() + " sl " + sl.toString());
-//		boolean reversedIntersection = twoSegmentIntersection(sr, sl);
-//		EventPoint next = eventPoints.peek();
+
 		double[] intersectionPoint = intersectionPoint(sl, sr, p);
 		double[] reversedIntersectionPoint = intersectionPoint(sr, sl, p);
-		// new
-//		double currEps = Math.min(conditionalEps(sl), conditionalEps(sr));
-//		if((intersectionPoint[1] - p.point[1]) < currEps){
-//			intersectionPoint[1] = p.point[1] - intersectionPoint[1];
-//		}
-		//
-//		System.out.println("left seg:  curveIndex"+ sl.curveIndex + " indexOnCurve " + sl.indexOnCurve);
-//		System.out.println("right seg:  curveIndex"+ sr.curveIndex + " indexOnCurve " + sr.indexOnCurve);
-//		System.out.println(" segments intersect: " + intersection );
-//		System.out.println(" segments intersect reversed: " + reversedIntersection );
-		if(intersection){
-//			System.out.println();
-//			System.out.println("Intersection located");
-//			intersectionPoint(sl, sr);
-//			System.out.println("sl horizontal "+isHorizontal(sl));
-//			System.out.println("sr horizontal "+isHorizontal(sr));
-//			System.out.println("sl "+ sl.toString() + "endpoints " + Arrays.toString(sl.segment[0]) + " " + Arrays.toString(sl.segment[1]));
-//			System.out.println("sr "+ sr.toString() + "endpoints " + Arrays.toString(sr.segment[0]) + " " + Arrays.toString(sr.segment[1]));
-//			System.out.println("EventPoint " + Arrays.toString(p.point));
-//			System.out.println(" intersectionPoint" + Arrays.toString(intersectionPoint));
-//			System.out.println(" reversedIntersectionPoint" + Arrays.toString(reversedIntersectionPoint));
-//			System.out.println();
-		}
-		if(intersection && (intersectionPoint[1] > p.point[1] || reversedIntersectionPoint[1] > p.point[1])){
-//			System.out.println();
-//			System.out.println("GROESSER");
-//			System.out.println();
-		}
-		if((intersection && intersectionPoint[1] < p.point[1]) || (intersection && intersectionPoint[1] == p.point[1] && intersectionPoint[0] >= p.point[0])
-				||(intersection && reversedIntersectionPoint[1] < p.point[1]) || (intersection && reversedIntersectionPoint[1] == p.point[1] && reversedIntersectionPoint[0] >= p.point[0])){
+
+		if((intersection && intersectionPoint[1] < p.getPoint()[1]) || (intersection && intersectionPoint[1] == p.getPoint()[1] && intersectionPoint[0] >= p.getPoint()[0])
+				||(intersection && reversedIntersectionPoint[1] < p.getPoint()[1]) || (intersection && reversedIntersectionPoint[1] == p.getPoint()[1] && reversedIntersectionPoint[0] >= p.getPoint()[0])){
 //			System.out.println("drinn mit Intersectionpoint: " + Arrays.toString(intersectionPoint));
 			boolean isSelected = false;
 			for (double[] ci  : currentIntersections) {

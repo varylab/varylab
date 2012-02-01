@@ -332,14 +332,14 @@ public class NurbsIO {
 //			System.out.println("P: " + p);
 			int q = d[1];
 //			System.out.println("Q: " + q);
-			int m = U.length - p - 1;
-			int n = V.length - q - 1;
+			int n = U.length - p - 1;
+			int m = V.length - q - 1;
 //			System.out.println("MESH U " + m);
 //			System.out.println("MESH V " + n);
-			double[][][] controlMesh = new double[m][n][4];
-			for (int i = 0; i < m; i++) {
-				for (int j = 0; j < n; j++) {
-					controlMesh[i][j] = ctrlPoints.get(i * n + j);
+			double[][][] controlMesh = new double[n][m][4];
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
+					controlMesh[i][j] = ctrlPoints.get(i * m + j);
 //					System.out.println("i: " + j);
 //					System.out.println("j: " + i);
 //
@@ -353,7 +353,7 @@ public class NurbsIO {
 			ns.setVKnotVector(V);
 			ns.setUDegree(p);
 			ns.setVDegree(q);
-			ns.setSurfDomain(surfDomain);
+//			ns.setSurfDomain(surfDomain);
 
 
 		} catch (FileNotFoundException ex) {

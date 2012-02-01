@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.EventPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 
@@ -82,13 +83,13 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 				compareS1 = getXComponentFromEventPoint(s1);
 			}
 			else{
-				compareS1 = c1 + ((d1 - c1) * (c2 - p.point[1]) / (c2 - d2));
+				compareS1 = c1 + ((d1 - c1) * (c2 - p.getPoint()[1]) / (c2 - d2));
 			}
 			if(segmentIsInEventPointSegmentList(s2)){
 				compareS2 = getXComponentFromEventPoint(s2);
 			}
 			else{
-				compareS2 = a1 + ((b1 - a1) * (a2 - p.point[1]) / (a2 - b2));
+				compareS2 = a1 + ((b1 - a1) * (a2 - p.getPoint()[1]) / (a2 - b2));
 			}
 //			System.out.println("do not intersect in same EventPoint");
 //			System.out.println("first " + s1.toString() + " second " + s2.toString() + " result " + (int)signum(compareS1 - compareS2));
@@ -128,7 +129,7 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 		double result = 0;
 		for (EventPointSegmentList epsl : eventPointSegmentList){
 			if(epsl.allSegments.contains(ls)){
-				result = epsl.p.point[0];
+				result = epsl.p.getPoint()[0];
 			}
 		}
 		return result;
