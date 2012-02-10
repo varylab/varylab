@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 	public class NURBSSurface {
@@ -248,37 +247,38 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		 * @param r
 		 * @return
 		 */
-		public static NURBSSurface SurfaceKnotInsertion(double[] UP, double[] VP, double[][][]Pw, boolean dir, double uv, int r){
-			int mult; // = s
-			int k;
-			int np = Pw.length - 1;
-			int p = UP.length - np - 2;
-			int mp = Pw[0].length - 1;
-			int q = VP.length - mp - 2;
-			int nq = np;
-			int mq = mp;
-			if(dir){
-				mult = getMultiplicity(uv, UP);
-				k = NURBSAlgorithm.FindSpan(np, p, uv, UP);
-				nq = np + r;
-			}
-			else{
-				mult = getMultiplicity(uv, VP);
-				k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
-				mq = mp + r;
-			}
-			double[] UQ = new double[nq + p + 2];
-			double[] VQ = new double[mq + q + 2];
-			double[][][]Qw = new double[nq + 1][mq + 1][4];
-			NURBSAlgorithm.SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
-			NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
-			return ns;
-		}
+//		public static NURBSSurface SurfaceKnotInsertion(double[] UP, double[] VP, double[][][]Pw, boolean dir, double uv, int r){
+//			int mult; // = s
+//			int k;
+//			int np = Pw.length - 1;
+//			int p = UP.length - np - 2;
+//			int mp = Pw[0].length - 1;
+//			int q = VP.length - mp - 2;
+//			int nq = np;
+//			int mq = mp;
+//			if(dir){
+//				mult = getMultiplicity(uv, UP);
+//				k = NURBSAlgorithm.FindSpan(np, p, uv, UP);
+//				nq = np + r;
+//			}
+//			else{
+//				mult = getMultiplicity(uv, VP);
+//				k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
+//				mq = mp + r;
+//			}
+//			double[] UQ = new double[nq + p + 2];
+//			double[] VQ = new double[mq + q + 2];
+//			double[][][]Qw = new double[nq + 1][mq + 1][4];
+//			NURBSAlgorithm.SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
+//			NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
+//			return ns;
+//		}
 		
 		public NURBSSurface SurfaceKnotInsertion(boolean dir, double uv, int r){
 			double[] UP = this.getUKnotVector();
 			double[] VP = this.getVKnotVector();
 			double[][][]Pw = this.getControlMesh();
+			
 			int mult; // = s
 			int k;
 			int np = Pw.length - 1;
@@ -310,23 +310,32 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		
 		
 		public NURBSSurface decomposeSurface(){
-			double[]Ud = U;
-			double[]Vd = V;
-//			double[][][]Pw = controlMesh;
 			ArrayList<Double> newUKnots = new ArrayList<Double>();
 			ArrayList<Integer> Umult = new ArrayList<Integer>();
-			getAllNewKnots(Ud, newUKnots, Umult);
+			getAllNewKnots(U, newUKnots, Umult);
 			ArrayList<Double> newVKnots = new ArrayList<Double>();
 			ArrayList<Integer> Vmult = new ArrayList<Integer>();
-			getAllNewKnots(Vd, newVKnots, Vmult);
-			NURBSSurface nsReturn = new NURBSSurface();
+			getAllNewKnots(V, newVKnots, Vmult);
+			NURBSSurface nsReturn = new NURBSSurface(U, V, controlMesh, p, q);
 			boolean dir = true;
 			for (int i = 0; i < newUKnots.size(); i++) {
-				nsReturn = SurfaceKnotInsertion(dir, newUKnots.get(i), Umult.get(i));
+				NURBSSurface ns = SurfaceKnotInsertion(dir, newUKnots.get(i), Umult.get(i));
+				nsReturn.setUKnotVector(ns.getUKnotVector());
+				nsReturn.setVKnotVector(ns.getVKnotVector());
+				nsReturn.setControlMesh(ns.getControlMesh());
+				System.out.println();
+				System.out.println("nsRETURN " + nsReturn.toString());
+				System.out.println();
 			}
 			dir = false;
 			for (int i = 0; i < newVKnots.size(); i++) {
-				nsReturn = SurfaceKnotInsertion(dir, newVKnots.get(i), Vmult.get(i));
+				NURBSSurface ns = SurfaceKnotInsertion(dir, newVKnots.get(i), Vmult.get(i));
+				nsReturn.setUKnotVector(ns.getUKnotVector());
+				nsReturn.setVKnotVector(ns.getVKnotVector());
+				nsReturn.setControlMesh(ns.getControlMesh());
+				System.out.println();
+				System.out.println("nsRETURN " + nsReturn.toString());
+				System.out.println();
 			}
 			return nsReturn;
 		}
@@ -335,7 +344,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 	
 		
 		public NURBSSurface[][] decomposeIntoBezierSurfaces(){
-			NURBSSurface nsDecompose = NURBSAlgorithm.decomposeSurface(this);
+			NURBSSurface nsDecompose = decomposeSurface();
+			System.out.println("nsDecompose in NURBSSURFACE");
+			System.out.println(nsDecompose.toString());
+			nsDecompose = NURBSAlgorithm.decomposeSurface(this);
+			System.out.println("nsDecompose in NURBSAlgorithm");
+			System.out.println(nsDecompose.toString());
 			double[] U = nsDecompose.getUKnotVector();
 			double[] V = nsDecompose.getVKnotVector();
 			double[][][]Pw = nsDecompose.getControlMesh();
