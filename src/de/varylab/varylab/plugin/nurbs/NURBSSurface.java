@@ -85,9 +85,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		}
 
 		/**
-		 * Use homogeneous coordinates. The fourth coordinates will be the weights
-		 * of the control points
-		 * 
+		
 		 * @param cm
 		 */
 		public void setControlMesh(double[][][] cm) {
@@ -172,6 +170,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		}
 		
 		
+		/**
+		 * 
+		 * @param u
+		 * @param v
+		 * @return the point in R^3
+		 */
 		public double[] getSurfacePoint( double u, double v) {
 			double[] S = new double[3];
 			NURBSAlgorithm.SurfacePoint(p, U, q, V, controlMesh, u, v, S);
@@ -179,7 +183,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		}
 		
 		
-		
+		/**
+		 * 
+		 * @param knot
+		 * @param knotVector
+		 * @return multiplicity of a given knot in the knot vector
+		 */
 		private static int getMultiplicity(double knot, double[] knotVector){
 			int counter = 0;
 			for (int i = 0; i < knotVector.length; i++) {
@@ -190,6 +199,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			return counter;
 		}
 		
+		
+		/**
+		 * 
+		 * @param knotVector
+		 * @return degree
+		 */
 		private static int getDegreeFromClampedKnotVector(double[] knotVector){
 			int count = 0;
 			double before = knotVector[0];
@@ -205,6 +220,21 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			return count;
 		}
 		
+		/**
+		 * This method stores all interior knots, which have not max. multiplicity
+		 * (= degree), in the List newKnots and computes the remaining
+		 * multiplicity, such that after knot insertion this knot has max.
+		 * multiplicity and writes this value into the List multiplicity.<br/>
+		 * <strong>Example</strong><br/>
+		 * U = {0,0,0,0,1,2,2,3,3,3,3} hence<br/>
+		 * newKnots = {1,2}<br/>
+		 * multiplicity = {2,1}<br/>
+		 * i.e. insert 1 twice and 2 once
+		 * @param knotVector 
+		 * @param newKnots (empty)
+		 * @param multiplicity (empty)
+		 * @return newKnots, multiplicity
+		 */
 		private static void getAllNewKnots(double[] knotVector,ArrayList<Double> newKnots, ArrayList<Integer> multiplicity){
 			int p = getDegreeFromClampedKnotVector(knotVector);
 			double before = knotVector[p];
@@ -228,6 +258,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		
 		}
 		
+		/**
+		 * 
+		 * @param knotVector
+		 * @param p
+		 * @return the set of the multiset filled knot vector 
+		 */
 		private static double[] getAllDifferentKnotsFromFilledKnotVector(double[] knotVector, int p){
 			int knotSize = (knotVector.length - 2) / p;
 			double[] knots = new double[knotSize];
@@ -238,41 +274,13 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		}
 		
 		/**
-		 * this is SurfaceKnotIns with smaller input
-		 * @param UP
-		 * @param VP
-		 * @param Pw
+		 * insert the knot uv r times into a knot vector of this surface. If dir == true into
+		 *  U else into V
 		 * @param dir
 		 * @param uv
 		 * @param r
 		 * @return
 		 */
-//		public static NURBSSurface SurfaceKnotInsertion(double[] UP, double[] VP, double[][][]Pw, boolean dir, double uv, int r){
-//			int mult; // = s
-//			int k;
-//			int np = Pw.length - 1;
-//			int p = UP.length - np - 2;
-//			int mp = Pw[0].length - 1;
-//			int q = VP.length - mp - 2;
-//			int nq = np;
-//			int mq = mp;
-//			if(dir){
-//				mult = getMultiplicity(uv, UP);
-//				k = NURBSAlgorithm.FindSpan(np, p, uv, UP);
-//				nq = np + r;
-//			}
-//			else{
-//				mult = getMultiplicity(uv, VP);
-//				k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
-//				mq = mp + r;
-//			}
-//			double[] UQ = new double[nq + p + 2];
-//			double[] VQ = new double[mq + q + 2];
-//			double[][][]Qw = new double[nq + 1][mq + 1][4];
-//			NURBSAlgorithm.SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
-//			NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
-//			return ns;
-//		}
 		
 		public NURBSSurface SurfaceKnotInsertion(boolean dir, double uv, int r){
 			double[] UP = this.getUKnotVector();
@@ -303,53 +311,85 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			NURBSAlgorithm.SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
 			NURBSSurface ns = new NURBSSurface(UQ, VQ, Qw, p, q);
 			return ns;
+		}
+		
+		/**
+		 * insert the knot uv r times into a knot vector of surface ns. If dir == true into
+		 *  U else into V
+		 * @param dir
+		 * @param uv
+		 * @param r
+		 * @return
+		 */
+		
+		public NURBSSurface SurfaceKnotInsertion(NURBSSurface ns, boolean dir, double uv, int r){
+			double[] UP = ns.getUKnotVector();
+			double[] VP = ns.getVKnotVector();
+			double[][][]Pw = ns.getControlMesh();
 			
+			int mult; // = s
+			int k;
+			int np = Pw.length - 1;
+			int p = UP.length - np - 2;
+			int mp = Pw[0].length - 1;
+			int q = VP.length - mp - 2;
+			int nq = np;
+			int mq = mp;
+			if(dir){
+				
+				mult = getMultiplicity(uv, UP);
+				k = NURBSAlgorithm.FindSpan(np, p, uv, UP);
+				nq = np + r;
+			}
+			else{
+				mult = getMultiplicity(uv, VP);
+				k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
+				mq = mp + r;
+			}
+			double[] UQ = new double[nq + p + 2];
+			double[] VQ = new double[mq + q + 2];
+			double[][][]Qw = new double[nq + 1][mq + 1][4];
+			NURBSAlgorithm.SurfaceKnotIns(np, p, UP, mp, q, VP, Pw, dir, uv, k, mult, r, nq, UQ, mq, VQ, Qw);
+			NURBSSurface nsReturn = new NURBSSurface(UQ, VQ, Qw, p, q);
+			return nsReturn;
 		}
 		
 		
-		
+		/**
+		 * decomposes both knot vectors of this surface s.d. both are filled
+		 * @return decomposed surface
+		 */
 		
 		public NURBSSurface decomposeSurface(){
+			double[]U = this.getUKnotVector();
+			double[]V = this.getVKnotVector();
+			double[][][]Pw = this.getControlMesh();
 			ArrayList<Double> newUKnots = new ArrayList<Double>();
 			ArrayList<Integer> Umult = new ArrayList<Integer>();
 			getAllNewKnots(U, newUKnots, Umult);
 			ArrayList<Double> newVKnots = new ArrayList<Double>();
 			ArrayList<Integer> Vmult = new ArrayList<Integer>();
 			getAllNewKnots(V, newVKnots, Vmult);
-			NURBSSurface nsReturn = new NURBSSurface(U, V, controlMesh, p, q);
+			NURBSSurface nsReturn = new NURBSSurface(U, V, Pw, p, q);
 			boolean dir = true;
 			for (int i = 0; i < newUKnots.size(); i++) {
-				NURBSSurface ns = SurfaceKnotInsertion(dir, newUKnots.get(i), Umult.get(i));
-				nsReturn.setUKnotVector(ns.getUKnotVector());
-				nsReturn.setVKnotVector(ns.getVKnotVector());
-				nsReturn.setControlMesh(ns.getControlMesh());
-				System.out.println();
-				System.out.println("nsRETURN " + nsReturn.toString());
-				System.out.println();
+				nsReturn = SurfaceKnotInsertion(nsReturn, dir, newUKnots.get(i), Umult.get(i));
 			}
 			dir = false;
 			for (int i = 0; i < newVKnots.size(); i++) {
-				NURBSSurface ns = SurfaceKnotInsertion(dir, newVKnots.get(i), Vmult.get(i));
-				nsReturn.setUKnotVector(ns.getUKnotVector());
-				nsReturn.setVKnotVector(ns.getVKnotVector());
-				nsReturn.setControlMesh(ns.getControlMesh());
-				System.out.println();
-				System.out.println("nsRETURN " + nsReturn.toString());
-				System.out.println();
+				nsReturn = SurfaceKnotInsertion(nsReturn, dir, newVKnots.get(i), Vmult.get(i));
 			}
 			return nsReturn;
 		}
 		
 		
-	
+		/**
+		 * computes all Bezier patches from this surface
+		 * @return Bezier patches
+		 */
 		
 		public NURBSSurface[][] decomposeIntoBezierSurfaces(){
 			NURBSSurface nsDecompose = decomposeSurface();
-			System.out.println("nsDecompose in NURBSSURFACE");
-			System.out.println(nsDecompose.toString());
-			nsDecompose = NURBSAlgorithm.decomposeSurface(this);
-			System.out.println("nsDecompose in NURBSAlgorithm");
-			System.out.println(nsDecompose.toString());
 			double[] U = nsDecompose.getUKnotVector();
 			double[] V = nsDecompose.getVKnotVector();
 			double[][][]Pw = nsDecompose.getControlMesh();
@@ -379,19 +419,38 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 							VknotVector[k] = diffrentVknots[j + 1];
 						}
 					}
-					BezierSurfaces[i][j].setUKnotVector(UknotVector);
-					BezierSurfaces[i][j].setVKnotVector(VknotVector);
 					double[][][]BezierControlPoints = new double[UknotVector.length - p - 1][VknotVector.length - q - 1][4];
 					for (int iB = 0; iB < BezierControlPoints.length; iB++) {
 						for (int jB = 0; jB < BezierControlPoints.length; jB++) {
 							BezierControlPoints[iB][jB] = Pw[p * i + iB][q * j + jB];
 						}
 					}
+					BezierSurfaces[i][j].setUKnotVector(UknotVector);
+					BezierSurfaces[i][j].setVKnotVector(VknotVector);
 					BezierSurfaces[i][j].setControlMesh(BezierControlPoints);
-					
+					BezierSurfaces[i][j].setUDegree(p);
+					BezierSurfaces[i][j].setVDegree(q);
 				}
 			}
 			return BezierSurfaces;
 		}
+		
+		
+		/**
+		 * 
+		 * @param p
+		 * @return
+		 */
+		public PointAndDistance getDistanceBetweenPointAndSurface(double[] point){
+			double[] p = new double[3];
+			double distance = 0;
+			NURBSSurface[][] BezierPatches = decomposeIntoBezierSurfaces();
+			PointAndDistance pad = new PointAndDistance(p, distance);
+			return pad;
+		}
+		
+		
+		
+		
 	
 }
