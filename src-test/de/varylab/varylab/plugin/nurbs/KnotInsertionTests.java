@@ -3,13 +3,12 @@ package de.varylab.varylab.plugin.nurbs;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-
 public class KnotInsertionTests {
 	
 	@Test
 	public void knotInsertionTest(){
 		double[] uv = {0.33, 0.44};
+		double []point = {0.1, 0.7};
 		double[] U = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
 		double[] V = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
 		int p = 3;
@@ -19,24 +18,15 @@ public class KnotInsertionTests {
 						{{6.389829555243823, 12.39239671320014, 0.0, 1.0}, {10.56365761489803, 4.973453194794152, 1.742680787793771, 1.0}, {10.28396810574596, -2.78972356564517, -5.851965114566728, 1.0}, {7.938879144393841, -8.00342287727509, -6.841635685412578, 1.0}}, 
 						{{17.1686329464127, 7.938879144393843, 0.0, 1.0}, {18.65313880268147, 0.839068527456261, 8.713403938968852, 1.0}, {18.65313880268147, -1.419962123387515, -3.808080239993792, 1.0}, {17.62043907658145, -7.164354349818831, 0.0, 1.0}}};
 
-		NURBSSurface ns = new NURBSSurface(U, V, cm, p, p);
-		double[] s1 = new double[3];
-		NURBSAlgorithm.SurfacePoint(p, U, q, V, cm, uv[0], uv[1], s1);
+		NURBSSurface ns = new NURBSSurface(U, V, cm, p, q);
+		double[] s1 = ns.getSurfacePoint(point[0], point[1]);
 		NURBSSurface ns2 = ns.SurfaceKnotInsertion(true, uv[0], 2);
-		double[] U2 = ns2.getUKnotVector();
-		double[] V2 = ns2.getVKnotVector();
-		double[][][] cm2 = ns2.getControlMesh(); 
-		double[] s2 = new double[3];
-		NURBSAlgorithm.SurfacePoint(p, U2, q, V2, cm2, uv[0], uv[1], s2);
+		double[] s2 = ns2.getSurfacePoint(point[0], point[1]);
 		double delta = 0.001;
 		Assert.assertArrayEquals(null, s1, s2, delta);
 		
 		NURBSSurface ns3 = ns.SurfaceKnotInsertion(false, uv[1], 3);
-		double[] U3 = ns3.getUKnotVector();
-		double[] V3 = ns3.getVKnotVector();
-		double[][][] cm3 = ns3.getControlMesh(); 
-		double[] s3 = new double[3];
-		NURBSAlgorithm.SurfacePoint(p, U3, q, V3, cm3, uv[0], uv[1], s3);
+		double[] s3 = ns3.getSurfacePoint(point[0], point[1]);
 		Assert.assertArrayEquals(null, s1, s3, delta);
 	}
 	
@@ -60,10 +50,19 @@ public class KnotInsertionTests {
 		NURBSSurface ns0 = new NURBSSurface(U, V, Pw0, p, q);
 		double[] s0 = ns0.getSurfacePoint(uv[0], uv[1]);
 		NURBSSurface ns1 = new NURBSSurface(U, V, Pw0, p, q);
+
+		/**
+		 * insert uInsertion into surface
+		 */
 		
 		for (int i = 0; i < uInsertion.length; i++) {
 			ns1 = ns1.SurfaceKnotInsertion(true, uInsertion[i], 1);
 		}
+		
+		/**
+		 * insert vInsertion into surface
+		 */
+		
 		for (int i = 0; i < vInsertion.length; i++) {
 			ns1 = ns1.SurfaceKnotInsertion(false, vInsertion[i], 1);
 		}
@@ -85,7 +84,14 @@ public class KnotInsertionTests {
 				}
 			}
 		}
+		System.out.println("Bezier " + Bezier.toString());
 		double[] BezierPoint = Bezier.getSurfacePoint(uv[0], uv[1]);
+		/**
+		 * s0 is point at original surface
+		 * s1 is point at surface after single knot insertion
+		 * sDecomposed is point after decomposing
+		 * BezierPoint is point at the patch which contains the domain point
+		 */
 		Assert.assertArrayEquals(null, s1, s0, delta);
 		Assert.assertArrayEquals(null, sDecomposed, s0, delta);
 		Assert.assertArrayEquals(null, BezierPoint, s0, delta);
