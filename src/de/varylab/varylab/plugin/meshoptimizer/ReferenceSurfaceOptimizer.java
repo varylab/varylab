@@ -81,6 +81,16 @@ public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements
 		functional.setReferenceSurface(refHDS, hif.getAdapters());
 		return functional;
 	}
+	
+	
+	public VHDS getReferenceSurface() {
+		if (refSurfaceLayer == null) {
+			return null;
+		} else {
+			return refSurfaceLayer.get(new VHDS());
+		}
+	}
+	
 
 	@Override
 	public String getName() {

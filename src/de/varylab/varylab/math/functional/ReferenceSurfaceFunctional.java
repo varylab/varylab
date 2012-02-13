@@ -104,12 +104,18 @@ implements Functional<V, E, F> {
 		}
 		return result;
 	}
+	
+	
+	public double[] getClosestPointOnReference(double[] vpos) {
+		return getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
+	}
+	
 
-	private double[] getClosestPointOnSurface(
-			HalfEdgeDataStructure<V, E, F> surface,
-			AdapterSet ras,
-			KdTree<V, E, F> kdtree,
-			double[] v)
+	public double[] getClosestPointOnSurface(
+		HalfEdgeDataStructure<V, E, F> surface,
+		AdapterSet ras,
+		KdTree<V, E, F> kdtree,
+		double[] v)
 	{
 		Collection<V> closest = kdtree.collectKNearest(v, 5);
 		double[] closestPointOnSurface = new double[3];
@@ -226,4 +232,10 @@ implements Functional<V, E, F> {
 		kdtree = new KdTree<V, E, F>(refSurface, as, 10, false);
 		refas = as;
 	}
+	
+	
+	public KdTree<V, E, F> getKdtree() {
+		return kdtree;
+	}
+	
 }

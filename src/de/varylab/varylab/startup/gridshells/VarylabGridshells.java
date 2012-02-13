@@ -31,6 +31,7 @@ import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
+import de.varylab.varylab.plugin.datasource.ReferenceDistance;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
@@ -160,6 +161,7 @@ public class VarylabGridshells {
 		v.registerPlugin(OppositeEdgesCurvature.class);
 		v.registerPlugin(OppositeAnglesCurvature.class);
 		v.registerPlugin(GeodesicCurvature.class);
+		v.registerPlugin(ReferenceDistance.class);
 	}
 
 

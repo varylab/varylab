@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.remeshing;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -17,6 +18,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.varylab.varylab.utilities.NodeIndexComparator;
 
 public class FitTexturePlugin extends AlgorithmPlugin {
 
@@ -37,7 +39,8 @@ public class FitTexturePlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		Set<V> vertices = hi.getSelection().getVertices(hds);
+		Set<V> vertices = new TreeSet<V>(new NodeIndexComparator<V>());
+		vertices.addAll(hi.getSelection().getVertices(hds));
 		if(vertices.size() == 2) {
 			Iterator<V> vi = vertices.iterator();
 			V 	v1 = vi.next(),
