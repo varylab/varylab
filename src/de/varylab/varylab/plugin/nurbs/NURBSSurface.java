@@ -3,8 +3,10 @@ package de.varylab.varylab.plugin.nurbs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-
+import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+
+
 
 	public class NURBSSurface {
 
@@ -356,7 +358,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		
 		
 		/**
-		 * decomposes both knot vectors of this surface s.d. both are filled
+		 * decomposes both knot vectors of this surface s.d. both are filled<br/>
+		  * <strong>Example</strong><br/>
+		  * Uold = {000012234444}<br/>
+		  * Unew = {00001112223334444}
+		  * 
+		 * 
 		 * @return decomposed surface
 		 */
 		
@@ -435,6 +442,407 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			return BezierSurfaces;
 		}
 		
+		public LinkedList<NURBSSurface> decomposeIntoBezierSurfacesList(){
+			LinkedList<NURBSSurface> surfaceList = new LinkedList<NURBSSurface>();
+			NURBSSurface[][] Bezier = decomposeIntoBezierSurfaces();
+			for (int i = 0; i < Bezier.length; i++) {
+				for (int j = 0; j < Bezier[0].length; j++) {
+					surfaceList.add(Bezier[i][j]);
+				}
+			}
+			return surfaceList;
+		}
+		
+		
+		/**
+		 * 
+		 * Distance Calculation Between a Point
+		 *and a NURBS Surface
+		 *Eva Dyllong and Wolfram Luther
+		 *
+		 */
+		
+//		private static double max(double[] array){
+//			double max = Double.MIN_VALUE;
+//			for (int i = 0; i < array.length; i++) {
+//				if(array[i] > max){
+//					max = array[i];
+//				}
+//			}
+//			return max;
+//		}
+		
+//		private static double phi(double[]w){
+//			int p = w.length; 
+//			double[] inverseW = new double[p];
+//			double[] smallW = new double[p - 2];
+//			for (int i = 0; i < p; i++) {
+//				inverseW[i] = 1 / w[i];
+//				if(i != 0 && i != p - 1){
+//					smallW[i - 1] = w[i];
+//				}
+//			}
+//			double maxW = max(smallW);
+//			double maxInverseW = max(inverseW);
+//			return 1 - 1 / (1 + maxInverseW * maxW * (Math.pow(2, p - 1) - 1));
+//		}
+		
+		private static double[] get3DPoint(double[] fourDPoint){
+			double[] threeDPoint = new double[3];
+			threeDPoint[0] = fourDPoint[0] / fourDPoint[3];
+			threeDPoint[1] = fourDPoint[1] / fourDPoint[3];
+			threeDPoint[2] = fourDPoint[2] / fourDPoint[3];
+			return threeDPoint;
+		}
+		
+		private double[][][] get3DControlmesh(){
+			double[][][] threeDControlmesh = new double[controlMesh.length][controlMesh[0].length][3];
+			for (int i = 0; i < controlMesh.length; i++) {
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					threeDControlmesh[i][j] = get3DPoint(controlMesh[i][j]);
+				}
+			}
+			return threeDControlmesh;
+		}
+		
+	
+		
+		private static double[] projectOntoLine(double[] pos, double[] v, double[] w) {
+			double[] l = Rn.subtract(null, w, v); // w - v
+			double[] np = Rn.subtract(null, pos, v); // pos - v
+			Rn.projectOnto(np, np, l);
+			Rn.add(np, np, v);
+			return np;
+		}
+		
+		private static boolean pointLiesOnSegment(double[] point, double[] v, double[] w){
+//			System.out.println("pointLiesOnSegment");
+//			System.out.println("point " + Arrays.toString(point));
+//			System.out.println("v " + Arrays.toString(v));
+//			System.out.println("w " + Arrays.toString(w));
+			if((point[0] < v[0] && point[0] < w[0]) || (point[0] > v[0] && point[0] > w[0])){
+				System.out.println("1. wrong");
+				return false;
+			}
+			else if((point[1] < v[1] && point[1] < w[1]) || (point[1] > v[1] && point[1] > w[1])){
+				System.out.println("2. wrong");
+				return false;
+			}
+			else if((point[2] < v[2] && point[2] < w[2]) || (point[2] > v[2] && point[2] > w[2])){
+				System.out.println("3. wrong");
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		
+//		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
+//			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
+//			double[] proj = Rn.subtract(null, pos, v1);
+//			Rn.projectOntoComplement(proj, proj, fn);
+//			return Rn.add(null,proj,v1);
+//		}
+		
+		
+		
+		/**
+		 * 
+		 * Algorithms from PAPER:
+		 * "Point inversion and projection for NURBS curve:
+		 * 			Control polygon approach"
+		 *  by YingLiang Ma and W T Hewitt
+		 * @return is valid
+		 */
+		
+		
+		/**
+		 * Algorithm 1
+		 * @param Polygon
+		 * @return
+		 */
+		private static boolean isValidPolygon(double[][] Polygon){
+			int n = Polygon.length - 1;
+			double R = 0;
+			System.out.println("isValidPolygon");
+			System.out.println("our polygon");
+			for (int i = 0; i < Polygon.length; i++) {
+				System.out.println(Arrays.toString(Polygon[i]));
+			}
+			for (int i = 1; i < n; i++) {
+//				System.out.println("n " + n);
+//				System.out.println("Polygon["+ (i + 1) +"] " + Arrays.toString(Polygon[i + 1]));
+//				System.out.println("Line: " + Arrays.toString(Polygon[i - 1]) + " " + Arrays.toString(Polygon[i + 1]));
+				double[] V1 = projectOntoLine(Polygon[i], Polygon[i - 1], Polygon[i + 1]);
+				System.out.println("Projection onto neighbourpoints" + Arrays.toString(V1));
+				double[] V2 = projectOntoLine(Polygon[i], Polygon[0], Polygon[n]);
+				System.out.println("Projection onto endpoints" + Arrays.toString(V2));
+				boolean validProjection = pointLiesOnSegment(V2, Polygon[0], Polygon[n]);
+				if(!validProjection){
+					System.out.println("!validProjection");
+					return false;
+				}
+				double[] V1Pi = Rn.subtract(null, Polygon[i], V1);
+			
+				if(i < (n / 2)){
+					double[] V1Pn = Rn.subtract(null, Polygon[n], V1);
+					R = Rn.innerProduct(V1Pi, V1Pn);
+				}
+				else{
+					double[] V1P0 = Rn.subtract(null, Polygon[0], V1);
+					R = Rn.innerProduct(V1Pi, V1P0);
+				}
+				if(R > 0){
+					System.out.println("!valid");
+					return false;
+				}
+			}
+			return true;
+		}
+		 
+		/**
+		 * Algorithm 2
+		 * @return
+		 */
+		
+		
+		public boolean hasValidControlmesh(){
+			System.out.println("hasValidControlmesh()");
+			double[][][] threeDControlMesh = get3DControlmesh();
+			System.out.println("in U direction");
+			for (int i = 0; i < threeDControlMesh.length; i++) {
+				double[][]Polygon = new double[threeDControlMesh[0].length][];
+				System.out.println("polygon");
+				for (int j = 0; j < threeDControlMesh[i].length; j++) {
+					Polygon[j] = threeDControlMesh[i][j];
+					System.out.println(Arrays.toString(Polygon[j]));
+				}
+				if(!isValidPolygon(Polygon)){
+					System.out.println("U false");
+					return false;
+				}
+			}
+			System.out.println("in V direction");
+			for (int j = 0; j < threeDControlMesh[0].length; j++) {
+				double[][]Polygon = new double[threeDControlMesh.length][];
+				System.out.println("polygon");
+				for (int i = 0; i < threeDControlMesh.length; i++) {
+					Polygon[i] = threeDControlMesh[i][j];
+					System.out.println(Arrays.toString(Polygon[i]));
+				}
+				if(!isValidPolygon(Polygon)){
+					System.out.println("V false");
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		
+		/**
+		 * Algorithm 3
+		 * @param Polygon
+		 * @param P
+		 * @return
+		 */
+//		private boolean pointNearestBezierCurve(double[][] Polygon, double[] P){
+//			int n  = Polygon.length - 1;
+//			double[] P0P = Rn.subtract(null, Polygon[0], P);
+//			double[] P0P1 = Rn.subtract(null, Polygon[0], Polygon[0]);
+//			double[] PnP = Rn.subtract(null, Polygon[n], P);
+//			double[] PnPn_1 = Rn.subtract(null, Polygon[n - 1], Polygon[n]);
+//			double[] PnP0 = Rn.subtract(null, Polygon[0], Polygon[n]);
+//			double R1 = Rn.innerProduct(P0P, P0P1);
+//			double R2 = Rn.innerProduct(PnP, PnPn_1);
+//			double R3 = Rn.innerProduct(PnP0, PnP);
+//			double R4 = Rn.innerProduct(PnP0, P0P);
+//			if(R1 < 0 ||  R2 < 0 && R3 * R4 > 0){
+//				return false;
+//			}
+//			else{
+//				return true;
+//			}
+//		}
+		
+		
+		/**
+		 * Algoritm 4
+		 * @param P
+		 * @return
+		 */
+//		private boolean pointNearestBezierPatch(double[] P){
+//			boolean Flag = false;
+//			for (int i = 0; i < controlMesh.length; i++) {
+//				double[][]Polygon = new double[controlMesh[i].length][];
+//				for (int j = 0; j < controlMesh[i].length; j++) {
+//					Polygon[j] = controlMesh[i][j];
+//				}
+//				if(pointNearestBezierCurve(Polygon, P)){
+//					Flag = true;
+//					break;
+//				}
+//			}
+//			if(!Flag){
+//				return false;// the nearest point is the point on the boundary curve
+//			}
+//			Flag = false;
+//			for (int j = 0; j < controlMesh[0].length; j++) {
+//				double[][]Polygon = new double[controlMesh.length][];
+//				for (int i = 0; i < controlMesh.length; i++) {
+//					Polygon[j] = controlMesh[i][j];
+//				}
+//				if(pointNearestBezierCurve(Polygon, P)){
+//					Flag = true;
+//					break;
+//				}
+//			}
+//			if(!Flag){
+//				return false;// the nearest point is the point on the boundary curve
+//			}
+//			return true;
+//		}
+		
+// 		private boolean isFlatEnough(double eps){
+//			double[] v1 = controlMesh[0][0];
+//			double[] v2 = controlMesh[0][controlMesh[0].length - 1];
+//			double[] v3 = controlMesh[controlMesh.length - 1][0];
+//			for (int i = 0; i < controlMesh.length; i++) {
+//				for (int j = 0; j < controlMesh[0].length; j++) {
+//					double[] proj = projectOnto(controlMesh[i][j], v1, v2, v3);
+//					double dist = Rn.euclideanDistance(proj, controlMesh[i][j]);
+//					if(dist > eps){
+//						return false;
+//					}
+//				}
+//			}
+//			return true;
+//		}
+ 		
+ 		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
+ 			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
+// 			System.out.println("subdivideIntoFourNewPatches");
+// 			System.out.println("U " + Arrays.toString(U));
+// 			System.out.println("V " + Arrays.toString(V));
+ 			double uInsert = (U[U.length - 1] + U[0]) / 2.0;
+ 			double vInsert = (V[V.length - 1] + V[0]) / 2.0;
+// 			System.out.println("uInsert " + uInsert);
+// 			System.out.println("vInsert " + vInsert);
+ 			NURBSSurface nsInsert = SurfaceKnotInsertion(true, uInsert, 1);
+ 			nsInsert = SurfaceKnotInsertion(nsInsert, false, vInsert, 1);
+ 			newPatches = nsInsert.decomposeIntoBezierSurfacesList();
+// 			System.out.println("ALL NEW PATCHES");
+// 			for (NURBSSurface n : newPatches) {
+//				System.out.println(n.toString());
+//			}
+ 			return newPatches;
+ 		}
+ 		
+ 		public LinkedList<NURBSSurface> subdivideUntilEveryPatchIsValid(){
+ 			LinkedList<NURBSSurface> validList = new LinkedList<NURBSSurface>();
+ 			LinkedList<NURBSSurface> oldList = decomposeIntoBezierSurfacesList();
+ 			System.out.println("subdivideUntilEveryPatchIsValid()");
+ 			while(!oldList.isEmpty()){
+ 				System.out.println("IN WHILE");
+ 				if(oldList.peekLast().hasValidControlmesh()){
+ 					System.out.println("IF");
+ 					NURBSSurface validSurface = oldList.pollLast();
+ 					System.out.println("validSurface "+validSurface.toString());
+ 					validList.add(validSurface);
+ 				}
+ 				else{
+ 					System.out.println("else");
+ 					NURBSSurface notValidSurface = oldList.pollLast();
+ 					System.out.println("notValidSurface " + notValidSurface.toString());
+ 					LinkedList<NURBSSurface> newPatches = notValidSurface.subdivideIntoFourNewPatches();
+ 					oldList.addAll(newPatches);
+ 				}
+ 			}			
+ 			return validList;
+ 		}
+		
+// 		/**
+// 		 * Newton's method
+// 		 * @param intitialUV
+// 		 * @return
+// 		 */
+// 		
+// 		private double[] getClosestPoint(double[] intitialUV, double[] P){
+// 			double u = intitialUV[0];
+// 			double v = intitialUV[1];
+// 			double[] S = getSurfacePoint(u, v);
+// 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
+// 			double[] Su = ci.getSu();
+//// 			double
+// 			return null;
+// 		}
+ 		
+ 		
+ 		private boolean isImpossiblePatch(double[] point, double closestMaxDistance){
+			for (int i = 0; i < controlMesh.length; i++) {
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					double dist = Rn.euclideanDistance(point, controlMesh[i][j]);
+					if(dist < closestMaxDistance){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+ 		
+ 		private double[] getMinControlPoint(double[] point){
+ 			double dist = Double.MAX_VALUE;
+ 			double[] minPoint = new double[3];
+ 			for (int i = 0; i < controlMesh.length; i++) {
+ 				for (int j = 0; j < controlMesh.length; j++) {
+ 					if(dist > Rn.euclideanDistance(point, controlMesh[i][j])){
+ 						dist = Rn.euclideanDistance(point, controlMesh[i][j]);
+ 						minPoint = controlMesh[i][j];
+ 					}
+ 				}
+			}
+ 			return minPoint;
+ 		}
+ 		
+ 		private double[] getMaxControlPoint(double[] point){
+ 			double dist = Double.MIN_VALUE;
+ 			double[] maxPoint = new double[3];
+ 			for (int i = 0; i < controlMesh.length; i++) {
+ 				for (int j = 0; j < controlMesh.length; j++) {
+ 					if(dist < Rn.euclideanDistance(point, controlMesh[i][j])){
+ 						dist = Rn.euclideanDistance(point, controlMesh[i][j]);
+ 						maxPoint = controlMesh[i][j];
+ 					}
+ 				}
+			}
+ 			return maxPoint;
+ 		}
+ 		
+ 		private static NURBSSurface getClosestPatch(LinkedList<NURBSSurface> surfList, double[] point){
+ 			double minDist = Double.MAX_VALUE;
+ 			NURBSSurface closestPatch = new NURBSSurface();
+ 			for (NURBSSurface ns : surfList) {
+ 				double[] minSurfPoint = ns.getMinControlPoint(point);
+				if(minDist > Rn.euclideanDistance(point, minSurfPoint)){
+					minDist = Rn.euclideanDistance(point, minSurfPoint);
+					closestPatch = ns;
+				}
+			}
+ 			return closestPatch;
+ 		}
+ 		
+ 		private static LinkedList<NURBSSurface> getPossiblePatches(LinkedList<NURBSSurface> surfList, double[] point){
+ 			NURBSSurface closestPatch = getClosestPatch(surfList, point);
+ 			double[] maxPoint = closestPatch.getMaxControlPoint(point);
+ 			double closestMaxDistance = Rn.euclideanDistance(point, maxPoint);
+ 			LinkedList<NURBSSurface> possiblePatches = new LinkedList<NURBSSurface>();
+ 			for (NURBSSurface ns : surfList) {
+				 if(!ns.isImpossiblePatch(point, closestMaxDistance)){
+					 possiblePatches.add(ns);
+				 }
+			}
+ 			return possiblePatches;
+ 		}
+		
 		
 		/**
 		 * 
@@ -443,14 +851,84 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		 */
 		public PointAndDistance getDistanceBetweenPointAndSurface(double[] point){
 			double[] p = new double[3];
-			double distance = 0;
-			NURBSSurface[][] BezierPatches = decomposeIntoBezierSurfaces();
-			PointAndDistance pad = new PointAndDistance(p, distance);
+			double dist = Double.MAX_VALUE;
+			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
+			for (int i = 0; i < 15; i++) {
+				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+				possiblePatches = getPossiblePatches(possiblePatches, point);
+				for (NURBSSurface ns : possiblePatches) {
+					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
+				}
+				possiblePatches = subdividedPatches;
+				System.out.println("Listenlaenge nach " + i + " Schritten: " + possiblePatches.size());
+			}
+			for (NURBSSurface ns : possiblePatches) {
+				double[] U = ns.getUKnotVector();
+				double[] V = ns.getVKnotVector();
+				double u = (U[0] + U[U.length - 1]) / 2;
+				double v = (V[0] + V[V.length - 1]) / 2;
+				double[] surfPoint = ns.getSurfacePoint(u, v);
+				if(dist > Rn.euclideanDistance(surfPoint, point)){
+					dist = Rn.euclideanDistance(surfPoint, point);
+					p = surfPoint;
+				}
+			}
+			PointAndDistance pad = new PointAndDistance(p, dist);
 			return pad;
 		}
 		
+	
 		
-		
+		public static void main(String[] a){
+//			double[] uInsertion = {0.11, 0.22};
+//			double[] vInsertion = {0.8, 0.9};
+//			double[]U = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
+//			double[] V = {0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0};
+//			int p = 3;
+//			int q = 3;
+//			double[][][]Pw0 = {{{-16.84591428200644, 9.165210069137606, 0.0, 1.0}, {-15.36140842573768, 3.743536507112545, -5.35712982914381, 1.0}, {-14.52233989828141, -1.484505856268766, 3.743536507112545, 1.0}, {-18.26587640539396, -5.550761027787562, 0.0, 1.0}}, 
+//							{{-8.84249140473135, 12.39239671320014, 10.06882232947512, 1.0}, {-6.454373288125074, 4.711692500331306, 6.045596313210488, 1.0}, {-4.066255171518796, -1.871768253556271, 4.582605034568804, 1.0}, {-8.455229007443846, -8.197054075918842, 0.0, 1.0}}, 
+//							{{6.389829555243823, 12.39239671320014, 0.0, 1.0}, {10.56365761489803, 4.973453194794152, 1.742680787793771, 1.0}, {10.28396810574596, -2.78972356564517, -5.851965114566728, 1.0}, {7.938879144393841, -8.00342287727509, -6.841635685412578, 1.0}}, 
+//							{{17.1686329464127, 7.938879144393843, 0.0, 1.0}, {18.65313880268147, 0.839068527456261, 8.713403938968852, 1.0}, {18.65313880268147, -1.419962123387515, -3.808080239993792, 1.0}, {17.62043907658145, -7.164354349818831, 0.0, 1.0}}};
+//
+//			NURBSSurface ns = new NURBSSurface(U, V, Pw0, p, q);
+//			
+//			/**
+//			 * insert uInsertion into surface
+//			 */
+//			
+//			for (int i = 0; i < uInsertion.length; i++) {
+//				ns = ns.SurfaceKnotInsertion(true, uInsertion[i], 1);
+//			
+//			}
+//			
+//			/**
+//			 * insert vInsertion into surface
+//			 */
+//			
+//			for (int i = 0; i < vInsertion.length; i++) {
+//				ns = ns.SurfaceKnotInsertion(false, vInsertion[i], 1);
+//			}
+//			
+//			NURBSSurface[][] BezierSurfaces = ns.decomposeIntoBezierSurfaces();
+//			for (int i = 0; i < BezierSurfaces.length; i++) {
+//				for (int j = 0; j < BezierSurfaces[0].length; j++) {
+//					System.out.println(BezierSurfaces[i][j].toString());
+//				}
+//			}
+			
+//			double[] v1 = {0,0,0};
+//			double[] v2 = {1,0,0};
+//			double[] v3 = {0,1,0};
+//			double[] pos = {1,2,3};
+//			double[] proj = projectOnto(pos, v1, v2, v3);
+//			System.out.println(Arrays.toString(proj));
+			
+			double[][] polygon = {{0,0,0},{0,1,1},{0,2,1},{0,3,0}};
+			boolean result = isValidPolygon(polygon);
+			System.out.println("is valid "+result);
+			
+		}
 		
 	
 }
