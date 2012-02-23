@@ -94,7 +94,6 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
-import de.varylab.varylab.plugin.nurbs.math.PointDistanceCalculator;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
 	
