@@ -53,11 +53,18 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.scene.data.Attribute;
+import de.jreality.scene.data.DataList;
+import de.jreality.scene.data.StorageModel;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
+import de.jreality.tools.DragEventTool;
+import de.jreality.tools.PointDragEvent;
+import de.jreality.tools.PointDragListener;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
@@ -739,17 +746,20 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			serialVersionUID = 1L;
 		private JButton
 			showControlMeshButton = new JButton("Show Control Mesh"),
-			goButton = new JButton("Go");
+			goButton = new JButton("Go"),
+			pointButton = new JButton("create point");
 		
-		private JRadioButton
-		bezierPatches = new JRadioButton("divide into Bezier Patches");
+		
+		private double[] point = {1,3,1};
+//		private JRadioButton
+//		bezierPatches = new JRadioButton("divide into Bezier Patches");
 		
 		public PointDistancePanel() {
 			super("Point Distance");
 			setShrinked(true);
 			setLayout(new GridBagLayout());
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
-			add(bezierPatches, rc);
+//			add(bezierPatches, rc);
 			add(goButton, rc);
 			add(showControlMeshButton, rc);
 			goButton.addActionListener(this);
@@ -760,7 +770,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		@Override
 		public void actionPerformed(ActionEvent e){
 			if (goButton == e.getSource()) {
-				calculateClosestPoint();
+				point = calculateClosestPoint(point);
 			}
 			if (showControlMeshButton == e.getSource()) {
 				NURBSSurface ns = getSelectedSurface();
@@ -807,21 +817,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
 			}
 		}
+		
+	
 
-		private void calculateClosestPoint() {
-			double[] point = {4,7,7};
+		private double[] calculateClosestPoint(double[] point) {
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
 			System.out.println(ns.toString());
-//			double[] surfacePoint = PointDistanceCalculator.surfacePoint(point, ns);
-			
 			HalfedgeLayer helPoint = new HalfedgeLayer(hif);
 			helPoint.setName("Point Distance");
-//			try {
-//				FileOutputStream fos = new FileOutputStream("test.obj");
-//				WriterOBJ.write(fS.getIndexedFaceSet(), fos);
-//				fos.close();
-//			} catch (Exception e2) {}
-//			hel.set(fS.getIndexedFaceSet());
 			hif.addLayer(helPoint);
 			PointSetFactory psfi = new PointSetFactory();
 			
@@ -839,8 +842,47 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 			ipointShader.setDiffuseColor(Color.orange);
 			hif.getActiveLayer().addTemporaryGeometry(sgci);
+			
+			DragEventTool t = new DragEventTool();
+			t.addPointDragListener(new PointDragListener() {
+
+				public void pointDragStart(PointDragEvent e) {
+					System.out.println("drag start of vertex no "+e.getIndex());				
+				}
+
+				public void pointDragged(PointDragEvent e) {
+					PointSet pointSet = e.getPointSet();
+					
+					double[][] points=new double[pointSet.getNumPoints()][];
+			        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
+			        System.out.println("point before dragging in tool: " + Arrays.toString(points[0]));
+			        points[e.getIndex()]=e.getPosition();  
+			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
+//			        psfi.setVertexAttribute(Attribute.COORDINATES, points);
+//			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createWritableDataList(points));
+//			        pointSet.setVertexAttributes(Attribute.COORDINATES,points);
+//			        DataList
+			        System.out.println("point after dragging in tool: " + Arrays.toString(points[0]));
+			        
+				}
+
+				public void pointDragEnd(PointDragEvent e) {
+				}
+				
+			});
+			
+			sgci.addTool(t);
+			
+//			System.out.println("point before dragging: " + Arrays.toString(point));
+//			PointSet pointSet = psfi.getPointSet();
+//			double[][] points = new double[pointSet.getNumPoints()][];
+//	        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
+//	        point = points[0];
+//	        System.out.println("point after dragging: " + Arrays.toString(point));
+			
 			PointAndDistance pad = ns.getDistanceBetweenPointAndSurface(point);
 			double[] surfacePoint = pad.getPoint();
+			System.out.println("closest point: " + Arrays.toString(surfacePoint));
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
 //			
@@ -862,6 +904,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			DefaultPointShader ipointShaderPoint = (DefaultPointShader)idgsPoint.getPointShader();
 			ipointShaderPoint.setDiffuseColor(Color.red);
 			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
+			
+			return point;
 			
 		}
 		
