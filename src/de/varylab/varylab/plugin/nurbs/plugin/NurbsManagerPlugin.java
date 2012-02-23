@@ -47,11 +47,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import de.jreality.geometry.PointSetFactory;
+import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
@@ -77,6 +80,7 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
+import de.varylab.varylab.plugin.nurbs.PointAndDistance;
 import de.varylab.varylab.plugin.nurbs.VertexComparator;
 import de.varylab.varylab.plugin.nurbs.adapter.FlatIndexFormAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
@@ -733,9 +737,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private class PointDistancePanel extends ShrinkPanel implements ActionListener{
 		
 		private static final long 
-		serialVersionUID = 1L;
+			serialVersionUID = 1L;
 		private JButton
-		goButton = new JButton("Go");
+			showControlMeshButton = new JButton("Show Control Mesh"),
+			goButton = new JButton("Go");
 		
 		private JRadioButton
 		bezierPatches = new JRadioButton("divide into Bezier Patches");
@@ -747,17 +752,68 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 			add(bezierPatches, rc);
 			add(goButton, rc);
+			add(showControlMeshButton, rc);
 			goButton.addActionListener(this);
-			
+			showControlMeshButton.addActionListener(this);
 			
 		}
 	
 		@Override
 		public void actionPerformed(ActionEvent e){
-			double[] point = new double[3];
+			if (goButton == e.getSource()) {
+				calculateClosestPoint();
+			}
+			if (showControlMeshButton == e.getSource()) {
+				NURBSSurface ns = getSelectedSurface();
+				System.out.println("original surface " + ns.toString());
+				boolean valid = ns.hasValidControlmesh();
+				System.out.println("is valid " + valid);
+				
+//				System.out.println("ns " + ns.toString());
+//				double[] uInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+//				double[] vInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+//				/**
+//				 * insert uInsertion into surface
+//				 */
+//				
+//				for (int i = 0; i < uInsertion.length; i++) {
+//					ns = ns.SurfaceKnotInsertion(true, uInsertion[i], 1);
+//				}
+//				
+//				/**
+//				 * insert vInsertion into surface
+//				 */
+//				
+//				for (int i = 0; i < vInsertion.length; i++) {
+//					ns = ns.SurfaceKnotInsertion(false, vInsertion[i], 1);
+//				}
+//				NURBSSurface nsInsert = ns.SurfaceKnotInsertion(true, uInsertion[0], 1);
+//				nsInsert = nsInsert.SurfaceKnotInsertion(false, vInsertion[0], 1);
+				NURBSSurface decomposed = ns.decomposeSurface();
+				double[][][] cm = decomposed.getControlMesh();
+				QuadMeshFactory qmf = new QuadMeshFactory();
+				qmf.setULineCount(cm.length);
+				qmf.setVLineCount(cm[0].length);
+				qmf.setVertexCoordinates(cm);
+				qmf.setGenerateEdgesFromFaces(true);
+				qmf.update();
+				IndexedFaceSet ifs = qmf.getIndexedFaceSet();
+				SceneGraphComponent cmc = new SceneGraphComponent("Control Mesh");
+				cmc.setGeometry(ifs);
+				Appearance app = new Appearance();
+				cmc.setAppearance(app);
+				app.setAttribute(CommonAttributes.FACE_DRAW, false);
+				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
+				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+				hif.getActiveLayer().addTemporaryGeometry(cmc);
+			}
+		}
+
+		private void calculateClosestPoint() {
+			double[] point = {4,7,7};
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
 			System.out.println(ns.toString());
-			double[] surfacePoint = PointDistanceCalculator.surfacePoint(point, ns);
+//			double[] surfacePoint = PointDistanceCalculator.surfacePoint(point, ns);
 			
 			HalfedgeLayer helPoint = new HalfedgeLayer(hif);
 			helPoint.setName("Point Distance");
@@ -768,12 +824,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //			} catch (Exception e2) {}
 //			hel.set(fS.getIndexedFaceSet());
 			hif.addLayer(helPoint);
-			hif.update();
 			PointSetFactory psfi = new PointSetFactory();
 			
 			psfi.setVertexCount(1);
 			
-			psfi.setVertexCoordinates(surfacePoint);
+			psfi.setVertexCoordinates(point);
 			psfi.update();
 			SceneGraphComponent sgci = new SceneGraphComponent("point distance");
 			SceneGraphComponent distancePointComp = new SceneGraphComponent("Intersection");
@@ -785,6 +840,29 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 			ipointShader.setDiffuseColor(Color.orange);
 			hif.getActiveLayer().addTemporaryGeometry(sgci);
+			PointAndDistance pad = ns.getDistanceBetweenPointAndSurface(point);
+			double[] surfacePoint = pad.getPoint();
+			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
+			surfPoint.setName("Point ");
+//			
+			hif.addLayer(surfPoint);
+			hif.update();
+			PointSetFactory psfPoint = new PointSetFactory();
+			
+			psfPoint.setVertexCount(1);
+			
+			psfPoint.setVertexCoordinates(surfacePoint);
+			psfPoint.update();
+			SceneGraphComponent sgcPoint = new SceneGraphComponent("closest point");
+			SceneGraphComponent PointComp = new SceneGraphComponent("PointComponent");
+			sgcPoint.addChild(PointComp);
+			sgcPoint.setGeometry(psfPoint.getGeometry());
+			Appearance iAPoint = new Appearance();
+			sgcPoint.setAppearance(iAPoint);
+			DefaultGeometryShader idgsPoint = ShaderUtility.createDefaultGeometryShader(iAPoint, false);
+			DefaultPointShader ipointShaderPoint = (DefaultPointShader)idgsPoint.getPointShader();
+			ipointShaderPoint.setDiffuseColor(Color.red);
+			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
 			
 		}
 		
