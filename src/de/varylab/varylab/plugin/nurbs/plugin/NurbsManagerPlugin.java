@@ -749,34 +749,86 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			goButton = new JButton("Go"),
 			pointButton = new JButton("create point");
 		
+		boolean pointCreated = false;
 		
 		private double[] point = {1,3,1};
-//		private JRadioButton
-//		bezierPatches = new JRadioButton("divide into Bezier Patches");
 		
 		public PointDistancePanel() {
 			super("Point Distance");
 			setShrinked(true);
 			setLayout(new GridBagLayout());
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
-//			add(bezierPatches, rc);
+			add(pointButton, rc);
 			add(goButton, rc);
 			add(showControlMeshButton, rc);
 			goButton.addActionListener(this);
 			showControlMeshButton.addActionListener(this);
+			pointButton.addActionListener(this);
 			
 		}
 	
 		@Override
 		public void actionPerformed(ActionEvent e){
-			if (goButton == e.getSource()) {
-				point = calculateClosestPoint(point);
+			
+			if(pointButton == e.getSource()){
+				pointCreated = true;
+				HalfedgeLayer helPoint = new HalfedgeLayer(hif);
+				helPoint.setName("Point Distance");
+				hif.addLayer(helPoint);
+				PointSetFactory psfi = new PointSetFactory();
+				System.out.println("create point");
+				psfi.setVertexCount(1);
+				psfi.setVertexCoordinates(point);
+				psfi.update();
+				SceneGraphComponent sgci = new SceneGraphComponent("point distance");
+				SceneGraphComponent distancePointComp = new SceneGraphComponent("Intersection");
+				sgci.addChild(distancePointComp);
+				sgci.setGeometry(psfi.getGeometry());
+				Appearance iAp = new Appearance();
+				sgci.setAppearance(iAp);
+				DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
+				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
+				ipointShader.setDiffuseColor(Color.orange);
+				hif.getActiveLayer().addTemporaryGeometry(sgci);
+				
+				DragEventTool t = new DragEventTool();
+				t.addPointDragListener(new PointDragListener() {
+	
+					public void pointDragStart(PointDragEvent e) {
+						System.out.println("drag start of vertex no "+e.getIndex());				
+					}
+	//
+					public void pointDragged(PointDragEvent e) {
+						PointSet pointSet = e.getPointSet();
+						
+						double[][] points=new double[pointSet.getNumPoints()][];
+				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
+				        System.out.println("point before dragging in tool: " + Arrays.toString(points[0]));
+				        points[e.getIndex()]=e.getPosition(); 
+				        point = e.getPosition().clone();
+				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
+//				        psfi.setVertexAttribute(Attribute.COORDINATES, points);
+//				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createWritableDataList(points));
+//				        pointSet.setVertexAttributes(Attribute.COORDINATES,points);
+//				        DataList
+				        System.out.println("point after dragging in tool: " + Arrays.toString(points[0]));
+				        
+					}
+	//
+					public void pointDragEnd(PointDragEvent e) {
+					}
+//					
+				});
+//				
+				sgci.addTool(t);
+				psfi.setVertexCoordinates(point);
+				
 			}
 			if (showControlMeshButton == e.getSource()) {
 				NURBSSurface ns = getSelectedSurface();
 				System.out.println("original surface " + ns.toString());
-				boolean valid = ns.hasValidControlmesh();
-				System.out.println("is valid " + valid);
+//				boolean valid = ns.hasValidControlmesh();
+//				System.out.println("is valid " + valid);
 				
 //				System.out.println("ns " + ns.toString());
 //				double[] uInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
@@ -816,6 +868,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
 			}
+			
+			if (pointCreated && goButton == e.getSource()) {
+				point = calculateClosestPoint(point);
+			}
 		}
 		
 	
@@ -823,55 +879,37 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private double[] calculateClosestPoint(double[] point) {
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
 			System.out.println(ns.toString());
-			HalfedgeLayer helPoint = new HalfedgeLayer(hif);
-			helPoint.setName("Point Distance");
-			hif.addLayer(helPoint);
-			PointSetFactory psfi = new PointSetFactory();
+		
 			
-			psfi.setVertexCount(1);
-			
-			psfi.setVertexCoordinates(point);
-			psfi.update();
-			SceneGraphComponent sgci = new SceneGraphComponent("point distance");
-			SceneGraphComponent distancePointComp = new SceneGraphComponent("Intersection");
-			sgci.addChild(distancePointComp);
-			sgci.setGeometry(psfi.getGeometry());
-			Appearance iAp = new Appearance();
-			sgci.setAppearance(iAp);
-			DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
-			DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-			ipointShader.setDiffuseColor(Color.orange);
-			hif.getActiveLayer().addTemporaryGeometry(sgci);
-			
-			DragEventTool t = new DragEventTool();
-			t.addPointDragListener(new PointDragListener() {
-
-				public void pointDragStart(PointDragEvent e) {
-					System.out.println("drag start of vertex no "+e.getIndex());				
-				}
-
-				public void pointDragged(PointDragEvent e) {
-					PointSet pointSet = e.getPointSet();
-					
-					double[][] points=new double[pointSet.getNumPoints()][];
-			        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
-			        System.out.println("point before dragging in tool: " + Arrays.toString(points[0]));
-			        points[e.getIndex()]=e.getPosition();  
-			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
-//			        psfi.setVertexAttribute(Attribute.COORDINATES, points);
-//			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createWritableDataList(points));
-//			        pointSet.setVertexAttributes(Attribute.COORDINATES,points);
-//			        DataList
-			        System.out.println("point after dragging in tool: " + Arrays.toString(points[0]));
-			        
-				}
-
-				public void pointDragEnd(PointDragEvent e) {
-				}
-				
-			});
-			
-			sgci.addTool(t);
+//			DragEventTool t = new DragEventTool();
+//			t.addPointDragListener(new PointDragListener() {
+//
+//				public void pointDragStart(PointDragEvent e) {
+//					System.out.println("drag start of vertex no "+e.getIndex());				
+//				}
+//
+//				public void pointDragged(PointDragEvent e) {
+//					PointSet pointSet = e.getPointSet();
+//					
+//					double[][] points=new double[pointSet.getNumPoints()][];
+//			        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
+//			        System.out.println("point before dragging in tool: " + Arrays.toString(points[0]));
+//			        points[e.getIndex()]=e.getPosition();  
+//			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
+////			        psfi.setVertexAttribute(Attribute.COORDINATES, points);
+////			        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createWritableDataList(points));
+////			        pointSet.setVertexAttributes(Attribute.COORDINATES,points);
+////			        DataList
+//			        System.out.println("point after dragging in tool: " + Arrays.toString(points[0]));
+//			        
+//				}
+//
+//				public void pointDragEnd(PointDragEvent e) {
+//				}
+//				
+//			});
+//			
+//			sgci.addTool(t);
 			
 //			System.out.println("point before dragging: " + Arrays.toString(point));
 //			PointSet pointSet = psfi.getPointSet();
