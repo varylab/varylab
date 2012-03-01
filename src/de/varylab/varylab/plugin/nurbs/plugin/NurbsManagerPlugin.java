@@ -751,7 +751,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		boolean pointCreated = false;
 		
-		private double[] point = {1,3,1};
+		private double[] point = {1,3,1,1};
 		
 		public PointDistancePanel() {
 			super("Point Distance");
@@ -790,7 +790,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 				ipointShader.setDiffuseColor(Color.orange);
 				hif.getActiveLayer().addTemporaryGeometry(sgci);
-				
+				System.out.println("point before dragging " + Arrays.toString(point));
 				DragEventTool t = new DragEventTool();
 				t.addPointDragListener(new PointDragListener() {
 	
@@ -803,15 +803,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 						
 						double[][] points=new double[pointSet.getNumPoints()][];
 				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
-				        System.out.println("point before dragging in tool: " + Arrays.toString(points[0]));
 				        points[e.getIndex()]=e.getPosition(); 
 				        point = e.getPosition().clone();
+				        point[3] = 1.;
+				        System.out.println("dragged point: " + Arrays.toString(point));
 				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
-//				        psfi.setVertexAttribute(Attribute.COORDINATES, points);
-//				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createWritableDataList(points));
-//				        pointSet.setVertexAttributes(Attribute.COORDINATES,points);
-//				        DataList
-				        System.out.println("point after dragging in tool: " + Arrays.toString(points[0]));
 				        
 					}
 	//
@@ -851,6 +847,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				NURBSSurface nsInsert = ns.SurfaceKnotInsertion(true, uInsertion[0], 1);
 //				nsInsert = nsInsert.SurfaceKnotInsertion(false, vInsertion[0], 1);
 				NURBSSurface decomposed = ns.decomposeSurface();
+//				NURBSSurface decomposed = ns;
+				
 				double[][][] cm = decomposed.getControlMesh();
 				QuadMeshFactory qmf = new QuadMeshFactory();
 				qmf.setULineCount(cm.length);
@@ -867,6 +865,28 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
+				LinkedList<NURBSSurface> fourPatches = decomposed.subdivideIntoFourNewPatches();
+				System.out.println("four new patches:");
+				for (NURBSSurface p : fourPatches) {
+					System.out.println(p.toString());
+					double[][][] cmP = p.getControlMesh();
+					QuadMeshFactory qmfP = new QuadMeshFactory();
+					qmfP.setULineCount(cmP.length);
+					qmfP.setVLineCount(cmP[0].length);
+					qmfP.setVertexCoordinates(cmP);
+					qmfP.setGenerateEdgesFromFaces(true);
+					qmfP.update();
+					IndexedFaceSet ifsP = qmfP.getIndexedFaceSet();
+					SceneGraphComponent cmcP = new SceneGraphComponent("Control Mesh");
+					cmcP.setGeometry(ifsP);
+					Appearance appP = new Appearance();
+					cmcP.setAppearance(appP);
+					appP.setAttribute(CommonAttributes.FACE_DRAW, false);
+					appP.setAttribute(CommonAttributes.EDGE_DRAW, true);
+					appP.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+					hif.getActiveLayer().addTemporaryGeometry(cmcP);
+					
+				}
 			}
 			
 			if (pointCreated && goButton == e.getSource()) {
