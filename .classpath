@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="/jrworkspace"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/halfedge"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
@@ -24,7 +25,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DiscreteConformalLab"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
-	<classpathentry exported="true" kind="src" path="/jrworkspace"/>
 	<classpathentry kind="lib" path="lib/HyperbolicNets.jar"/>
 	<classpathentry kind="lib" path="lib/jPETScTao.jar"/>
 	<classpathentry kind="output" path="bin"/>

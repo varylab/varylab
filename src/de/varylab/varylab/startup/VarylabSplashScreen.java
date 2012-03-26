@@ -1,6 +1,7 @@
 package de.varylab.varylab.startup;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -18,7 +19,6 @@ public class VarylabSplashScreen extends SplashScreen {
 		progressBar = new JProgressBar(0, 100);
 	
 	public VarylabSplashScreen() {
-		super();
 		setIconImage(ImageHook.getImage("main_03.png"));
 		setLayout(new BorderLayout());
 		add(image, BorderLayout.CENTER);
@@ -28,14 +28,18 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	@Override
 	public void setStatus(String status) {
+		getLayout().layoutContainer(getRootPane());
 		progressBar.setString(status);
-		paint(getGraphics());
+		Rectangle r = new Rectangle(getWidth(), getHeight());
+		getRootPane().paintImmediately(r);
 	}
 
 	@Override
 	public void setProgress(double progress) {
+		getLayout().layoutContainer(getRootPane());
 		progressBar.setValue((int)(progress * 100));
-		paint(getGraphics());
+		Rectangle r = new Rectangle(getWidth(), getHeight());
+		getRootPane().paintImmediately(r);
 	}
 
 }
