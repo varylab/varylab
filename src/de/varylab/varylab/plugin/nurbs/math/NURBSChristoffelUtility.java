@@ -19,7 +19,7 @@ public class NURBSChristoffelUtility {
 
 		int nl = ns.getControlMesh().length-1;
 		int ml = ns.getControlMesh()[0].length-1;
-		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
+		NURBSAlgorithm.SurfaceDerivatives(nl, p, U, ml, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
 		for (int i = 0; i < SKL1.length; i++) {

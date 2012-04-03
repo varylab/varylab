@@ -122,9 +122,9 @@ public class NurbsIO {
 
 					// surf
 					Matcher mVertex = vertex.matcher(str); // surface vertex
-					Matcher mParamU = paramU.matcher(str); // 1. knotvector
+					Matcher mParamV = paramU.matcher(str); // 1. knotvector
 															// surface
-					Matcher mParamV = paramV.matcher(str); // 2. knotvector
+					Matcher mParamU = paramV.matcher(str); // 2. knotvector
 															// surface
 					Matcher mDegSurf = degSurf.matcher(str); // degree surface
 					Matcher mSurf = surf.matcher(str); // surface domain and
@@ -328,9 +328,9 @@ public class NurbsIO {
 				V[i] = surfKnotV.get(i);
 			}
 //			System.out.println("Knotvector V: " + Arrays.toString(V));
-			int p = d[0];
+			int p = d[1];
 //			System.out.println("P: " + p);
-			int q = d[1];
+			int q = d[0];
 //			System.out.println("Q: " + q);
 			int n = U.length - p - 1;
 			int m = V.length - q - 1;
@@ -353,6 +353,9 @@ public class NurbsIO {
 			ns.setVKnotVector(V);
 			ns.setUDegree(p);
 			ns.setVDegree(q);
+			System.out.println("gelesene NURBS flaeche");
+			System.out.println(ns.toString());
+			System.out.println("end");
 //			ns.setSurfDomain(surfDomain);
 
 

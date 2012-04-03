@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.nurbs;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,10 +40,16 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 	@Override
 	protected void updateImpl() {
 		double[][] S = new double[getVLineCount()*getULineCount()][4];
+		System.out.println("U " + Arrays.toString(surface.getUKnotVector()));
+		System.out.println("V " + Arrays.toString(surface.getVKnotVector()));
+		double uStart = surface.getUKnotVector()[0];
+		double uEnd = surface.getUKnotVector()[surface.getUKnotVector().length - 1];
+		double vStart = surface.getVKnotVector()[0];
+		double vEnd = surface.getVKnotVector()[surface.getVKnotVector().length - 1];
 		for(int j = 0; j < getVLineCount(); ++j) {
 			for(int i = 0; i < getULineCount(); ++i) {
-				double u = i / (double)(getULineCount() - 1);
-				double v = j / (double)(getVLineCount() - 1);
+				double u = uStart + (i / (double)(getULineCount() - 1) * (uEnd - uStart));
+				double v = vStart + (j / (double)(getVLineCount() - 1) * (vEnd - vStart));
 				int index = i+j*getULineCount();
 				surface.getSurfacePoint(u, v, S[index]);
 				
@@ -52,7 +59,10 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
+//				System.out.println("u " + u);
+//				System.out.println("v " + v);
 				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, u, v);
+				
 				if(ci.getMinCurvature() == ci.getMaxCurvature()) { //umbillic point
 					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});

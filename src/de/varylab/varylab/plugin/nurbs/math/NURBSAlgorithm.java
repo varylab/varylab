@@ -340,10 +340,17 @@ public class NURBSAlgorithm {
 			}
 		}
 		int dv = Math.min(d, q);
-
+//		System.out.println("n = " + n);
+//		System.out.println("p = " + p);
+//		System.out.println("u = " + u);
+//		System.out.println("U = " + Arrays.toString(U));
 		int uspan = FindSpan(n,p,u,U);
 		double [][] Nu = new double[du + 1][p + 1];
 		DersBasisFuns(uspan, u, p, du, U, Nu);
+//		System.out.println("m = " + m);
+//		System.out.println("q = " + q);
+//		System.out.println("v = " + v);
+//		System.out.println("V = " + Arrays.toString(V));
 		int vspan = FindSpan(m,q,v,V);
 		double [][] Nv = new double[dv + 1][q + 1];
 		DersBasisFuns(vspan, v, q, dv, V, Nv);

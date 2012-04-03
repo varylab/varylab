@@ -847,11 +847,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				nsInsert = nsInsert.SurfaceKnotInsertion(false, vInsertion[0], 1);
 				NURBSSurface decomposed = ns.decomposeSurface();
 //				NURBSSurface decomposed = ns;
+//				double[][][] control = ns.getControlMesh();
+//				double[][][] cm = new double[control.length][control[0].length][3];
+//				for (int i = 0; i < control.length; i++) {
+//					for (int j = 0; j < control[0].length; j++) {
+//						cm[i][j] = ns.get3DPoint(control[i][j]);
+//					}
+//				}
 				
 				double[][][] cm = decomposed.getControlMesh();
 				QuadMeshFactory qmf = new QuadMeshFactory();
-				qmf.setULineCount(cm.length);
-				qmf.setVLineCount(cm[0].length);
+				qmf.setULineCount(cm[0].length);
+				qmf.setVLineCount(cm.length);
 				qmf.setVertexCoordinates(cm);
 				qmf.setGenerateEdgesFromFaces(true);
 				qmf.update();
@@ -864,28 +871,28 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
-				LinkedList<NURBSSurface> fourPatches = decomposed.subdivideIntoFourNewPatches();
-				System.out.println("four new patches:");
-				for (NURBSSurface p : fourPatches) {
-					System.out.println(p.toString());
-					double[][][] cmP = p.getControlMesh();
-					QuadMeshFactory qmfP = new QuadMeshFactory();
-					qmfP.setULineCount(cmP.length);
-					qmfP.setVLineCount(cmP[0].length);
-					qmfP.setVertexCoordinates(cmP);
-					qmfP.setGenerateEdgesFromFaces(true);
-					qmfP.update();
-					IndexedFaceSet ifsP = qmfP.getIndexedFaceSet();
-					SceneGraphComponent cmcP = new SceneGraphComponent("Control Mesh");
-					cmcP.setGeometry(ifsP);
-					Appearance appP = new Appearance();
-					cmcP.setAppearance(appP);
-					appP.setAttribute(CommonAttributes.FACE_DRAW, false);
-					appP.setAttribute(CommonAttributes.EDGE_DRAW, true);
-					appP.setAttribute(CommonAttributes.VERTEX_DRAW, true);
-					hif.getActiveLayer().addTemporaryGeometry(cmcP);
-					
-				}
+//				LinkedList<NURBSSurface> fourPatches = decomposed.subdivideIntoFourNewPatches();
+//				System.out.println("four new patches:");
+//				for (NURBSSurface p : fourPatches) {
+//					System.out.println(p.toString());
+//					double[][][] cmP = p.getControlMesh();
+//					QuadMeshFactory qmfP = new QuadMeshFactory();
+//					qmfP.setULineCount(cmP.length);
+//					qmfP.setVLineCount(cmP[0].length);
+//					qmfP.setVertexCoordinates(cmP);
+//					qmfP.setGenerateEdgesFromFaces(true);
+//					qmfP.update();
+//					IndexedFaceSet ifsP = qmfP.getIndexedFaceSet();
+//					SceneGraphComponent cmcP = new SceneGraphComponent("Control Mesh");
+//					cmcP.setGeometry(ifsP);
+//					Appearance appP = new Appearance();
+//					cmcP.setAppearance(appP);
+//					appP.setAttribute(CommonAttributes.FACE_DRAW, false);
+//					appP.setAttribute(CommonAttributes.EDGE_DRAW, true);
+//					appP.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+//					hif.getActiveLayer().addTemporaryGeometry(cmcP);
+//					
+//				}
 			}
 			
 			if (pointCreated && goButton == e.getSource()) {
@@ -1064,156 +1071,156 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			hif.set(qmf.getGeometry());
 			hif.update();
 			hif.addLayerAdapter(qmf.getUVAdapter(), false);
-			AdapterSet as = hif.getAdapters();
-			VHDS hds = hif.get(new VHDS());
-			umbilics = findUmbilics(hds, as);
-			PointSetFactory psfu = new PointSetFactory();
-			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
-			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
-			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
-			double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
-			double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
-			double[][] uu = new double[umbilics.size()][];
-			double[][] upoints = new double[umbilics.size()][];
-			for (int i = 0; i < uu.length; i++) {
-				uu[i] = umbilics.get(i);
-			}
-			psfu.setVertexCount(uu.length);
-
-			for (int i = 0; i < uu.length; i++) {
-				double[] S = new double[4];
-				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, uu[i][0], uu[i][1], S);
-				upoints[i] = S;
-			}
-			if(umbilics.size()>0){
-			psfu.setVertexCoordinates(upoints);
-			psfu.update();
-			SceneGraphComponent sgcu = new SceneGraphComponent("umbilics");
-			SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
-			sgcu.addChild(umbilicComp);
-			sgcu.setGeometry(psfu.getGeometry());
-			Appearance uAp = new Appearance();
-			sgcu.setAppearance(uAp);
-			DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
-			DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
-			upointShader.setDiffuseColor(Color.black);
-			hif.getActiveLayer().addTemporaryGeometry(sgcu);
-			}
-			if(vectorFieldBox.isSelected()) {
-				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
-				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
-			}
+//			AdapterSet as = hif.getAdapters();
+//			VHDS hds = hif.get(new VHDS());
+//			umbilics = findUmbilics(hds, as);
+//			PointSetFactory psfu = new PointSetFactory();
+//			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
+//			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
+//			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
+//			double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
+//			double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+//			double[][] uu = new double[umbilics.size()][];
+//			double[][] upoints = new double[umbilics.size()][];
+//			for (int i = 0; i < uu.length; i++) {
+//				uu[i] = umbilics.get(i);
+//			}
+//			psfu.setVertexCount(uu.length);
+//
+//			for (int i = 0; i < uu.length; i++) {
+//				double[] S = new double[4];
+//				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, uu[i][0], uu[i][1], S);
+//				upoints[i] = S;
+//			}
+//			if(umbilics.size()>0){
+//			psfu.setVertexCoordinates(upoints);
+//			psfu.update();
+//			SceneGraphComponent sgcu = new SceneGraphComponent("umbilics");
+//			SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
+//			sgcu.addChild(umbilicComp);
+//			sgcu.setGeometry(psfu.getGeometry());
+//			Appearance uAp = new Appearance();
+//			sgcu.setAppearance(uAp);
+//			DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
+//			DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
+//			upointShader.setDiffuseColor(Color.black);
+//			hif.getActiveLayer().addTemporaryGeometry(sgcu);
+//			}
+//			if(vectorFieldBox.isSelected()) {
+//				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
+//				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
+//			}
 			segments.clear();
 		} 
 	}
 	
 	
-	private LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
-		NURBSSurface ns = getSelectedSurface();
-		double u0 = ns.getUKnotVector()[0];
-		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
-		double v0 = ns.getVKnotVector()[0];
-		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
-		for (VVertex v : hds.getVertices()) {
-			double[] NurbsuvCoordinate = as.get(NurbsUVCoordinate.class, v, double[].class);
-			double uCoord = NurbsuvCoordinate[0];
-			double vCoord = NurbsuvCoordinate[1];
-			if(uCoord < u0 || uCoord > u1){
-				System.out.println("uCoord is out of domain " + uCoord);
-			}
-			if(vCoord < v0 || vCoord > v1){
-				System.out.println("uCoord is out of domain " + vCoord);
-			}
-			
-			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, uCoord, vCoord);
-			double[] vector = ci.getCurvatureDirectionsDomain()[0];
-			linefield.set(v, vector, as);
-		}
-		
-		
-		as.add(indexAdapter);
-		LinkedList<Double> umbFaces = new LinkedList<Double>();
-		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
-		for (VFace f : hds.getFaces()){
-			double result = indexAdapter.get(f, as);
-			if(Math.abs(Math.abs(result) - 1) < 0.001){
-				umbFaces.add(result);
-				umbilicFaces.add(f);
-			}
-		}
-
-		RealFunctionOfSeveralVariables fun = new RealFunctionOfSeveralVariables() {
-			@Override
-			public int getNumberOfVariables() {
-				return 2;
-			}
-			@Override
-			public double eval(double[] p) {
-				NURBSSurface ns = getSelectedSurface();
-				double u0 = ns.getUKnotVector()[0];
-				double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
-				double v0 = ns.getVKnotVector()[0];
-				double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
-				if(p[0] < u0 || p[0] > u1){
-					System.out.println("Nelder-Mead out of domain");
-					System.out.println("p[0]: " + p[0]);
-					return 10000;
-				}
-				if(p[1] < v0 || p[1] > v1){
-					System.out.println("Nelder-Mead out of domain");
-					System.out.println("p[1]: " + p[1]);
-					return 10000;
-				}
-				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
-				double H = ci.getMeanCurvature();
-				double K = ci.getGaussCurvature();
-				return Math.abs(H*H - K);
-			}
-		};
-		
-		LinkedList<double[]> possibleUmbs = new LinkedList<double[]>();
-		for (VFace f : umbilicFaces){
-			System.out.println("Faceindex: " + f.getIndex());
-			VVertex v = f.getBoundaryEdge().getStartVertex();
-			double[] start = as.get(NurbsUVCoordinate.class, v, double[].class);
-			double[][] xi = computeXi(start);
-			double value = NelderMead.search(start, xi, 1E-12, fun,100,new Info());
-			System.out.println();
-			System.out.println("NM Value " + value);
-			System.out.println("NM Pos " + Arrays.toString(start));
-			possibleUmbs.add(start);
-		}
-		
-		
-		double epsilon = 0.001;
-		HashMap<double[], List<double[]>> near = new HashMap<double[], List<double[]>>();
-		for (double[] umb1 : possibleUmbs) {
-			List<double[]> nearUmb1 = new LinkedList<double[]>();
-			for (double[] umb2 : possibleUmbs) {
-				if(umb1 != umb2){
-					if(Rn.euclideanDistance(umb1, umb2) < epsilon){
-						nearUmb1.add(umb2);
-					}
-				}
-			}
-			near.put(umb1, nearUmb1);
-		}
-		List<double[]> allNearUmb = new LinkedList<double[]>();
-		List<double[]> allNearFirstUmb = new LinkedList<double[]>();
-		for (double[] umb : possibleUmbs) {
-			if(near.containsKey(umb)){
-				allNearUmb.add(umb);
-				if(!allNearFirstUmb.contains(umb)){
-					for(double[] u : near.get(umb)){
-						allNearFirstUmb.add(u);
-					}
-				}
-			}
-		}
-		possibleUmbs.removeAll(allNearFirstUmb);
-		return possibleUmbs;
-	}
-	
+//	private LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
+//		NURBSSurface ns = getSelectedSurface();
+//		double u0 = ns.getUKnotVector()[0];
+//		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
+//		double v0 = ns.getVKnotVector()[0];
+//		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
+//		for (VVertex v : hds.getVertices()) {
+//			double[] NurbsuvCoordinate = as.get(NurbsUVCoordinate.class, v, double[].class);
+//			double uCoord = NurbsuvCoordinate[0];
+//			double vCoord = NurbsuvCoordinate[1];
+//			if(uCoord < u0 || uCoord > u1){
+//				System.out.println("uCoord is out of domain " + uCoord);
+//			}
+//			if(vCoord < v0 || vCoord > v1){
+//				System.out.println("uCoord is out of domain " + vCoord);
+//			}
+//			
+//			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, uCoord, vCoord);
+//			double[] vector = ci.getCurvatureDirectionsDomain()[0];
+//			linefield.set(v, vector, as);
+//		}
+//		
+//		
+//		as.add(indexAdapter);
+//		LinkedList<Double> umbFaces = new LinkedList<Double>();
+//		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
+//		for (VFace f : hds.getFaces()){
+//			double result = indexAdapter.get(f, as);
+//			if(Math.abs(Math.abs(result) - 1) < 0.001){
+//				umbFaces.add(result);
+//				umbilicFaces.add(f);
+//			}
+//		}
+//
+//		RealFunctionOfSeveralVariables fun = new RealFunctionOfSeveralVariables() {
+//			@Override
+//			public int getNumberOfVariables() {
+//				return 2;
+//			}
+//			@Override
+//			public double eval(double[] p) {
+//				NURBSSurface ns = getSelectedSurface();
+//				double u0 = ns.getUKnotVector()[0];
+//				double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
+//				double v0 = ns.getVKnotVector()[0];
+//				double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
+//				if(p[0] < u0 || p[0] > u1){
+//					System.out.println("Nelder-Mead out of domain");
+//					System.out.println("p[0]: " + p[0]);
+//					return 10000;
+//				}
+//				if(p[1] < v0 || p[1] > v1){
+//					System.out.println("Nelder-Mead out of domain");
+//					System.out.println("p[1]: " + p[1]);
+//					return 10000;
+//				}
+//				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
+//				double H = ci.getMeanCurvature();
+//				double K = ci.getGaussCurvature();
+//				return Math.abs(H*H - K);
+//			}
+//		};
+//		
+//		LinkedList<double[]> possibleUmbs = new LinkedList<double[]>();
+//		for (VFace f : umbilicFaces){
+//			System.out.println("Faceindex: " + f.getIndex());
+//			VVertex v = f.getBoundaryEdge().getStartVertex();
+//			double[] start = as.get(NurbsUVCoordinate.class, v, double[].class);
+//			double[][] xi = computeXi(start);
+//			double value = NelderMead.search(start, xi, 1E-12, fun,100,new Info());
+//			System.out.println();
+//			System.out.println("NM Value " + value);
+//			System.out.println("NM Pos " + Arrays.toString(start));
+//			possibleUmbs.add(start);
+//		}
+//		
+//		
+//		double epsilon = 0.001;
+//		HashMap<double[], List<double[]>> near = new HashMap<double[], List<double[]>>();
+//		for (double[] umb1 : possibleUmbs) {
+//			List<double[]> nearUmb1 = new LinkedList<double[]>();
+//			for (double[] umb2 : possibleUmbs) {
+//				if(umb1 != umb2){
+//					if(Rn.euclideanDistance(umb1, umb2) < epsilon){
+//						nearUmb1.add(umb2);
+//					}
+//				}
+//			}
+//			near.put(umb1, nearUmb1);
+//		}
+//		List<double[]> allNearUmb = new LinkedList<double[]>();
+//		List<double[]> allNearFirstUmb = new LinkedList<double[]>();
+//		for (double[] umb : possibleUmbs) {
+//			if(near.containsKey(umb)){
+//				allNearUmb.add(umb);
+//				if(!allNearFirstUmb.contains(umb)){
+//					for(double[] u : near.get(umb)){
+//						allNearFirstUmb.add(u);
+//					}
+//				}
+//			}
+//		}
+//		possibleUmbs.removeAll(allNearFirstUmb);
+//		return possibleUmbs;
+//	}
+//	
 	public NURBSSurface getSelectedSurface() {
 		return surfaces.get(surfacesTable.getSelectedRow());
 	}

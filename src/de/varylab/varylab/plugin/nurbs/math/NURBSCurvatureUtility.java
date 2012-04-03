@@ -16,7 +16,8 @@ public class NURBSCurvatureUtility {
 	 */
 	public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double u, double v){
 		CurvatureInfo dG = new CurvatureInfo();
-		
+//		System.out.println("CurvatureInfo");
+//		System.out.println(ns.toString());
 		double[] FFs = new double[6];
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
@@ -29,7 +30,7 @@ public class NURBSCurvatureUtility {
 		
 		int nl = ns.getControlMesh().length-1;
 		int ml = ns.getControlMesh()[0].length-1;
-		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
+		NURBSAlgorithm.SurfaceDerivatives(nl, p, U, ml, q, V, ns.getControlMesh(), u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
 		for (int i = 0; i < SKL1.length; i++) {
@@ -145,7 +146,7 @@ public class NURBSCurvatureUtility {
 		curvatureVectorManifold[0] = Rn.add(null, Rn.times(null, curvatureVectorDomain[0][0], SKL[1][0]), Rn.times(null, curvatureVectorDomain[0][1], SKL[0][1]));
 		curvatureVectorManifold[1] = Rn.add(null, Rn.times(null, curvatureVectorDomain[1][0], SKL[1][0]), Rn.times(null, curvatureVectorDomain[1][1], SKL[0][1]));
 		dG.setCurvatureDirectionsManifold(curvatureVectorManifold);
-		
+//		System.out.println("end CurvatureInfo");
 		return dG;
 	}
 	
