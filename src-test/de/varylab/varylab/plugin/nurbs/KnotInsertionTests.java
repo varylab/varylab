@@ -32,6 +32,7 @@ public class KnotInsertionTests {
 	
 	
 	
+	
 	@Test
 	public void decomositionTest(){
 		double delta = 0.001;
@@ -96,6 +97,11 @@ public class KnotInsertionTests {
 		Assert.assertArrayEquals(null, sDecomposed, s0, delta);
 		Assert.assertArrayEquals(null, BezierPoint, s0, delta);
 	
+	}
+	
+	@Test
+	public void decompositionTestNotBezier(){
+		
 	}
 
 }
