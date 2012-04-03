@@ -161,6 +161,8 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			for (int i = 0; i < V.length; i++) {
 				str = str + V[i] + ", ";
 			}
+			str = str + '\n' + "p " + p;
+			str = str + '\n' + "q " + q;
 			str = str + '\n' + "control mesh";
 			for (int i = 0; i < controlMesh.length; i++) {
 				str = str + '\n';
@@ -402,33 +404,35 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			double[][][]Pw = nsDecompose.getControlMesh();
 			int p = getDegreeFromClampedKnotVector(U);
 			int q = getDegreeFromClampedKnotVector(V);
-			double[] diffrentUknots = getAllDifferentKnotsFromFilledKnotVector(U, p);
-			double[] diffrentVknots = getAllDifferentKnotsFromFilledKnotVector(V, q);
-			NURBSSurface[][] BezierSurfaces = new NURBSSurface[diffrentUknots.length - 1][diffrentVknots.length - 1];
+			double[] differentUknots = getAllDifferentKnotsFromFilledKnotVector(U, p);
+//			System.out.println("differentUknots " + Arrays.toString(differentUknots));
+			double[] differentVknots = getAllDifferentKnotsFromFilledKnotVector(V, q);
+//			System.out.println("differentVknots " + Arrays.toString(differentVknots));
+			NURBSSurface[][] BezierSurfaces = new NURBSSurface[differentUknots.length - 1][differentVknots.length - 1];
 			for (int i = 0; i < BezierSurfaces.length; i++) {
-				for (int j = 0; j < BezierSurfaces.length; j++) {
+				for (int j = 0; j < BezierSurfaces[0].length; j++) {
 					BezierSurfaces[i][j] = new NURBSSurface();
 					double[] UknotVector = new double[2 * p + 2];
 					for (int k = 0; k < UknotVector.length; k++) {
 						if(k < UknotVector.length / 2){
-							UknotVector[k] = diffrentUknots[i];
+							UknotVector[k] = differentUknots[i];
 						}
 						else{
-							UknotVector[k] = diffrentUknots[i + 1];
+							UknotVector[k] = differentUknots[i + 1];
 						}
 					}
 					double[] VknotVector = new double[2 * q + 2];
 					for (int k = 0; k < VknotVector.length; k++) {
 						if(k < VknotVector.length / 2){
-							VknotVector[k] = diffrentVknots[j];
+							VknotVector[k] = differentVknots[j];
 						}
 						else{
-							VknotVector[k] = diffrentVknots[j + 1];
+							VknotVector[k] = differentVknots[j + 1];
 						}
 					}
 					double[][][]BezierControlPoints = new double[UknotVector.length - p - 1][VknotVector.length - q - 1][4];
 					for (int iB = 0; iB < BezierControlPoints.length; iB++) {
-						for (int jB = 0; jB < BezierControlPoints.length; jB++) {
+						for (int jB = 0; jB < BezierControlPoints[0].length; jB++) {
 							BezierControlPoints[iB][jB] = Pw[p * i + iB][q * j + jB];
 						}
 					}
@@ -893,34 +897,105 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		
 		public static void main(String[] a){
 //			double[] point = {0.2, 0.3};
-			double u = 0.8;
+//			double u = 0.8;
+//			double v = 0.3;
+//			double[] U = {0.0,0.0,0.0,1.0,1.0,1.0};
+//			double[] V = {0.0,0.0,0.0,1.0,1.0,1.0};
+//			int p = 2;
+//			int q = 2;
+//			double[][][]Pw0 = {{{0, 0, 3, 1},{1, 0, 3, 1},{2, 0, 0, 2}},
+//						{{0, 0, 3, 1},{1, 2, 3, 1},{2, 4, 0, 2}},
+//						{{0, 0, 3, 1},{0, 2, 3, 1},{0, 4, 0, 2}}};
+//			NURBSSurface ns0 = new NURBSSurface(U, V, Pw0, p, q);
+//			LinkedList<NURBSSurface> bezierList = ns0.decomposeIntoBezierSurfacesList();
+//			System.out.println("Bezier list:");
+//			for (NURBSSurface b : bezierList) {
+//				System.out.println(b.toString());
+//			}
+//			System.out.println("ns0 " + ns0.toString());
+//			System.out.println("surfPoint " + Arrays.toString(ns0.getSurfacePoint(u, v)));
+//			LinkedList<NURBSSurface> ns4Patches = ns0.subdivideIntoFourNewPatches();
+//			int counter = 0;
+//			for (NURBSSurface patch : ns4Patches) {
+//				counter++;
+//				System.out.println("patch " + counter + " " + patch.toString());
+//				double[] UPatch = patch.getUKnotVector();
+//				double[] VPatch = patch.getVKnotVector();
+//				if(u > UPatch[0] && u <= UPatch[UPatch.length - 1] && v > VPatch[0] && v <= VPatch[VPatch.length - 1]){
+//					System.out.println("patchPoint" + Arrays.toString(patch.getSurfacePoint(u, v)));
+//				}
+//			}
+//			double u = 0.2;
+//			double v = 0.3;
+//			double[] U = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0} ;
+//			double[] V = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0};
+//			double[][][]Pw0 = 
+//			{{{-1.0, 1.0, 0.0, 1.0},{0.0, 1.0, 0.0, 1.0},{1.0, 1.0, 0.0, 1.0},{2.0, 1.0, 0.0, 1.0}}, 
+//			{{-1.0, 0.0, 0.0, 1.0},{0.0, 0.0, 4.0, 1.0},{1.0, 0.0, -2.0, 1.0},{2.0, 0.0, 0.0, 1.0}}, 
+//			{{-1.0, -1.0, 0.0, 1.0},{0.0, -1.0, 0.0, 1.0},{1.0, -1.0, 0.0, 1.0},{2.0, -1.0, 0.0, 1.0}}};
+//			int p = 2;
+//			int q = 3;
+//			NURBSSurface ns = new NURBSSurface(U, V, Pw0, p, q);
+//			NURBSSurface nsDecomposed = ns.decomposeSurface();
+//			double[] originalPoint = ns.getSurfacePoint(u, v);
+//			double[] decomposedPoint = nsDecomposed.getSurfacePoint(u, v);
+//			System.out.println("nsDecomposed ");
+//			System.out.println(nsDecomposed.toString());
+//			double[] bezierPoint = new double[4];
+//			LinkedList<NURBSSurface> bezierList = ns.decomposeIntoBezierSurfacesList();
+//			for (NURBSSurface bezier : bezierList) {
+//				System.out.println("bezier");
+//				System.out.println(bezier.toString());
+//				double[] bU = bezier.getUKnotVector();
+//				double[] bV = bezier.getVKnotVector();
+//				double uStart = bU[0];
+//				double uEnd = bU[bU.length - 1];
+//				double vStart = bV[0];
+//				double vEnd = bV[bV.length - 1];
+//				if(u >= uStart && u <= uEnd && v >= vStart && v<= vEnd){
+//					bezierPoint = bezier.getSurfacePoint(u, v);
+//				}
+//			}
+//			System.out.println("originalPoint " + Arrays.toString(originalPoint));
+//			System.out.println("decomposedPoint " + Arrays.toString(decomposedPoint));
+//			System.out.println("bezierPoint " + Arrays.toString(bezierPoint));
+			double u = 0.2;
 			double v = 0.3;
-			double[] U = {0.0,0.0,0.0,1.0,1.0,1.0};
-			double[] V = {0.0,0.0,0.0,1.0,1.0,1.0};
+			double[] U = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0} ;
+			double[] V = {0.0, 0.0, 0.0, 0.0, 5.69734275730471, 5.69734275730471, 11.39468551460942, 11.39468551460942, 14.24335689326177, 14.24335689326177, 17.09202827191413, 17.09202827191413, 22.78937102921884, 22.78937102921884, 22.78937102921884, 22.78937102921884};
+			double[][][]Pw0 = 
+			{{{9.697601503225346, 9.832916873037798, 0.0, 1.0},{8.332577520192173, 9.98984176284457, 1.319686459561706, 1.0},{6.842887538969059, 10.13539866136639, 2.534236859343848, 1.0},{3.533276724877663, 10.36545166337421, 4.416444353758425, 1.0},{1.679140536595167, 10.44826757634601, 5.068264524643205, 1.0},{-1.191651351158919, 10.47044905275173, 5.14871483136908, 1.0},{-2.147208308180635, 10.46109739103686, 5.02880437903552, 1.0},{-3.984353016768909, 10.41061387141653, 4.513175987979253, 1.0},{-4.86168958771056, 10.37017162971258, 4.123659136735529, 1.0},{-7.327437373448136, 10.21610435909473, 2.674599869781878, 1.0},{-8.744443613902616, 10.07341951493079, 1.367003442095999, 1.0},{-9.998345907874073, 9.916601854172452, -0.05715153061129224, 1.0}}, 
+			{{10.59970396864166, 8.612591399313345, 8.153363598686303, 1.0},{9.17820771862226, 7.372955294465832, 13.76132151267763, 1.0},{7.528991806150149, 6.232858515945541, 16.29011924513487, 1.0},{5.110141801191052, 4.215967078129421, 10.68278514272968, 1.0},{3.241030433722658, 3.623034849863626, 10.4628896877334, 1.0},{1.152023611257983, 3.566841454708031, 10.57283741523154, 1.0},{-1.03409784772681, 3.682521984715714, 11.00128196069404, 1.0},{-1.706617303693677, 4.163735451118495, 11.89221014520923, 1.0},{-3.575728671162071, 4.523555019300631, 13.10163514768878, 1.0},{-6.705247473825765, 6.123656733200651, 15.60207245641716, 1.0},{-8.202887446327445, 7.325858476052421, 11.97730990771158, 1.0},{-9.521641875195925, 8.641427590447083, 8.024295062116572, 1.0}}, 
+			{{10.05844248939187, -9.5622861334129, 0.0, 1.0},{8.70593059540053, -9.602185490073103, -1.290604275306549, 1.0},{7.224071291254099, -9.636469801995078, -2.471595422926313, 1.0},{3.926965412878942, -9.679455325423554, -4.277324122426215, 1.0},{2.080489482293896, -9.686982004222013, -4.880221706650961, 1.0},{-0.7619069296181856, -9.662980081909415, -4.929024253647056, 1.0},{-1.706806813092623, -9.649461127812668, -4.808314658385771, 1.0},{-3.528963443362211, -9.612796250625099, -4.313588658878198, 1.0},{-4.402608249806587, -9.589915532386465, -3.945309502630125, 1.0},{-6.8743865383855, -9.512092446812133, -2.579844365850761, 1.0},{-8.317781791192552, -9.449114218752918, -1.349103566733365, 1.0},{-9.607687028063145, -9.382751503786524, -4.144638787324619E-4, 1.0}}};
 			int p = 2;
-			int q = 2;
-			double[][][]Pw0 = {{{0, 0, 3, 1},{1, 0, 3, 1},{2, 0, 0, 2}},
-						{{0, 0, 3, 1},{1, 2, 3, 1},{2, 4, 0, 2}},
-						{{0, 0, 3, 1},{0, 2, 3, 1},{0, 4, 0, 2}}};
-			NURBSSurface ns0 = new NURBSSurface(U, V, Pw0, p, q);
-			LinkedList<NURBSSurface> bezierList = ns0.decomposeIntoBezierSurfacesList();
-			System.out.println("Bezier list:");
-			for (NURBSSurface b : bezierList) {
-				System.out.println(b.toString());
-			}
-			System.out.println("ns0 " + ns0.toString());
-			System.out.println("surfPoint " + Arrays.toString(ns0.getSurfacePoint(u, v)));
-			LinkedList<NURBSSurface> ns4Patches = ns0.subdivideIntoFourNewPatches();
+			int q = 3;
+			NURBSSurface ns = new NURBSSurface(U, V, Pw0, p, q);
+			NURBSSurface nsDecomposed = ns.decomposeSurface();
+			double[] originalPoint = ns.getSurfacePoint(u, v);
+			double[] decomposedPoint = nsDecomposed.getSurfacePoint(u, v);
+			System.out.println("nsDecomposed ");
+			System.out.println(nsDecomposed.toString());
+			double[] bezierPoint = new double[4];
+			LinkedList<NURBSSurface> bezierList = ns.decomposeIntoBezierSurfacesList();
+			System.out.println("bezierList size " + bezierList.size());
 			int counter = 0;
-			for (NURBSSurface patch : ns4Patches) {
+			for (NURBSSurface bezier : bezierList) {
 				counter++;
-				System.out.println("patch " + counter + " " + patch.toString());
-				double[] UPatch = patch.getUKnotVector();
-				double[] VPatch = patch.getVKnotVector();
-				if(u > UPatch[0] && u <= UPatch[UPatch.length - 1] && v > VPatch[0] && v <= VPatch[VPatch.length - 1]){
-					System.out.println("patchPoint" + Arrays.toString(patch.getSurfacePoint(u, v)));
+				System.out.println(counter + ". bezier");
+				System.out.println(bezier.toString());
+				double[] bU = bezier.getUKnotVector();
+				double[] bV = bezier.getVKnotVector();
+				double uStart = bU[0];
+				double uEnd = bU[bU.length - 1];
+				double vStart = bV[0];
+				double vEnd = bV[bV.length - 1];
+				if(u >= uStart && u <= uEnd && v >= vStart && v<= vEnd){
+					bezierPoint = bezier.getSurfacePoint(u, v);
 				}
 			}
+			System.out.println("originalPoint " + Arrays.toString(originalPoint));
+			System.out.println("decomposedPoint " + Arrays.toString(decomposedPoint));
+			System.out.println("bezierPoint " + Arrays.toString(bezierPoint));
 		}
 		
 	
