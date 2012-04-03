@@ -423,9 +423,10 @@ public class NURBSAlgorithm {
 		for (int l = 0; l <= q; l++) {
 			Rn.add(Sw, Sw, Rn.times(null, Nv[l], temp[l]));
 		}
-		for(int i = 0; i <= 3; i++){
+		for(int i = 0; i < 3; i++){
 			S[i] = Sw[i] / Sw[3];
 		}
+		S[3] = 1/Sw[3];
 	}
 	
 
