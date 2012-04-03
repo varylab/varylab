@@ -384,6 +384,26 @@ public class NURBSAlgorithm {
 	 * @param v
 	 * @param S
 	 */
+//	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
+//		int n = Pw.length - 1;
+//		int m = Pw[0].length - 1;
+//		int uspan = FindSpan(n, p, u, U);
+//		int vspan = FindSpan(m, q, v, V);
+//		double[] Nu = new double[p + 1];
+//		double[] Nv = new double[q + 1];
+//		BasisFuns(uspan, u, p, U, Nu);
+//		BasisFuns(vspan, v, q, V, Nv);
+//		double[][] temp = new double[q + 1][4];
+//		for (int l = 0; l <= q; l++) {
+//			for (int k = 0; k <= p; k++) {
+//				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], Pw[uspan - p + k][vspan - q + l]));
+//			}
+//		}
+//		for (int l = 0; l <= q; l++) {
+//			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
+//		}
+//	}
+	
 	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
 		int n = Pw.length - 1;
 		int m = Pw[0].length - 1;
@@ -399,8 +419,12 @@ public class NURBSAlgorithm {
 				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], Pw[uspan - p + k][vspan - q + l]));
 			}
 		}
+		double[] Sw = new double[4];
 		for (int l = 0; l <= q; l++) {
-			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
+			Rn.add(Sw, Sw, Rn.times(null, Nv[l], temp[l]));
+		}
+		for(int i = 0; i <= 3; i++){
+			S[i] = Sw[i] / Sw[3];
 		}
 	}
 	
