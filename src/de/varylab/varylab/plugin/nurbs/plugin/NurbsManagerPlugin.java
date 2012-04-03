@@ -847,15 +847,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				nsInsert = nsInsert.SurfaceKnotInsertion(false, vInsertion[0], 1);
 				NURBSSurface decomposed = ns.decomposeSurface();
 //				NURBSSurface decomposed = ns;
-//				double[][][] control = ns.getControlMesh();
-//				double[][][] cm = new double[control.length][control[0].length][3];
-//				for (int i = 0; i < control.length; i++) {
-//					for (int j = 0; j < control[0].length; j++) {
+				double[][][] control = ns.getControlMesh();
+				double[][][] cm = new double[control.length][control[0].length][3];
+				for (int i = 0; i < control.length; i++) {
+					for (int j = 0; j < control[0].length; j++) {
 //						cm[i][j] = ns.get3DPoint(control[i][j]);
-//					}
-//				}
+						for(int k = 0; k < 3; k++){
+							cm[i][j][k] = control[i][j][k];
+						}
+					}
+				}
 				
-				double[][][] cm = decomposed.getControlMesh();
+//				double[][][] cm = decomposed.getControlMesh();
 				QuadMeshFactory qmf = new QuadMeshFactory();
 				qmf.setULineCount(cm[0].length);
 				qmf.setVLineCount(cm.length);
