@@ -346,6 +346,13 @@ public class NurbsIO {
 //					System.out.println(Arrays.toString(controlMesh[i][j]));
 				}
 			}
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
+					for (int k = 0; k < 3; k++) {
+						controlMesh[i][j][k] = controlMesh[i][j][k] * controlMesh[i][j][3];
+					}
+				}
+			}
 			ns.setControlMesh(controlMesh);
 			ns.setHoleCurves(holeC);
 			ns.setTrimCurves(trimC);

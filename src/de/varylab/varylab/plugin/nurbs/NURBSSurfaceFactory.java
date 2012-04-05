@@ -40,8 +40,6 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 	@Override
 	protected void updateImpl() {
 		double[][] S = new double[getVLineCount()*getULineCount()][4];
-		System.out.println("U " + Arrays.toString(surface.getUKnotVector()));
-		System.out.println("V " + Arrays.toString(surface.getVKnotVector()));
 		double uStart = surface.getUKnotVector()[0];
 		double uEnd = surface.getUKnotVector()[surface.getUKnotVector().length - 1];
 		double vStart = surface.getVKnotVector()[0];

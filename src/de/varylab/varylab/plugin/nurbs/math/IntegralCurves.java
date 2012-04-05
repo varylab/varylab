@@ -113,64 +113,64 @@ public class IntegralCurves {
 				Phi1 = Rn.add(null, Phi1, Rn.times(null, c1[l], k[l]));
 				Phi2 = Rn.add(null, Phi2, Rn.times(null, c2[l], k[l]));
 			}
-				v = Rn.add(null, v, Rn.times(null, h, Phi2));
-				tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
-				vau = Rn.euclideanNorm(u.getLast()) + 1;
-				if (tau <= tol * vau) {
-					u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
-					for (double[] umb : umbilics) {
-						if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
-							IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-							intObj.setUmbilicIndex(umbilics.indexOf(umb));
-							System.out.println("near umbilic");
-							System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
-							return intObj;
-						}
-					}
-					if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
-							|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
-						System.out.println("out of domain 2");
-						double[] last = new double [2];
-						if(u.getLast()[0] >= u2){
-							last[0] = u2;// + 0.1;
-							last[1] = v[1];
-						}
-						else if(u.getLast()[0] <= u1){
-							last[0] = u1;// - 0.1;
-							last[1] = v[1];
-						}
-						else if(u.getLast()[1] >= v2){
-							last[0] = v[0];
-							last[1] = v2;// + 0.1;
-						}
-						else if(u.getLast()[1] <= v1){
-							last[0] = v[0];
-							last[1] = v1;// - 0.1;
-						}
-						u.pollLast();
-						u.add(last);
-						System.out.println("LAST: "+ Arrays.toString(u.getLast()));
+			v = Rn.add(null, v, Rn.times(null, h, Phi2));
+			tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
+			vau = Rn.euclideanNorm(u.getLast()) + 1;
+			if (tau <= tol * vau) {
+				u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
+				for (double[] umb : umbilics) {
+					if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
 						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-						System.out.println("Last IntObj: " + Arrays.toString(intObj.getPoints().getLast()));
+						intObj.setUmbilicIndex(umbilics.indexOf(umb));
+						System.out.println("near umbilic");
+						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 						return intObj;
 					}
-					if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
-						orientation = IntegralCurves.getMaxMinCurv(ns,u.getLast()[0], u.getLast()[1], max);
-					} else {
-						orientation = Rn.times(null, -1, IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max));
+				}
+				if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
+						|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
+					System.out.println("out of domain 2");
+					double[] last = new double [2];
+					if(u.getLast()[0] >= u2){
+						last[0] = u2;// + 0.1;
+						last[1] = v[1];
 					}
+					else if(u.getLast()[0] <= u1){
+						last[0] = u1;// - 0.1;
+						last[1] = v[1];
+					}
+					else if(u.getLast()[1] >= v2){
+						last[0] = v[0];
+						last[1] = v2;// + 0.1;
+					}
+					else if(u.getLast()[1] <= v1){
+						last[0] = v[0];
+						last[1] = v1;// - 0.1;
+					}
+					u.pollLast();
+					u.add(last);
+					System.out.println("LAST: "+ Arrays.toString(u.getLast()));
+					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+					System.out.println("Last IntObj: " + Arrays.toString(intObj.getPoints().getLast()));
+					return intObj;
 				}
-				if ((tau > tol * vau)) {
-					h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
-				}
-				dist = Rn.euclideanDistance(u.getLast(), y0);
-				if (!(dist < eps) && first) {
-					first = false;
-				}
-				if (dist < eps && !first) {
-					nearBy = true;
+				if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
+					orientation = IntegralCurves.getMaxMinCurv(ns,u.getLast()[0], u.getLast()[1], max);
+				} else {
+					orientation = Rn.times(null, -1, IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max));
 				}
 			}
+			if ((tau > tol * vau)) {
+				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
+			}
+			dist = Rn.euclideanDistance(u.getLast(), y0);
+			if (!(dist < eps) && first) {
+				first = false;
+			}
+			if (dist < eps && !first) {
+				nearBy = true;
+			}
+		}
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 		return intObj;

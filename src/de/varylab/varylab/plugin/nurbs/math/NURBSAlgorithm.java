@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
@@ -387,6 +388,14 @@ public class NURBSAlgorithm {
 //	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
 //		int n = Pw.length - 1;
 //		int m = Pw[0].length - 1;
+//		double[][][] P = new double[Pw.length][Pw[0].length][4];
+//		for (int i = 0; i < Pw.length; i++) {
+//			for (int j = 0; j < Pw[0].length; j++) {
+////				P[i][j] = Pw[i][j];
+//				Pn.dehomogenize(P[i][j] , Pw[i][j]);
+//				P[i][j][3] = 1 / Pw[i][j][3];
+//			}
+//		}
 //		int uspan = FindSpan(n, p, u, U);
 //		int vspan = FindSpan(m, q, v, V);
 //		double[] Nu = new double[p + 1];
@@ -396,12 +405,16 @@ public class NURBSAlgorithm {
 //		double[][] temp = new double[q + 1][4];
 //		for (int l = 0; l <= q; l++) {
 //			for (int k = 0; k <= p; k++) {
-//				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], Pw[uspan - p + k][vspan - q + l]));
+//				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], P[uspan - p + k][vspan - q + l]));
 //			}
 //		}
+//		
 //		for (int l = 0; l <= q; l++) {
 //			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
 //		}
+////		double weight = S[3];
+////		Pn.dehomogenize(S, S);
+////		S[3] = weight;
 //	}
 	
 	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
@@ -418,17 +431,38 @@ public class NURBSAlgorithm {
 			for (int k = 0; k <= p; k++) {
 				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], Pw[uspan - p + k][vspan - q + l]));
 			}
-		}
-		double[] Sw = new double[4];
+		}		
 		for (int l = 0; l <= q; l++) {
-			Rn.add(Sw, Sw, Rn.times(null, Nv[l], temp[l]));
+			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
 		}
-		for(int i = 0; i < 3; i++){
-			S[i] = Sw[i] / Sw[3];
-		}
-		S[3] = 1/Sw[3];
 	}
 	
+	
+//	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
+//		
+//		int n = Pw.length - 1;
+//		int m = Pw[0].length - 1;
+//		int uspan = FindSpan(n, p, u, U);
+//		int vspan = FindSpan(m, q, v, V);
+//		double[] Nu = new double[p + 1];
+//		double[] Nv = new double[q + 1];
+//		BasisFuns(uspan, u, p, U, Nu);
+//		BasisFuns(vspan, v, q, V, Nv);
+//		int uind = uspan - p;
+//		
+////		double[][] temp = new double[q + 1][4];
+//		for (int l = 0; l <= q; l++) {
+//			double[] temp = {0.0, 0.0};
+//			int vind = vspan - q + 1;
+//			for(int k = 0; k <= q; k++){
+////				temp = temp + Nu[k] * P[uind + k][vind];
+//				Rn.add(temp, temp, Rn.times(null, Nu[k], P[uind + k][vind]));
+//			}
+//			Rn.add(S, S, Rn.times(null, Nv[l], temp));
+//		}
+//		
+//		
+//	}
 
 	/**
 	 * Algorithm A4.4 from the NURBS Book

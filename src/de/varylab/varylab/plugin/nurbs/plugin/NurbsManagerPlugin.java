@@ -794,7 +794,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				t.addPointDragListener(new PointDragListener() {
 	
 					public void pointDragStart(PointDragEvent e) {
-						System.out.println("drag start of vertex no "+e.getIndex());				
 					}
 	//
 					public void pointDragged(PointDragEvent e) {
@@ -805,7 +804,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				        points[e.getIndex()]=e.getPosition(); 
 				        point = e.getPosition().clone();
 				        point[3] = 1.;
-				        System.out.println("dragged point: " + Arrays.toString(point));
 				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
 				        
 					}
