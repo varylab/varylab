@@ -34,8 +34,8 @@ public class LineSegmentIntersection {
 	public static LinkedList<LineSegment> preSelection
 	(double u0, double u1, double v0, double v1, LinkedList<LineSegment> segList){
 		System.out.println("START");
-		int curves = segList.getLast().getCurveIndex();
-		curves = 1200;
+//		int curves = segList.getLast().getCurveIndex();
+		int curves = 1200;
 		double uFactor = curves / (u1 - u0);
 		double vFactor = curves / (v1 - v0);
 		
@@ -49,6 +49,8 @@ public class LineSegmentIntersection {
 		}
 		double endIni = System.currentTimeMillis();
 		System.out.println("time for initializing: " + (startIni - endIni));
+		
+		
 		for(LineSegment ls : segList){
 			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
 			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
@@ -58,7 +60,6 @@ public class LineSegmentIntersection {
 			int vS = (int)vStart;
 			int uE = (int)uEnd;
 			int vE = (int)vEnd;
-			
 			
 			if(uS > uE){
 				int temp = uS;
