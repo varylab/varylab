@@ -851,24 +851,23 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 		 * @param p
 		 * @return
 		 */
-		public PointAndDistance getDistanceBetweenPointAndSurface(double[] point){
+		public double[] getClosestPoint(double[] point){
 			double[] p = new double[3];
 			double dist = Double.MAX_VALUE;
 			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
 //			NURBSSurface original = possiblePatches.getFirst();
 			
 		
-			for (int i = 0; i < 15; i++) {
+			for (int i = 0; i < 6; i++) {
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, point);
 				for (NURBSSurface ns : possiblePatches) {
 					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
 				}
 				possiblePatches = subdividedPatches;
-				System.out.println("Listenlaenge nach " + i + " Schritten: " + possiblePatches.size());
+//				System.out.println("Listenlaenge nach " + i + " Schritten: " + possiblePatches.size());
 			}
-			double uCoord = 0;
-			double vCoord = 0;
+		
 			for (NURBSSurface ns : possiblePatches) {
 				double[] U = ns.getUKnotVector();
 				double[] V = ns.getVKnotVector();
@@ -879,20 +878,10 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 				if(dist > Rn.euclideanDistance(surfPoint, point)){
 					dist = Rn.euclideanDistance(surfPoint, point);
 					p = homogSurfPoint;
-					uCoord = u;
-					vCoord = v;
 				}
 			}
-//			double[] returnPoint = new double[4];
-//			returnPoint[0] = p[0];
-//			returnPoint[1] = p[1];
-//			returnPoint[2] = p[2];
-//			returnPoint[3] = 1.;
-			PointAndDistance pad = new PointAndDistance(p, dist);
-			double[] result = pad.getPoint();
-			System.out.println("result " + Arrays.toString(result));
-			System.out.println("original point " + Arrays.toString(getSurfacePoint(uCoord, vCoord)));
-			return pad;
+
+			return p;
 		}
 		
 	

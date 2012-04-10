@@ -3,7 +3,6 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 

@@ -63,6 +63,7 @@ import de.varylab.varylab.plugin.meshoptimizer.GeodesicCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.MeanEdgeLengthOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.NURBSSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
@@ -243,6 +244,8 @@ public class VaryLab {
 		v.registerPlugin(EqualDiagonalsOptimizer.class);
 		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
 		v.registerPlugin(GeodesicCurvatureOptimizer.class);
+		
+		v.registerPlugin(NURBSSurfaceOptimizer.class);
 	}
 	
 //	private static void addLnFPlugins(JRViewer v) {

@@ -22,7 +22,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -76,21 +75,15 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
-import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariables;
-import de.jtem.numericalMethods.calculus.minimizing.Info;
-import de.jtem.numericalMethods.calculus.minimizing.NelderMead;
-import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
-import de.varylab.varylab.plugin.nurbs.PointAndDistance;
 import de.varylab.varylab.plugin.nurbs.VertexComparator;
 import de.varylab.varylab.plugin.nurbs.adapter.FlatIndexFormAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
-import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
@@ -99,7 +92,6 @@ import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
 	
@@ -935,8 +927,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //	        point = points[0];
 //	        System.out.println("point after dragging: " + Arrays.toString(point));
 			
-			PointAndDistance pad = ns.getDistanceBetweenPointAndSurface(point);
-			double[] surfacePoint = pad.getPoint();
+			double[] surfacePoint = ns.getClosestPoint(point);
 			System.out.println("closest point: " + Arrays.toString(surfacePoint));
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
