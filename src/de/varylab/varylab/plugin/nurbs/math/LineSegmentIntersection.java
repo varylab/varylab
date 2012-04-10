@@ -1,4 +1,5 @@
 package de.varylab.varylab.plugin.nurbs.math;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,7 +54,8 @@ public class LineSegmentIntersection {
 		double endIni = System.currentTimeMillis();
 		System.out.println("time for initializing: " + (startIni - endIni));
 		
-		
+		System.out.println("U " + Arrays.toString(U));
+		System.out.println("V " + Arrays.toString(V));
 		for(LineSegment ls : segList){
 			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
 			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
@@ -63,7 +65,7 @@ public class LineSegmentIntersection {
 			int vS = (int)vStart;
 			int uE = (int)uEnd;
 			int vE = (int)vEnd;
-			
+//			System.out.println("ls " + ls.toString());
 			if(uS > uE){
 				int temp = uS;
 				uS = uE;
@@ -74,7 +76,15 @@ public class LineSegmentIntersection {
 				vS = vE;
 				vE = temp;
 			}
-			
+//			if(vS == -360){
+//				System.out.println("linesegment");
+//				System.out.println("start "+Arrays.toString(ls.getSegment()[0])+ "end "+Arrays.toString(ls.getSegment()[0]));
+//			}
+//			System.out.println("uS: " + uS);
+//			System.out.println("uE: " + uE);
+//			System.out.println("vS: " + vS);
+//			System.out.println("vE: " + vE);
+//			System.out.println("curves: " + curves);
 			for (int i = uS; i <= uE; i++) {
 				for (int j = vS; j <= vE; j++) {
 					partition[i][j].getSegList().add(ls);
@@ -106,7 +116,11 @@ public class LineSegmentIntersection {
 	}
 	
 	
-	public static LinkedList<IntersectionPoint> BentleyOttmannAlgoritm(List<LineSegment> segments){
+	public static LinkedList<IntersectionPoint> BentleyOttmannAlgoritm(double[] U, double[] V, List<LineSegment> segments){
+		double u0 = U[0];
+		double u1 = U[U.length - 1];
+		double v0 = V[0];
+		double v1 = V[V.length - 1];
 		Set<RLineSegment2D> RSegments = new HashSet<RLineSegment2D>();
 		Map<RLineSegment2D, LineSegment> inverseMap = new HashMap<RLineSegment2D, LineSegment>();
 		
@@ -150,6 +164,24 @@ public class LineSegmentIntersection {
 			ip.setIntersectingSegments(segList);
 			
 			intersectionPoints.add(ip);
+			double[] Point = ip.getPoint();
+			if(Point[0] < u0){
+				Point[0] = u0;
+			}
+			else if(Point[0] > u1){
+				Point[0] = u1;
+			}
+			else if(Point[1] < v0){
+				Point[1] = v0;
+			}
+			else if(Point[1] > v1){
+				Point[1] = v1;
+			}
+			ip.setPoint(Point);
+		}
+		System.out.println("ALL INTERSECTIONS");
+		for (IntersectionPoint iP : intersectionPoints) {
+			System.out.println(Arrays.toString(iP.getPoint()));
 		}
 		System.out.println("# intersections: " + intersectionPoints.size());
 		return intersectionPoints;

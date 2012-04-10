@@ -528,13 +528,33 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
 				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-				double[][] seg1 = {{0,0},{1,0}};
+//				double[][] seg1 = {{0,0},{1,0}};
+				double[][] seg1 = new double[2][2];
+				seg1[0][0] = U[0];
+				seg1[0][1] = V[0];
+				seg1[1][0] = U[U.length - 1];
+				seg1[1][1] = V[0];
 				LineSegment b1 = new LineSegment(seg1, 1, 1);
-				double[][] seg2 = {{1,0},{1,1}};
+//				double[][] seg2 = {{1,0},{1,1}};
+				double[][] seg2 = new double[2][2];
+				seg2[0][0] = U[U.length - 1];
+				seg2[0][1] = V[0];
+				seg2[1][0] = U[U.length - 1];
+				seg2[1][1] = V[V.length - 1];
 				LineSegment b2 = new LineSegment(seg2, 1, 2);
-				double[][] seg3 = {{1,1},{0,1}};
+//				double[][] seg3 = {{1,1},{0,1}};
+				double[][] seg3 = new double[2][2];
+				seg3[0][0] = U[U.length - 1];
+				seg3[0][1] = V[V.length - 1];
+				seg3[1][0] = U[0];
+				seg3[1][1] = V[V.length - 1];
 				LineSegment b3 = new LineSegment(seg3, 1, 3);
-				double[][] seg4 = {{0,1},{0,0}};
+//				double[][] seg4 = {{0,1},{0,0}};
+				double[][] seg4 = new double[2][2];
+				seg4[0][0] = U[0];
+				seg4[0][1] = V[V.length - 1];
+				seg4[1][0] = U[0];
+				seg4[1][1] = V[0];
 				LineSegment b4 = new LineSegment(seg4, 1, 4);
 				boundarySegments.add(b1);
 				boundarySegments.add(b2);
@@ -572,12 +592,19 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));				
 				System.out.println("mit preSelection");				
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
+	
+				for (LineSegment ls : allSegments) {
+					System.out.println("linesegment");
+					System.out.println("start "+Arrays.toString(ls.getSegment()[0])+ "end "+Arrays.toString(ls.getSegment()[1]));
+				}
+				System.out.println("U " + Arrays.toString(U));
+				System.out.println("V " + Arrays.toString(V));
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
 				System.out.println("Double Time: " + (lastTimeDouble - firstTimeDouble));
 				double firstTimeBentley = System.currentTimeMillis();
-				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
+				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments);
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
