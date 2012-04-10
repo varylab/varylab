@@ -31,11 +31,14 @@ import de.varylab.varylab.plugin.nurbs.data.Partition;
 public class LineSegmentIntersection {
 	
 	
-	public static LinkedList<LineSegment> preSelection
-	(double u0, double u1, double v0, double v1, LinkedList<LineSegment> segList){
+	public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
+		double u0 = U[0];
+		double u1 = U[U.length - 1];
+		double v0 = V[0];
+		double v1 = V[V.length - 1];
 		System.out.println("START");
 //		int curves = segList.getLast().getCurveIndex();
-		int curves = 1200;
+		int curves = 120;
 		double uFactor = curves / (u1 - u0);
 		double vFactor = curves / (v1 - v0);
 		

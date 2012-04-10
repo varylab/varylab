@@ -569,11 +569,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				double firstTimeBentley = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
 //				double lastTimeBentley = System.currentTimeMillis();
-//				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
-				
-				System.out.println("mit preSelection");
-				
-				allSegments = LineSegmentIntersection.preSelection(0, 1, 0, 1, allSegments);
+//				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));				
+				System.out.println("mit preSelection");				
+				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
@@ -820,43 +818,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			if (showControlMeshButton == e.getSource()) {
 				NURBSSurface ns = getSelectedSurface();
 				System.out.println("original surface " + ns.toString());
-//				boolean valid = ns.hasValidControlmesh();
-//				System.out.println("is valid " + valid);
-				
-//				System.out.println("ns " + ns.toString());
-//				double[] uInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
-//				double[] vInsertion = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
-//				/**
-//				 * insert uInsertion into surface
-//				 */
-//				
-//				for (int i = 0; i < uInsertion.length; i++) {
-//					ns = ns.SurfaceKnotInsertion(true, uInsertion[i], 1);
-//				}
-//				
-//				/**
-//				 * insert vInsertion into surface
-//				 */
-//				
-//				for (int i = 0; i < vInsertion.length; i++) {
-//					ns = ns.SurfaceKnotInsertion(false, vInsertion[i], 1);
-//				}
-//				NURBSSurface nsInsert = ns.SurfaceKnotInsertion(true, uInsertion[0], 1);
-//				nsInsert = nsInsert.SurfaceKnotInsertion(false, vInsertion[0], 1);
-				NURBSSurface decomposed = ns.decomposeSurface();
-//				NURBSSurface decomposed = ns;
-				double[][][] control = ns.getControlMesh();
-				double[][][] cm = new double[control.length][control[0].length][3];
-				for (int i = 0; i < control.length; i++) {
-					for (int j = 0; j < control[0].length; j++) {
-//						cm[i][j] = ns.get3DPoint(control[i][j]);
-						for(int k = 0; k < 3; k++){
-							cm[i][j][k] = control[i][j][k];
-						}
-					}
-				}
-				
-//				double[][][] cm = decomposed.getControlMesh();
+				NURBSSurface decomposed = ns.decomposeSurface();				
+				double[][][] cm = decomposed.getControlMesh();
 				QuadMeshFactory qmf = new QuadMeshFactory();
 				qmf.setULineCount(cm[0].length);
 				qmf.setVLineCount(cm.length);
