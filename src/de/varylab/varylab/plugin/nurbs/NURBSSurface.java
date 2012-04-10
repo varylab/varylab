@@ -790,7 +790,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
  			double dist = Double.MAX_VALUE;
  			double[] minPoint = new double[3];
  			for (int i = 0; i < controlMesh.length; i++) {
- 				for (int j = 0; j < controlMesh.length; j++) {
+ 				for (int j = 0; j < controlMesh[0].length; j++) {
  					if(dist > Rn.euclideanDistance(p, get3DPoint(controlMesh[i][j]))){
  						dist = Rn.euclideanDistance(p, get3DPoint(controlMesh[i][j]));
  						minPoint = controlMesh[i][j];
@@ -806,7 +806,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
  			double dist = Double.MIN_VALUE;
  			double[] maxPoint = new double[3];
  			for (int i = 0; i < controlMesh.length; i++) {
- 				for (int j = 0; j < controlMesh.length; j++) {
+ 				for (int j = 0; j < controlMesh[0].length; j++) {
  					if(dist < Rn.euclideanDistance(p, get3DPoint(controlMesh[i][j]))){
  						dist = Rn.euclideanDistance(p, get3DPoint(controlMesh[i][j]));
  						maxPoint = controlMesh[i][j];
@@ -856,6 +856,8 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			double dist = Double.MAX_VALUE;
 			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
 //			NURBSSurface original = possiblePatches.getFirst();
+			
+		
 			for (int i = 0; i < 15; i++) {
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, point);
@@ -896,79 +898,19 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 	
 		
 		public static void main(String[] a){
-//			double[] point = {0.2, 0.3};
-//			double u = 0.8;
-//			double v = 0.3;
-//			double[] U = {0.0,0.0,0.0,1.0,1.0,1.0};
-//			double[] V = {0.0,0.0,0.0,1.0,1.0,1.0};
-//			int p = 2;
-//			int q = 2;
-//			double[][][]Pw0 = {{{0, 0, 3, 1},{1, 0, 3, 1},{2, 0, 0, 2}},
-//						{{0, 0, 3, 1},{1, 2, 3, 1},{2, 4, 0, 2}},
-//						{{0, 0, 3, 1},{0, 2, 3, 1},{0, 4, 0, 2}}};
-//			NURBSSurface ns0 = new NURBSSurface(U, V, Pw0, p, q);
-//			LinkedList<NURBSSurface> bezierList = ns0.decomposeIntoBezierSurfacesList();
-//			System.out.println("Bezier list:");
-//			for (NURBSSurface b : bezierList) {
-//				System.out.println(b.toString());
-//			}
-//			System.out.println("ns0 " + ns0.toString());
-//			System.out.println("surfPoint " + Arrays.toString(ns0.getSurfacePoint(u, v)));
-//			LinkedList<NURBSSurface> ns4Patches = ns0.subdivideIntoFourNewPatches();
-//			int counter = 0;
-//			for (NURBSSurface patch : ns4Patches) {
-//				counter++;
-//				System.out.println("patch " + counter + " " + patch.toString());
-//				double[] UPatch = patch.getUKnotVector();
-//				double[] VPatch = patch.getVKnotVector();
-//				if(u > UPatch[0] && u <= UPatch[UPatch.length - 1] && v > VPatch[0] && v <= VPatch[VPatch.length - 1]){
-//					System.out.println("patchPoint" + Arrays.toString(patch.getSurfacePoint(u, v)));
-//				}
-//			}
-//			double u = 0.2;
-//			double v = 0.3;
-//			double[] U = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0} ;
-//			double[] V = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0};
-//			double[][][]Pw0 = 
-//			{{{-1.0, 1.0, 0.0, 1.0},{0.0, 1.0, 0.0, 1.0},{1.0, 1.0, 0.0, 1.0},{2.0, 1.0, 0.0, 1.0}}, 
-//			{{-1.0, 0.0, 0.0, 1.0},{0.0, 0.0, 4.0, 1.0},{1.0, 0.0, -2.0, 1.0},{2.0, 0.0, 0.0, 1.0}}, 
-//			{{-1.0, -1.0, 0.0, 1.0},{0.0, -1.0, 0.0, 1.0},{1.0, -1.0, 0.0, 1.0},{2.0, -1.0, 0.0, 1.0}}};
-//			int p = 2;
-//			int q = 3;
-//			NURBSSurface ns = new NURBSSurface(U, V, Pw0, p, q);
-//			NURBSSurface nsDecomposed = ns.decomposeSurface();
-//			double[] originalPoint = ns.getSurfacePoint(u, v);
-//			double[] decomposedPoint = nsDecomposed.getSurfacePoint(u, v);
-//			System.out.println("nsDecomposed ");
-//			System.out.println(nsDecomposed.toString());
-//			double[] bezierPoint = new double[4];
-//			LinkedList<NURBSSurface> bezierList = ns.decomposeIntoBezierSurfacesList();
-//			for (NURBSSurface bezier : bezierList) {
-//				System.out.println("bezier");
-//				System.out.println(bezier.toString());
-//				double[] bU = bezier.getUKnotVector();
-//				double[] bV = bezier.getVKnotVector();
-//				double uStart = bU[0];
-//				double uEnd = bU[bU.length - 1];
-//				double vStart = bV[0];
-//				double vEnd = bV[bV.length - 1];
-//				if(u >= uStart && u <= uEnd && v >= vStart && v<= vEnd){
-//					bezierPoint = bezier.getSurfacePoint(u, v);
-//				}
-//			}
-//			System.out.println("originalPoint " + Arrays.toString(originalPoint));
-//			System.out.println("decomposedPoint " + Arrays.toString(decomposedPoint));
-//			System.out.println("bezierPoint " + Arrays.toString(bezierPoint));
 			double u = 0.2;
 			double v = 0.3;
-			double[] U = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0} ;
-			double[] V = {0.0, 0.0, 0.0, 0.0, 5.69734275730471, 5.69734275730471, 11.39468551460942, 11.39468551460942, 14.24335689326177, 14.24335689326177, 17.09202827191413, 17.09202827191413, 22.78937102921884, 22.78937102921884, 22.78937102921884, 22.78937102921884};
-			double[][][]Pw0 = 
-			{{{9.697601503225346, 9.832916873037798, 0.0, 1.0},{8.332577520192173, 9.98984176284457, 1.319686459561706, 1.0},{6.842887538969059, 10.13539866136639, 2.534236859343848, 1.0},{3.533276724877663, 10.36545166337421, 4.416444353758425, 1.0},{1.679140536595167, 10.44826757634601, 5.068264524643205, 1.0},{-1.191651351158919, 10.47044905275173, 5.14871483136908, 1.0},{-2.147208308180635, 10.46109739103686, 5.02880437903552, 1.0},{-3.984353016768909, 10.41061387141653, 4.513175987979253, 1.0},{-4.86168958771056, 10.37017162971258, 4.123659136735529, 1.0},{-7.327437373448136, 10.21610435909473, 2.674599869781878, 1.0},{-8.744443613902616, 10.07341951493079, 1.367003442095999, 1.0},{-9.998345907874073, 9.916601854172452, -0.05715153061129224, 1.0}}, 
-			{{10.59970396864166, 8.612591399313345, 8.153363598686303, 1.0},{9.17820771862226, 7.372955294465832, 13.76132151267763, 1.0},{7.528991806150149, 6.232858515945541, 16.29011924513487, 1.0},{5.110141801191052, 4.215967078129421, 10.68278514272968, 1.0},{3.241030433722658, 3.623034849863626, 10.4628896877334, 1.0},{1.152023611257983, 3.566841454708031, 10.57283741523154, 1.0},{-1.03409784772681, 3.682521984715714, 11.00128196069404, 1.0},{-1.706617303693677, 4.163735451118495, 11.89221014520923, 1.0},{-3.575728671162071, 4.523555019300631, 13.10163514768878, 1.0},{-6.705247473825765, 6.123656733200651, 15.60207245641716, 1.0},{-8.202887446327445, 7.325858476052421, 11.97730990771158, 1.0},{-9.521641875195925, 8.641427590447083, 8.024295062116572, 1.0}}, 
-			{{10.05844248939187, -9.5622861334129, 0.0, 1.0},{8.70593059540053, -9.602185490073103, -1.290604275306549, 1.0},{7.224071291254099, -9.636469801995078, -2.471595422926313, 1.0},{3.926965412878942, -9.679455325423554, -4.277324122426215, 1.0},{2.080489482293896, -9.686982004222013, -4.880221706650961, 1.0},{-0.7619069296181856, -9.662980081909415, -4.929024253647056, 1.0},{-1.706806813092623, -9.649461127812668, -4.808314658385771, 1.0},{-3.528963443362211, -9.612796250625099, -4.313588658878198, 1.0},{-4.402608249806587, -9.589915532386465, -3.945309502630125, 1.0},{-6.8743865383855, -9.512092446812133, -2.579844365850761, 1.0},{-8.317781791192552, -9.449114218752918, -1.349103566733365, 1.0},{-9.607687028063145, -9.382751503786524, -4.144638787324619E-4, 1.0}}};
-			int p = 2;
-			int q = 3;
+			double[] U = {0.0, 0.0, 0.0, 0.0, 6.08276253029822, 13.69853563616213, 17.82164126177979, 20.82164126177979, 20.82164126177979, 20.82164126177979, 20.82164126177979};
+			double[] V = {0.0, 0.0, 0.0, 3.141592653589793, 3.141592653589793, 6.283185307179586, 6.283185307179586, 6.283185307179586};
+			int p = 3;
+			int q = 2;
+			double[][][]Pw0 = {{{0.0, 8.0, 0.0, 1.0},{0.0, 5.656854249492381, 5.65685424949238, 0.7071067811865476},{0.0, 4.898587196589413E-16, 8.0, 1.0},{0.0, -5.65685424949238, 5.656854249492381, 0.7071067811865476},{0.0, -8.0, 9.797174393178826E-16, 1.0}}, 
+							{{1.878837730442698, 8.762285965878977, 0.0, 1.0},{1.3285388999451744, 6.195871825168743, 6.195871825168742, 0.7071067811865476},{1.878837730442698, 5.365352730663731E-16, 8.762285965878977, 1.0},{1.3285388999451744, -6.195871825168742, 6.195871825168743, 0.7071067811865476},{1.878837730442698, -8.762285965878977, 1.073070546132746E-15, 1.0}},
+							{{6.732195665770425, 10.3579035456024, 0.0, 1.0},{4.760381207540952, 7.324143835971641, 7.324143835971641, 0.7071067811865476},{6.732195665770425, 6.342386711499501E-16, 10.3579035456024, 1.0},{4.760381207540952, -7.324143835971641, 7.324143835971641, 0.7071067811865476},{6.732195665770425, -10.3579035456024, 1.2684773422999E-15, 1.0}},
+							{{11.79896093016204, 4.652377985466189, 0.0, 1.0},{8.343125284672714, 3.2897280221661513, 3.289728022166151, 0.7071067811865476},{11.79896093016204, 2.84875990416239E-16, 4.652377985466189, 1.0},{8.343125284672714, -3.289728022166151, 3.2897280221661513, 0.7071067811865476},{11.79896093016204, -4.652377985466189, 5.69751980832478E-16, 1.0}}, 
+							{{16.6099396548775, 7.289389793384495, 0.0, 1.0},{11.745000965063225, 5.154376953614183, 5.154376953614182, 0.7071067811865476},{16.6099396548775, 4.463463939102854E-16, 7.289389793384495, 1.0},{11.745000965063225, -5.154376953614182, 5.154376953614183, 0.7071067811865476},{16.6099396548775, -7.289389793384495, 8.926927878205708E-16, 1.0}}, 
+							{{19.00504976463275, 7.100369463198012, 0.0, 1.0},{13.438599565359619, 5.020719396357201, 5.0207193963572, 0.7071067811865476},{19.00504976463275, 4.347722367934528E-16, 7.100369463198012, 1.0},{13.438599565359619, -5.0207193963572, 5.020719396357201, 0.7071067811865476},{19.00504976463275, -7.100369463198012, 8.695444735869056E-16, 1.0}}, 
+							{{20.0, 7.0, 0.0, 1.0},{14.142135623730951, 4.949747468305833, 4.949747468305832, 0.7071067811865476},{20.0, 4.286263797015736E-16, 7.0, 1.0},{14.142135623730951, -4.949747468305832, 4.949747468305833, 0.7071067811865476},{20.0, -7.0, 8.572527594031472E-16, 1.0}}}; 
 			NURBSSurface ns = new NURBSSurface(U, V, Pw0, p, q);
 			NURBSSurface nsDecomposed = ns.decomposeSurface();
 			double[] originalPoint = ns.getSurfacePoint(u, v);
@@ -995,7 +937,8 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			}
 			System.out.println("originalPoint " + Arrays.toString(originalPoint));
 			System.out.println("decomposedPoint " + Arrays.toString(decomposedPoint));
-			System.out.println("bezierPoint " + Arrays.toString(bezierPoint));
+			System.out.println("bezierPoint " + Arrays.toString(bezierPoint));			
+		
 		}
 		
 	
