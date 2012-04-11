@@ -50,6 +50,7 @@ import de.varylab.varylab.plugin.generator.HexMeshGenerator;
 import de.varylab.varylab.plugin.generator.PrimitivesGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
+import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
@@ -189,6 +190,7 @@ public class VaryLab {
 		v.registerPlugin(HexMeshGenerator.class);
 		v.registerPlugin(SimpleRoofGenerator.class);
 		v.registerPlugin(PrimitivesGenerator.class);
+		v.registerPlugin(TschebyscheffSphereGenerator.class);
 	}
 
 
