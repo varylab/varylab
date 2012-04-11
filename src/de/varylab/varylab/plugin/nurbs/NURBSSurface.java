@@ -858,7 +858,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 //			NURBSSurface original = possiblePatches.getFirst();
 			
 		
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 12; i++) {
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, point);
 				for (NURBSSurface ns : possiblePatches) {
