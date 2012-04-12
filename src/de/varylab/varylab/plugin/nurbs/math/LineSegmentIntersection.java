@@ -54,8 +54,6 @@ public class LineSegmentIntersection {
 		double endIni = System.currentTimeMillis();
 		System.out.println("time for initializing: " + (startIni - endIni));
 		
-		System.out.println("U " + Arrays.toString(U));
-		System.out.println("V " + Arrays.toString(V));
 		for(LineSegment ls : segList){
 			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
 			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
@@ -65,7 +63,6 @@ public class LineSegmentIntersection {
 			int vS = (int)vStart;
 			int uE = (int)uEnd;
 			int vE = (int)vEnd;
-//			System.out.println("ls " + ls.toString());
 			if(uS > uE){
 				int temp = uS;
 				uS = uE;
@@ -76,15 +73,6 @@ public class LineSegmentIntersection {
 				vS = vE;
 				vE = temp;
 			}
-//			if(vS == -360){
-//				System.out.println("linesegment");
-//				System.out.println("start "+Arrays.toString(ls.getSegment()[0])+ "end "+Arrays.toString(ls.getSegment()[0]));
-//			}
-//			System.out.println("uS: " + uS);
-//			System.out.println("uE: " + uE);
-//			System.out.println("vS: " + vS);
-//			System.out.println("vE: " + vE);
-//			System.out.println("curves: " + curves);
 			for (int i = uS; i <= uE; i++) {
 				for (int j = vS; j <= vE; j++) {
 					partition[i][j].getSegList().add(ls);
@@ -179,11 +167,6 @@ public class LineSegmentIntersection {
 			}
 			ip.setPoint(Point);
 		}
-		System.out.println("ALL INTERSECTIONS");
-		for (IntersectionPoint iP : intersectionPoints) {
-			System.out.println(Arrays.toString(iP.getPoint()));
-		}
-		System.out.println("# intersections: " + intersectionPoints.size());
 		return intersectionPoints;
 	}
 
@@ -263,7 +246,6 @@ public class LineSegmentIntersection {
 			//new
 			double currEps = Math.min(conditionalEps(first), conditionalEps(second)) ;
 			if(p.getPoint()[1] < result[1] && (result[1] - p.getPoint()[1]) < currEps){
-				System.out.println("hier passierts");
 				result[1] = p.getPoint()[1] - result[1];
 			}
 			//

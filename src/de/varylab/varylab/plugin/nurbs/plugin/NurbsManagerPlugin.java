@@ -556,41 +556,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				for (LineSegment bs : boundarySegments) {
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 				}
-				allSegments.addAll(boundarySegments);
-//				String str = new String();
-//				try {
-//					System.out.println("PRINT OUT START");
-//					FileWriter testOut = new FileWriter("testSegmentsNew.txt");
-//					int ijk = 0;
-//					for (LineSegment ls : allSegments) {
-//						++ijk;
-//						str = ls.getSegment()[0][0] + " " + ls.getSegment()[0][1] + " " + ls.getSegment()[1][0] + " " + ls.getSegment()[1][1] + "\n";
-//						testOut.write(str);
-//						if(ijk%10000 == 0) {
-//							System.out.print(".");
-//						}
-//					}
-//					testOut.close();
-//				} catch (Exception e1) {
-//					e1.printStackTrace();
-//				}
-//				double firstTimeDouble = System.currentTimeMillis();
-//				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
-//				double lastTimeDouble = System.currentTimeMillis();
-//				System.out.println("Double Time: " + (lastTimeDouble - firstTimeDouble));
-//				double firstTimeBentley = System.currentTimeMillis();
-//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
-//				double lastTimeBentley = System.currentTimeMillis();
-//				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));				
-				System.out.println("mit preSelection");				
+				allSegments.addAll(boundarySegments);			
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
-	
-				for (LineSegment ls : allSegments) {
-					System.out.println("linesegment");
-					System.out.println("start "+Arrays.toString(ls.getSegment()[0])+ "end "+Arrays.toString(ls.getSegment()[1]));
-				}
-				System.out.println("U " + Arrays.toString(U));
-				System.out.println("V " + Arrays.toString(V));
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
@@ -836,8 +803,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			if (showControlMeshButton == e.getSource()) {
 				NURBSSurface ns = getSelectedSurface();
-//				double time = ns.getTime();
-				
 				System.out.println("original surface " + ns.toString());
 				NURBSSurface decomposed = ns.decomposeSurface();				
 				double[][][] cm = decomposed.getControlMesh();
