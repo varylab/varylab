@@ -78,6 +78,7 @@ public class NurbsIO {
 			Pattern degCurve = Pattern.compile("deg\\s([+-]?[0-9])*");
 			Pattern paramCurve = Pattern
 					.compile("parm\\su(\\s[-+]?[0-9]*\\.?[0-9]*)+");
+			Pattern endOfReading = Pattern.compile("# - trim loop+");
 			String line = null;
 			boolean surfKnot = false;
 			boolean backSlash = false;
@@ -99,10 +100,10 @@ public class NurbsIO {
 			int trimCounter = 0;
 			int holeCounter = 0;
 			int trimIndex;
+			int endCounter = 0;
 			String str = new String();
 			String help = new String();
-			while ((line = lnr.readLine()) != null) {
-
+			while ((line = lnr.readLine()) != null && endCounter < 2) {
 				if (line.endsWith("\\")) {
 					if (line.startsWith(" ")) {
 						help = line.replaceFirst("\\s", "");
@@ -122,24 +123,20 @@ public class NurbsIO {
 
 					// surf
 					Matcher mVertex = vertex.matcher(str); // surface vertex
-					Matcher mParamV = paramU.matcher(str); // 1. knotvector
-															// surface
-					Matcher mParamU = paramV.matcher(str); // 2. knotvector
-															// surface
+					Matcher mParamV = paramU.matcher(str); // 1. knotvector surface
+					Matcher mParamU = paramV.matcher(str); // 2. knotvector surface
 					Matcher mDegSurf = degSurf.matcher(str); // degree surface
-					Matcher mSurf = surf.matcher(str); // surface domain and
-														// index control mesh
+					Matcher mSurf = surf.matcher(str); // surface domain and index control mesh
 					Matcher mTrim = trim.matcher(str); // domain and index curve
 					Matcher mHole = hole.matcher(str); // domain and index curve
 					// trim loop
 					Matcher mVp = vp.matcher(str); // curve vertex
 					Matcher mDegCurve = degCurve.matcher(str); // degree curve
-					Matcher mCurveDim = curvedim.matcher(str); // dimension
-																// ambient space
-																// curve
-					Matcher mParamCurve = paramCurve.matcher(str); // knotvector
-																	// curve
-
+					Matcher mCurveDim = curvedim.matcher(str); // dimension ambient space curve
+					Matcher mParamCurve = paramCurve.matcher(str); // knotvector curve
+					
+					Matcher mEnd = endOfReading.matcher(str);
+					
 					String[] splitLineFirst = str.split("\\s");
 					int space = 0;
 					for (int i = 0; i < splitLineFirst.length; i++) {
@@ -268,6 +265,9 @@ public class NurbsIO {
 								curveDeg));
 						curveIndex = new LinkedList<Integer>();
 
+					}
+					else if(mEnd.matches()){
+						endCounter++;
 					}
 					str = "";
 				}
