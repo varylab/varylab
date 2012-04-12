@@ -246,8 +246,8 @@ public class VaryLab {
 		v.registerPlugin(EqualDiagonalsOptimizer.class);
 		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
 		v.registerPlugin(GeodesicCurvatureOptimizer.class);
-		
 		v.registerPlugin(NURBSSurfaceOptimizer.class);
+		
 	}
 	
 //	private static void addLnFPlugins(JRViewer v) {

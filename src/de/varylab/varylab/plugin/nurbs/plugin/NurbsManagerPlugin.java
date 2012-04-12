@@ -836,6 +836,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			if (showControlMeshButton == e.getSource()) {
 				NURBSSurface ns = getSelectedSurface();
+//				double time = ns.getTime();
+				
 				System.out.println("original surface " + ns.toString());
 				NURBSSurface decomposed = ns.decomposeSurface();				
 				double[][][] cm = decomposed.getControlMesh();
@@ -854,6 +856,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
+//				System.out.println("time: " + time);
 //				LinkedList<NURBSSurface> fourPatches = decomposed.subdivideIntoFourNewPatches();
 //				System.out.println("four new patches:");
 //				for (NURBSSurface p : fourPatches) {

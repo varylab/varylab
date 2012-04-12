@@ -9,7 +9,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 
 	public class NURBSSurface {
-
+//		private double time = 0.0;
 		protected double[] U;
 		protected double[] V;
 		protected LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
@@ -721,6 +721,10 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 //			}
 //			return true;
 //		}
+		
+//		public double getTime(){
+//			return time;
+//		}
  		
  		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
  			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
@@ -732,28 +736,246 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
  			return newPatches;
  		}
  		
- 		public LinkedList<NURBSSurface> subdivideUntilEveryPatchIsValid(){
- 			LinkedList<NURBSSurface> validList = new LinkedList<NURBSSurface>();
- 			LinkedList<NURBSSurface> oldList = decomposeIntoBezierSurfacesList();
- 			System.out.println("subdivideUntilEveryPatchIsValid()");
- 			while(!oldList.isEmpty()){
- 				System.out.println("IN WHILE");
- 				if(oldList.peekLast().hasValidControlmesh()){
- 					System.out.println("IF");
- 					NURBSSurface validSurface = oldList.pollLast();
- 					System.out.println("validSurface "+validSurface.toString());
- 					validList.add(validSurface);
+ 		private static int binomialCoefficient(int n, int k) {
+ 			if (n - k == 1 || k == 1)
+ 				return n;
+
+ 			long[][] b = new long[n + 1][n - k + 1];
+ 			b[0][0] = 1;
+ 			for (int i = 1; i < b.length; i++) {
+ 				for (int j = 0; j < b[i].length; j++) {
+ 					if (i == j || j == 0)
+ 						b[i][j] = 1;
+ 					else if (j == 1 || i - j == 1)
+ 						b[i][j] = i;
+ 					else
+ 						b[i][j] = b[i - 1][j - 1] + b[i - 1][j];
+ 				}
+ 			}
+ 			return (int)b[n][n - k];
+ 		}
+
+ 		
+ 
+ 		
+		public LinkedList<NURBSSurface> subdivideBezierIntoTwoHalfPatches(boolean uDirection){
+ 			LinkedList<NURBSSurface> halfPatches = new LinkedList<NURBSSurface>();
+ 			double[][][] cm = getControlMesh();
+ 			double[][][] firstCm = new double[cm.length][cm[0].length][4];
+ 			double[][][] secondCm = new double[cm.length][cm[0].length][4];
+ 			NURBSSurface firstNs = new NURBSSurface();
+ 			NURBSSurface secondNs = new NURBSSurface();
+ 			if(uDirection){
+ 				double[][][]newCm = new double[2 * p + 1][cm[0].length][4];
+ 				if(p == 1){
+ 					for (int j = 0; j < cm[0].length; j++) {
+						newCm[0][j] = cm[0][j];
+						newCm[1][j] = Rn.add(null,Rn.times(null, 0.5, cm[0][j]), Rn.times(null, 0.5, cm[1][j]));
+						newCm[2][j] = cm[1][j];
+					}
+ 				}
+ 				else if(p == 2){
+ 					for (int j = 0; j < cm[0].length; j++) {
+ 						newCm[0][j] = cm[0][j];
+ 						newCm[1][j] = Rn.add(null,Rn.times(null, 0.5, cm[0][j]), Rn.times(null, 0.5, cm[1][j]));
+ 						newCm[2][j] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[0][j]), Rn.times(null, 0.5, cm[1][j])), Rn.times(null, 0.25, cm[2][j]));
+ 						newCm[3][j] = Rn.add(null,Rn.times(null, 0.5, cm[1][j]), Rn.times(null, 0.5, cm[2][j]));
+ 						newCm[4][j] = cm[2][j];
+ 					}
+ 				}
+ 				else if(p == 3){
+ 					for (int j = 0; j < cm[0].length; j++) {
+ 						newCm[0][j] = cm[0][j];
+ 						newCm[1][j] = Rn.add(null,Rn.times(null, 0.5, cm[0][j]), Rn.times(null, 0.5, cm[1][j]));
+ 						newCm[2][j] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[0][j]), Rn.times(null, 0.5, cm[1][j])), Rn.times(null, 0.25, cm[2][j]));
+ 						newCm[3][j] = Rn.add(null, Rn.add(null,Rn.times(null, 0.125, cm[0][j]), Rn.times(null, 0.375, cm[1][j])), Rn.add(null,Rn.times(null, 0.375, cm[2][j]), Rn.times(null, 0.125, cm[3][j])));
+ 						newCm[4][j] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[1][j]), Rn.times(null, 0.5, cm[2][j])), Rn.times(null, 0.25, cm[3][j]));
+ 						newCm[5][j] = Rn.add(null,Rn.times(null, 0.5, cm[2][j]), Rn.times(null, 0.5, cm[3][j]));
+ 						newCm[6][j] = cm[3][j];
+ 					}
  				}
  				else{
- 					System.out.println("else");
- 					NURBSSurface notValidSurface = oldList.pollLast();
- 					System.out.println("notValidSurface " + notValidSurface.toString());
- 					LinkedList<NURBSSurface> newPatches = notValidSurface.subdivideIntoFourNewPatches();
- 					oldList.addAll(newPatches);
+	 				for (int j = 0; j < cm[0].length; j++) {
+	 					for (int i = 0; i <= 2 * p; i++) {
+	 						if(i <= p){
+	 							newCm[i][j] = new double[4];
+	 							for(int k = 0; k <= i; k++){
+	 								int dom = binomialCoefficient(i, k);
+	 								double num = Math.pow(2, i);
+	 								Rn.add(newCm[i][j], newCm[i][j], Rn.times(null, num / dom, cm[k][j]));
+	 							}
+	 						}
+	 						else{
+	 							newCm[i][j] = new double[4];
+	 							for(int k = 0; k <= (2 * p) - i; k++){
+	 								int dom = binomialCoefficient((2 * p) - i, k);
+	 								double num = Math.pow(2, ((2 * p) - i));
+	 								Rn.add(newCm[i][j], newCm[i][j], Rn.times(null, num / dom, cm[p - k][j]));
+	 							}
+	 						}
+	 					}
+	 				}
  				}
- 			}			
- 			return validList;
+ 				double u0 = U[0];
+ 				double u1 = U[U.length - 1];
+ 				double uHalf = (u0 + u1) / 2;
+ 				
+ 				double[] firstU = new double[U.length];
+ 				for(int i  = 0; i < U.length / 2; i++){
+ 					firstU[i] = u0;
+ 				}
+ 				for(int i  = U.length / 2; i < U.length; i++){
+ 					firstU[i] = uHalf;
+ 				}
+ 				
+ 				double[] secondU = new double[U.length];
+ 				for(int i  = 0; i < U.length / 2; i++){
+ 					secondU[i] = uHalf;
+ 				}
+ 				for(int i  = U.length / 2; i < U.length; i++){
+ 					secondU[i] = u1;
+ 				}
+ 				
+ 				for (int i = 0; i < firstCm.length; i++) {
+ 					for (int j = 0; j < firstCm[0].length; j++) {
+ 						firstCm[i][j] = newCm[i][j];
+ 					}
+				}
+ 				
+ 				for (int i = 0; i < secondCm.length; i++) {
+ 					for (int j = 0; j < secondCm[0].length; j++) {
+ 						secondCm[i][j] = newCm[p  + i][j];
+ 					}
+				}
+ 				firstNs = new NURBSSurface(firstU, V, firstCm, p, q);
+ 				secondNs = new NURBSSurface(secondU, V, secondCm, p, q);
+ 				
+ 				
+ 				
+ 			}
+ 			if(!uDirection){
+ 				double[][][]newCm = new double[cm.length][2 * q + 1][4];
+ 				if(q == 1){
+ 					for (int i = 0; i < cm.length; i++) {
+						newCm[i][0] = cm[i][0];
+						newCm[i][1] = Rn.add(null,Rn.times(null, 0.5, cm[i][0]), Rn.times(null, 0.5, cm[i][1]));
+						newCm[i][2] = cm[i][1];
+					}
+ 				}
+ 				else if(q == 2){
+ 					for (int i = 0; i < cm.length; i++) {
+ 						newCm[i][0] = cm[i][0];
+ 						newCm[i][1] = Rn.add(null,Rn.times(null, 0.5, cm[i][0]), Rn.times(null, 0.5, cm[i][1]));
+ 						newCm[i][2] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[i][0]), Rn.times(null, 0.5, cm[i][1])), Rn.times(null, 0.25, cm[i][2]));
+ 						newCm[i][3] = Rn.add(null,Rn.times(null, 0.5, cm[i][1]), Rn.times(null, 0.5, cm[i][2]));
+ 						newCm[i][4] = cm[i][2];
+ 					}
+ 				}
+ 				else if(q == 3){
+ 					for (int i = 0; i < cm.length; i++) {
+ 						newCm[i][0] = cm[i][0];
+ 						newCm[i][1] = Rn.add(null,Rn.times(null, 0.5, cm[i][0]), Rn.times(null, 0.5, cm[i][1]));
+ 						newCm[i][2] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[i][0]), Rn.times(null, 0.5, cm[i][1])), Rn.times(null, 0.25, cm[i][2]));
+ 						newCm[i][3] = Rn.add(null, Rn.add(null,Rn.times(null, 0.125, cm[i][0]), Rn.times(null, 0.375, cm[i][1])), Rn.add(null,Rn.times(null, 0.375, cm[i][2]), Rn.times(null, 0.125, cm[i][3])));
+ 						newCm[i][4] = Rn.add(null, Rn.add(null,Rn.times(null, 0.25, cm[i][1]), Rn.times(null, 0.5, cm[i][2])), Rn.times(null, 0.25, cm[i][3]));
+ 						newCm[i][5] = Rn.add(null,Rn.times(null, 0.5, cm[i][2]), Rn.times(null, 0.5, cm[i][3]));
+ 						newCm[i][6] = cm[i][3];
+ 					}
+ 				}
+ 				else{
+	 				for (int i = 0; i < cm[0].length; i++) {
+	 					for (int j = 0; j <= 2 * q; j++) {
+	 						if(j <= q){
+	 							newCm[i][j] = new double[4];
+	 							for(int k = 0; k <= j; k++){
+	 								int dom = binomialCoefficient(j, k);
+	 								double num = Math.pow(2, i);
+	 								Rn.add(newCm[i][j], newCm[i][j], Rn.times(null, num / dom, cm[i][k]));
+	 							}
+	 						}
+	 						else{
+	 							newCm[i][j] = new double[4];
+	 							for(int k = 0; k <= (2 * q) - j; k++){
+	 								int dom = binomialCoefficient((2 * q) - j, k);
+	 								double num = Math.pow(2, ((2 * q) - j));
+	 								Rn.add(newCm[i][j], newCm[i][j], Rn.times(null, num / dom, cm[i][q - k]));
+	 							}
+	 						}
+	 					}
+	 				}
+ 				}
+ 				double v0 = V[0];
+ 				double v1 = V[V.length - 1];
+ 				double vHalf = (v0 + v1) / 2;
+ 				
+ 				double[] firstV = new double[V.length];
+ 				for(int i  = 0; i < V.length / 2; i++){
+ 					firstV[i] = v0;
+ 				}
+ 				for(int i  = V.length / 2; i < V.length; i++){
+ 					firstV[i] = vHalf;
+ 				}
+ 				
+ 				double[] secondV = new double[V.length];
+ 				for(int i  = 0; i < V.length / 2; i++){
+ 					secondV[i] = vHalf;
+ 				}
+ 				for(int i  = V.length / 2; i < V.length; i++){
+ 					secondV[i] = v1;
+ 				}
+ 				for (int i = 0; i < firstCm.length; i++) {
+ 					for (int j = 0; j < firstCm[0].length; j++) {
+ 						firstCm[i][j] = newCm[i][j];
+ 					}
+				}
+ 				
+ 				for (int i = 0; i < secondCm.length; i++) {
+ 					for (int j = 0; j < secondCm[0].length; j++) {
+ 						secondCm[i][j] = newCm[i][q + j];
+ 					}
+				}
+ 				firstNs = new NURBSSurface(U, firstV, firstCm, p, q);
+ 				secondNs = new NURBSSurface(U, secondV, secondCm, p, q);
+ 			}
+ 			halfPatches.add(firstNs);
+ 			halfPatches.add(secondNs);
+ 			return halfPatches;
  		}
+ 		
+ 		public LinkedList<NURBSSurface> subdivideBezierIntoFourBezierPatches(){
+// 			double firstTimeDouble = System.currentTimeMillis();
+ 			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
+ 			LinkedList<NURBSSurface> uPatches = subdivideBezierIntoTwoHalfPatches(true);
+ 			for (NURBSSurface ns : uPatches) {
+				newPatches.addAll(ns.subdivideBezierIntoTwoHalfPatches(false));
+			}
+// 			double lastTimeDouble = System.currentTimeMillis();
+//			time = time + (lastTimeDouble - firstTimeDouble);
+ 			return newPatches;
+ 		}
+ 		
+// 		public LinkedList<NURBSSurface> subdivideUntilEveryPatchIsValid(){
+// 			LinkedList<NURBSSurface> validList = new LinkedList<NURBSSurface>();
+// 			LinkedList<NURBSSurface> oldList = decomposeIntoBezierSurfacesList();
+// 			System.out.println("subdivideUntilEveryPatchIsValid()");
+// 			while(!oldList.isEmpty()){
+// 				System.out.println("IN WHILE");
+// 				if(oldList.peekLast().hasValidControlmesh()){
+// 					System.out.println("IF");
+// 					NURBSSurface validSurface = oldList.pollLast();
+// 					System.out.println("validSurface "+validSurface.toString());
+// 					validList.add(validSurface);
+// 				}
+// 				else{
+// 					System.out.println("else");
+// 					NURBSSurface notValidSurface = oldList.pollLast();
+// 					System.out.println("notValidSurface " + notValidSurface.toString());
+// 					LinkedList<NURBSSurface> newPatches = notValidSurface.subdivideIntoFourNewPatches();
+// 					oldList.addAll(newPatches);
+// 				}
+// 			}			
+// 			return validList;
+// 		}
 		
 // 		/**
 // 		 * Newton's method

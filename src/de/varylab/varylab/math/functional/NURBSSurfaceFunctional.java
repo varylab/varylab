@@ -35,12 +35,15 @@ public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V,
 		if (E != null || G != null) {
 			double[] vpos = new double[4];
 			vpos[3] = 1.0;
+			double firstTimeDouble = System.currentTimeMillis();
 			for (V v : hds.getVertices()) {
 				FunctionalUtils.getPosition(v, x, vpos);
 				double[] pt = refSurface.getClosestPoint(vpos);
 				Pn.dehomogenize(pt, pt);
 				closestPointMap.put(v, pt);
 			}
+			double lastTimeDouble = System.currentTimeMillis();
+			System.out.println("time functional " + (lastTimeDouble - firstTimeDouble));
 		}
 		if (E != null) {
 			E.set(evaluate(hds, x));

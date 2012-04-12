@@ -44,6 +44,7 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
  * 
  * 
  */
+
 public class NURBSAlgorithm {
 	
 	private static long binomialCoefficient(int n, int k) {
@@ -593,7 +594,7 @@ public class NURBSAlgorithm {
 			for (int i = 0; i <= mp + q + 1; i++) {
 				VQ[i] = VP[i];
 			}
-			double[][] alpha = new double[p - s][r + 1]; // ??????
+			double[][] alpha = new double[p - s][r + 1]; 
 			/* save the alphas */
 			for(int j = 1; j <= r; j++){
 				/**
