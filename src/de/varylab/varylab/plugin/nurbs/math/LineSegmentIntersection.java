@@ -1,5 +1,4 @@
 package de.varylab.varylab.plugin.nurbs.math;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,8 +25,8 @@ import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
-import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
 import de.varylab.varylab.plugin.nurbs.data.Partition;
+import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
 
 public class LineSegmentIntersection {
 	
