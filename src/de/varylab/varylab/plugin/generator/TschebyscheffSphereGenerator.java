@@ -1,8 +1,6 @@
 package de.varylab.varylab.plugin.generator;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.exp;
-import static java.lang.Math.sin;
+import de.jtem.ellipticFunctions.Jacobi;
 
 import com.wolfram.jlink.KernelLink;
 import com.wolfram.jlink.MathLinkException;
@@ -10,6 +8,7 @@ import com.wolfram.jlink.MathLinkException;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.util.NativePathUtility;
@@ -57,32 +56,30 @@ public class TschebyscheffSphereGenerator extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		QuadMeshFactory qmf = new QuadMeshFactory();
-		int m = 50;
-		int n = 50;
+		int m = 40;
+		int n = 40;
 		
 		MatrixBuilder mb = MatrixBuilder.euclidean();
-		mb.scale(0.1);
+		mb.scale(3.927);
 //		mb.rotate(Math.PI/2, 0, 0, 1);
-		mb.translate(-1, -1, 0);
+//		mb.translate(-1, -1, 0);
 		Matrix T = mb.getMatrix();
 		
-//		double k = 1;
+		double k = 0.001;
 		double[][][] verts = new double[m][n][];
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < n; j++) {
-				double u = m / (double)(i+1);
-				double v = n / (double)(j+1);
+				double u = (i+1) / (double)m;
+				double v = (j+1) / (double)n;
 				double[] uvVec = {u, v, 0, 1};
 				T.transformVector(uvVec);
 				u = uvVec[0];
 				v = uvVec[1];
-//				double x = Math.sin(am(u+v, k)) * Math.cos(u-v) * k;
-//				double y = Math.sin(am(u+v, k)) * Math.sin(u-v) * k;
-//				double z = Math.cos(am(u+v, k));
-				double x = cos(u-v) * (exp(u+v) - exp(-u-v)) / (exp(u+v) + exp(-u-v));
-				double y = sin(u-v) * (exp(u+v) - exp(-u-v)) / (exp(u+v) + exp(-u-v));
-				double z = 2 / (exp(u+v) + exp(-u-v));
+				double x = sn(u+v, k) * cn(u-v, k) * k;
+				double y = sn(u+v, k) * sn(u-v, k) * k;
+				double z = cn(u+v, k) * k;
 				verts[i][j] = new double[] {x, y, z};
+				Rn.normalize(verts[i][j], verts[i][j]);
 			}
 		}
 		qmf.setVLineCount(m);
@@ -94,13 +91,12 @@ public class TschebyscheffSphereGenerator extends AlgorithmPlugin {
 		hi.update();
 	}
 
-	@SuppressWarnings("unused")
-	private double am(double u, double m) {
+	protected double Jacobi(String fun, double u, double m) {
 		KernelLink l = null;
 		try {
 			l = link.getLink();
 			l.putFunction("EvaluatePacket", 1);
-			l.putFunction("JacobiAmplitude", 2);
+			l.putFunction(fun, 2);
 			l.put(u);
 			l.put(m);
 			l.endPacket();
@@ -115,6 +111,17 @@ public class TschebyscheffSphereGenerator extends AlgorithmPlugin {
 			}
 		}
 		return 0.0;
+	}
+	
+	
+	private double sn(double u, double m) {
+		return Jacobi.sn(u, m);
+//		return Jacobi("JacobiSN", u, m);
+	}
+	
+	private double cn(double u, double m) {
+		return Jacobi.cn(u, m);
+//		return Jacobi("JacobiCN", u, m);
 	}
 	
 	public static void main(String[] args) {

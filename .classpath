@@ -30,5 +30,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
 	<classpathentry kind="lib" path="lib/HyperbolicNets.jar"/>
 	<classpathentry kind="lib" path="lib/jPETScTao.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ellipticFunctions"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mfc"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
