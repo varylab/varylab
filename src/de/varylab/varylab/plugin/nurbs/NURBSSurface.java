@@ -151,6 +151,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			return name;
 		}
 		
+		@Override
 		public String toString() {
 			String str = new String();
 			str = str + "NURBSSurface" + '\n' + "U knot vector" + '\n';

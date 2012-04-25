@@ -777,9 +777,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				DragEventTool t = new DragEventTool();
 				t.addPointDragListener(new PointDragListener() {
 	
+					@Override
 					public void pointDragStart(PointDragEvent e) {
 					}
 	//
+					@Override
 					public void pointDragged(PointDragEvent e) {
 						PointSet pointSet = e.getPointSet();
 						
@@ -792,6 +794,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				        
 					}
 	//
+					@Override
 					public void pointDragEnd(PointDragEvent e) {
 					}
 //					

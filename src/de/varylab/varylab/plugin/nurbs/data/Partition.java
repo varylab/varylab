@@ -30,6 +30,7 @@ package de.varylab.varylab.plugin.nurbs.data;
 			this.indexList = indexList;
 		}
 		
+		@Override
 		public String toString(){
 			String str = new String();
 			str = str + segList.toString() + indexList.toString();
