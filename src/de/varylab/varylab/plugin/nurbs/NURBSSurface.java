@@ -542,12 +542,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 			}
 		}
 		
-//		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
-//			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
-//			double[] proj = Rn.subtract(null, pos, v1);
-//			Rn.projectOntoComplement(proj, proj, fn);
-//			return Rn.add(null,proj,v1);
-//		}
+		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
+			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
+			double[] proj = Rn.subtract(null, pos, v1);
+			Rn.projectOntoComplement(proj, proj, fn);
+			return Rn.add(null,proj,v1);
+		}
 		
 		
 		
@@ -707,25 +707,22 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 //			return true;
 //		}
 		
-// 		private boolean isFlatEnough(double eps){
-//			double[] v1 = controlMesh[0][0];
-//			double[] v2 = controlMesh[0][controlMesh[0].length - 1];
-//			double[] v3 = controlMesh[controlMesh.length - 1][0];
-//			for (int i = 0; i < controlMesh.length; i++) {
-//				for (int j = 0; j < controlMesh[0].length; j++) {
-//					double[] proj = projectOnto(controlMesh[i][j], v1, v2, v3);
-//					double dist = Rn.euclideanDistance(proj, controlMesh[i][j]);
-//					if(dist > eps){
-//						return false;
-//					}
-//				}
-//			}
-//			return true;
-//		}
+ 		private boolean isFlatEnough(double eps){
+			double[] v1 = controlMesh[0][0];
+			double[] v2 = controlMesh[0][controlMesh[0].length - 1];
+			double[] v3 = controlMesh[controlMesh.length - 1][0];
+			for (int i = 0; i < controlMesh.length; i++) {
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					double[] proj = projectOnto(controlMesh[i][j], v1, v2, v3);
+					double dist = Rn.euclideanDistance(proj, controlMesh[i][j]);
+					if(dist > eps){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
 		
-//		public double getTime(){
-//			return time;
-//		}
  		
  		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
  			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
