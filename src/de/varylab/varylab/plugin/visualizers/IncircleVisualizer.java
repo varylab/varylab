@@ -5,6 +5,7 @@ import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_SHADER;
+import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryEdges;
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
 import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.NormalMethod.Face_Sphere;
 import static java.lang.Math.PI;
@@ -35,6 +36,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.VectorField;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -52,7 +54,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 	private JCheckBox
 		useDisks = new JCheckBox("Use Disks");
 	private SpinnerNumberModel
-		diskHeightModel = new SpinnerNumberModel(0.03, 0.001, 1.0, 0.001),
+		diskHeightModel = new SpinnerNumberModel(0.3, 0.01, 100.0, 0.01),
 		circleResModel = new SpinnerNumberModel(20, 3, 200, 1);
 	private JSpinner
 		diskHeightSpinner = new JSpinner(diskHeightModel),
@@ -112,7 +114,15 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 		}
 		for (F f : hds.getFaces()) {
 			List<V> bd = boundaryVertices(f);
+			List<E> ebd = boundaryEdges(f);
 			if (bd.size() != 4) continue;
+			double l1 = a.get(Length.class, ebd.get(0), Double.class);
+			double l2 = a.get(Length.class, ebd.get(1), Double.class);
+			double l3 = a.get(Length.class, ebd.get(2), Double.class);
+			double l4 = a.get(Length.class, ebd.get(3), Double.class);
+			double ie = l1 + l3 - l2 - l4;
+			// do we have a meaningfull incircle
+			if (ie * ie > l1 * 1E-2) continue;
 			SceneGraphComponent comp = new SceneGraphComponent("circle " + f.getIndex());
 			comp.setGeometry(geometry);
 			double[] c = ChristoffelTransform.getIncircle(f, a);

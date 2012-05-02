@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.nurbs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
@@ -707,7 +708,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 //			return true;
 //		}
 		
- 		private boolean isFlatEnough(double eps){
+ 		protected boolean isFlatEnough(double eps){
 			double[] v1 = controlMesh[0][0];
 			double[] v2 = controlMesh[0][controlMesh[0].length - 1];
 			double[] v3 = controlMesh[controlMesh.length - 1][0];
