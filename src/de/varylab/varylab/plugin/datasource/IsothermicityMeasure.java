@@ -61,9 +61,9 @@ public class IsothermicityMeasure extends Plugin {
 	}
 	
 	
-	protected class IsothermicityMeasureAdapter extends AbstractAdapter<Double> {
+	protected class SinConditionAdapter extends AbstractAdapter<Double> {
 		
-		public IsothermicityMeasureAdapter() {
+		public SinConditionAdapter() {
 			super(Double.class, true, false);
 		}
 		
@@ -73,22 +73,21 @@ public class IsothermicityMeasure extends Plugin {
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> Double getV(V v, AdapterSet a) {
-			double s = 1;
+			double sl = 1;
+			double sr = 1;
 			if (HalfEdgeUtils.isBoundaryVertex(v)) {
-				return s;
+				return 0.0;
 			}
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
 				double alphaE = a.get(CurvatureMinAngle.class, e, Double.class);
 				double alphaEPrev = a.get(CurvatureMinAngle.class, e.getPreviousEdge(), Double.class);
 				double alphaENext = a.get(CurvatureMinAngle.class, e.getNextEdge(), Double.class);
-				double sl = calculateTriangleAngle(alphaE, alphaENext, alphaEPrev);
-				double sr = calculateTriangleAngle(alphaENext, alphaEPrev, alphaE);
-				s *= sl/sr;
-//				double k1 = a.get(PrincipalCurvatureMax.class, e, Double.class);
-//				double k2 = a.get(PrincipalCurvatureMin.class, e, Double.class);
-//				s *= (k1 - k2)*(k1 - k2);
+				double slr = Math.sin(calculateTriangleAngle(alphaE, alphaEPrev, alphaENext));
+				double sll = Math.sin(calculateTriangleAngle(alphaENext, alphaEPrev, alphaE));
+				sl *= sll;
+				sr *= slr;
 			}
-			return s;
+			return (sl - sr)*(sl - sr);
 		}
 		
 		@Override
@@ -98,7 +97,7 @@ public class IsothermicityMeasure extends Plugin {
 		
 		@Override
 		public String toString() {
-			return "Isothermicity";
+			return "Sinus-Condition";
 		}
 		
 	}
@@ -125,8 +124,10 @@ public class IsothermicityMeasure extends Plugin {
 	protected double normalizeAngle(double a) {
 		a %= 2*PI;
 		if (a > PI/2) {
+			System.out.println("IsothermicityMeasure.normalizeAngle()");
 			return a - PI;
-		} else if (a < PI/2) {
+		} else if (a < -PI/2) {
+			System.out.println("IsothermicityMeasure.normalizeAngle()");
 			return PI + a;
 		} else {
 			return a;
@@ -156,7 +157,7 @@ public class IsothermicityMeasure extends Plugin {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		c.getPlugin(HalfedgeInterface.class).addAdapter(new CurvatureAngleAdapter(), true);
-		c.getPlugin(HalfedgeInterface.class).addAdapter(new IsothermicityMeasureAdapter(), true);
+		c.getPlugin(HalfedgeInterface.class).addAdapter(new SinConditionAdapter(), true);
 	}
 	
 }
