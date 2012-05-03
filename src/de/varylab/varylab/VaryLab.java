@@ -34,7 +34,6 @@ import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
-import de.varylab.varylab.plugin.datasource.IsothermicityMeasure;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
@@ -219,7 +218,6 @@ public class VaryLab {
 		v.registerPlugin(OppositeEdgesCurvature.class);
 		v.registerPlugin(OppositeAnglesCurvature.class);
 		v.registerPlugin(GeodesicCurvature.class);
-		v.registerPlugin(IsothermicityMeasure.class);
 	}
 
 
