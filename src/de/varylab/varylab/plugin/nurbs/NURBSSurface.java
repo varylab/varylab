@@ -1139,15 +1139,16 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  			if(nt == null){
  				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
  			}
- 			for (int i = 0; i < 10; i++) {
+ 			for (int i = 0; i < 11; i++) {
  				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
  				possiblePatches = getPossiblePatches(possiblePatches, point);
  				for (NURBSSurface ns : possiblePatches) {
- 					NURBSTreeNode ntn = new NURBSTreeNode(ns);
-					subdividedPatches.addAll(ntn.getAllChilds());
+					subdividedPatches.addAll(nt.getAllChilds(ns));
 				}
  				possiblePatches = subdividedPatches;
  			}
+ //			System.out.println(nt.toString());
+ 			
  			
  			for (NURBSSurface ns : possiblePatches) {
 				double[] U = ns.getUKnotVector();

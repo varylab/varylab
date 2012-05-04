@@ -14,23 +14,7 @@ public class NURBSTreeNode {
 	private NURBSTreeNode fourthChild;
 	
 	
-	public NURBSTreeNode() {
-		this.ns = null;
-		this.bezierList = null;
-		this.firstChild = null;
-		this.secondChild = null;
-		this.thirdChild = null;
-		this.fourthChild = null;
-	}
-	
-//	public NURBSTreeNode(LinkedList<NURBSTreeNode> bezierList) {
-//		this.ns = null;
-//		this.bezierList = bezierList;
-//		this.firstChild = null;
-//		this.secondChild = null;
-//		this.thirdChild = null;
-//		this.fourthChild = null;
-//	}
+
 	
 	public NURBSTreeNode(LinkedList<NURBSSurface> bezierList) {
 		this.ns = null;
@@ -55,19 +39,6 @@ public class NURBSTreeNode {
 		this.fourthChild = null;
 	}
 	
-//	public boolean ListEquals(double u0, double v0, double u1, double v1){
-//		double u0Check = getNs().getUKnotVector()[0];
-//		double v0Check = getNs().getVKnotVector()[0];
-//		double u1Check = getNs().getUKnotVector()[getNs().getUKnotVector().length - 1];
-//		double v1Check = getNs().getVKnotVector()[getNs().getVKnotVector().length - 1];
-//		if(u0 == u0Check || v0 == v0Check || u1 == u1Check || v1 == v1Check){
-//			return true;
-//		}
-//		else{
-//			return false;
-//		}
-//		
-//	}
 	
 	public LinkedList<NURBSSurface> getAllChilds(){
 		LinkedList<NURBSSurface> childs = new LinkedList<NURBSSurface>();
@@ -76,8 +47,10 @@ public class NURBSTreeNode {
 			childs.add(secondChild.getNs());
 			childs.add(thirdChild.getNs());
 			childs.add(fourthChild.getNs());
+//			System.out.println("kinder sind schon da!!");
 		}
 		else{
+//			System.out.println("kinder sind noch nicht da!!");
 			LinkedList<NURBSSurface> nsList = getNs().subdivideIntoFourNewPatches();
 			childs.addAll(nsList);
 			NURBSTreeNode first  = new NURBSTreeNode(nsList.getFirst());
@@ -99,8 +72,10 @@ public class NURBSTreeNode {
 			childs.add(secondChild);
 			childs.add(thirdChild);
 			childs.add(fourthChild);
+//			System.out.println("schon kinder da!!");
 		}
 		else{
+//			System.out.println("kinder sind noch nicht da!!");
 			LinkedList<NURBSSurface> nsList = getNs().subdivideIntoFourNewPatches();
 			NURBSTreeNode first  = new NURBSTreeNode(nsList.getFirst());
 			setFirstChild(first);
@@ -143,7 +118,7 @@ public class NURBSTreeNode {
 		double ntnU1 = ntn.getU1();
 		double ntnV0 = ntn.getV0();
 		double ntnV1 = ntn.getV1();
-		if(u0 == ntnU0 || u1 == ntnU1 || v0 == ntnV0 || v1 == ntnV1){
+		if(u0 == ntnU0 && u1 == ntnU1 && v0 == ntnV0 && v1 == ntnV1){
 			return true;
 		}
 		else{
@@ -160,7 +135,7 @@ public class NURBSTreeNode {
 		double ntnU1 = ntn.getU1();
 		double ntnV0 = ntn.getV0();
 		double ntnV1 = ntn.getV1();
-		if(u0 >= ntnU0 || u1 <= ntnU1 || v0 >= ntnV0 || v1 <= ntnV1){
+		if(u0 >= ntnU0 && u1 <= ntnU1 && v0 >= ntnV0 && v1 <= ntnV1){
 			return true;
 		}
 		else{
