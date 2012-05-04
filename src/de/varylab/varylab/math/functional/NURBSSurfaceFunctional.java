@@ -15,6 +15,7 @@ import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.data.NURBSTree;
 
 public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>>
 		implements Functional<V, E, F> {
@@ -36,9 +37,11 @@ public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V,
 			double[] vpos = new double[4];
 			vpos[3] = 1.0;
 			double firstTimeDouble = System.currentTimeMillis();
+			NURBSTree nt = null;
 			for (V v : hds.getVertices()) {
-				FunctionalUtils.getPosition(v, x, vpos);
-				double[] pt = refSurface.getClosestPoint(vpos);
+//				FunctionalUtils.getPosition(v, x, vpos);
+//				double[] pt = refSurface.getClosestPoint(vpos);
+				double[] pt = refSurface.getClosestPointWithTree(vpos, nt);
 				Pn.dehomogenize(pt, pt);
 				closestPointMap.put(v, pt);
 			}

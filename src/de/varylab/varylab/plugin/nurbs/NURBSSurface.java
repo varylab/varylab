@@ -6,6 +6,8 @@ import java.util.LinkedList;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
+import de.varylab.varylab.plugin.nurbs.data.NURBSTree;
+import de.varylab.varylab.plugin.nurbs.data.NURBSTreeNode;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 
@@ -13,12 +15,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 
 	public class NURBSSurface {
 //		private double time = 0.0;
-		protected double[] U;
-		protected double[] V;
-		protected LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
-		protected LinkedList<NURBSTrimLoop> holeC = new LinkedList<NURBSTrimLoop>();
-		protected double[][][] controlMesh;
-		protected int p, q;
+		private double[] U;
+		private double[] V;
+		private LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
+		private LinkedList<NURBSTrimLoop> holeC = new LinkedList<NURBSTrimLoop>();
+		private double[][][] controlMesh;
+		private int p, q;
 		private String name = "Nurbs Surface";
 
 		public NURBSSurface() {
@@ -737,24 +739,33 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  			return newPatches;
  		}
  		
- 		private static int binomialCoefficient(int n, int k) {
- 			if (n - k == 1 || k == 1)
- 				return n;
-
- 			long[][] b = new long[n + 1][n - k + 1];
- 			b[0][0] = 1;
- 			for (int i = 1; i < b.length; i++) {
- 				for (int j = 0; j < b[i].length; j++) {
- 					if (i == j || j == 0)
- 						b[i][j] = 1;
- 					else if (j == 1 || i - j == 1)
- 						b[i][j] = i;
- 					else
- 						b[i][j] = b[i - 1][j - 1] + b[i - 1][j];
- 				}
- 			}
- 			return (int)b[n][n - k];
+ 		public NURBSSurface[] subdivideIntoFourNewPatchestoArray(){
+ 			NURBSSurface[] newPatches = new NURBSSurface[4];
+ 			LinkedList<NURBSSurface> list = subdivideIntoFourNewPatches();
+ 			for (int i = 0; i < newPatches.length; i++) {
+				newPatches[i] = list.get(i);
+			}
+ 			return newPatches;
  		}
+ 		
+// 		private static int binomialCoefficient(int n, int k) {
+// 			if (n - k == 1 || k == 1)
+// 				return n;
+//
+// 			long[][] b = new long[n + 1][n - k + 1];
+// 			b[0][0] = 1;
+// 			for (int i = 1; i < b.length; i++) {
+// 				for (int j = 0; j < b[i].length; j++) {
+// 					if (i == j || j == 0)
+// 						b[i][j] = 1;
+// 					else if (j == 1 || i - j == 1)
+// 						b[i][j] = i;
+// 					else
+// 						b[i][j] = b[i - 1][j - 1] + b[i - 1][j];
+// 				}
+// 			}
+// 			return (int)b[n][n - k];
+// 		}
 
  		
  
@@ -1121,26 +1132,24 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			return p;
 		}
  		
- 		public double[] getClosestPointNewton(double[] point){
- 
+ 		public double[] getClosestPointWithTree(double[] point, NURBSTree nt){
+ 			double[] p = new double[3];
 			double dist = Double.MAX_VALUE;
-			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
-//			NURBSSurface original = possiblePatches.getFirst();
-			
-		
-			for (int i = 0; i < 12; i++) {
-				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
-				possiblePatches = getPossiblePatches(possiblePatches, point);
-				for (NURBSSurface ns : possiblePatches) {
-					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
+ 			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
+ 			if(nt == null){
+ 				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
+ 			}
+ 			for (int i = 0; i < 10; i++) {
+ 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+ 				possiblePatches = getPossiblePatches(possiblePatches, point);
+ 				for (NURBSSurface ns : possiblePatches) {
+ 					NURBSTreeNode ntn = new NURBSTreeNode(ns);
+					subdividedPatches.addAll(ntn.getAllChilds());
 				}
-				possiblePatches = subdividedPatches;
-//				System.out.println("Listenlaenge nach " + i + " Schritten: " + possiblePatches.size());
-			}
-//			NURBSSurface bestSurface = new NURBSSurface();
-			double uStart = 0.;
-			double vStart = 0.;
-			for (NURBSSurface ns : possiblePatches) {
+ 				possiblePatches = subdividedPatches;
+ 			}
+ 			
+ 			for (NURBSSurface ns : possiblePatches) {
 				double[] U = ns.getUKnotVector();
 				double[] V = ns.getVKnotVector();
 				double u = (U[0] + U[U.length - 1]) / 2;
@@ -1149,18 +1158,55 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 				double[] surfPoint = get3DPoint(homogSurfPoint);
 				if(dist > Rn.euclideanDistance(surfPoint, point)){
 					dist = Rn.euclideanDistance(surfPoint, point);
-					uStart = u;
-					vStart = v;
+					p = homogSurfPoint;
 				}
 			}
+ 			return p;
+ 		}
+ 		
+// 		public double[] getClosestPoint(double[] point){
+// 
+//			double dist = Double.MAX_VALUE;
+//			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
+////			NURBSSurface original = possiblePatches.getFirst();
+//			
+//		
+//			for (int i = 0; i < 12; i++) {
+//				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+//				possiblePatches = getPossiblePatches(possiblePatches, point);
+//				for (NURBSSurface ns : possiblePatches) {
+//					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
+//				}
+//				possiblePatches = subdividedPatches;
+////				System.out.println("Listenlaenge nach " + i + " Schritten: " + possiblePatches.size());
+//			}
+////			NURBSSurface bestSurface = new NURBSSurface();
+//			double uStart = 0.;
+//			double vStart = 0.;
+//			for (NURBSSurface ns : possiblePatches) {
+//				double[] U = ns.getUKnotVector();
+//				double[] V = ns.getVKnotVector();
+//				double u = (U[0] + U[U.length - 1]) / 2;
+//				double v = (V[0] + V[V.length - 1]) / 2;
+//				double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+//				double[] surfPoint = get3DPoint(homogSurfPoint);
+//				if(dist > Rn.euclideanDistance(surfPoint, point)){
+//					dist = Rn.euclideanDistance(surfPoint, point);
+//					uStart = u;
+//					vStart = v;
+//				}
+//			}
+//
+//			return newtonMethod(point, 0.001);
+//		}
+ 		
+ 		
 
-			return newtonMethod(uStart, vStart, point, 0.001);
-		}
  		
 		
-		private double[] newtonMethod(double u, double v, double[] P, double eps){
-//			double u = (U[U.length - 1] + U[0]) / 2;
-//			double v = (V[V.length - 1] + V[0]) / 2;
+		private double[] newtonMethod(double[] P, double eps){
+			double u = (U[U.length - 1] + U[0]) / 2;
+			double v = (V[V.length - 1] + V[0]) / 2;
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
 //			double[] S = getSurfacePoint(u, v);
 			double[] S3D = get3DPoint(getSurfacePoint(u, v));
@@ -1176,9 +1222,9 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			double fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
 			double fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
 			double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
-			for(int i = 0; i < 10; i++){
+			for(int i = 0; i < 12; i++){
 				if(Rn.euclideanDistanceSquared(S3D, P3D) < eps){
-					System.out.println(" genauigkeit erreicht");
+//					System.out.println(" genauigkeit erreicht");
 					return S3D;
 				}
 				else{
@@ -1205,7 +1251,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 					}
 					if(notInPatch){
 //						System.out.println();
-						System.out.println("not in patch");
+//						System.out.println("not in patch");
 //						System.out.println();
 //						S = getSurfacePoint(u, v);
 						return get3DPoint(getSurfacePoint(u, v));
@@ -1225,7 +1271,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 					gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 				}
 			}
-			System.out.println("am ende");
+//			System.out.println("am ende");
 			return S3D;
 		}
 	

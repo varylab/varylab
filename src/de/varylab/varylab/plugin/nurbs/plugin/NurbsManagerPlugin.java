@@ -89,6 +89,7 @@ import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.data.NURBSTree;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
@@ -897,8 +898,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //	        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
 //	        point = points[0];
 //	        System.out.println("point after dragging: " + Arrays.toString(point));
-			
-			double[] surfacePoint = ns.getClosestPoint(point);
+			NURBSTree nt = null;
+			double[] surfacePoint = ns.getClosestPointWithTree(point, nt);
 			System.out.println("closest point: " + Arrays.toString(surfacePoint));
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
@@ -922,7 +923,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			ipointShaderPoint.setDiffuseColor(Color.red);
 			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
 			
-			double[] surfacePointn = ns.getClosestPointNewton(point);
+			double[] surfacePointn = ns.getClosestPoint(point);
 			System.out.println("closest point: " + Arrays.toString(surfacePointn));
 			HalfedgeLayer surfPointn = new HalfedgeLayer(hif);
 			surfPointn.setName("Pointn ");
