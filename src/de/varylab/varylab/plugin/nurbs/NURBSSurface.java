@@ -1140,7 +1140,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
  			}
  			for (int i = 0; i < 12; i++) {
- 				if(i > 5){
+ 				if(i > 1){
  					double uStart = 0.;
  					double vStart = 0.;
  					for (NURBSSurface ns : possiblePatches) {
