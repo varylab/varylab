@@ -900,7 +900,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //	        System.out.println("point after dragging: " + Arrays.toString(point));
 			NURBSTree nt = null;
 			double[] surfacePoint = ns.getClosestPointWithTree(point, nt);
-			System.out.println("closest point: " + Arrays.toString(surfacePoint));
+			System.out.println("closest point with tree: " + Arrays.toString(surfacePoint));
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
 //			

@@ -1139,7 +1139,29 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  			if(nt == null){
  				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
  			}
- 			for (int i = 0; i < 11; i++) {
+ 			for (int i = 0; i < 12; i++) {
+ 				if(i > 5){
+ 					double uStart = 0.;
+ 					double vStart = 0.;
+ 					for (NURBSSurface ns : possiblePatches) {
+ 						double[] U = ns.getUKnotVector();
+ 						double[] V = ns.getVKnotVector();
+ 						double u = (U[0] + U[U.length - 1]) / 2;
+ 						double v = (V[0] + V[V.length - 1]) / 2;
+ 						double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+ 						double[] surfPoint = get3DPoint(homogSurfPoint);
+ 						if(dist > Rn.euclideanDistance(surfPoint, point)){
+ 							dist = Rn.euclideanDistance(surfPoint, point);
+ 							uStart = u;
+ 							vStart = v;
+ 						}
+ 					}
+ 					double[] result = newtonMethod(point, 0.001, uStart, vStart);
+ 					if(result != null){
+ 						return result;
+ 					}
+ 				}
+ 				
  				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
  				possiblePatches = getPossiblePatches(possiblePatches, point);
  				for (NURBSSurface ns : possiblePatches) {
@@ -1205,11 +1227,11 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 
  		
 		
-		private double[] newtonMethod(double[] P, double eps){
-			double u = (U[U.length - 1] + U[0]) / 2;
-			double v = (V[V.length - 1] + V[0]) / 2;
+		private double[] newtonMethod(double[] P, double eps,double u, double v){
+//			double u = (U[U.length - 1] + U[0]) / 2;
+//			double v = (V[V.length - 1] + V[0]) / 2;
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-//			double[] S = getSurfacePoint(u, v);
+			double[] S = getSurfacePoint(u, v);
 			double[] S3D = get3DPoint(getSurfacePoint(u, v));
 			double[] P3D = get3DPoint(P);
 			double[] r = Rn.subtract(null, S3D, P3D);
@@ -1255,9 +1277,11 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 //						System.out.println("not in patch");
 //						System.out.println();
 //						S = getSurfacePoint(u, v);
-						return get3DPoint(getSurfacePoint(u, v));
+						return null;
+//						return get3DPoint(getSurfacePoint(u, v));
 					}
 					ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
+					S = getSurfacePoint(u, v);
 					S3D = get3DPoint(getSurfacePoint(u, v));
 					r = Rn.subtract(null, S3D, P);
 					Su = ci.getSu();
@@ -1273,7 +1297,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 				}
 			}
 //			System.out.println("am ende");
-			return S3D;
+			return S;
 		}
 	
 		
