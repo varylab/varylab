@@ -1,5 +1,7 @@
 package de.varylab.varylab;
 
+import java.util.Arrays;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -26,6 +28,7 @@ import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
+import de.jtem.jtao.Tao;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
@@ -282,7 +285,6 @@ public class VaryLab {
 	}
 	
 	public static void startup() {
-		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
 		StaticSetup.includePluginJars();
 		StaticSetup.includeLibraryJars();
@@ -312,6 +314,16 @@ public class VaryLab {
 		System.out.println("Welcome to Varylab.");
 	}
 	
+	static {
+		NativePathUtility.set("native");
+		String[] taoCommand = new String[] {
+			"-tao_nm_lamda", "0.01", 
+			"-tao_nm_mu", "1.0",
+//			"-tao_fd_gradient", "1E-6"
+		};
+		System.out.println("initing tao: " + Arrays.toString(taoCommand));
+		Tao.Initialize("Tao Varylab", taoCommand, false);
+	}
 	
 	public static void main(String[] args) throws Exception {
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "VaryLab[Ultimate]");
