@@ -899,7 +899,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //	        point = points[0];
 //	        System.out.println("point after dragging: " + Arrays.toString(point));
 			NURBSTree nt = null;
-			double[] surfacePoint = ns.getClosestPointWithTree(point, nt);
+			double[] surfacePoint = ns.getClosestPoint(point, nt);
 			System.out.println("closest point with tree: " + Arrays.toString(surfacePoint));
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
@@ -922,30 +922,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			DefaultPointShader ipointShaderPoint = (DefaultPointShader)idgsPoint.getPointShader();
 			ipointShaderPoint.setDiffuseColor(Color.red);
 			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
-			
-			double[] surfacePointn = ns.getClosestPoint(point);
-			System.out.println("closest point: " + Arrays.toString(surfacePointn));
-			HalfedgeLayer surfPointn = new HalfedgeLayer(hif);
-			surfPointn.setName("Pointn ");
-//			
-			hif.addLayer(surfPointn);
-			hif.update();
-			PointSetFactory psfPointn = new PointSetFactory();
-			
-			psfPointn.setVertexCount(1);
-			
-			psfPointn.setVertexCoordinates(surfacePointn);
-			psfPointn.update();
-			SceneGraphComponent sgcPointn = new SceneGraphComponent("closest pointn");
-			SceneGraphComponent PointCompn = new SceneGraphComponent("PointComponentn");
-			sgcPointn.addChild(PointCompn);
-			sgcPointn.setGeometry(psfPointn.getGeometry());
-			Appearance iAPointn = new Appearance();
-			sgcPointn.setAppearance(iAPointn);
-			DefaultGeometryShader idgsPointn = ShaderUtility.createDefaultGeometryShader(iAPointn, false);
-			DefaultPointShader ipointShaderPointn = (DefaultPointShader)idgsPointn.getPointShader();
-			ipointShaderPointn.setDiffuseColor(Color.blue);
-			hif.getActiveLayer().addTemporaryGeometry(sgcPointn);
 			
 			return point;
 			

@@ -48,30 +48,6 @@ public class NURBSTreeNode {
 	}
 	
 	
-	public LinkedList<NURBSSurface> getAllChilds(){
-		LinkedList<NURBSSurface> childs = new LinkedList<NURBSSurface>();
-		if(getFirstChild() != null){
-			childs.add(firstChild.getNs());
-			childs.add(secondChild.getNs());
-			childs.add(thirdChild.getNs());
-			childs.add(fourthChild.getNs());
-//			System.out.println("kinder sind schon da!!");
-		}
-		else{
-//			System.out.println("kinder sind noch nicht da!!");
-			LinkedList<NURBSSurface> nsList = getNs().subdivideIntoFourNewPatches();
-			childs.addAll(nsList);
-			NURBSTreeNode first  = new NURBSTreeNode(nsList.getFirst());
-			setFirstChild(first);
-			NURBSTreeNode second  = new NURBSTreeNode(nsList.get(1));
-			setSecondChild(second);
-			NURBSTreeNode third  = new NURBSTreeNode(nsList.get(2));
-			setThirdChild(third);
-			NURBSTreeNode fourth  = new NURBSTreeNode(nsList.getLast());
-			setFourthChild(fourth);
-		}
-		return childs;
-	}
 	
 	public LinkedList<NURBSTreeNode> getAllChildNodes(){
 		LinkedList<NURBSTreeNode> childs = new LinkedList<NURBSTreeNode>();
@@ -80,10 +56,8 @@ public class NURBSTreeNode {
 			childs.add(secondChild);
 			childs.add(thirdChild);
 			childs.add(fourthChild);
-//			System.out.println("schon kinder da!!");
 		}
 		else{
-//			System.out.println("kinder sind noch nicht da!!");
 			LinkedList<NURBSSurface> nsList = getNs().subdivideIntoFourNewPatches();
 			NURBSTreeNode first  = new NURBSTreeNode(nsList.getFirst());
 			setFirstChild(first);
@@ -117,69 +91,13 @@ public class NURBSTreeNode {
 		return ns.getVKnotVector()[ns.getVKnotVector().length - 1];
 	}
 	
-	public boolean equals(NURBSTreeNode ntn){
-		double u0 = getU0();
-		double u1 = getU1();
-		double v0 = getV0();
-		double v1 = getV1();
-		double ntnU0 = ntn.getU0();
-		double ntnU1 = ntn.getU1();
-		double ntnV0 = ntn.getV0();
-		double ntnV1 = ntn.getV1();
-		if(u0 == ntnU0 && u1 == ntnU1 && v0 == ntnV0 && v1 == ntnV1){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	
-	public boolean isInside(NURBSTreeNode ntn){
-		double u0 = getU0();
-		double u1 = getU1();
-		double v0 = getV0();
-		double v1 = getV1();
-		double ntnU0 = ntn.getU0();
-		double ntnU1 = ntn.getU1();
-		double ntnV0 = ntn.getV0();
-		double ntnV1 = ntn.getV1();
-		if(u0 >= ntnU0 && u1 <= ntnU1 && v0 >= ntnV0 && v1 <= ntnV1){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	
-	public NURBSTreeNode childContainsThisNode(NURBSTreeNode ntn){
-		if(isInside(ntn.getFirstChild())){
-			return ntn.getFirstChild();
-		}
-		else if(isInside(ntn.getSecondChild())){
-			return ntn.getSecondChild();
-		}
-		else if(isInside(ntn.getThirdChild())){
-			return ntn.getThirdChild();
-		}
-		else if(isInside(ntn.getFourthChild())){
-			return ntn.getFourthChild();
-		}
-		else{
-			return null;
-		}
-	}
-	
-	
 	public NURBSSurface getNs() {
 		return ns;
 	}
-	
-
 
 	public void setNs(NURBSSurface ns) {
 		this.ns = ns;
-	}
-	
+	}	
 
 	public LinkedList<NURBSTreeNode> getBezierList() {
 		return bezierList;
