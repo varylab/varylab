@@ -618,7 +618,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  			}
  			LinkedList<NURBSTreeNode> possiblePatches = nt.getDummy().getBezierList();
  			for (int i = 0; i < 12; i++) {
- 				if(i > 1){
+ 				if(i > 1 && i < 5){
  					double uStart = 0.;
  					double vStart = 0.;
  					for (NURBSTreeNode ntn : possiblePatches) {
@@ -635,7 +635,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  						}
  					}
  					
- 					double[] result = newtonMethod(point, 0.0000000001, uStart, vStart);
+ 					double[] result = newtonMethod(point, 0.00000001, uStart, vStart);
  					if(result != null){
 // 						if(i > 2){
 // 							System.out.println("besserer starpunktnach 2 iterarionen");
@@ -690,38 +690,32 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 			double deltaU = Double.MAX_VALUE;
 			double deltaV = Double.MAX_VALUE;
-			for(int i = 0; i < 12; i++){
-//				if(f < eps && g < eps && deltaU < eps && deltaV < eps){
-				if(false){
-					return S3D;
+			for(int i = 0; i < 10; i++){
+				deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
+				deltaU = -((f + (fv * deltaV)) / fu);
+				u = deltaU + u;
+				v = deltaV + v;
+				boolean notInPatch = false;
+				if(u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1]){
+					notInPatch = true;
 				}
-				else{
-					deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
-					deltaU = -((f + (fv * deltaV)) / fu);
-					u = deltaU + u;
-					v = deltaV + v;
-					boolean notInPatch = false;
-					if(u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1]){
-						notInPatch = true;
-					}
-					if(notInPatch){
-						return null;
-					}
-					ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-					S = getSurfacePoint(u, v);
-					S3D = get3DPoint(getSurfacePoint(u, v));
-					r = Rn.subtract(null, S3D, P);
-					Su = ci.getSu();
-					Sv = ci.getSv();
-					Suu = ci.getSuu();
-					Suv = ci.getSuv();
-					Svv = ci.getSvv();
-					f = Rn.innerProduct(r, Su);
-					g = Rn.innerProduct(r, Sv);
-					fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
-					fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
-					gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
+				if(notInPatch){
+					return null;
 				}
+				ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
+				S = getSurfacePoint(u, v);
+				S3D = get3DPoint(getSurfacePoint(u, v));
+				r = Rn.subtract(null, S3D, P);
+				Su = ci.getSu();
+				Sv = ci.getSv();
+				Suu = ci.getSuu();
+				Suv = ci.getSuv();
+				Svv = ci.getSvv();
+				f = Rn.innerProduct(r, Su);
+				g = Rn.innerProduct(r, Sv);
+				fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
+				fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
+				gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 			}
 			return S;
 		}
