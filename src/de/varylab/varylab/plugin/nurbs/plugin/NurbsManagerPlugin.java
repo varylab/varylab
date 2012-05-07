@@ -735,7 +735,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		boolean pointCreated = false;
 		
-		private double[] point = {1,3,1,1};
+		private double[] point = {1,12,1,1};
 		
 		public PointDistancePanel() {
 			super("Point Distance");

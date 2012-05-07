@@ -38,17 +38,27 @@ public class NURBSTree {
 		}
 		return null;
 	}
-	
-	public String toString(){
-		String str = new String();
-		
-		for (NURBSTreeNode listNode : dummy.getBezierList()) {
-//			str = str + listNode.getNs().toString();
-			str = str + "jetzt kommt 1. kind";
-			str = str + listNode.getFirstChild().getNs().toString();
-		}
-		return str;
-		
+
+	public NURBSTreeNode getDummy() {
+		return dummy;
 	}
+
+	public void setDummy(NURBSTreeNode dummy) {
+		this.dummy = dummy;
+	}
+	
+	
+	
+//	public String toString(){
+//		String str = new String();
+//		
+//		for (NURBSTreeNode listNode : dummy.getBezierList()) {
+////			str = str + listNode.getNs().toString();
+//			str = str + "jetzt kommt 1. kind";
+//			str = str + listNode.getFirstChild().getNs().toString();
+//		}
+//		return str;
+//		
+//	}
 
 }

@@ -463,6 +463,18 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			return surfaceList;
 		}
 		
+		public LinkedList<NURBSTreeNode> decomposeIntoBezierTreeNodeList(){
+			LinkedList<NURBSTreeNode> treeNodeList = new LinkedList<NURBSTreeNode>();
+			NURBSSurface[][] Bezier = decomposeIntoBezierSurfaces();
+			for (int i = 0; i < Bezier.length; i++) {
+				for (int j = 0; j < Bezier[0].length; j++) {
+					NURBSTreeNode ntn = new NURBSTreeNode(Bezier[i][j]);
+					treeNodeList.add(ntn);
+				}
+			}
+			return treeNodeList;
+		}
+		
 		
 		/**
 		 * 
@@ -1065,6 +1077,20 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  			return closestPatch;
  		}
  		
+ 		private static NURBSTreeNode getClosestPatch(LinkedList<NURBSTreeNode> treeNodeList, double[] point){
+ 			double[] p = get3DPoint(point);
+ 			double minDist = Double.MAX_VALUE;
+ 			NURBSTreeNode closestPatch = new NURBSTreeNode();
+ 			for (NURBSTreeNode ntn : treeNodeList) {
+ 				double[] minSurfPoint = get3DPoint(ntn.getNs().getMinControlPoint(point));
+				if(minDist > Rn.euclideanDistance(p, minSurfPoint)){
+					minDist = Rn.euclideanDistance(p, minSurfPoint);
+					closestPatch = ntn;
+				}
+			}
+ 			return closestPatch;
+ 		}
+ 		
  		private static LinkedList<NURBSSurface> getPossiblePatches(LinkedList<NURBSSurface> surfList, double[] point){
  			double[] p = get3DPoint(point);
  			NURBSSurface closestPatch = getClosestPatch(surfList, point);
@@ -1078,6 +1104,21 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			}
  			return possiblePatches ;
  		}
+ 		
+ 		private static LinkedList<NURBSTreeNode> getPossiblePatches1(LinkedList<NURBSTreeNode> treeNodeList, double[] point){
+ 			double[] p = get3DPoint(point);
+ 			NURBSTreeNode closestPatch = getClosestPatch(treeNodeList, point);
+ 			double[] maxPoint = get3DPoint(closestPatch.getNs().getMaxControlPoint(point));
+ 			double closestMaxDistance = Rn.euclideanDistance(p, maxPoint);
+ 			LinkedList<NURBSTreeNode> possiblePatches = new LinkedList<NURBSTreeNode>();
+ 			for (NURBSTreeNode ntn : treeNodeList) {
+				 if(!ntn.getNs().isImpossiblePatch(point, closestMaxDistance)){
+					 possiblePatches.add(ntn);
+				 }
+			}
+ 			return possiblePatches ;
+ 		}
+ 	
  		
 // 		private static LinkedList<NURBSSurface> subdivideUntilEveryPatchIsFlatEnough(LinkedList<NURBSSurface> surfList, double eps){
 // 			LinkedList<NURBSSurface> flatList = new LinkedList<NURBSSurface>();
@@ -1132,23 +1173,83 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			return p;
 		}
  		
- 		public double[] getClosestPointWithTree(double[] point, NURBSTree nt){
+// 		public double[] getClosestPointWithTree(double[] point, NURBSTree nt){
+// 			double[] p = new double[3];
+//			double dist = Double.MAX_VALUE;
+// 			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
+// 			if(nt == null){
+// 				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
+// 			}
+// 			for (int i = 0; i < 12; i++) {
+// 				if(i > 0){
+// 					double uStart = 0.;
+// 					double vStart = 0.;
+// 					for (NURBSSurface ns : possiblePatches) {
+// 						double[] U = ns.getUKnotVector();
+// 						double[] V = ns.getVKnotVector();
+// 						double u = (U[0] + U[U.length - 1]) / 2;
+// 						double v = (V[0] + V[V.length - 1]) / 2;
+// 						double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+// 						double[] surfPoint = get3DPoint(homogSurfPoint);
+// 						if(dist > Rn.euclideanDistance(surfPoint, point)){
+// 							dist = Rn.euclideanDistance(surfPoint, point);
+// 							uStart = u;
+// 							vStart = v;
+// 						}
+// 					}
+// 					
+// 					double[] result = newtonMethod(point, 0.0001, uStart, vStart);
+// 					if(result != null){
+// 						if(i > 2){
+// 							System.out.println("besserer starpunktnach 2 iterarionen");
+// 						}
+// 						return result;
+// 					}
+// 				}
+// 				
+// 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+// 				possiblePatches = getPossiblePatches(possiblePatches, point);
+// 				for (NURBSSurface ns : possiblePatches) {
+//					subdividedPatches.addAll(nt.getAllChilds(ns));
+//				}
+// 				possiblePatches = subdividedPatches;
+// 			}
+// //			System.out.println(nt.toString());
+// 			
+// 			
+// 			for (NURBSSurface ns : possiblePatches) {
+//				double[] U = ns.getUKnotVector();
+//				double[] V = ns.getVKnotVector();
+//				double u = (U[0] + U[U.length - 1]) / 2;
+//				double v = (V[0] + V[V.length - 1]) / 2;
+//				double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+//				double[] surfPoint = get3DPoint(homogSurfPoint);
+//				if(dist > Rn.euclideanDistance(surfPoint, point)){
+//					dist = Rn.euclideanDistance(surfPoint, point);
+//					p = homogSurfPoint;
+//				}
+//			}
+// 			return p;
+// 		}
+ 		
+ 		
+		public double[] getClosestPointWithTree(double[] point, NURBSTree nt){
  			double[] p = new double[3];
 			double dist = Double.MAX_VALUE;
- 			LinkedList<NURBSSurface> possiblePatches = decomposeIntoBezierSurfacesList();
  			if(nt == null){
  				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
  			}
+ 			LinkedList<NURBSTreeNode> possiblePatches = nt.getDummy().getBezierList();
  			for (int i = 0; i < 12; i++) {
  				if(i > 1){
  					double uStart = 0.;
  					double vStart = 0.;
- 					for (NURBSSurface ns : possiblePatches) {
- 						double[] U = ns.getUKnotVector();
- 						double[] V = ns.getVKnotVector();
+ 					for (NURBSTreeNode ntn : possiblePatches) {
+ 						double[] U = ntn.getNs().getUKnotVector();
+ 						double[] V = ntn.getNs().getVKnotVector();
  						double u = (U[0] + U[U.length - 1]) / 2;
  						double v = (V[0] + V[V.length - 1]) / 2;
- 						double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+ 						double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
  						double[] surfPoint = get3DPoint(homogSurfPoint);
  						if(dist > Rn.euclideanDistance(surfPoint, point)){
  							dist = Rn.euclideanDistance(surfPoint, point);
@@ -1156,28 +1257,32 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  							vStart = v;
  						}
  					}
- 					double[] result = newtonMethod(point, 0.001, uStart, vStart);
+ 					
+ 					double[] result = newtonMethod(point, 0.0001, uStart, vStart);
  					if(result != null){
+ 						if(i > 2){
+// 							System.out.println("besserer starpunktnach 2 iterarionen");
+ 						}
  						return result;
  					}
  				}
  				
- 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
- 				possiblePatches = getPossiblePatches(possiblePatches, point);
- 				for (NURBSSurface ns : possiblePatches) {
-					subdividedPatches.addAll(nt.getAllChilds(ns));
+ 				LinkedList<NURBSTreeNode> subdividedPatches = new LinkedList<NURBSTreeNode>();
+ 				possiblePatches = getPossiblePatches1(possiblePatches, point);
+ 				for (NURBSTreeNode ntn : possiblePatches) {
+					subdividedPatches.addAll(ntn.getAllChildNodes());
 				}
  				possiblePatches = subdividedPatches;
  			}
  //			System.out.println(nt.toString());
  			
  			
- 			for (NURBSSurface ns : possiblePatches) {
-				double[] U = ns.getUKnotVector();
-				double[] V = ns.getVKnotVector();
+ 			for (NURBSTreeNode ntn : possiblePatches) {
+				double[] U = ntn.getNs().getUKnotVector();
+				double[] V = ntn.getNs().getVKnotVector();
 				double u = (U[0] + U[U.length - 1]) / 2;
 				double v = (V[0] + V[V.length - 1]) / 2;
-				double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+				double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
 				double[] surfPoint = get3DPoint(homogSurfPoint);
 				if(dist > Rn.euclideanDistance(surfPoint, point)){
 					dist = Rn.euclideanDistance(surfPoint, point);
@@ -1186,6 +1291,65 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			}
  			return p;
  		}
+ 		
+// 		public double[] getClosestPointWithTree1(double[] point, NURBSTree nt){
+// 			double[] p = new double[3];
+//			double dist = Double.MAX_VALUE;
+// 			LinkedList<NURBSTreeNode> possiblePatches = decomposeIntoBezierTreeNodeList();
+// 			if(nt == null){
+// 				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
+// 			}
+// 			for (int i = 0; i < 12; i++) {
+// 				if(i > 0){
+// 					double uStart = 0.;
+// 					double vStart = 0.;
+// 					for (NURBSTreeNode ntn : possiblePatches) {
+// 						double[] U = ntn.getNs().getUKnotVector();
+// 						double[] V = ntn.getNs().getVKnotVector();
+// 						double u = (U[0] + U[U.length - 1]) / 2;
+// 						double v = (V[0] + V[V.length - 1]) / 2;
+// 						double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
+// 						double[] surfPoint = get3DPoint(homogSurfPoint);
+// 						if(dist > Rn.euclideanDistance(surfPoint, point)){
+// 							dist = Rn.euclideanDistance(surfPoint, point);
+// 							uStart = u;
+// 							vStart = v;
+// 						}
+// 					}
+// 					
+// 					double[] result = newtonMethod(point, 0.0001, uStart, vStart);
+// 					if(result != null){
+// 						if(i > 2){
+// 							System.out.println("besserer starpunktnach 2 iterarionen");
+// 						}
+// 						return result;
+// 					}
+// 				}
+// 				
+// 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+// 				possiblePatches = getPossiblePatches(possiblePatches, point);
+// 				for (NURBSSurface ns : possiblePatches) {
+//					subdividedPatches.addAll(nt.getAllChilds(ns));
+//				}
+// 				possiblePatches = subdividedPatches;
+// 			}
+// //			System.out.println(nt.toString());
+// 			
+// 			
+// 			for (NURBSSurface ns : possiblePatches) {
+//				double[] U = ns.getUKnotVector();
+//				double[] V = ns.getVKnotVector();
+//				double u = (U[0] + U[U.length - 1]) / 2;
+//				double v = (V[0] + V[V.length - 1]) / 2;
+//				double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+//				double[] surfPoint = get3DPoint(homogSurfPoint);
+//				if(dist > Rn.euclideanDistance(surfPoint, point)){
+//					dist = Rn.euclideanDistance(surfPoint, point);
+//					p = homogSurfPoint;
+//				}
+//			}
+// 			return p;
+// 		}
  		
 // 		public double[] getClosestPoint(double[] point){
 // 
@@ -1245,8 +1409,10 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			double fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
 			double fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
 			double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
-			for(int i = 0; i < 12; i++){
-				if(Rn.euclideanDistanceSquared(S3D, P3D) < eps){
+			for(int i = 0; i < 10; i++){
+				if(false){
+					
+					// richtige konvergenz kriterien implementieren
 //					System.out.println(" genauigkeit erreicht");
 					return S3D;
 				}

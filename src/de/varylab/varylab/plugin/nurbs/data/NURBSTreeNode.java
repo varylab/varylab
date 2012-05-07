@@ -14,6 +14,14 @@ public class NURBSTreeNode {
 	private NURBSTreeNode fourthChild;
 	
 	
+	public NURBSTreeNode() {
+		this.ns = null;
+		this.bezierList = null;
+		this.firstChild = null;
+		this.secondChild = null;
+		this.thirdChild = null;
+		this.fourthChild = null;
+	}
 
 	
 	public NURBSTreeNode(LinkedList<NURBSSurface> bezierList) {
