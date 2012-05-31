@@ -11,10 +11,14 @@ import java.util.ListIterator;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.projgeom.P5;
+import de.jtem.projgeom.PlueckerLineGeometry;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.utilities.SelectionUtility;
 
 public class HFaceSurface {
@@ -82,14 +86,17 @@ public class HFaceSurface {
 		}
 	}
 
-	public void propagateParametrisation() {
+	public void propagateParametrisation(AdapterSet as) {
 		for(Strip<VEdge,VFace> s : stripDecomposition.getStrips()) {
 			ListIterator<VFace> sit = s.getIterator();
 			VFace vf = sit.next();
 			HFace hf = vhMap.get(vf);
 			VEdge startEdge = s.getLeftEdge(vf);
 			double d = 0.5;
-			double[] y = Rn.linearCombination(null, d, startEdge.getStartVertex().position, 1-d, startEdge.getTargetVertex().position);
+			VVertex 
+				startV = startEdge.getStartVertex(),
+				targetV = startEdge.getTargetVertex();
+			double[] y = Rn.linearCombination(null, d, as.getD(Position3d.class, startV), 1-d, as.getD(Position3d.class,targetV));
 			// TODO: This won't work anymore when homogeneous coords are implemented in the halfedge project...
 			hf.setParameterLine(startEdge,Pn.homogenize(null, y));
 			
@@ -103,13 +110,13 @@ public class HFaceSurface {
 	}
 
 	private void propagateParametrisation(VEdge e, HFace nextFace) {
-//		HFace aktFace = vhMap.get(e.getLeftFace());
-//		double[]
-//		       pc1 = aktFace.getPluecker(e),
-//		       pc2 = aktFace.getParameterLine(e.getPreviousEdge());
+		HFace aktFace = vhMap.get(e.getLeftFace());
+		double[]
+		       pc1 = aktFace.getPluecker(e),
+		       pc2 = aktFace.getParameterLine(e.getPreviousEdge());
 		//:TODO lineIntersectLineWhileExistenceIsUnchecked() seems to be removed
-		throw new RuntimeException("TODO lineIntersectLineWhileExistenceIsUnchecked() seems to be removed");
-//		nextFace.setParameterLine(e.getOppositeEdge(), PlueckerLineGeometry.lineIntersectLineWhileExistenceIsUnchecked(null, pc1, pc2));
+//		throw new RuntimeException("TODO lineIntersectLineWhileExistenceIsUnchecked() seems to be removed");
+		nextFace.setParameterLine(e.getOppositeEdge(), PlueckerLineGeometry.intersectionPointUnchecked(null, pc1, pc2));
 	}
 
 	public Collection<HFace> getFaces() {

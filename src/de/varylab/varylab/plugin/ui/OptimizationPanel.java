@@ -136,7 +136,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(fixBoundaryZChecker, gbc2);
 		constraintsPanel.add(moveAlongBoundaryChecker, gbc2);
 		constraintsPanel.add(tangentialConstraintChecker, gbc2);
-		constraintsPanel.add(smoothGradientChecker, gbc1);
+		constraintsPanel.add(smoothGradientChecker, gbc2);
 		constraintsPanel.add(smoothSurfaceChecker,gbc2);
 		shrinkPanel.add(constraintsPanel, gbc2);
 		

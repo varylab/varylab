@@ -97,7 +97,7 @@ public class HyperbolicPatchVisualizer extends VisualizerPlugin implements Actio
 		hSurface.propagateQ(startEdge, parameter * Math.PI);
 		
 		//TODO: Implement interactive choice of Inital 1/2 - parameter lines
-		hSurface.propagateParametrisation();
+		hSurface.propagateParametrisation(hif.getAdapters());
 		
 		SceneGraphComponent patchRoot = new SceneGraphComponent();
 		patchRoot.setName("Hyperbolic Patches");

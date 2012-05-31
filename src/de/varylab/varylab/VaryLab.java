@@ -36,6 +36,7 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
@@ -149,7 +150,7 @@ public class VaryLab {
 		
 		v.registerPlugin(CatmullClarkPlugin.class);
 		v.registerPlugin(LoopPlugin.class);
-		
+		v.registerPlugin(Spherize.class);
 		v.registerPlugin(ConsolePlugin.class);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.registerPlugin(RoofSubdivisionPlugin.class);

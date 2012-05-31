@@ -31,7 +31,7 @@ public class LeastSquaresSphere extends AlgorithmPlugin {
 	}
 
 	
-	public <
+	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
@@ -61,7 +61,7 @@ public class LeastSquaresSphere extends AlgorithmPlugin {
 		
 		lss.setInitialSolutionVec(x);
 		
-		Tao optimizer = new Tao(Tao.Method.CG);
+		Tao optimizer = new Tao(Tao.Method.NM);
 		optimizer.setApplication(lss);
 		optimizer.setGradientTolerances(acc, acc, 0);
 		optimizer.setMaximumIterates(maxIter);
