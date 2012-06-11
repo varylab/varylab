@@ -37,7 +37,6 @@ public class LineSegmentIntersection {
 		double v0 = V[0];
 		double v1 = V[V.length - 1];
 		System.out.println("START");
-//		int curves = segList.getLast().getCurveIndex();
 		int curves = 120;
 		double uFactor = curves / (u1 - u0);
 		double vFactor = curves / (v1 - v0);

@@ -366,7 +366,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 		
 		
 		/**
-		 * decomposes both knot vectors of this surface s.d. both are filled<br/>
+		 * decomposes both knot vectors of this surface s.t. both are filled<br/>
 		  * <strong>Example</strong><br/>
 		  * Uold = {000012234444}<br/>
 		  * Unew = {00001112223334444}
@@ -487,29 +487,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 		
 
 		
-		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
-			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
-			double[] proj = Rn.subtract(null, pos, v1);
-			Rn.projectOntoComplement(proj, proj, fn);
-			return Rn.add(null,proj,v1);
-		}
-		
-		
- 		protected boolean isFlatEnough(double eps){
-			double[] v1 = controlMesh[0][0];
-			double[] v2 = controlMesh[0][controlMesh[0].length - 1];
-			double[] v3 = controlMesh[controlMesh.length - 1][0];
-			for (int i = 0; i < controlMesh.length; i++) {
-				for (int j = 0; j < controlMesh[0].length; j++) {
-					double[] proj = projectOnto(controlMesh[i][j], v1, v2, v3);
-					double dist = Rn.euclideanDistance(proj, controlMesh[i][j]);
-					if(dist > eps){
-						return false;
-					}
-				}
-			}
-			return true;
-		}
+//		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
+//			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
+//			double[] proj = Rn.subtract(null, pos, v1);
+//			Rn.projectOntoComplement(proj, proj, fn);
+//			return Rn.add(null,proj,v1);
+//		}
 		
  		
  		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
@@ -530,8 +513,6 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			}
  			return newPatches;
  		}
- 		
- 		
  		
  		
  		private boolean isImpossiblePatch(double[] point, double closestMaxDistance){
@@ -634,16 +615,11 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  							vStart = v;
  						}
  					}
- 					
- 					double[] result = newtonMethod(point, 0.00000001, uStart, vStart);
+ 					double[] result = newtonMethod(point, 0.00000000001,uStart, vStart);
  					if(result != null){
-// 						if(i > 2){
-// 							System.out.println("besserer starpunktnach 2 iterarionen");
-// 						}
  						return result;
  					}
  				}
- 				
  				LinkedList<NURBSTreeNode> subdividedPatches = new LinkedList<NURBSTreeNode>();
  				possiblePatches = getPossiblePatches(possiblePatches, point);
  				for (NURBSTreeNode ntn : possiblePatches) {
@@ -670,14 +646,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  		}
  		
 
- 		
-
-		private double[] newtonMethod(double[] P, double eps,double u, double v){
+		private double[] newtonMethod(double[] P, double eps, double u, double v){
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
 			double[] S = getSurfacePoint(u, v);
 			double[] S3D = get3DPoint(getSurfacePoint(u, v));
 			double[] P3D = get3DPoint(P);
-			double[] r = Rn.subtract(null, S3D, P3D);
+			double[] r = Rn.times(null, 1 / Rn.euclideanNorm(Rn.subtract(null, S3D, P3D)), Rn.subtract(null, S3D, P3D));
 			double[] Su = ci.getSu();
 			double[] Sv = ci.getSv();
 			double[] Suu = ci.getSuu();
@@ -690,7 +664,14 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 			double deltaU = Double.MAX_VALUE;
 			double deltaV = Double.MAX_VALUE;
-			for(int i = 0; i < 10; i++){
+			for(int i = 0; i < 12; i++){
+//				if(f < eps && g < eps && deltaU < eps && deltaV < eps){
+				if(false){	
+					System.out.println("terminiert nach " + i + " Schritten");
+					return S;
+					
+				}
+				else{
 				deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
 				deltaU = -((f + (fv * deltaV)) / fu);
 				u = deltaU + u;
@@ -716,9 +697,81 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 				fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
 				fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
 				gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
+				}
+			}
+			if(f > eps || g > eps){
+				System.out.println("f " + f + " g " + g);
 			}
 			return S;
 		}
+		
+//		private double[] newtonMethod(double[] P, double eps, double u, double v){
+//			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
+//			double[] S = getSurfacePoint(u, v);
+//			double[] S3D = get3DPoint(getSurfacePoint(u, v));
+//			double[] P3D = get3DPoint(P);
+//			double[] SminusP = Rn.subtract(null, S3D, P3D);
+//			double euclNormSminusP = Rn.euclideanNorm(SminusP);
+//			double[] r = Rn.times(null,1 / euclNormSminusP, SminusP);
+//			double[] Su = ci.getSu();
+//			double[] Sv = ci.getSv();
+//			double[] Suu = ci.getSuu();
+//			double[] Suv = ci.getSuv();
+//			double[] Svv = ci.getSvv();
+//			double[]SuTilde = Rn.times(null, 1 / Rn.euclideanNorm(Su), Su);
+//			double[]SvTilde = Rn.times(null, 1 / Rn.euclideanNorm(Sv), Sv);
+//			double f = Rn.innerProduct(r, SuTilde);
+//			double g = Rn.innerProduct(r, SvTilde);
+//			double[] ru = Rn.times(null, 1 / (euclNormSminusP * euclNormSminusP), Rn.subtract(null, Rn.times(null, euclNormSminusP, Su), Rn.times(null, 2 * Rn.innerProduct(Su, SminusP)/ euclNormSminusP, S)));
+//			double[] rv = Rn.times(null, 1 / (euclNormSminusP * euclNormSminusP), Rn.subtract(null, Rn.times(null, euclNormSminusP, Sv), Rn.times(null, 2 * Rn.innerProduct(Sv, SminusP)/ euclNormSminusP, S)));
+//			double[]SuuTilde = Rn.times(null, 1 / Rn.euclideanNormSquared(Su), Rn.subtract(null, Rn.times(null, Rn.euclideanNorm(Su), Suu), Rn.times(null, 2 * Rn.innerProduct(Suu, Su) / Rn.euclideanNorm(Su), Su)));
+//			double[]SuvTilde = Rn.times(null, 1 / Rn.euclideanNormSquared(Su), Rn.subtract(null, Rn.times(null, Rn.euclideanNorm(Su), Suv), Rn.times(null, 2 * Rn.innerProduct(Suv, Su) / Rn.euclideanNorm(Su), Su)));
+//			double[]SvvTilde = Rn.times(null, 1 / Rn.euclideanNormSquared(Sv), Rn.subtract(null, Rn.times(null, Rn.euclideanNorm(Sv), Svv), Rn.times(null, 2 * Rn.innerProduct(Svv, Sv) / Rn.euclideanNorm(Sv), Sv)));
+//			double fu = Rn.innerProduct(ru, SuTilde) + Rn.innerProduct(r, SuuTilde);
+//			double fv = Rn.innerProduct(rv, SuTilde) + Rn.innerProduct(r, SuvTilde);
+//			double gv = Rn.innerProduct(rv, SvTilde) + Rn.innerProduct(r, SvvTilde);
+//			double deltaU = Double.MAX_VALUE;
+//			double deltaV = Double.MAX_VALUE;
+//			for(int i = 0; i < 15; i++){
+//				if(false){
+////				if(f < eps * eps && g < eps * eps && deltaU < eps * eps && deltaV < eps * eps){	
+//					System.out.println("terminiert nach " + i + " Schritten");
+//					return S;
+//					
+//				}
+//				else{
+//				deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
+//				deltaU = -((f + (fv * deltaV)) / fu);
+//				u = deltaU + u;
+//				v = deltaV + v;
+//				boolean notInPatch = false;
+//				if(u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1]){
+//					notInPatch = true;
+//				}
+//				if(notInPatch){
+//					return null;
+//				}
+//				ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
+//				S = getSurfacePoint(u, v);
+//				S3D = get3DPoint(getSurfacePoint(u, v));
+//				r = Rn.subtract(null, S3D, P);
+//				Su = ci.getSu();
+//				Sv = ci.getSv();
+//				Suu = ci.getSuu();
+//				Suv = ci.getSuv();
+//				Svv = ci.getSvv();
+//				f = Rn.innerProduct(r, Su);
+//				g = Rn.innerProduct(r, Sv);
+//				fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
+//				fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
+//				gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
+//				}
+//			}
+//			if(f > eps || g > eps){
+//				System.out.println("f " + f + " g " + g);
+//			}
+//			return S;
+//		}
 	
 	
 }
