@@ -1280,7 +1280,7 @@ public class LineSegmentIntersection {
 //		findIntersections(segmentsT);
 ////		LinkedList<LineSegmentIntersection> test = new LinkedList<LineSegmentIntersection>();
 		
-		
+		 
 		/*
 		 * this is the example from NURBS-Surface c1 if you select the highest  right vertex 
 		 */
