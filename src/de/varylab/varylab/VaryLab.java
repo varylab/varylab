@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jvnet.substance.skin.SubstanceRavenGraphiteGlassLookAndFeel;
 
@@ -278,9 +277,14 @@ public class VaryLab {
 	
 	
 	public static void installLookAndFeel() {
+		String os = System.getProperty("os.name");
 		try {
-			UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
-		} catch (UnsupportedLookAndFeelException e) {
+			if (os.toLowerCase().contains("mac")) {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} else {
+				UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
+			}			
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
