@@ -7,6 +7,7 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -16,6 +17,8 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -33,13 +36,16 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -160,6 +166,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 	private LinkedList<LineSegment> 
 		segments = new LinkedList<LineSegment>();
+	
+	
 	
 	private int 
 		curveIndex = 1;
@@ -317,9 +325,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(nearbySpinner, rc);
 			add(segmentButton, rc);
 			add(goButton, rc);
-			
 			goButton.addActionListener(this);
-			
+			JScrollPane curvePanel = new JScrollPane(new JLabel("all curves"));
+			curvePanel.setToolTipText("teyety");
+			add(curvePanel);
 		}
 		
 		@Override
@@ -451,7 +460,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			minButton = new JRadioButton("Min Curvature (cyan)"),
 			intersectionButton = new JRadioButton("Bentley Ottmann");
 		
-		 
+		private JTable 
+			curveTable = new JTable(new CurveTableModel());
+		private JScrollPane 
+			curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+		
+	
+		
+//		private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener{}
+
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
@@ -470,8 +487,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(minButton, rc);
 			add(intersectionButton, rc);
 			add(goButton, rc);
-			
 			goButton.addActionListener(this);
+			add(curveScrollPanel);
+			
 		}
 		
 		
@@ -522,6 +540,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					}
 			}
 			segments.addAll(currentSegments);
+			
 			hif.clearSelection();
 			
 			if(inter){
@@ -934,6 +953,43 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 		}
 		
+	}
+	
+	private class CurveTableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = 1L;
+
+		private String[] columnNames = new String[]{"Name"};
+		
+		@Override
+		public String getColumnName(int col) {
+	        return columnNames[col].toString();
+	    }
+		
+	    @Override
+		public int getRowCount() { 
+	    	return (surfaces==null)?0:surfaces.size();
+	    }
+	    
+	    @Override
+		public int getColumnCount() { 
+	    	return 1; 
+	    }
+	    
+	    @Override
+		public Object getValueAt(int row, int col) {
+	        return surfaces.get(row).getName();
+	    }
+	    
+	    @Override
+		public boolean isCellEditable(int row, int col) {
+	    	return true; 
+	    }
+	    
+	    @Override
+		public void setValueAt(Object value, int row, int col) {
+	        surfaces.get(row).setName((String)value);
+	    }
 	}
 
 	private class SurfaceTableModel extends DefaultTableModel {
