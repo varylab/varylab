@@ -164,9 +164,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private JCheckBox
 		vectorFieldBox = new JCheckBox("vf");
 	
-	private LinkedList<LineSegment> 
-		segments = new LinkedList<LineSegment>();
+//	private LinkedList<LineSegment> 
+//		segments = new LinkedList<LineSegment>();
 	
+	private LinkedList<LinkedList<LineSegment>>
+		lines = new LinkedList<LinkedList<LineSegment>>();
 	
 	
 	private int 
@@ -459,11 +461,20 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			maxButton = new JRadioButton("Max Curvature (red)"),
 			minButton = new JRadioButton("Min Curvature (cyan)"),
 			intersectionButton = new JRadioButton("Bentley Ottmann");
-		
+		private CurveTableModel
+			curveTableModel = new CurveTableModel();
 		private JTable 
-			curveTable = new JTable(new CurveTableModel());
+			curveTable = new JTable(curveTableModel);
 		private JScrollPane 
 			curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+		
+//		JPanel tablePanel = new JPanel();
+//		tablePanel.setLayout(new GridLayout());
+//		tablePanel.add(layersScroller);
+//		curveScrollPanel.setMinimumSize(new Dimension(30, 150));
+//		surfacesTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
+//		surfacesTable.setRowHeight(22);
+//		surfacesTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		
 	
 		
@@ -472,6 +483,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
+			
 			setLayout(new GridBagLayout());
 			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
@@ -488,6 +500,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(intersectionButton, rc);
 			add(goButton, rc);
 			goButton.addActionListener(this);
+			JPanel tablePanel = new JPanel();
+			tablePanel.setLayout(new GridLayout());
+			tablePanel.add(curveScrollPanel);
+			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
+			curveTable.setRowHeight(22);
+			curveTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			add(curveScrollPanel);
 			
 		}
@@ -524,7 +543,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean max = maxButton.isSelected();
 			boolean min = minButton.isSelected();
 			boolean inter = intersectionButton.isSelected();
-			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
+//			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
+			LinkedList<LinkedList<LineSegment>> currentSegments = new LinkedList<LinkedList<LineSegment>>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
 			
 
@@ -539,13 +559,16 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, false, umbilicStop);
 					}
 			}
-			segments.addAll(currentSegments);
-			
+//			segments.addAll(currentSegments);
+			lines.addAll(currentSegments);
 			hif.clearSelection();
 			
 			if(inter){
 				// default patch
-				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
+				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
+				for(LinkedList<LineSegment> segmentList:lines){
+					allSegments.addAll(segmentList);
+				}
 				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
 //				double[][] seg1 = {{0,0},{1,0}};
 				double[][] seg1 = new double[2][2];
@@ -645,13 +668,17 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					hif.getActiveLayer().addTemporaryGeometry(sgci);
 				}
 			}
+			curveTableModel.fireTableDataChanged();
 		}
 
 		private int curveLine(double tol, double eps, double stepSize,
 				List<double[]> umbilics, int p, int q, double[] U,
 				double[] V, double[][][] Pw,
-				LinkedList<LineSegment> segments, int curveIndex,
+//				LinkedList<LineSegment> segments, 
+				LinkedList<LinkedList<LineSegment>> segments,
+				int curveIndex,
 				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop) {
+			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 			IntObjects intObj;
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
@@ -694,11 +721,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					ls.setSegment(seg);
 					ls.setCurveIndex(curveIndex);
 					ls.setCyclic(cyclic);
-					segments.add(ls);
+					currentSegments.add(ls);
 					firstcurvePoint = secondCurvePoint;
 				}
 			}
-			
+			segments.add(currentSegments);
 			curveIndex ++;
 			PointSetFactory psf = new PointSetFactory();
 			double[][] u = new double[all.size()][];
@@ -959,26 +986,28 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 		private static final long serialVersionUID = 1L;
 
-		private String[] columnNames = new String[]{"Name"};
+		private String[] columnNames = {"Show", "Curve"};
 		
 		@Override
 		public String getColumnName(int col) {
-	        return columnNames[col].toString();
+			return columnNames[col].toString();
 	    }
 		
 	    @Override
 		public int getRowCount() { 
-	    	return (surfaces==null)?0:surfaces.size();
+	    	return (lines==null)?0:lines.size();
 	    }
 	    
 	    @Override
 		public int getColumnCount() { 
-	    	return 1; 
+	    	return columnNames.length;
 	    }
 	    
 	    @Override
 		public Object getValueAt(int row, int col) {
-	        return surfaces.get(row).getName();
+	        if (col == 0)
+	        	return true;	// Hier auslesen
+	    	return (row+1) + ". curve";
 	    }
 	    
 	    @Override
@@ -988,7 +1017,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	    
 	    @Override
 		public void setValueAt(Object value, int row, int col) {
-	        surfaces.get(row).setName((String)value);
+	    	if (col == 0)
+	    		return; 	//Hier setzen
+	    }
+
+	    @Override
+	    public Class<?> getColumnClass(int col) {
+	    	if (col == 0)
+	    		return Boolean.class;
+	        return super.getColumnClass(col);
 	    }
 	}
 
@@ -1127,7 +1164,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
 				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
 			}
-			segments.clear();
+			lines.clear();
 		} 
 	}
 	
