@@ -37,6 +37,8 @@ import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
+import de.varylab.varylab.plugin.datasource.IncircleCrossRatio;
+import de.varylab.varylab.plugin.datasource.IncircleCrossRatio2;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
@@ -221,6 +223,8 @@ public class VaryLab {
 		v.registerPlugin(OppositeEdgesCurvature.class);
 		v.registerPlugin(OppositeAnglesCurvature.class);
 		v.registerPlugin(GeodesicCurvature.class);
+		v.registerPlugin(IncircleCrossRatio.class);
+		v.registerPlugin(IncircleCrossRatio2.class);
 	}
 
 
