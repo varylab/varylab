@@ -666,12 +666,12 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 			double deltaV = Double.MAX_VALUE;
 			for(int i = 0; i < 12; i++){
 //				if(f < eps && g < eps && deltaU < eps && deltaV < eps){
-				if(false){	
-					System.out.println("terminiert nach " + i + " Schritten");
-					return S;
-					
-				}
-				else{
+//				if(false){	
+//					System.out.println("terminiert nach " + i + " Schritten");
+//					return S;
+//					
+//				}
+//				else{
 				deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
 				deltaU = -((f + (fv * deltaV)) / fu);
 				u = deltaU + u;
@@ -697,7 +697,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 				fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
 				fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
 				gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
-				}
+//				}
 			}
 			if(f > eps || g > eps){
 				System.out.println("f " + f + " g " + g);

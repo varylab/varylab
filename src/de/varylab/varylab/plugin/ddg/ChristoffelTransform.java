@@ -72,8 +72,6 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 		associateSpinner = new JSpinner(associateModel);
 	private HalfedgeInterface hif = null;
 	
-	private LeastSquaresSphere
-		lsSphere = null;
 	private static double[]
 	    lsSphereCoords = null;
 	
@@ -274,7 +272,7 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void dualize(HDS hds, double phi, AdapterSet a, NormalMethod method) {
 		if (method == NormalMethod.LS_Sphere) {
-			lsSphereCoords = lsSphere.getSphereCenter(hds, a);
+			lsSphereCoords = LeastSquaresSphere.getSphereCenter(hds, a);
 		}
 		List<Map<V, double[]>> newCoordsMaps = new LinkedList<Map<V, double[]>>();
 		Set<V> rootSet = getRadomInnerPoints(hds, 10);
@@ -432,7 +430,7 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		ceSubdivider = c.getPlugin(CentralExtensionSubdivision.class);
-		lsSphere = c.getPlugin(LeastSquaresSphere.class);
+		c.getPlugin(LeastSquaresSphere.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 
