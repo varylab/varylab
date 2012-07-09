@@ -26,8 +26,8 @@ import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.varylab.discreteconformal.heds.CoVertex;
 import de.varylab.varylab.hds.VFace;
+import de.varylab.varylab.hds.VVertex;
 
 public class RemeshingUtility {
 
@@ -123,7 +123,7 @@ public class RemeshingUtility {
 	
 	
 	
-	public static boolean isFeatureVertexInConvexTextureFace(CoVertex fv, VFace f) {
+	public static boolean isFeatureVertexInConvexTextureFace(VVertex fv, VFace f) {
 //		double[] fp = fv.getPosition().get();
 		
 		return false;
