@@ -30,6 +30,7 @@ import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
 import de.jtem.jtao.Tao;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
+import de.varylab.discreteconformal.plugin.visualizer.FlippedTriangles;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
@@ -223,6 +224,7 @@ public class VaryLab {
 		v.registerPlugin(OppositeEdgesCurvature.class);
 		v.registerPlugin(OppositeAnglesCurvature.class);
 		v.registerPlugin(GeodesicCurvature.class);
+		v.registerPlugin(FlippedTriangles.class);
 		v.registerPlugin(IncircleCrossRatio.class);
 		v.registerPlugin(IncircleCrossRatio2.class);
 	}
