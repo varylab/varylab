@@ -248,6 +248,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 					WARNING_MESSAGE
 				);
 				return;
+			default:
+				break;
 			}
 		}
 		optimizer.setApplication(app);

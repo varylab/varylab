@@ -5,7 +5,8 @@ import java.util.Arrays;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.jvnet.substance.skin.SubstanceRavenGraphiteGlassLookAndFeel;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.skin.GraphiteGlassSkin;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -288,7 +289,8 @@ public class VaryLab {
 			if (os.toLowerCase().contains("mac")) {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} else {
-				UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
+				SubstanceLookAndFeel.setSkin(new GraphiteGlassSkin());
+//				UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
 			}			
 		} catch (Exception e) {
 			e.printStackTrace();

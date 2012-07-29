@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.skin.SkinInfo;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.skin.SkinInfo;
 
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelPlugin;
 
