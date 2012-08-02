@@ -38,6 +38,7 @@ import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
+import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.IncircleCrossRatio;
 import de.varylab.varylab.plugin.datasource.IncircleCrossRatio2;
@@ -114,6 +115,7 @@ import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
 import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.IncircleVisualizer;
+import de.varylab.varylab.plugin.visualizers.IndexMedialGraph;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
@@ -225,9 +227,11 @@ public class VaryLab {
 		v.registerPlugin(OppositeEdgesCurvature.class);
 		v.registerPlugin(OppositeAnglesCurvature.class);
 		v.registerPlugin(GeodesicCurvature.class);
+		v.registerPlugin(GeodesicCircumcircleCurvature.class);
 		v.registerPlugin(FlippedTriangles.class);
 		v.registerPlugin(IncircleCrossRatio.class);
 		v.registerPlugin(IncircleCrossRatio2.class);
+		v.registerPlugin(IndexMedialGraph.class);
 	}
 
 

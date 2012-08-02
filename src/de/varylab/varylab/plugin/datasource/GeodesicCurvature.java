@@ -39,7 +39,7 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 		}
 
 		/**
-		 * Uses the radius of the circumcircle as discrete curvature.
+		 * Uses the radius of the circumcircle in the plane normal to the vertex normal as discrete curvature.
 		 */
 		@Override
 		public <
@@ -49,7 +49,7 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 		> Double getV(V v, AdapterSet a) {
 			double[] vv = a.getD(Position3d.class, v);
 			double[] nv = a.getD(Normal.class, v);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, a);
+			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, a);
 			if (geodesicPairs.isEmpty() || HalfEdgeUtils.isBoundaryVertex(v)) {
 				return null;
 			}
@@ -65,7 +65,7 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 				double alpha = euclideanAngle(vec1, vec2);
 				Rn.subtract(vec3, vec1, vec2);
 				double la = Rn.euclideanNorm(vec3);
-				double r = la / 2.0 / sin(alpha);
+				double r = la / 2.0 / sin(alpha/2);
 				if (1 / r < 0) {
 					System.out.println("negative geodesic curvature!");
 				}

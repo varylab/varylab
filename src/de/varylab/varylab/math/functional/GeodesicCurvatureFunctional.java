@@ -51,7 +51,7 @@ public class GeodesicCurvatureFunctional <
 		for (V v : hds.getVertices()) {
 			getPosition(v, x, vv);
 			double[] n = aSet.getD(Normal.class, v);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, aSet);
+			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, aSet);
 			for (E e : geodesicPairs.keySet()) {
 				E ee = geodesicPairs.get(e);
 				getPosition(e.getStartVertex(), x, vs);

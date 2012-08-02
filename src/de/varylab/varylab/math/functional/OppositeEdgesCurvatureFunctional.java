@@ -55,13 +55,14 @@ public class OppositeEdgesCurvatureFunctional<
 	 * such that there are the same number of edges with label -1 on the left
 	 * as on the right of the pair. If this is not possible the edges remain unpaired.
 	 * @param v 
+	 * @param symmetric if true symmetrizes the map of pairs
 	 * @return a map which maps one edge of each pair onto its partner
 	 */
 	public static <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>
-	>  Map<E, E> findGeodesicPairs(V v, boolean manualOnly, AdapterSet a) {
+	>  Map<E, E> findGeodesicPairs(V v, boolean manualOnly, boolean symmetric, AdapterSet a) {
 		Map<E, E> r = new HashMap<E, E>();
 		List<E> star = HalfEdgeUtils.incomingEdges(v);
 		Set<Integer> geodesicsSet = new HashSet<Integer>();
@@ -89,6 +90,9 @@ public class OppositeEdgesCurvatureFunctional<
 			E e1 = star.get(i);
 			E e2 = star.get(i + nn/2);
 			r.put(e1, e2);
+			if(symmetric) {
+				r.put(e2, e1);
+			}
 		}
 		return r;
 	}
@@ -104,7 +108,7 @@ public class OppositeEdgesCurvatureFunctional<
 		       vt = new double[3];
 		for (V v : hds.getVertices()) {
 			FunctionalUtils.getPosition(v, x, vv);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, adapters);
+			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, adapters);
 
 			double[] angles = new double[geodesicPairs.size()];
 			int i = 0;
@@ -137,7 +141,7 @@ public class OppositeEdgesCurvatureFunctional<
 		for (V v : hds.getVertices()) {
 				FunctionalUtils.getPosition(v, x, vv);
 				int vi = v.getIndex();
-				Map<E, E> geodesicPairs = findGeodesicPairs(v, false, adapters);
+				Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, adapters);
 				double[] angles = new double[geodesicPairs.size()];
 				int i = 0;
 				for (E e : geodesicPairs.keySet()) {

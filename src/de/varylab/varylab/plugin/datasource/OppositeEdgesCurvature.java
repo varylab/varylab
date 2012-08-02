@@ -35,7 +35,7 @@ public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider
 			F extends Face<V, E, F>
 		> Double getV(V v, AdapterSet a) {
 			double[] p = a.getD(Position3d.class, v);
-			Map<E, E> geoMap = findGeodesicPairs(v, false, a);
+			Map<E, E> geoMap = findGeodesicPairs(v, false, false, a);
 			double[] angles = new double[geoMap.size()];
 			if (angles.length == 0) return null; // unknown curvature
 			int i = 0;
