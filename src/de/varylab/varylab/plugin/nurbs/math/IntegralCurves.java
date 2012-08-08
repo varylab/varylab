@@ -19,7 +19,11 @@ public class IntegralCurves {
 		}
 	}
 	/**
-	 * computes the curvature lines
+	 * <p><strong>computes the curvature lines</strong></p>
+	 * 
+	 * this is a step-size controlled runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
+	 * </br>
+	 * <strong>while</strong> (!nearby)
 	 * 
 	 * @param ns
 	 * @param y0 
@@ -29,11 +33,12 @@ public class IntegralCurves {
 	 * @param eps --> if we obtain a closed curve then eps is the maximal distance between the start point and the last point
 	 * @return
 	 */
-	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, double stepSize, List<double[]> umbilics, double umbilicStop) {
+	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, List<double[]> umbilics, double umbilicStop) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
 		double[] b = { 0, 0.5, 0.75, 1 };
+		double stepSize = umbilicStop / 2;
 		LinkedList<double[]> u = new LinkedList<double[]>();
 		int dim = y0.length;
 		double h = stepSize;
@@ -57,8 +62,8 @@ public class IntegralCurves {
 		boolean first = true;
 		double dist;
 		double[] ori = orientation;
-
-		while (!nearBy ) {
+		
+		while (!nearBy) {
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
@@ -114,9 +119,13 @@ public class IntegralCurves {
 				Phi2 = Rn.add(null, Phi2, Rn.times(null, c2[l], k[l]));
 			}
 			v = Rn.add(null, v, Rn.times(null, h, Phi2));
-			tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
+			tau = Rn.euclideanNorm(Rn.subtract(null, Phi2, Phi1));
+//			tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
 			vau = Rn.euclideanNorm(u.getLast()) + 1;
 			if (tau <= tol * vau) {
+				//new
+				
+				//
 				u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
 				for (double[] umb : umbilics) {
 					if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
@@ -160,8 +169,15 @@ public class IntegralCurves {
 					orientation = Rn.times(null, -1, IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max));
 				}
 			}
-			if ((tau > tol * vau)) {
-				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
+			if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
+				double oldH = h;
+//				System.out.println("schrittaenderung beantragt");
+				h = h * Math.sqrt(tol * vau / tau);
+				if(h > stepSize * 2){
+//					System.out.println("schrittaenderung nicht durchgefuehrt");
+					h = oldH;
+				}
+//				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
 			}
 			dist = Rn.euclideanDistance(u.getLast(), y0);
 			if (!(dist < eps) && first) {
@@ -177,11 +193,6 @@ public class IntegralCurves {
 	}
 	
 
-	
-	public static double[] parallelTransport(double[] start){
-		return null;
-	}
-	
 	/**
 	 * computes geodesics via the exponetial map
 	 * @param ns
