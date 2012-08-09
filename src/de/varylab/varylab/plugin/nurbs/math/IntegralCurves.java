@@ -7,7 +7,9 @@ import java.util.List;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
+import de.varylab.varylab.plugin.nurbs.data.EventPoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 public class IntegralCurves {
 
@@ -18,6 +20,246 @@ public class IntegralCurves {
 			return NURBSCurvatureUtility.curvatureAndDirections(ns, u, v).getCurvatureDirectionsDomain()[0];
 		}
 	}
+//	/**
+//	 * <p><strong>computes the curvature lines</strong></p>
+//	 * 
+//	 * this is a step-size controlled runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
+//	 * </br>
+//	 * <strong>while</strong> (!nearby)
+//	 * 
+//	 * @param ns
+//	 * @param y0 
+//	 * @param tol
+//	 * @param secondOrientation --> is true if we use the direction of the given vectorfield an false if we use the opposite direction 
+//	 * @param max 
+//	 * @param eps --> if we obtain a closed curve then eps is the maximal distance between the start point and the last point
+//	 * @return
+//	 */
+//	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, List<double[]> umbilics, double umbilicStop) {
+//		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
+//		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
+//		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
+//		double[] b = { 0, 0.5, 0.75, 1 };
+//		double stepSize = umbilicStop / 2;
+//		LinkedList<double[]> u = new LinkedList<double[]>();
+//		int dim = y0.length;
+//		double h = stepSize;
+//		double tau;
+//		double vau;
+//		u.add(y0);
+//		double[] Udomain = { ns.getUKnotVector()[0], ns.getUKnotVector()[ns.getUKnotVector().length - 1] };
+//		double[] Vdomain = { ns.getVKnotVector()[0], ns.getVKnotVector()[ns.getVKnotVector().length - 1] };
+//		double u1 = Udomain[0];
+//		double u2 = Udomain[1];
+//		double v1 = Vdomain[0];
+//		double v2 = Vdomain[1];
+//		double[] orientation = new double[2];
+//		if (!secondOrientation) {
+//			orientation = IntegralCurves.getMaxMinCurv(ns, y0[0], y0[1], max);
+//		} else {
+//			orientation = Rn.times(null, -1,
+//					IntegralCurves.getMaxMinCurv(ns, y0[0], y0[1], max));
+//		}
+//		boolean nearBy = false;
+//		boolean first = true;
+//		double dist;
+//		double[] ori = orientation;
+//		
+//		while (!nearBy) {
+//			double[] v = new double[dim];
+//			double[] sumA = new double[dim];
+//			for (int i = 0; i < dim; i++) {
+//				v[i] = u.getLast()[i]; // initialisiere das AWP v = y0
+//			}
+//			double[][] k = new double[b.length][2];
+//
+//			if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, v[0], v[1], max)) > 0) {
+//				k[0] = Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0], v[1], max));
+//			} else {
+//				k[0] = Rn.times(null, -1, Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0], v[1], max)));
+//			}
+//			for (int l = 1; l < b.length; l++) {
+//				sumA = Rn.times(null, A[l][0], k[0]);
+//				for (int m = 1; m < l - 1; m++) {
+//					sumA = Rn.add(null, sumA, Rn.times(null, A[l][m], k[m]));
+//				}
+//				if ((v[0] + h * sumA[0]) >= u2 || (v[0] + h * sumA[0]) <= u1|| (v[1] + h * sumA[1]) >= v2|| (v[1] + h * sumA[1]) <= v1) {
+//					System.out.println("out of domain 1");
+//					double[] last = new double [2];//u.getLast();
+//					System.out.println("letztes v"+Arrays.toString(v));
+//					if((v[0] + h * sumA[0]) >= u2){
+//						last[0] = u2;
+//						last[1] = v[1];
+//					}
+//					else if((v[0] + h * sumA[0]) <= u1){
+//						last[0] = u1;// - 0.1;
+//						last[1] = v[1];
+//					}
+//					else if((v[1] + h * sumA[1]) >= v2){
+//						last[0] = v[0];
+//						last[1] = v2;// + 0.1;
+//					}
+//					else if((v[1] + h * sumA[1]) <= v1){
+//						last[0] = v[0];
+//						last[1] = v1;// - 0.1;
+//					}
+//					u.add(last);
+//					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+//					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//					return intObj;
+//				}
+//				if (Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0] + h* sumA[0], v[1] + h * sumA[1], max))) > 0) {
+//					k[l] = Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns,v[0] + h * sumA[0], v[1] + h * sumA[1], max));
+//				} else  {
+//					k[l] = Rn.times(null, -1, Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h* sumA[1], max)));
+//				}
+//			}
+//			double[] Phi1 = new double[dim];
+//			double[] Phi2 = new double[dim];
+//			for (int l = 0; l < b.length; l++) {
+//				Phi1 = Rn.add(null, Phi1, Rn.times(null, c1[l], k[l]));
+//				Phi2 = Rn.add(null, Phi2, Rn.times(null, c2[l], k[l]));
+//			}
+//			v = Rn.add(null, v, Rn.times(null, h, Phi2));
+//			tau = Rn.euclideanNorm(Rn.subtract(null, Phi2, Phi1));
+////			tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
+//			vau = Rn.euclideanNorm(u.getLast()) + 1;
+//			if (tau <= tol * vau) {
+//				//new
+//				
+//				//
+//				u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
+//				for (double[] umb : umbilics) {
+//					if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
+//						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+//						intObj.setUmbilicIndex(umbilics.indexOf(umb));
+//						System.out.println("near umbilic");
+//						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//						return intObj;
+//					}
+//				}
+//				if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
+//						|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
+//					System.out.println("out of domain 2");
+//					double[] last = new double [2];
+//					if(u.getLast()[0] >= u2){
+//						last[0] = u2;// + 0.1;
+//						last[1] = v[1];
+//					}
+//					else if(u.getLast()[0] <= u1){
+//						last[0] = u1;// - 0.1;
+//						last[1] = v[1];
+//					}
+//					else if(u.getLast()[1] >= v2){
+//						last[0] = v[0];
+//						last[1] = v2;// + 0.1;
+//					}
+//					else if(u.getLast()[1] <= v1){
+//						last[0] = v[0];
+//						last[1] = v1;// - 0.1;
+//					}
+//					u.pollLast();
+//					u.add(last);
+//					System.out.println("LAST: "+ Arrays.toString(u.getLast()));
+//					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+//					System.out.println("Last IntObj: " + Arrays.toString(intObj.getPoints().getLast()));
+//					return intObj;
+//				}
+//				if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
+//					orientation = IntegralCurves.getMaxMinCurv(ns,u.getLast()[0], u.getLast()[1], max);
+//				} else {
+//					orientation = Rn.times(null, -1, IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max));
+//				}
+//			}
+//			if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
+////				double oldH = h;
+////				System.out.println("schrittaenderung beantragt");
+//				h = h * Math.sqrt(tol * vau / tau);
+////				if(h > stepSize * 2){
+//////					System.out.println("schrittaenderung nicht durchgefuehrt");
+////					h = oldH;
+////				}
+////				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
+//			}
+//			dist = Rn.euclideanDistance(u.getLast(), y0);
+//			if (!(dist < eps) && first) {
+//				first = false;
+//			}
+//			if (dist < eps && !first) {
+//				nearBy = true;
+//			}
+//		}
+//		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+//		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
+//		return intObj;
+//	}
+	
+	private static boolean segmentIntersectBoundary(LineSegment seg, LinkedList<LineSegment> boundary){
+		for (LineSegment lS : boundary) {
+			if(LineSegmentIntersection.twoSegmentIntersection(seg, lS)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static double[] intersectionPoint(LineSegment first, LineSegment second){
+		double s1 = first.getSegment()[0][0];
+		double s2 = first.getSegment()[0][1];
+		double t1 = first.getSegment()[1][0];
+		double t2 = first.getSegment()[1][1];
+		double p1 = second.getSegment()[0][0];
+		double p2 = second.getSegment()[0][1];
+		double q1 = second.getSegment()[1][0];
+		double q2 = second.getSegment()[1][1];
+		double lambda = ((p1 - s1) * (s2 - t2) - (p2 - s2) * (s1 - t1)) / ((q2 - p2) * (s1 - t1) - (q1 - p1) * (s2 - t2));
+		return Rn.add(null, second.getSegment()[0],Rn.times(null, lambda, Rn.add(null, second.getSegment()[1], Rn.times(null, -1, second.getSegment()[0]))));
+	}
+	
+	private static double[] boundaryIntersection(LineSegment seg, LinkedList<LineSegment> boundary){
+		double minDist = Double.MAX_VALUE;
+		double[] intersection = null;
+		for (LineSegment lS : boundary) {
+			if(Rn.euclideanDistance(seg.getSegment()[0], intersectionPoint(seg, lS)) < minDist){
+				intersection = intersectionPoint(seg, lS);
+				minDist = Rn.euclideanDistance(seg.getSegment()[0], intersectionPoint(seg, lS));
+			}
+		}
+		return intersection;
+	}
+	
+	private static boolean isOutOfDomain(NURBSSurface ns, double[] point){
+		double u0 = ns.getUKnotVector()[0];
+		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
+		double v0 = ns.getVKnotVector()[0];
+		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
+		if(point[0] < u0 || point[0] > u1 ||point[1] < v0 || point[1] > v1){
+			return true;
+		}
+		return false;
+	}
+	
+	private static double[] projectPointIntoDomain(NURBSSurface ns, double[] point){
+		double u0 = ns.getUKnotVector()[0];
+		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
+		double v0 = ns.getVKnotVector()[0];
+		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
+		double[] domainPoint = point;
+		if(point[0] < u0){
+			domainPoint[0] = u0;
+		}
+		else if(point[0] > u1){
+			domainPoint[0] = u1;
+		}
+		else if(point[1] < v0){
+			domainPoint[1] = v0;
+		}
+		else if(point[1] > v1){
+			domainPoint[1] = v1;
+		}
+		return domainPoint;
+	}
+	
 	/**
 	 * <p><strong>computes the curvature lines</strong></p>
 	 * 
@@ -33,7 +275,7 @@ public class IntegralCurves {
 	 * @param eps --> if we obtain a closed curve then eps is the maximal distance between the start point and the last point
 	 * @return
 	 */
-	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, List<double[]> umbilics, double umbilicStop) {
+	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, List<double[]> umbilics, double umbilicStop, LinkedList<LineSegment> boundary) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
@@ -62,8 +304,10 @@ public class IntegralCurves {
 		boolean first = true;
 		double dist;
 		double[] ori = orientation;
+		LineSegment seg = new LineSegment();
 		
 		while (!nearBy) {
+			
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
@@ -76,37 +320,32 @@ public class IntegralCurves {
 			} else {
 				k[0] = Rn.times(null, -1, Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0], v[1], max)));
 			}
+			double[][] segment = new double[2][2];
 			for (int l = 1; l < b.length; l++) {
 				sumA = Rn.times(null, A[l][0], k[0]);
 				for (int m = 1; m < l - 1; m++) {
 					sumA = Rn.add(null, sumA, Rn.times(null, A[l][m], k[m]));
 				}
-				if ((v[0] + h * sumA[0]) >= u2 || (v[0] + h * sumA[0]) <= u1|| (v[1] + h * sumA[1]) >= v2|| (v[1] + h * sumA[1]) <= v1) {
+				segment[0][0]= v[0];
+				segment[0][1]= v[1];
+				segment[1][0]= v[0] + h * sumA[0];
+				segment[1][1]= v[1] + h * sumA[1];
+				seg.setSegment(segment);
+				if (segmentIntersectBoundary(seg, boundary)) {
 					System.out.println("out of domain 1");
-					double[] last = new double [2];//u.getLast();
-					System.out.println("letztes v"+Arrays.toString(v));
-					if((v[0] + h * sumA[0]) >= u2){
-						last[0] = u2;
-						last[1] = v[1];
+					double[] intersection = boundaryIntersection(seg, boundary);
+					if(isOutOfDomain(ns, intersection)){
+						intersection = projectPointIntoDomain(ns, intersection);
 					}
-					else if((v[0] + h * sumA[0]) <= u1){
-						last[0] = u1;// - 0.1;
-						last[1] = v[1];
+					u.add(intersection);
+					if(isOutOfDomain(ns, intersection)){
+						System.out.println("ALLES FALSCH");
 					}
-					else if((v[1] + h * sumA[1]) >= v2){
-						last[0] = v[0];
-						last[1] = v2;// + 0.1;
-					}
-					else if((v[1] + h * sumA[1]) <= v1){
-						last[0] = v[0];
-						last[1] = v1;// - 0.1;
-					}
-					u.add(last);
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
-				if (Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0] + h* sumA[0], v[1] + h * sumA[1], max))) > 0) {
+				if (Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h * sumA[1], max))) > 0) {
 					k[l] = Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns,v[0] + h * sumA[0], v[1] + h * sumA[1], max));
 				} else  {
 					k[l] = Rn.times(null, -1, Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h* sumA[1], max)));
@@ -120,13 +359,12 @@ public class IntegralCurves {
 			}
 			v = Rn.add(null, v, Rn.times(null, h, Phi2));
 			tau = Rn.euclideanNorm(Rn.subtract(null, Phi2, Phi1));
-//			tau = Rn.euclideanNorm(Rn.add(null, Phi2,Rn.times(null, -1, Phi1)));
 			vau = Rn.euclideanNorm(u.getLast()) + 1;
 			if (tau <= tol * vau) {
-				//new
-				
-				//
-				u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
+				segment[0] = u.getLast();
+				segment[1] = Rn.add(null, u.getLast(), Rn.times(null, h, Phi1));
+				seg.setSegment(segment);
+				u.add(segment[1]);
 				for (double[] umb : umbilics) {
 					if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
 						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
@@ -136,8 +374,19 @@ public class IntegralCurves {
 						return intObj;
 					}
 				}
-				if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
-						|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
+//				if (segmentIntersectBoundary(seg, boundary)) {
+//					System.out.println("out of domain 2");
+//					double[] intersection = boundaryIntersection(seg, boundary);
+//					if(isOutOfDomain(ns, intersection)){
+//						intersection = projectPointIntoDomain(ns, intersection);
+//					}
+//					u.pollLast();
+//					u.add(intersection);
+//					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+//					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//					return intObj;
+//				}
+				if (u.getLast()[0] > u2 || u.getLast()[0] < u1 || u.getLast()[1] > v2 || u.getLast()[1] < v1) {
 					System.out.println("out of domain 2");
 					double[] last = new double [2];
 					if(u.getLast()[0] >= u2){
@@ -170,13 +419,13 @@ public class IntegralCurves {
 				}
 			}
 			if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
-				double oldH = h;
+//				double oldH = h;
 //				System.out.println("schrittaenderung beantragt");
 				h = h * Math.sqrt(tol * vau / tau);
-				if(h > stepSize * 2){
-//					System.out.println("schrittaenderung nicht durchgefuehrt");
-					h = oldH;
-				}
+//				if(h > stepSize * 2){
+////					System.out.println("schrittaenderung nicht durchgefuehrt");
+//					h = oldH;
+//				}
 //				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
 			}
 			dist = Rn.euclideanDistance(u.getLast(), y0);
@@ -191,6 +440,8 @@ public class IntegralCurves {
 		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 		return intObj;
 	}
+	
+
 	
 
 	/**

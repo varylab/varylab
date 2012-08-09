@@ -48,6 +48,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import de.jreality.geometry.IndexedLineSetFactory;
+import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Rn;
@@ -524,16 +526,54 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 //			LinkedList<LinkedList<LineSegment>> currentSegments = new LinkedList<LinkedList<LineSegment>>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
+			LinkedList<double[]> boundaryVerts = new LinkedList<double[]>();
+			double[] boundVert1 = new double[2];
+			boundVert1[0] = U[0];
+			boundVert1[1] = V[0];
+			double[] boundVert2 = new double[2];
+			boundVert2[0] = U[U.length - 1];
+			boundVert2[1] = V[0];
+			double[] boundVert3 = new double[2];
+			boundVert3[0] = U[U.length - 1];
+			boundVert3[1] = V[V.length - 1];
+			double[] boundVert4 = new double[2];
+			boundVert4[0] = U[0];
+			boundVert4[1] = V[V.length - 1];
+			boundaryVerts.add(boundVert1);
+			boundaryVerts.add(boundVert2);
+			boundaryVerts.add(boundVert3);
+			boundaryVerts.add(boundVert4);
+			LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
 
+			double[][] seg1 = new double[2][2];
+			seg1[0] = boundVert1;
+			seg1[1] = boundVert2;
+			LineSegment b1 = new LineSegment(seg1, 1, 1);
+			double[][] seg2 = new double[2][2];
+			seg2[0] = boundVert2;
+			seg2[1] = boundVert3;
+			LineSegment b2 = new LineSegment(seg2, 1, 2);
+			double[][] seg3 = new double[2][2];
+			seg3[0] = boundVert3;
+			seg3[1] = boundVert4;
+			LineSegment b3 = new LineSegment(seg3, 1, 3);
+			double[][] seg4 = new double[2][2];
+			seg4[0] = boundVert4;
+			seg4[1] = boundVert1;
+			LineSegment b4 = new LineSegment(seg4, 1, 4);
+			boundarySegments.add(b1);
+			boundarySegments.add(b2);
+			boundarySegments.add(b3);
+			boundarySegments.add(b4);
 			for(VVertex v : vSet) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
 					if (max){
 						curveIndex = curveLine(tol, eps, umbilics, p, q,
-								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, true, umbilicStop);
+								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, true, umbilicStop, boundarySegments);
 					}
 					if (min){
 						curveIndex = curveLine(tol, eps, umbilics, p, q,
-								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, false, umbilicStop);
+								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, false, umbilicStop, boundarySegments);
 					}
 			}
 			lines.addAll(currentLines);
@@ -546,52 +586,45 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				for(PolygonalLine pl:lines){
 					allSegments.addAll(pl.getpLine());
 				}
-				LinkedList<double[]> boundaryVerts = new LinkedList<double[]>();
-				double[] boundVert1 = new double[2];
-				boundVert1[0] = U[0];
-				boundVert1[1] = V[0];
-				double[] boundVert2 = new double[2];
-				boundVert2[0] = U[0];
-				boundVert2[1] = V[V.length - 1];
-				double[] boundVert3 = new double[2];
-				boundVert3[0] = U[U.length - 1];
-				boundVert3[1] = V[0];
-				double[] boundVert4 = new double[2];
-				boundVert4[0] = U[U.length - 1];
-				boundVert4[1] = V[V.length - 1];
-				boundaryVerts.add(boundVert1);
-				boundaryVerts.add(boundVert2);
-				boundaryVerts.add(boundVert3);
-				boundaryVerts.add(boundVert4);
-				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-				double[][] seg1 = new double[2][2];
-				seg1[0][0] = U[0];
-				seg1[0][1] = V[0];
-				seg1[1][0] = U[U.length - 1];
-				seg1[1][1] = V[0];
-				LineSegment b1 = new LineSegment(seg1, 1, 1);
-				double[][] seg2 = new double[2][2];
-				seg2[0][0] = U[U.length - 1];
-				seg2[0][1] = V[0];
-				seg2[1][0] = U[U.length - 1];
-				seg2[1][1] = V[V.length - 1];
-				LineSegment b2 = new LineSegment(seg2, 1, 2);
-				double[][] seg3 = new double[2][2];
-				seg3[0][0] = U[U.length - 1];
-				seg3[0][1] = V[V.length - 1];
-				seg3[1][0] = U[0];
-				seg3[1][1] = V[V.length - 1];
-				LineSegment b3 = new LineSegment(seg3, 1, 3);
-				double[][] seg4 = new double[2][2];
-				seg4[0][0] = U[0];
-				seg4[0][1] = V[V.length - 1];
-				seg4[1][0] = U[0];
-				seg4[1][1] = V[0];
-				LineSegment b4 = new LineSegment(seg4, 1, 4);
-				boundarySegments.add(b1);
-				boundarySegments.add(b2);
-				boundarySegments.add(b3);
-				boundarySegments.add(b4);
+//				LinkedList<double[]> boundaryVerts = new LinkedList<double[]>();
+//				double[] boundVert1 = new double[2];
+//				boundVert1[0] = U[0];
+//				boundVert1[1] = V[0];
+//				double[] boundVert2 = new double[2];
+//				boundVert2[0] = U[0];
+//				boundVert2[1] = V[V.length - 1];
+//				double[] boundVert3 = new double[2];
+//				boundVert3[0] = U[U.length - 1];
+//				boundVert3[1] = V[0];
+//				double[] boundVert4 = new double[2];
+//				boundVert4[0] = U[U.length - 1];
+//				boundVert4[1] = V[V.length - 1];
+//				boundaryVerts.add(boundVert1);
+//				boundaryVerts.add(boundVert2);
+//				boundaryVerts.add(boundVert3);
+//				boundaryVerts.add(boundVert4);
+//				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
+//
+//				double[][] seg1 = new double[2][2];
+//				seg1[0] = boundVert1;
+//				seg1[1] = boundVert2;
+//				LineSegment b1 = new LineSegment(seg1, 1, 1);
+//				double[][] seg2 = new double[2][2];
+//				seg2[0] = boundVert2;
+//				seg2[1] = boundVert3;
+//				LineSegment b2 = new LineSegment(seg2, 1, 2);
+//				double[][] seg3 = new double[2][2];
+//				seg3[0] = boundVert3;
+//				seg3[1] = boundVert4;
+//				LineSegment b3 = new LineSegment(seg3, 1, 3);
+//				double[][] seg4 = new double[2][2];
+//				seg4[0] = boundVert4;
+//				seg4[1] = boundVert1;
+//				LineSegment b4 = new LineSegment(seg4, 1, 4);
+//				boundarySegments.add(b1);
+//				boundarySegments.add(b2);
+//				boundarySegments.add(b3);
+//				boundarySegments.add(b4);
 				int shiftedIndex = allSegments.size();
 				for (LineSegment bs : boundarySegments) {
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
@@ -666,12 +699,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				double[] V, double[][][] Pw,
 				LinkedList<PolygonalLine> segments,
 				int curveIndex,
-				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop) {
+				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop,LinkedList<LineSegment> boundary) {
 			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 			IntObjects intObj;
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
-			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,umbilics, umbilicStop);
+			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,umbilics, umbilicStop, boundary);
 			if(intObj.getUmbilicIndex() != 0){
 				umbilicIndex.add(intObj.getUmbilicIndex());
 			}
@@ -682,7 +715,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean cyclic = false;
 			if(!intObj.isNearby()){
 				all.pollLast();
-				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps, umbilics, umbilicStop);
+				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps, umbilics, umbilicStop, boundary);
 				if(intObj.getUmbilicIndex() != 0){
 					umbilicIndex.add(intObj.getUmbilicIndex());
 				}
@@ -729,13 +762,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
 				points[i] = S;
 			}
-			psf.setVertexCoordinates(points);
-			psf.update();
+			IndexedLineSetFactory lsf = IndexedLineSetUtility.createCurveFactoryFromPoints(points, false);
+			lsf.update();
 			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
 			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
 			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
 			sgc.addChild(maxCurveComp);
-			sgc.setGeometry(psf.getGeometry());
+			sgc.setGeometry(lsf.getGeometry());
 			Appearance labelAp = new Appearance();
 			sgc.setAppearance(labelAp);
 			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
@@ -746,6 +779,24 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				pointShader.setDiffuseColor(Color.cyan);
 			}
 			hif.getActiveLayer().addTemporaryGeometry(sgc);
+			
+//			psf.setVertexCoordinates(points);
+//			psf.update();
+//			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
+//			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
+//			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
+//			sgc.addChild(maxCurveComp);
+//			sgc.setGeometry(psf.getGeometry());
+//			Appearance labelAp = new Appearance();
+//			sgc.setAppearance(labelAp);
+//			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+//			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+//			if(maxMin){
+//				pointShader.setDiffuseColor(Color.red);
+//			}else{
+//				pointShader.setDiffuseColor(Color.cyan);
+//			}
+//			hif.getActiveLayer().addTemporaryGeometry(sgc);
 			return curveIndex;
 		}
 	}
