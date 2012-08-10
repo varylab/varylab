@@ -281,12 +281,6 @@ public class IntegralCurves {
 		}
 	}
 	
-	private static double innerProductTwoSegments(double[][] seg1, double[][] seg2){
-		double[] vec1 = Rn.subtract(null, seg1[1], seg1[0]);
-		double[] vec2 = Rn.subtract(null, seg2[1], seg2[0]);
-		return Rn.innerProduct(vec1, vec2);
-	}
-	
 	/**
 	 * <p><strong>computes the curvature lines</strong></p>
 	 * 
@@ -385,12 +379,14 @@ public class IntegralCurves {
 				segment[1] = Rn.add(null, u.getLast(), Rn.times(null, h, Phi1));
 				seg.setSegment(segment);
 				u.add(segment[1]);
+				if(u.size() > 2){
+					
+				}
 				for (double[] umb : umbilics) {
-					if(u.size() > 2){
+					if(u.size() > 1){
 						double[][] lastSegment = new double[2][2];
 						lastSegment[1] = u.pollLast();
 						lastSegment[0] = u.getLast();
-//						System.out.println("last Segment: start " + Arrays.toString(lastSegment[0]) + " end " + Arrays.toString(lastSegment[1]));
 						seg.setSegment(lastSegment);
 						dist = distLineSegmentPoint(umb, seg);
 						if(dist < umbilicStop){
@@ -435,14 +431,14 @@ public class IntegralCurves {
 				vec1 = Rn.subtract(null, u.getLast(), u.getFirst());
 				
 			}
-			if(u.size() > 20){
+			if(u.size() > 2){
 				double[][] lastSegment = new double[2][2];
 				lastSegment[1] = u.pollLast();
 				lastSegment[0] = u.getLast();
 				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
 				seg.setSegment(lastSegment);
 				dist = distLineSegmentPoint(y0, seg);
-				if(Rn.innerProduct(vec1, vec2) > 0){
+				if(Rn.innerProduct(vec1, vec2) < 0){
 					closed = true;
 //					System.out.println(" innerproduct > 0");
 //					System.out.println("vec1 " + Arrays.toString(vec1));
