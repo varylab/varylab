@@ -4,11 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
-import de.varylab.varylab.plugin.nurbs.data.EventPoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
@@ -283,6 +281,12 @@ public class IntegralCurves {
 		}
 	}
 	
+	private static double innerProductTwoSegments(double[][] seg1, double[][] seg2){
+		double[] vec1 = Rn.subtract(null, seg1[1], seg1[0]);
+		double[] vec2 = Rn.subtract(null, seg2[1], seg2[0]);
+		return Rn.innerProduct(vec1, vec2);
+	}
+	
 	/**
 	 * <p><strong>computes the curvature lines</strong></p>
 	 * 
@@ -309,6 +313,9 @@ public class IntegralCurves {
 		double h = maxDist / 5.0;
 		double tau;
 		double vau;
+		double [] vec1 = new double[2];
+		double [] vec2 = new double[2];
+		boolean closed = false;
 		u.add(y0);
 		double[] orientation = new double[2];
 		if (!secondOrientation) {
@@ -318,7 +325,6 @@ public class IntegralCurves {
 					IntegralCurves.getMaxMinCurv(ns, y0[0], y0[1], max));
 		}
 		boolean nearBy = false;
-		boolean first = true;
 		double dist;
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
@@ -355,9 +361,6 @@ public class IntegralCurves {
 						intersection = projectPointIntoDomain(ns, intersection);
 					}
 					u.add(intersection);
-					if(isOutOfDomain(ns, intersection)){
-						System.out.println("ALLES FALSCH");
-					}
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
@@ -383,14 +386,7 @@ public class IntegralCurves {
 				seg.setSegment(segment);
 				u.add(segment[1]);
 				for (double[] umb : umbilics) {
-//					if(Rn.euclideanDistance(u.getLast(), umb) < umbilicStop){
-//						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-//						intObj.setUmbilicIndex(umbilics.indexOf(umb));
-//						System.out.println("near umbilic");
-//						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
-//						return intObj;
-//					}
-					if(u.size() > 1){
+					if(u.size() > 2){
 						double[][] lastSegment = new double[2][2];
 						lastSegment[1] = u.pollLast();
 						lastSegment[0] = u.getLast();
@@ -435,21 +431,24 @@ public class IntegralCurves {
 					h = hOld;
 				}
 			}
-//			dist = Rn.euclideanDistance(u.getLast(), y0);
-//			if (!(dist < umbilicStop) && first) {
-//				first = false;
-//			}
-//			if (dist < umbilicStop && !first) {
-//				nearBy = true;
-//			}
-			
-			if(u.size() > 10){
+			if(u.size() == 2){
+				vec1 = Rn.subtract(null, u.getLast(), u.getFirst());
+				
+			}
+			if(u.size() > 20){
 				double[][] lastSegment = new double[2][2];
 				lastSegment[1] = u.pollLast();
 				lastSegment[0] = u.getLast();
+				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
 				seg.setSegment(lastSegment);
 				dist = distLineSegmentPoint(y0, seg);
-				if(dist < umbilicStop){
+				if(Rn.innerProduct(vec1, vec2) > 0){
+					closed = true;
+//					System.out.println(" innerproduct > 0");
+//					System.out.println("vec1 " + Arrays.toString(vec1));
+//					System.out.println("vec2 " + Arrays.toString(vec1));
+				}
+				if(dist < umbilicStop && closed){
 					nearBy = true;
 					System.out.println("closed");
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
