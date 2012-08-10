@@ -303,10 +303,10 @@ public class IntegralCurves {
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
 		double[] b = { 0, 0.5, 0.75, 1 };
-		double stepSize = umbilicStop / 2;
 		LinkedList<double[]> u = new LinkedList<double[]>();
 		int dim = y0.length;
-		double h = stepSize;
+		double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] - ns.getUKnotVector()[ns.getUKnotVector().length - 1]), Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
+		double h = maxDist / 5.0;
 		double tau;
 		double vau;
 		u.add(y0);
@@ -429,34 +429,36 @@ public class IntegralCurves {
 				}
 			}
 			if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
+				double hOld = h;
 				h = h * Math.sqrt(tol * vau / tau);
+				if(h > maxDist / 2){
+					h = hOld;
+				}
 			}
-			dist = Rn.euclideanDistance(u.getLast(), y0);
-			if (!(dist < umbilicStop) && first) {
-				first = false;
-			}
-			if (dist < umbilicStop && !first) {
-				nearBy = true;
-			}
-			
-//			if(u.size() > 1){
-//				double[][] lastSegment = new double[2][2];
-//				lastSegment[1] = u.pollLast();
-//				lastSegment[0] = u.getLast();
-//				seg.setSegment(lastSegment);
-//				dist = distLineSegmentPoint(y0, seg);
-////				System.out.println("eps " + umbilicStop);
-////				System.out.println("dist " + dist);
-//				if (!(dist < umbilicStop * 8) && first) {
-//					first = false;
-//				}
-//				else{
-//					u.add(segment[1]);
-//				}
-//				if (dist < umbilicStop && !first) {
-//					nearBy = true;
-//				}
+//			dist = Rn.euclideanDistance(u.getLast(), y0);
+//			if (!(dist < umbilicStop) && first) {
+//				first = false;
 //			}
+//			if (dist < umbilicStop && !first) {
+//				nearBy = true;
+//			}
+			
+			if(u.size() > 10){
+				double[][] lastSegment = new double[2][2];
+				lastSegment[1] = u.pollLast();
+				lastSegment[0] = u.getLast();
+				seg.setSegment(lastSegment);
+				dist = distLineSegmentPoint(y0, seg);
+				if(dist < umbilicStop){
+					nearBy = true;
+					System.out.println("closed");
+					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+					return intObj;
+				}
+				else{
+					u.add(lastSegment[1]);
+				}
+			}
 		}
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
