@@ -447,12 +447,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			serialVersionUID = 1L;
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
-			epsExpModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1);
 			
 		private JSpinner
 			tolSpinner = new JSpinner(tolExpModel),
-			epsSpinner = new JSpinner(epsExpModel),
 			nearUmbilicSpinner = new JSpinner(nearUmbilicModel);
 		private JButton
 			goButton = new JButton("Go");
@@ -498,8 +496,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
-			double eps = epsExpModel.getNumber().doubleValue();
-			eps = Math.pow(10, eps);
 			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
 			umbilicStop = Math.pow(10, umbilicStop);
 			
@@ -568,11 +564,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			for(VVertex v : vSet) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
 					if (max){
-						curveIndex = curveLine(tol, eps, umbilics, p, q,
+						curveIndex = curveLine(tol, umbilics, p, q,
 								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, true, umbilicStop, boundarySegments);
 					}
 					if (min){
-						curveIndex = curveLine(tol, eps, umbilics, p, q,
+						curveIndex = curveLine(tol, umbilics, p, q,
 								U, V, Pw, currentLines, curveIndex, umbilicIndex, y0, false, umbilicStop, boundarySegments);
 					}
 			}
@@ -586,45 +582,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				for(PolygonalLine pl:lines){
 					allSegments.addAll(pl.getpLine());
 				}
-//				LinkedList<double[]> boundaryVerts = new LinkedList<double[]>();
-//				double[] boundVert1 = new double[2];
-//				boundVert1[0] = U[0];
-//				boundVert1[1] = V[0];
-//				double[] boundVert2 = new double[2];
-//				boundVert2[0] = U[0];
-//				boundVert2[1] = V[V.length - 1];
-//				double[] boundVert3 = new double[2];
-//				boundVert3[0] = U[U.length - 1];
-//				boundVert3[1] = V[0];
-//				double[] boundVert4 = new double[2];
-//				boundVert4[0] = U[U.length - 1];
-//				boundVert4[1] = V[V.length - 1];
-//				boundaryVerts.add(boundVert1);
-//				boundaryVerts.add(boundVert2);
-//				boundaryVerts.add(boundVert3);
-//				boundaryVerts.add(boundVert4);
-//				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-//
-//				double[][] seg1 = new double[2][2];
-//				seg1[0] = boundVert1;
-//				seg1[1] = boundVert2;
-//				LineSegment b1 = new LineSegment(seg1, 1, 1);
-//				double[][] seg2 = new double[2][2];
-//				seg2[0] = boundVert2;
-//				seg2[1] = boundVert3;
-//				LineSegment b2 = new LineSegment(seg2, 1, 2);
-//				double[][] seg3 = new double[2][2];
-//				seg3[0] = boundVert3;
-//				seg3[1] = boundVert4;
-//				LineSegment b3 = new LineSegment(seg3, 1, 3);
-//				double[][] seg4 = new double[2][2];
-//				seg4[0] = boundVert4;
-//				seg4[1] = boundVert1;
-//				LineSegment b4 = new LineSegment(seg4, 1, 4);
-//				boundarySegments.add(b1);
-//				boundarySegments.add(b2);
-//				boundarySegments.add(b3);
-//				boundarySegments.add(b4);
 				int shiftedIndex = allSegments.size();
 				for (LineSegment bs : boundarySegments) {
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
@@ -694,8 +651,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			curveTableModel.fireTableDataChanged();
 		}
 
-		private int curveLine(double tol, double eps,
-				List<double[]> umbilics, int p, int q, double[] U,
+		private int curveLine(double tol, List<double[]> umbilics, int p, int q, double[] U,
 				double[] V, double[][][] Pw,
 				LinkedList<PolygonalLine> segments,
 				int curveIndex,
@@ -704,7 +660,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			IntObjects intObj;
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
-			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,umbilics, umbilicStop, boundary);
+			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin, umbilics, umbilicStop, boundary);
 			if(intObj.getUmbilicIndex() != 0){
 				umbilicIndex.add(intObj.getUmbilicIndex());
 			}
@@ -715,7 +671,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean cyclic = false;
 			if(!intObj.isNearby()){
 				all.pollLast();
-				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps, umbilics, umbilicStop, boundary);
+				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
 				if(intObj.getUmbilicIndex() != 0){
 					umbilicIndex.add(intObj.getUmbilicIndex());
 				}
