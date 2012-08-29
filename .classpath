@@ -18,8 +18,6 @@
 	<classpathentry kind="lib" path="lib/mathematica/bsh-1.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/mathematica/JLink.jar" sourcepath="/MathematicaPlugin"/>
 	<classpathentry kind="lib" path="plugin/MathematicaPlugin.jar"/>
-	<classpathentry kind="lib" path="lib/substance/substance-6.2.jar"/>
-	<classpathentry kind="lib" path="lib/substance/trident-6.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/halfedgetools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
@@ -30,5 +28,7 @@
 	<classpathentry kind="lib" path="lib/jPETScTao.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ellipticFunctions"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mfc"/>
+	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar"/>
+	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
