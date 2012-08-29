@@ -3,7 +3,6 @@ package de.varylab.varylab;
 import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.skin.GraphiteAquaSkin;
@@ -290,15 +289,8 @@ public class VaryLab {
 	
 	
 	public static void installLookAndFeel() {
-		String os = System.getProperty("os.name");
 		try {
-			if (os.toLowerCase().contains("mac")) {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} else {
-//				SubstanceLookAndFeel.setSkin(new GraphiteGlassSkin());
-				SubstanceLookAndFeel.setSkin(new GraphiteAquaSkin());
-//				UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
-			}			
+			SubstanceLookAndFeel.setSkin(new GraphiteAquaSkin());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -26,6 +26,7 @@ public class PolygonalLine {
 		return pLine.getFirst().getCurveIndex();
 	}
 	
+	@Override
 	public String toString(){
 		String str = new String();
 		for (LineSegment ls : pLine) {
