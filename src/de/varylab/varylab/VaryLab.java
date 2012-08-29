@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
-import org.pushingpixels.substance.api.skin.GraphiteGlassSkin;
+import org.pushingpixels.substance.api.skin.GraphiteAquaSkin;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -60,6 +60,7 @@ import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
+import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
@@ -149,7 +150,7 @@ public class VaryLab {
 		v.registerPlugin(HeightFieldEditor.class);
 		
 		addOptimizationPlugins(v);
-//		addLnFPlugins(v);
+		addLnFPlugins(v);
 		addVisualizerPlugins(v);
 		addDDGPlugins(v);
 		
@@ -264,7 +265,7 @@ public class VaryLab {
 		
 	}
 	
-//	private static void addLnFPlugins(JRViewer v) {
+	private static void addLnFPlugins(JRViewer v) {
 //		v.registerPlugin(LookAndFeelSwitch.class);
 //		v.registerPlugin(FHLookAndFeel.class);
 //		v.registerPlugin(TinyLookAndFeel.class);
@@ -274,7 +275,8 @@ public class VaryLab {
 //		v.registerPlugin(SyntheticaStandardLnf.class);
 //		v.registerPlugin(SyntheticaBlackEyeLnf.class);
 //		v.registerPlugin(SubstanceLnF.class);
-//	}
+		v.registerPlugin(SubstanceLnFMenu.class);
+	}
 	
 	private static void addDDGPlugins(JRViewer v) {
 		v.registerPlugin(ChristoffelTransform.class);
@@ -293,7 +295,8 @@ public class VaryLab {
 			if (os.toLowerCase().contains("mac")) {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} else {
-				SubstanceLookAndFeel.setSkin(new GraphiteGlassSkin());
+//				SubstanceLookAndFeel.setSkin(new GraphiteGlassSkin());
+				SubstanceLookAndFeel.setSkin(new GraphiteAquaSkin());
 //				UIManager.setLookAndFeel(new SubstanceRavenGraphiteGlassLookAndFeel());
 			}			
 		} catch (Exception e) {

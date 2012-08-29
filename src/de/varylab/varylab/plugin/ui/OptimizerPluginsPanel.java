@@ -206,6 +206,12 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 			activeRow = row;
 			model.setValue(value);
+			TableCellRenderer defaultRenderer = table.getDefaultRenderer(String.class);
+			Component c = defaultRenderer.getTableCellRendererComponent(table, "", isSelected, true, row, column);
+			spinner.setOpaque(false);
+			spinner.setBackground(c.getBackground());
+			spinner.setForeground(c.getForeground());
+			SwingUtilities.updateComponentTreeUI(spinner);
 			return spinner;
 		}
 
@@ -213,6 +219,12 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			activeRow = row;
 			model.setValue(value);
+			TableCellRenderer defaultRenderer = table.getDefaultRenderer(String.class);
+			Component c = defaultRenderer.getTableCellRendererComponent(table, "", isSelected, true, row, column);
+			spinner.setOpaque(false);
+			spinner.setBackground(c.getBackground());
+			spinner.setForeground(c.getForeground());
+			SwingUtilities.updateComponentTreeUI(spinner);
 			return spinner;
 		}
 
