@@ -1,10 +1,11 @@
 package de.varylab.varylab.math.functional;
 
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Vector;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;

@@ -2,7 +2,7 @@ package de.varylab.varylab.plugin.nurbs.data;
 
 	
 	import java.util.LinkedList;
-	import java.util.List;
+import java.util.List;
 
 	public class Partition {
 		

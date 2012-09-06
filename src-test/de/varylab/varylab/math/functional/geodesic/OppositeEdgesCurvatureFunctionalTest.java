@@ -2,11 +2,12 @@ package de.varylab.varylab.math.functional.geodesic;
 
 import java.util.Random;
 
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Vector;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.functional.MyDomainValue;

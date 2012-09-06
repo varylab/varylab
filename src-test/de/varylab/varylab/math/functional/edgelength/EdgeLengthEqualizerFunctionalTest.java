@@ -31,11 +31,12 @@ OF SUCH DAMAGE.
 
 package de.varylab.varylab.math.functional.edgelength;
 
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Vector;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.Vector;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.MyDomainValue;
