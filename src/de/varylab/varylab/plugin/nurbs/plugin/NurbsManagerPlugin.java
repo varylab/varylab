@@ -130,9 +130,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private CurvatureLinesPanel
 		curvatureLinesPanel = new CurvatureLinesPanel();
 	
-	private PolygonalCurvePanel
-		polygonalCurvePanel = new PolygonalCurvePanel();
-	
 	private PointDistancePanel
 		pointDistancePanel = new PointDistancePanel();
 	
@@ -219,8 +216,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		shrinkPanel.add(curvatureLinesPanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(geodesicPanel, c);
-		c.weighty = 0.0;
-		shrinkPanel.add(polygonalCurvePanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(pointDistancePanel, c);
 	}
@@ -487,7 +482,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			curveTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			add(curveScrollPanel, rc);
-			
 			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
 		}
 		
@@ -706,13 +700,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			PolygonalLine currentLine = new PolygonalLine(currentSegments);
 			segments.add(currentLine);
 			curveIndex ++;
-			PointSetFactory psf = new PointSetFactory();
 			double[][] u = new double[all.size()][];
 			double[][] points = new double[all.size()][];
 			for (int i = 0; i < u.length; i++) {
 				u[i] = all.get(i);
 			}
-			psf.setVertexCount(u.length);
 			for (int i = 0; i < u.length; i++) {
 				double[] S = new double[4];
 				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
@@ -735,45 +727,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				pointShader.setDiffuseColor(Color.cyan);
 			}
 			hif.getActiveLayer().addTemporaryGeometry(sgc);
-			
-//			psf.setVertexCoordinates(points);
-//			psf.update();
-//			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
-//			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
-//			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
-//			sgc.addChild(maxCurveComp);
-//			sgc.setGeometry(psf.getGeometry());
-//			Appearance labelAp = new Appearance();
-//			sgc.setAppearance(labelAp);
-//			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
-//			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
-//			if(maxMin){
-//				pointShader.setDiffuseColor(Color.red);
-//			}else{
-//				pointShader.setDiffuseColor(Color.cyan);
-//			}
-//			hif.getActiveLayer().addTemporaryGeometry(sgc);
 			return curveIndex;
 		}
 	}
 	
-	private class PolygonalCurvePanel extends ShrinkPanel implements ActionListener{
-		
-		private static final long 
-		serialVersionUID = 1L;
-		
-		public PolygonalCurvePanel() {
-			super("Polygonal Curves");
-			setShrinked(true);
-			setLayout(new GridBagLayout());
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e){
-			
-		}
-		
-	}
 	
 	private class PointDistancePanel extends ShrinkPanel implements ActionListener{
 		
@@ -836,14 +793,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					@Override
 					public void pointDragged(PointDragEvent e) {
 						PointSet pointSet = e.getPointSet();
-						
 						double[][] points=new double[pointSet.getNumPoints()][];
 				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
 				        points[e.getIndex()]=e.getPosition(); 
 				        point = e.getPosition().clone();
 				        point[3] = 1.;
 				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
-				        
 					}
 					
 					@Override

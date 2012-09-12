@@ -304,7 +304,7 @@ public class IntegralCurves {
 		LinkedList<double[]> u = new LinkedList<double[]>();
 		int dim = y0.length;
 		double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] - ns.getUKnotVector()[ns.getUKnotVector().length - 1]), Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
-		double h = maxDist / 5.0;
+		double h = maxDist / 50;
 		double tau;
 		double vau;
 		double [] vec1 = new double[2];
@@ -379,9 +379,6 @@ public class IntegralCurves {
 				segment[1] = Rn.add(null, u.getLast(), Rn.times(null, h, Phi1));
 				seg.setSegment(segment);
 				u.add(segment[1]);
-				if(u.size() > 2){
-					
-				}
 				for (double[] umb : umbilics) {
 					if(u.size() > 1){
 						double[][] lastSegment = new double[2][2];
@@ -455,6 +452,7 @@ public class IntegralCurves {
 				}
 			}
 		}
+		System.out.println("u.size() " + u.size());
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 		System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 		return intObj;

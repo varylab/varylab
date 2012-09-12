@@ -1,4 +1,5 @@
 package de.varylab.varylab.plugin.nurbs.math;
+//import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +15,14 @@ import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
 
+//import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
+//import de.jreality.scene.Appearance;
+//import de.jreality.scene.SceneGraphComponent;
+//import de.jreality.shader.DefaultGeometryShader;
+//import de.jreality.shader.DefaultPointShader;
+//import de.jreality.shader.ShaderUtility;
+//import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
@@ -30,6 +38,8 @@ import de.varylab.varylab.plugin.nurbs.data.Partition;
 import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
 
 public class LineSegmentIntersection {
+//	private static HalfedgeInterface 
+//	hif = null;
 	
 	
 	public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
@@ -85,7 +95,7 @@ public class LineSegmentIntersection {
 		TreeSet<LineSegment> finalSegmentTree = new TreeSet<LineSegment>(new PartitionComparator());
 		for (int i = 0; i < partition.length; i++) {
 			for (int j = 0; j < partition.length; j++) {
-				if(partition[i][j].getIndexList().size() >= 2){
+				if(partition[i][j].getIndexList().size() > 1){
 					for(LineSegment ls : partition[i][j].getSegList()){
 						finalSegmentTree.add(ls);
 					}
@@ -583,6 +593,25 @@ public class LineSegmentIntersection {
 			bP.setUnusedNbrs(removedStartDirection);
 			
 			allAjacentNbrs.add(next);
+//			if(next.getParentHP() == null){
+//				System.out.println("NEXT");
+//				System.out.println(Arrays.toString(next.getPoint()));
+//				PointSetFactory psf = new PointSetFactory();
+//				psf.setVertexCount(1);
+//				psf.setVertexCoordinates(next.getPoint());
+//				psf.update();
+//				SceneGraphComponent sgc = new SceneGraphComponent("geodesic segment");
+//				SceneGraphComponent minCurveComp = new SceneGraphComponent("Geodesic Segment");
+//				sgc.addChild(minCurveComp);
+//				sgc.setGeometry(psf.getGeometry());
+//				Appearance labelAp = new Appearance();
+//				sgc.setAppearance(labelAp);
+//				DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+//				DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+//				pointShader.setDiffuseColor(Color.magenta);
+//				hif.getActiveLayer().addTemporaryGeometry(sgc);
+//				
+//			}
 			HalfedgePoint hP = next.getParentHP();
 			allNbrs.add(hP);
 		}
