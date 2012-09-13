@@ -54,14 +54,10 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 			double[] t = a.getD(Position3d.class, ee.getStartVertex());
 			subtract(vec1, s, vv);
 			subtract(vec2, t, vv);
-			double alpha = Math.PI-euclideanAngle(vec1, vec2);
+			double alpha = euclideanAngle(vec1, vec2);
 			Rn.subtract(vec3, vec1, vec2);
-			double la = Rn.euclideanNorm(vec3);
-			double c = 2.0 * (1-Math.cos(2.0*alpha)) / la;
-			if (c < 0) {
-				System.out.println("negative geodesic curvature!");
-			}
-			return Math.sqrt(Math.abs(c));
+			double l = Rn.euclideanNorm(vec3);
+			return 2 * Math.sin(alpha)/l;
 		}
 		
 		@Override
