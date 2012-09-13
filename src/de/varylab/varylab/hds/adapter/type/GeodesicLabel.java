@@ -1,4 +1,4 @@
-package de.varylab.varylab.hds.adapter;
+package de.varylab.varylab.hds.adapter.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

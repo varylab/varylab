@@ -36,8 +36,8 @@ public class MeanEdgeLengthOptimizer extends VarylabOptimizerPlugin {
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
 		double l = 0.0;
 		for (VEdge e : hds.getPositiveEdges()) {
-			double[] s = e.getStartVertex().position;
-			double[] t = e.getTargetVertex().position;
+			double[] s = e.getStartVertex().P;
+			double[] t = e.getTargetVertex().P;
 			l += Rn.euclideanDistance(s, t);
 		}
 		l /= hds.numEdges() / 2.0;

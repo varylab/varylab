@@ -46,10 +46,10 @@ public class HFace {
 		       vc2 = new double[4],
 		       vc3 = new double[4],
 		       vc4 = new double[4];
-		System.arraycopy(v1.position, 0, vc1, 0, 3);
-		System.arraycopy(v2.position, 0, vc2, 0, 3);
-		System.arraycopy(v3.position, 0, vc3, 0, 3);
-		System.arraycopy(v4.position, 0, vc4, 0, 3);
+		System.arraycopy(v1.P, 0, vc1, 0, 3);
+		System.arraycopy(v2.P, 0, vc2, 0, 3);
+		System.arraycopy(v3.P, 0, vc3, 0, 3);
+		System.arraycopy(v4.P, 0, vc4, 0, 3);
 		vc1[3]=1;
 		vc2[3]=1;
 		vc3[3]=1;
@@ -101,8 +101,8 @@ public class HFace {
 			double[]
 			       vc1 = new double[4],
 			       vc2 = new double[4];
-			System.arraycopy(v1.position, 0, vc1, 0, 3);
-			System.arraycopy(v2.position, 0, vc2, 0, 3);
+			System.arraycopy(v1.P, 0, vc1, 0, 3);
+			System.arraycopy(v2.P, 0, vc2, 0, 3);
 			vc1[3]=1;
 			vc2[3]=1;
 			double[] plueckerCoords = new double[6];

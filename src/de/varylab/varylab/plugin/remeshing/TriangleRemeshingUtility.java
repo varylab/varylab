@@ -200,8 +200,8 @@ public class TriangleRemeshingUtility {
 				double move = j % 2 == 0 ? 0.0 : xstep;
 				double xPos = bbox.getMinX() + 2*i*xstep + move;
 				double yPos = bbox.getMinY() + j * ystep;
-				v.position = new double[]{xPos,yPos,1.0};
-				v.texcoord = new double[]{xPos,yPos,1.0};
+				v.P = new double[]{xPos,yPos,1.0};
+				v.T = new double[]{xPos,yPos,1.0};
 			}
 		}
 		for (int i = 0; i < xRes  - 1; i++) {

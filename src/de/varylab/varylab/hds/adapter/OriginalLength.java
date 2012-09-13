@@ -16,7 +16,7 @@ public class OriginalLength implements Length<VEdge> {
 		for(VEdge e: hds.getEdges()) {
 			VVertex s = e.getStartVertex();
 			VVertex t = e.getTargetVertex();
-			el[e.getIndex()] = Rn.euclideanDistance(s.position, t.position);
+			el[e.getIndex()] = Rn.euclideanDistance(s.P, t.P);
 		}
 	}
 	

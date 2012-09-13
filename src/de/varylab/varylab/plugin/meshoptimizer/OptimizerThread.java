@@ -81,9 +81,9 @@ public class OptimizerThread extends Thread {
 					@Override
 					public void run() {
 						for (VVertex v : hds.getVertices()) {
-							uArr[v.getIndex() * 3 + 0] = v.position[0];
-							uArr[v.getIndex() * 3 + 1] = v.position[1];
-							uArr[v.getIndex() * 3 + 2] = v.position[2];
+							uArr[v.getIndex() * 3 + 0] = v.P[0];
+							uArr[v.getIndex() * 3 + 1] = v.P[1];
+							uArr[v.getIndex() * 3 + 2] = v.P[2];
 						}
 					}
 				});

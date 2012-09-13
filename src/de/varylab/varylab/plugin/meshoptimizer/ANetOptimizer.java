@@ -26,7 +26,7 @@ public class ANetOptimizer extends VarylabOptimizerPlugin {
 	public static double getShortestEdgeLength(VHDS hds) {
 		double r = Double.MAX_VALUE;
 		for (VEdge e : hds.getEdges()) {
-			double tmp = Pn.distanceBetween(e.getStartVertex().position, e.getTargetVertex().position, Pn.EUCLIDEAN);
+			double tmp = Pn.distanceBetween(e.getStartVertex().P, e.getTargetVertex().P, Pn.EUCLIDEAN);
 			if (tmp < r) {
 				r = tmp;
 			}

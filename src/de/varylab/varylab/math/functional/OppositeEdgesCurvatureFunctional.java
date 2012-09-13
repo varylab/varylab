@@ -20,7 +20,7 @@ import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.hds.adapter.GeodesicLabel;
+import de.varylab.varylab.hds.adapter.type.GeodesicLabel;
 
 public class OppositeEdgesCurvatureFunctional<
 	V extends Vertex<V, E, F>, 

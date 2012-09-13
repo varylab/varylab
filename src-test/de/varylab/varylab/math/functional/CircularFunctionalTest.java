@@ -30,16 +30,16 @@ public class CircularFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace
 			v4 = hds.addNewVertex();
 		
 		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v3,v4);
-		v1.position = new double[] {0.0,0.0,0.0};
-		v2.position = new double[] {1.0,0.0,0.0};
-		v3.position = new double[] {0.0,1.0,0.0};
-		v4.position = new double[] {Math.random(), Math.random(), 0.0};
+		v1.P = new double[] {0.0,0.0,0.0};
+		v2.P = new double[] {1.0,0.0,0.0};
+		v3.P = new double[] {0.0,1.0,0.0};
+		v4.P = new double[] {Math.random(), Math.random(), 0.0};
 
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {
-			result.set(v.getIndex() * 3 + 0, v.position[0]);
-			result.set(v.getIndex() * 3 + 1, v.position[1]);
-			result.set(v.getIndex() * 3 + 2, v.position[2]);
+			result.set(v.getIndex() * 3 + 0, v.P[0]);
+			result.set(v.getIndex() * 3 + 1, v.P[1]);
+			result.set(v.getIndex() * 3 + 2, v.P[2]);
 		}
 		
 		MyDomainValue pos = new MyDomainValue(result);

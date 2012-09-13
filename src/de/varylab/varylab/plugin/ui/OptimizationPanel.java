@@ -211,9 +211,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		
 		Vec x = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
-			x.setValue(v.getIndex() * 3 + 0, v.position[0], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 1, v.position[1], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 2, v.position[2], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 0, v.P[0], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 1, v.P[1], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 2, v.P[2], InsertMode.INSERT_VALUES);
 		}
 		
 		double maxz_before = Double.NEGATIVE_INFINITY;
@@ -335,9 +335,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		int dim = hds.numVertices() * 3;
 		DenseVector u = new DenseVector(dim);
 		for (VVertex v : hds.getVertices()) {
-			u.set(v.getIndex() * 3 + 0, v.position[0]);
-			u.set(v.getIndex() * 3 + 1, v.position[1]);
-			u.set(v.getIndex() * 3 + 2, v.position[2]);
+			u.set(v.getIndex() * 3 + 0, v.P[0]);
+			u.set(v.getIndex() * 3 + 1, v.P[1]);
+			u.set(v.getIndex() * 3 + 2, v.P[2]);
 		}
 		return new MyDomainValue(u);
 	}

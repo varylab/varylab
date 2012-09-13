@@ -1,5 +1,5 @@
 <linked-list>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>1.0</double>
@@ -13,10 +13,10 @@
     <indexOnCurve>2</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment/segment/double-array[2]"/>
       <double-array>
         <double>0.8444444444444443</double>
         <double>0.7777777777777778</double>
@@ -25,10 +25,10 @@
     <indexOnCurve>3</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[2]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[2]/segment/double-array[2]"/>
       <double-array>
         <double>0.7444444444444444</double>
         <double>0.7777777777777778</double>
@@ -37,10 +37,10 @@
     <indexOnCurve>4</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[3]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[3]/segment/double-array[2]"/>
       <double-array>
         <double>0.6444444444444444</double>
         <double>0.7777777777777778</double>
@@ -49,10 +49,10 @@
     <indexOnCurve>5</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[4]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[4]/segment/double-array[2]"/>
       <double-array>
         <double>0.5444444444444444</double>
         <double>0.7777777777777778</double>
@@ -61,10 +61,10 @@
     <indexOnCurve>6</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[5]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[5]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.7777777777777778</double>
@@ -73,10 +73,10 @@
     <indexOnCurve>7</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[6]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[6]/segment/double-array[2]"/>
       <double-array>
         <double>0.34444444444444444</double>
         <double>0.7777777777777778</double>
@@ -85,10 +85,10 @@
     <indexOnCurve>9</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[7]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[7]/segment/double-array[2]"/>
       <double-array>
         <double>0.24444444444444444</double>
         <double>0.7777777777777778</double>
@@ -97,10 +97,10 @@
     <indexOnCurve>10</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[8]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[8]/segment/double-array[2]"/>
       <double-array>
         <double>0.14444444444444443</double>
         <double>0.7777777777777778</double>
@@ -109,10 +109,10 @@
     <indexOnCurve>11</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[9]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[9]/segment/double-array[2]"/>
       <double-array>
         <double>0.044444444444444425</double>
         <double>0.7777777777777778</double>
@@ -121,10 +121,10 @@
     <indexOnCurve>12</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[10]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[10]/segment/double-array[2]"/>
       <double-array>
         <double>0.0</double>
         <double>0.7777777777777778</double>
@@ -133,8 +133,8 @@
     <indexOnCurve>13</indexOnCurve>
     <curveIndex>5</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.4444444444444444</double>
@@ -148,10 +148,10 @@
     <indexOnCurve>2</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[12]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[12]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.8777777777777778</double>
@@ -160,19 +160,19 @@
     <indexOnCurve>3</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[13]/segment/double-array[2]"/>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[6]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[13]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[6]/segment/double-array[2]"/>
     </segment>
     <indexOnCurve>4</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[6]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[6]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.6777777777777778</double>
@@ -181,10 +181,10 @@
     <indexOnCurve>6</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[15]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[15]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.5777777777777778</double>
@@ -193,10 +193,10 @@
     <indexOnCurve>7</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[16]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[16]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.47777777777777786</double>
@@ -205,10 +205,10 @@
     <indexOnCurve>8</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[17]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[17]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.3777777777777779</double>
@@ -217,10 +217,10 @@
     <indexOnCurve>9</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[18]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[18]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.2777777777777779</double>
@@ -229,10 +229,10 @@
     <indexOnCurve>10</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[19]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[19]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.1777777777777779</double>
@@ -241,10 +241,10 @@
     <indexOnCurve>11</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[20]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[20]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.07777777777777789</double>
@@ -253,10 +253,10 @@
     <indexOnCurve>12</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[21]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[21]/segment/double-array[2]"/>
       <double-array>
         <double>0.4444444444444444</double>
         <double>0.0</double>
@@ -265,8 +265,8 @@
     <indexOnCurve>13</indexOnCurve>
     <curveIndex>6</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.0</double>
@@ -280,10 +280,10 @@
     <indexOnCurve>2</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[23]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[23]/segment/double-array[2]"/>
       <double-array>
         <double>0.1333333333333333</double>
         <double>0.6666666666666666</double>
@@ -292,10 +292,10 @@
     <indexOnCurve>3</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[24]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[24]/segment/double-array[2]"/>
       <double-array>
         <double>0.2333333333333333</double>
         <double>0.6666666666666666</double>
@@ -304,10 +304,10 @@
     <indexOnCurve>4</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[25]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[25]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.6666666666666666</double>
@@ -316,10 +316,10 @@
     <indexOnCurve>5</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[26]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[26]/segment/double-array[2]"/>
       <double-array>
         <double>0.43333333333333335</double>
         <double>0.6666666666666666</double>
@@ -328,10 +328,10 @@
     <indexOnCurve>7</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[27]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[27]/segment/double-array[2]"/>
       <double-array>
         <double>0.5333333333333333</double>
         <double>0.6666666666666666</double>
@@ -340,10 +340,10 @@
     <indexOnCurve>8</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[28]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[28]/segment/double-array[2]"/>
       <double-array>
         <double>0.6333333333333333</double>
         <double>0.6666666666666666</double>
@@ -352,10 +352,10 @@
     <indexOnCurve>9</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[29]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[29]/segment/double-array[2]"/>
       <double-array>
         <double>0.7333333333333333</double>
         <double>0.6666666666666666</double>
@@ -364,10 +364,10 @@
     <indexOnCurve>10</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[30]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[30]/segment/double-array[2]"/>
       <double-array>
         <double>0.8333333333333333</double>
         <double>0.6666666666666666</double>
@@ -376,10 +376,10 @@
     <indexOnCurve>11</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[31]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[31]/segment/double-array[2]"/>
       <double-array>
         <double>0.9333333333333332</double>
         <double>0.6666666666666666</double>
@@ -388,10 +388,10 @@
     <indexOnCurve>12</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[32]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[32]/segment/double-array[2]"/>
       <double-array>
         <double>1.0</double>
         <double>0.6666666666666666</double>
@@ -400,8 +400,8 @@
     <indexOnCurve>13</indexOnCurve>
     <curveIndex>7</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.3333333333333333</double>
@@ -415,10 +415,10 @@
     <indexOnCurve>2</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[34]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[34]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.8666666666666666</double>
@@ -427,10 +427,10 @@
     <indexOnCurve>3</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[35]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[35]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.7666666666666666</double>
@@ -439,19 +439,19 @@
     <indexOnCurve>4</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[36]/segment/double-array[2]"/>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[26]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[36]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[26]/segment/double-array[2]"/>
     </segment>
     <indexOnCurve>5</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[26]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[26]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.5666666666666667</double>
@@ -460,10 +460,10 @@
     <indexOnCurve>7</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[38]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[38]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.4666666666666667</double>
@@ -472,10 +472,10 @@
     <indexOnCurve>8</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[39]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[39]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.3666666666666667</double>
@@ -484,10 +484,10 @@
     <indexOnCurve>9</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[40]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[40]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.2666666666666667</double>
@@ -496,10 +496,10 @@
     <indexOnCurve>10</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[41]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[41]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.1666666666666667</double>
@@ -508,10 +508,10 @@
     <indexOnCurve>11</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[42]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[42]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.06666666666666671</double>
@@ -520,10 +520,10 @@
     <indexOnCurve>12</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
-      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.LineSegment[43]/segment/double-array[2]"/>
+      <double-array reference="../../../de.varylab.varylab.plugin.nurbs.data.LineSegment[43]/segment/double-array[2]"/>
       <double-array>
         <double>0.3333333333333333</double>
         <double>0.0</double>
@@ -532,8 +532,8 @@
     <indexOnCurve>13</indexOnCurve>
     <curveIndex>8</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.0010</double>
@@ -547,8 +547,8 @@
     <indexOnCurve>1</indexOnCurve>
     <curveIndex>1</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.999</double>
@@ -562,8 +562,8 @@
     <indexOnCurve>1</indexOnCurve>
     <curveIndex>2</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.999</double>
@@ -577,8 +577,8 @@
     <indexOnCurve>1</indexOnCurve>
     <curveIndex>3</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
-  <de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
+  <de.varylab.varylab.plugin.nurbs.data.LineSegment>
     <segment>
       <double-array>
         <double>0.0010</double>
@@ -592,5 +592,5 @@
     <indexOnCurve>1</indexOnCurve>
     <curveIndex>4</curveIndex>
 
-  </de.varylab.varylab.plugin.nurbs.LineSegment>
+  </de.varylab.varylab.plugin.nurbs.data.LineSegment>
 </linked-list>

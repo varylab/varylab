@@ -4,6 +4,8 @@ import de.jtem.halfedge.Face;
 
 public class VFace extends Face<VVertex, VEdge, VFace> {
 
+	public double[]
+		P = {0, 0, 0, 1};
 	private double
 		weight = 1.0;
 	

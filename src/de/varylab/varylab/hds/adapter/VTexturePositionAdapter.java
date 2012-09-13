@@ -10,9 +10,6 @@ import de.varylab.varylab.hds.VVertex;
 @TexturePosition
 public class VTexturePositionAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 
-	private static double[]
-	    defaultTexCoordinate = {0, 0, 0, 1};
-	
 	public VTexturePositionAdapter() {
 		super(VVertex.class, null, null, double[].class, true, true);
 	}
@@ -24,27 +21,28 @@ public class VTexturePositionAdapter extends AbstractTypedAdapter<VVertex, VEdge
 	
 	@Override
 	public double[] getVertexValue(VVertex v, AdapterSet a) {
-		if (v.texcoord != null) {
-			return v.texcoord;
-		} else {
-			return defaultTexCoordinate;
-		}
+		return v.T;
 	}
 	
 	@Override
 	public void setVertexValue(VVertex v, double[] value, AdapterSet a) {
-		switch (value.length) {
-		case 2:
-			v.texcoord = new double[] {value[0], value[1], 0, 1.0};
-			break;
-		case 3:
-			v.texcoord = new double[] {value[0], value[1], value[2], 1.0};
-			break;
-		case 4:
-		default:	
-			v.texcoord = value;
-			break;
-		} 
+		if (value.length == 2) {
+			v.T[0] = value[0];
+			v.T[1] = value[1];
+			v.T[2] = 0.0;
+			v.T[3] = 1.0;
+		} else 
+		if (value.length == 3) {
+			v.T[0] = value[0];
+			v.T[1] = value[1];
+			v.T[2] = value[2];
+			v.T[3] = 1.0;
+		} else 
+		if (value.length == 4) {
+			System.arraycopy(value, 0, v.T, 0, 4);
+		} else {
+			throw new IllegalArgumentException("invalid dimension in set vertex value of CoVertex");
+		}
 	}
 	
 }

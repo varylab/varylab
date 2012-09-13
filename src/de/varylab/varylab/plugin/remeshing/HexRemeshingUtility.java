@@ -24,8 +24,8 @@ public class HexRemeshingUtility {
 				double move = (j % 2 == 0) ? 1 : -1;
 				move *= (i % 2 == 0) ? 1 : -1;
 				xPos += move*radius/4;
-				v.position = new double[]{xPos,yPos,1.0};
-				v.texcoord = new double[]{xPos,yPos,1.0};
+				v.P = new double[]{xPos,yPos,1.0};
+				v.T = new double[]{xPos,yPos,1.0};
 			}
 		}
 		for (int i = 0; i < xRes - 1; i++) {

@@ -6,8 +6,8 @@ import de.jtem.halfedge.Vertex;
 public class VVertex extends Vertex<VVertex, VEdge, VFace> {
 
 	public double[]
-	    position = null,
-	    texcoord = null;
+	    P = {0, 0, 0, 1},
+	    T = {0, 0, 0, 1};
 	private boolean
 		variable = true;
 	private double
@@ -29,19 +29,19 @@ public class VVertex extends Vertex<VVertex, VEdge, VFace> {
 
 	public void applyTransformation(Matrix t) {
 		double[] homPosition = new double[4];
-		System.arraycopy(position, 0, homPosition, 0, position.length);
+		System.arraycopy(P, 0, homPosition, 0, P.length);
 		homPosition[3]=1;
 		homPosition = t.multiplyVector(homPosition);
 		for(int i = 0; i < 3; i++ ) {
-			position[i] = homPosition[i]/homPosition[3];
+			P[i] = homPosition[i]/homPosition[3];
 		}
 	}
 	
 	@Override
 	public void copyData(VVertex v) {
 		super.copyData(v);
-		if (v.position != null) position = v.position.clone();
-		if (v.texcoord != null) texcoord = v.texcoord.clone();
+		if (v.P != null) P = v.P.clone();
+		if (v.T != null) T = v.T.clone();
 		variable = v.variable;
 		weight = v.weight;
 	}

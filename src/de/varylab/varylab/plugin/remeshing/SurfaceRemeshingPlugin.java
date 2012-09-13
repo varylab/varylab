@@ -152,7 +152,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			return;
 		}
 		for(VVertex v : remesh.getVertices()) {
-			v.position = remeshPosMap.get(v.getIndex());
+			v.P = remeshPosMap.get(v.getIndex());
 		}
 		hcp.set(remesh);
 	}
@@ -178,7 +178,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		newOldFaceMap.clear();
 		surface = hcp.get(surface);
 		AdapterSet a = hcp.getAdapters();
-		if (surface.getVertex(0).texcoord == null) {
+		if (surface.getVertex(0).T == null) {
 			throw new RemeshingException("Surface has no texture coordinates.");
 		}
 		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, a, 10, false);
@@ -190,7 +190,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Matrix texMatrix = ai.getTextureMatrix();
 
 		for (VVertex v : surface.getVertices()) {
-			texMatrix.transformVector(v.texcoord);
+			texMatrix.transformVector(v.T);
 		}
 		
 		Matrix texInvMatrix = texMatrix.getInverse();
@@ -211,12 +211,12 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesh = remesher.remesh(surface, a); 
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
-				texInvMatrix.transformVector(v.position);
-				texInvMatrix.transformVector(v.texcoord);
-				remeshPosMap.put(v.getIndex(), v.position);
+				texInvMatrix.transformVector(v.P);
+				texInvMatrix.transformVector(v.T);
+				remeshPosMap.put(v.getIndex(), v.P);
 			}
 			for (VVertex v : surface.getVertices()) {
-				texInvMatrix.transformVector(v.texcoord);
+				texInvMatrix.transformVector(v.T);
 			}
 			hcp.set(remesh);
 			return;
@@ -228,12 +228,12 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesher.setLattice(new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
 			remesh = remesher.remesh(surface, a); 
 			for (VVertex v : remesh.getVertices()) {
-				texInvMatrix.transformVector(v.position);
-				texInvMatrix.transformVector(v.texcoord);
-				remeshPosMap.put(v.getIndex(), v.position);
+				texInvMatrix.transformVector(v.P);
+				texInvMatrix.transformVector(v.T);
+				remeshPosMap.put(v.getIndex(), v.P);
 			}
 			for (VVertex v : surface.getVertices()) {
-				texInvMatrix.transformVector(v.texcoord);
+				texInvMatrix.transformVector(v.T);
 			}
 			hcp.set(remesh);
 			return;
@@ -247,8 +247,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				texInvMatrix.transformVector(coord);
 				a.set(Position.class, v, coord);
 				a.set(TexturePosition.class, v, coord);
-				v.position = coord;
-				v.texcoord = coord;
+				v.P = coord;
+				v.T = coord;
 				remeshPosMap.put(v.getIndex(), coord);
 			}
 //			for (VVertex v : surface.getVertices()) {
@@ -328,10 +328,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		
 		// transform tex coordinates
 		for (VVertex v : remesh.getVertices()) {
-			texInvMatrix.transformVector(v.texcoord);
+			texInvMatrix.transformVector(v.T);
 		}
 		for (VVertex v : surface.getVertices()) {
-			texInvMatrix.transformVector(v.texcoord);
+			texInvMatrix.transformVector(v.T);
 		}
 		
 		RemeshingUtility.cutTargetBoundary(faceOverlap, overlap, surface, featureSet, a);
