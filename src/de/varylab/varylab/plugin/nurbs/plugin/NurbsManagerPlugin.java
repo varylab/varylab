@@ -498,11 +498,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			vSet.addAll(hif.getSelection().getVertices(hds));
 			AdapterSet as = hif.getAdapters();
 			
-			for (double[] umb : umbilics) {
-				System.out.println();
-				System.out.println("umbilic: " + Arrays.toString(umb));
-				System.out.println();
-			}
+//			for (double[] umb : umbilics) {
+//				System.out.println();
+//				System.out.println("umbilic: " + Arrays.toString(umb));
+//				System.out.println();
+//			}
 			
 
 			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
@@ -1105,13 +1105,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			linefield.set(v, vector, as);
 		}
 		
-		
 		as.add(indexAdapter);
 		LinkedList<Double> umbFaces = new LinkedList<Double>();
 		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
 		for (VFace f : hds.getFaces()){
 			double result = indexAdapter.get(f, as);
-			if(Math.abs(Math.abs(result) - 1) < 0.001){
+//			if(Math.abs(Math.abs(result) - 1) < 0.01){
+			if(Math.abs(Math.abs(result) - 1) < 0.01 || Math.abs(Math.abs(result) - 2) < 0.01){
+//			if((Math.abs((int)result)== 1 || Math.abs((int)result)== 2) && Math.abs(result - (int)result) < 0.001){
+//			if(Math.abs(result - (int)result) < 0.001){	
 				umbFaces.add(result);
 				umbilicFaces.add(f);
 			}
@@ -1130,15 +1132,27 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				double v0 = ns.getVKnotVector()[0];
 				double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
 				if(p[0] < u0 || p[0] > u1){
-					System.out.println("Nelder-Mead out of domain");
-					System.out.println("p[0]: " + p[0]);
+//					System.out.println("Nelder-Mead out of domain");
+//					System.out.println("p[0]: " + p[0]);
 					return 10000;
 				}
 				if(p[1] < v0 || p[1] > v1){
-					System.out.println("Nelder-Mead out of domain");
-					System.out.println("p[1]: " + p[1]);
+//					System.out.println("Nelder-Mead out of domain");
+//					System.out.println("p[1]: " + p[1]);
 					return 10000;
 				}
+//				if(p[0] < u0){
+//					p[0] = u0;
+//				}
+//				else if(p[0] > u1){
+//					p[0] = u1;
+//				}
+//				if(p[1] < v0){
+//					p[1] = v0;
+//				}
+//				else if(p[1] > v1){
+//					p[1] = v1;
+//				}
 				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
 				double H = ci.getMeanCurvature();
 				double K = ci.getGaussCurvature();
@@ -1160,7 +1174,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		}
 		
 		
-		double epsilon = 0.001;
+		double epsilon = 0.00001;
 		HashMap<double[], List<double[]>> near = new HashMap<double[], List<double[]>>();
 		for (double[] umb1 : possibleUmbs) {
 			List<double[]> nearUmb1 = new LinkedList<double[]>();
@@ -1204,17 +1218,17 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		double uend = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
 		double vend = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
 		if(pu + 0.05 < uend){
-			x1[0] = 1.; 
+			x1[0] = 0.001; 
 		}
 		else{
-			x1[0] = -1.;
+			x1[0] = -0.001;
 		}
 		x1[1] = 0;
 		if(pv + 0.05 < vend){
-			x2[1] = 1.;
+			x2[1] = 0.001;
 		}
 		else{
-			x2[1] = -1.;
+			x2[1] = -0.001;
 		}
 		x2[0] = 0;
 		xi[0] = x1;

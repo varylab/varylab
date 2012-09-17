@@ -593,7 +593,57 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
  		
 		public double[] getClosestPoint(double[] point, NURBSTree nt){
  			double[] p = new double[3];
-			double dist = Double.MAX_VALUE;
+ 			int n = controlMesh.length;
+ 			int m = controlMesh[0].length;
+ 			double[] pp00 = Rn.subtract(null, get3DPoint(point), get3DPoint(controlMesh[0][0]));
+ 			double[] pp01 = Rn.subtract(null, get3DPoint(point), get3DPoint(controlMesh[0][m - 1]));
+ 			double[] pp10 = Rn.subtract(null, get3DPoint(point), get3DPoint(controlMesh[n - 1][0]));
+ 			double[] pp11 = Rn.subtract(null, get3DPoint(point), get3DPoint(controlMesh[n - 1][m - 1]));
+ 			boolean b00 = true;
+ 			boolean b01 = true;
+ 			boolean b10 = true;
+ 			boolean b11 = true;
+ 			double[] cMPoint;
+ 			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
+					double[] ijPoint = get3DPoint(controlMesh[i][j]);
+					cMPoint = Rn.subtract(null, ijPoint, get3DPoint(controlMesh[0][0]));
+					if(Rn.innerProduct(pp00, cMPoint) > 0){
+						b00 = false;
+					}
+					cMPoint = Rn.subtract(null, ijPoint, get3DPoint(controlMesh[0][m - 1]));
+					if(Rn.innerProduct(pp01, cMPoint) > 0){
+						b01 = false;
+					}
+					cMPoint = Rn.subtract(null, ijPoint, get3DPoint(controlMesh[n - 1][0]));
+					if(Rn.innerProduct(pp10, cMPoint) > 0){
+						b10 = false;
+					}
+					cMPoint = Rn.subtract(null, ijPoint, get3DPoint(controlMesh[n - 1][m - 1]));
+					if(Rn.innerProduct(pp11, cMPoint) > 0){
+						b11 = false;
+					}
+					
+				}
+			}
+ 			if(b00){
+ 				System.out.println("HALLO b00");
+ 				return controlMesh[0][0];
+ 			}
+ 			if(b01){
+ 				System.out.println("HALLO b01");
+ 				return controlMesh[0][m - 1];
+ 			}
+ 			if(b10){
+ 				System.out.println("HALLO b10");
+ 				return controlMesh[n - 1][0];
+ 			}
+ 			if(b11){
+ 				System.out.println("HALLO b11");
+ 				return controlMesh[n - 1][m - 1];
+ 			}
+ 			double dist = Double.MAX_VALUE;
+			
  			if(nt == null){
  				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
  			}

@@ -49,6 +49,8 @@ public class  FlatIndexFormAdapter extends AbstractAdapter<Double> {
 		return sum/(2*Math.PI);
 	}
 	
+
+	
 	private double[] multiply(double[] u, double[] v) {
 		return new double[]{u[0] * v[0] - u[1] * v[1], u[0] * v[1]
 				+ u[1] * v[0]};

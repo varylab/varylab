@@ -42,66 +42,127 @@ public class LineSegmentIntersection {
 //	hif = null;
 	
 	
-	public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
-		double u0 = U[0];
-		double u1 = U[U.length - 1];
-		double v0 = V[0];
-		double v1 = V[V.length - 1];
-		System.out.println("START");
-		int curves = 120;
-		double uFactor = curves / (u1 - u0);
-		double vFactor = curves / (v1 - v0);
+//	public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
+//		double u0 = U[0];
+//		double u1 = U[U.length - 1];
+//		double v0 = V[0];
+//		double v1 = V[V.length - 1];
+//		System.out.println("START");
+//		int curves = 120;
+//		double uFactor = curves / (u1 - u0);
+//		double vFactor = curves / (v1 - v0);
+//		
+//		Partition[][] partition = new Partition[curves + 1][curves + 1];
+//		System.out.println("Start ini");
+//		double startIni = System.currentTimeMillis();
+//		for (int i = 0; i < partition.length; i++) {
+//			for (int j = 0; j < partition.length; j++) {
+//				partition[i][j] = new Partition();
+//			}
+//		}
+//		double endIni = System.currentTimeMillis();
+//		System.out.println("time for initializing: " + (startIni - endIni));
+//		
+//		for(LineSegment ls : segList){
+//			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
+//			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
+//			double uEnd = uFactor * (ls.getSegment()[1][0] - u0);
+//			double vEnd = vFactor * (ls.getSegment()[1][1] - v0);
+//			int uS = (int)uStart;
+//			int vS = (int)vStart;
+//			int uE = (int)uEnd;
+//			int vE = (int)vEnd;
+//			if(uS > uE){
+//				int temp = uS;
+//				uS = uE;
+//				uE = temp;
+//			}
+//			if(vS > vE){
+//				int temp = vS;
+//				vS = vE;
+//				vE = temp;
+//			}
+//			for (int i = uS; i <= uE; i++) {
+//				for (int j = vS; j <= vE; j++) {
+//					partition[i][j].getSegList().add(ls);
+//					if(!partition[i][j].getIndexList().contains(ls.getCurveIndex())){
+//						partition[i][j].getIndexList().add(ls.getCurveIndex());
+//					}
+//				}
+//			}
+//		}
+//		System.out.println("END");
+//		TreeSet<LineSegment> finalSegmentTree = new TreeSet<LineSegment>(new PartitionComparator());
+//		for (int i = 0; i < partition.length; i++) {
+//			for (int j = 0; j < partition.length; j++) {
+//				if(partition[i][j].getIndexList().size() > 1){
+//					for(LineSegment ls : partition[i][j].getSegList()){
+//						finalSegmentTree.add(ls);
+//					}
+//				}
+//			}
+//		}
 		
-		Partition[][] partition = new Partition[curves + 1][curves + 1];
-		System.out.println("Start ini");
-		double startIni = System.currentTimeMillis();
-		for (int i = 0; i < partition.length; i++) {
-			for (int j = 0; j < partition.length; j++) {
-				partition[i][j] = new Partition();
+		public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
+			double u0 = U[0];
+			double u1 = U[U.length - 1];
+			double v0 = V[0];
+			double v1 = V[V.length - 1];
+			System.out.println("START");
+			int curves = 120;
+			double uFactor = curves / (u1 - u0);
+			double vFactor = curves / (v1 - v0);
+			
+			Partition[][] partition = new Partition[curves + 1][curves + 1];
+			System.out.println("Start ini");
+			double startIni = System.currentTimeMillis();
+			for (int i = 0; i < partition.length; i++) {
+				for (int j = 0; j < partition.length; j++) {
+					partition[i][j] = new Partition();
+				}
 			}
-		}
-		double endIni = System.currentTimeMillis();
-		System.out.println("time for initializing: " + (startIni - endIni));
-		
-		for(LineSegment ls : segList){
-			double uStart = uFactor * (ls.getSegment()[0][0] - u0);
-			double vStart = vFactor * (ls.getSegment()[0][1] - v0);
-			double uEnd = uFactor * (ls.getSegment()[1][0] - u0);
-			double vEnd = vFactor * (ls.getSegment()[1][1] - v0);
-			int uS = (int)uStart;
-			int vS = (int)vStart;
-			int uE = (int)uEnd;
-			int vE = (int)vEnd;
-			if(uS > uE){
-				int temp = uS;
-				uS = uE;
-				uE = temp;
-			}
-			if(vS > vE){
-				int temp = vS;
-				vS = vE;
-				vE = temp;
-			}
-			for (int i = uS; i <= uE; i++) {
-				for (int j = vS; j <= vE; j++) {
-					partition[i][j].getSegList().add(ls);
-					if(!partition[i][j].getIndexList().contains(ls.getCurveIndex())){
-						partition[i][j].getIndexList().add(ls.getCurveIndex());
+			double endIni = System.currentTimeMillis();
+			System.out.println("time for initializing: " + (startIni - endIni));
+			
+			for(LineSegment ls : segList){
+				double uStart = uFactor * (ls.getSegment()[0][0] - u0);
+				double vStart = vFactor * (ls.getSegment()[0][1] - v0);
+				double uEnd = uFactor * (ls.getSegment()[1][0] - u0);
+				double vEnd = vFactor * (ls.getSegment()[1][1] - v0);
+				int uS = (int)uStart;
+				int vS = (int)vStart;
+				int uE = (int)uEnd;
+				int vE = (int)vEnd;
+				if(uS > uE){
+					int temp = uS;
+					uS = uE;
+					uE = temp;
+				}
+				if(vS > vE){
+					int temp = vS;
+					vS = vE;
+					vE = temp;
+				}
+				for (int i = uS; i <= uE; i++) {
+					for (int j = vS; j <= vE; j++) {
+						partition[i][j].getSegList().add(ls);
+						if(!partition[i][j].getIndexList().contains(ls.getCurveIndex())){
+							partition[i][j].getIndexList().add(ls.getCurveIndex());
+						}
 					}
 				}
 			}
-		}
-		System.out.println("END");
-		TreeSet<LineSegment> finalSegmentTree = new TreeSet<LineSegment>(new PartitionComparator());
-		for (int i = 0; i < partition.length; i++) {
-			for (int j = 0; j < partition.length; j++) {
-				if(partition[i][j].getIndexList().size() > 1){
-					for(LineSegment ls : partition[i][j].getSegList()){
-						finalSegmentTree.add(ls);
+			System.out.println("END");
+			TreeSet<LineSegment> finalSegmentTree = new TreeSet<LineSegment>(new PartitionComparator());
+			for (int i = 0; i < partition.length; i++) {
+				for (int j = 0; j < partition.length; j++) {
+					if(partition[i][j].getIndexList().size() > 1){
+						for(LineSegment ls : partition[i][j].getSegList()){
+							finalSegmentTree.add(ls);
+						}
 					}
 				}
 			}
-		}
 
 		System.out.println("anfanglänge: " + segList.size());
 		System.out.println("endlänge: " + finalSegmentTree.size());

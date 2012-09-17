@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;

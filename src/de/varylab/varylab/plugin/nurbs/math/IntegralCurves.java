@@ -284,7 +284,7 @@ public class IntegralCurves {
 	/**
 	 * <p><strong>computes the curvature lines</strong></p>
 	 * 
-	 * this is a step-size controlled runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
+	 * this is a step adaptive runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
 	 * </br>
 	 * <strong>while</strong> (!nearby)
 	 * 
@@ -301,6 +301,10 @@ public class IntegralCurves {
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
 		double[] b = { 0, 0.5, 0.75, 1 };
+//		double[][] A = {{0,0,0,0,0,0,0},{1/5.,0,0,0,0,0,0},{3/40.,9/40.,0,0,0,0,0},{44/45.,-56/15.,32/9.,0,0,0,0},{19372/6561.,-25360/2187.,64448/6561.,-212/729.,0,0,0},{9017/3168.,-355/33.,46732/5247.,49/176.,-5103/18656.,0,0},{35/384., 0, 500/1113., 125/192., -2187/6784., 11/84.,0}};
+//		double[] c1 = {35/384., 0, 500/1113., 125/192., -2187/6784., 11/84., 0 };
+//		double[] c2 = {5179/57600., 0, 7571/16695., 393/640., -92097/339200., 187/2100., 1/40.};
+//		double[] b = { 0,1/5., 3/10.,4/5.,8/9.,1,1 };
 		LinkedList<double[]> u = new LinkedList<double[]>();
 		int dim = y0.length;
 		double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] - ns.getUKnotVector()[ns.getUKnotVector().length - 1]), Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
@@ -324,7 +328,6 @@ public class IntegralCurves {
 		LineSegment seg = new LineSegment();
 		
 		while (!nearBy) {
-			
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
