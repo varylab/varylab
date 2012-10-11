@@ -1,7 +1,6 @@
 package de.varylab.varylab.plugin.datasource;
 
 import static de.jtem.halfedgetools.functional.FunctionalUtils.angle;
-import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
 import static java.lang.Math.PI;
 
 import java.util.Map;
@@ -16,6 +15,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.varylab.math.GeodesicUtility;
 
 public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider {
 
@@ -35,7 +35,7 @@ public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider
 			F extends Face<V, E, F>
 		> Double getV(V v, AdapterSet a) {
 			double[] p = a.getD(Position3d.class, v);
-			Map<E, E> geoMap = findGeodesicPairs(v, false, false, a);
+			Map<E, E> geoMap = GeodesicUtility.findGeodesicPairs(v, false, false, a);
 			double[] angles = new double[geoMap.size()];
 			if (angles.length == 0) return null; // unknown curvature
 			int i = 0;

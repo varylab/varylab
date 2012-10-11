@@ -4,7 +4,6 @@ import static de.jreality.math.Rn.euclideanAngle;
 import static de.jreality.math.Rn.innerProduct;
 import static de.jreality.math.Rn.subtract;
 import static de.jreality.math.Rn.times;
-import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
 import static java.lang.Math.sin;
 
 import java.util.Map;
@@ -21,6 +20,7 @@ import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.varylab.math.GeodesicUtility;
 
 public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 
@@ -49,7 +49,7 @@ public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 		> Double getV(V v, AdapterSet a) {
 			double[] vv = a.getD(Position3d.class, v);
 			double[] nv = a.getD(Normal.class, v);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, a);
+			Map<E, E> geodesicPairs = GeodesicUtility.findGeodesicPairs(v, false, false, a);
 			if (geodesicPairs.isEmpty() || HalfEdgeUtils.isBoundaryVertex(v)) {
 				return null;
 			}

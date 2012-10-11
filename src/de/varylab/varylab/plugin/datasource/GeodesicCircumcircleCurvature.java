@@ -1,12 +1,7 @@
 package de.varylab.varylab.plugin.datasource;
 
-import static de.jreality.math.Rn.euclideanAngle;
-import static de.jreality.math.Rn.subtract;
-import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
-
 import java.util.Map;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
@@ -17,15 +12,12 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.varylab.math.GeodesicUtility;
 
 public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceProvider {
 
 	private GeodesicCircumcircleCurvatureAdapter
 		adapter = new GeodesicCircumcircleCurvatureAdapter();
-	private double[]	
-		vec1 = new double[3],
-		vec2 = new double[3],
-		vec3 = new double[3];
 	
 	private class GeodesicCircumcircleCurvatureAdapter extends AbstractAdapter<Double> {
 
@@ -44,7 +36,7 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 		> Double getE(E e, AdapterSet a) {
 			V v = e.getTargetVertex();
 			double[] vv = a.getD(Position3d.class, v);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, true, a);
+			Map<E, E> geodesicPairs = GeodesicUtility.findGeodesicPairs(v, false, true, a);
 			if (geodesicPairs.isEmpty() || HalfEdgeUtils.isBoundaryVertex(v)) {
 				return null;
 			}
@@ -52,14 +44,9 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 			if(ee == null) {return null;}
 			double[] s = a.getD(Position3d.class, e.getStartVertex());
 			double[] t = a.getD(Position3d.class, ee.getStartVertex());
-			subtract(vec1, s, vv);
-			subtract(vec2, t, vv);
-			double alpha = euclideanAngle(vec1, vec2);
-			Rn.subtract(vec3, vec1, vec2);
-			double l = Rn.euclideanNorm(vec3);
-			return 2 * Math.sin(alpha)/l;
+			return Math.sqrt(GeodesicUtility.circumcircleCurvatureSquared(s, vv, t));
 		}
-		
+
 		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 			return Edge.class.isAssignableFrom(nodeClass);

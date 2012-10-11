@@ -38,6 +38,7 @@ import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
+import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
 import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.IncircleCrossRatio;
@@ -63,6 +64,7 @@ import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
@@ -232,6 +234,7 @@ public class VaryLab {
 		v.registerPlugin(IncircleCrossRatio.class);
 		v.registerPlugin(IncircleCrossRatio2.class);
 		v.registerPlugin(IndexMedialGraph.class);
+		v.registerPlugin(EdgeNormalTorsion.class);
 	}
 
 
@@ -260,6 +263,7 @@ public class VaryLab {
 		v.registerPlugin(EqualDiagonalsOptimizer.class);
 		v.registerPlugin(EdgeLengthEqualizerOptimizer.class);
 		v.registerPlugin(GeodesicCurvatureOptimizer.class);
+		v.registerPlugin(CircumcircleCurvatureOptimizer.class);
 		v.registerPlugin(NURBSSurfaceOptimizer.class);
 		
 	}

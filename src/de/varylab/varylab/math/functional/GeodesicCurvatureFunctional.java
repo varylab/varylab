@@ -4,7 +4,6 @@ import static de.jreality.math.Rn.innerProduct;
 import static de.jreality.math.Rn.subtract;
 import static de.jreality.math.Rn.times;
 import static de.jtem.halfedgetools.functional.FunctionalUtils.getPosition;
-import static de.varylab.varylab.math.functional.OppositeEdgesCurvatureFunctional.findGeodesicPairs;
 
 import java.util.Map;
 
@@ -20,6 +19,7 @@ import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
+import de.varylab.varylab.math.GeodesicUtility;
 
 public class GeodesicCurvatureFunctional <
 	V extends Vertex<V, E, F>, 
@@ -51,7 +51,7 @@ public class GeodesicCurvatureFunctional <
 		for (V v : hds.getVertices()) {
 			getPosition(v, x, vv);
 			double[] n = aSet.getD(Normal.class, v);
-			Map<E, E> geodesicPairs = findGeodesicPairs(v, false, false, aSet);
+			Map<E, E> geodesicPairs = GeodesicUtility.findGeodesicPairs(v, false, false, aSet);
 			for (E e : geodesicPairs.keySet()) {
 				E ee = geodesicPairs.get(e);
 				getPosition(e.getStartVertex(), x, vs);

@@ -28,10 +28,12 @@ import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.hds.adapter.SingularityAdapter;
 import de.varylab.varylab.hds.adapter.VPositionAdapter;
 import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
 import de.varylab.varylab.plugin.datasource.ReferenceDistance;
+import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
@@ -151,6 +153,7 @@ public class VarylabGridshells {
 //		v.registerPlugin(CircularityVisualizer.class);
 		v.registerPlugin(GaussCurvatureVisualizer.class);
 		v.registerPlugin(AngleDefectVisualizer.class);
+		v.registerPlugin(GeodesicCircumcircleCurvature.class);
 //		v.registerPlugin(ConnectionVisualizer.class);
 //		v.registerPlugin(PositiveEdgeVisualizer.class);
 //		v.registerPlugin(ConicalityVisualizer.class);
@@ -189,6 +192,7 @@ public class VarylabGridshells {
 //		v.registerPlugin(TouchingIncirclesOptimizerCot.class);
 //		v.registerPlugin(TouchingIncirclesTan2Optimizer.class);
 //		v.registerPlugin(EqualDiagonalsOptimizer.class);
+		v.registerPlugin(CircumcircleCurvatureOptimizer.class);
 	}
 	
 //	private static void addLnFPlugins(JRViewer v) {
