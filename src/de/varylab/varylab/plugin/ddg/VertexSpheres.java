@@ -151,6 +151,7 @@ public class VertexSpheres extends ShrinkPanelPlugin implements ActionListener, 
 		radiusLabel.setEnabled(true);
 		radiusSpinner.setEnabled(true);
 		radiusModel.setValue(0.0);
+		radiusSlider.setValue((int) (-min/(max-min)*100));
 	}
 
 	private void initModVector() {
@@ -276,8 +277,9 @@ public class VertexSpheres extends ShrinkPanelPlugin implements ActionListener, 
 			b.setEntry(i, Rn.euclideanNorm(as.getD(EdgeVector.class, ee)));
 			++i;
 		}
-		SingularValueDecomposition svd = new SingularValueDecomposition(A);
-		DecompositionSolver solver = svd.getSolver();
+		SingularValueDecomposition dec = new SingularValueDecomposition(A);
+//		QRDecomposition dec = new QRDecomposition(A);
+		DecompositionSolver solver = dec.getSolver();
 		return solver.solve(b);
 	}
 
@@ -291,7 +293,7 @@ public class VertexSpheres extends ShrinkPanelPlugin implements ActionListener, 
 		}
 		if (radiusSpinner == e.getSource()) {
 			double val = radiusModel.getNumber().doubleValue();
-			radiusSlider.setValue((int) (val*100));
+			radiusSlider.setValue((int) ((val-min)/(max-min)*100));
 		}
 		blockListeners = false;
 //		if(spheres.getOwner() != null) {
