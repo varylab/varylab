@@ -35,6 +35,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -243,17 +244,15 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			newOldFaceMap = localQuadRemesher.remesh(surface,remesh,a, projectiveCoordsBox.isSelected());
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
-				double[] coord = a.getD(Position.class,v);
+				double[] coord = a.getD(Position4d.class, v);
 				texInvMatrix.transformVector(coord);
-				a.set(Position.class, v, coord);
-				a.set(TexturePosition.class, v, coord);
-				v.P = coord;
-				v.T = coord;
+				a.set(Position.class, v, coord.clone());
+				a.set(TexturePosition.class, v, coord.clone());
 				remeshPosMap.put(v.getIndex(), coord);
 			}
-//			for (VVertex v : surface.getVertices()) {
-//				texInvMatrix.transformVector(v.texcoord);
-//			}
+			for (VVertex v : surface.getVertices()) {
+				texInvMatrix.transformVector(v.T);
+			}
 
 			hcp.set(remesh);
 			HalfedgeSelection selection = hcp.getSelection();

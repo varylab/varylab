@@ -11,7 +11,6 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
-import de.jreality.plugin.scene.Sky;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
@@ -146,8 +145,6 @@ public class VaryLab {
 		
 		addGeneratorPlugins(v);
 		
-		v.registerPlugin(IdentifyVerticesPlugin.class);
-		
 		v.registerPlugin(HeightFieldEditor.class);
 		
 		addOptimizationPlugins(v);
@@ -174,7 +171,7 @@ public class VaryLab {
 //		v.registerPlugin(HalfedgeDebuggerPlugin.class);
 //		v.registerPlugin(WebContentLoader.class);
 		
-		v.registerPlugin(Sky.class);
+//		v.registerPlugin(Sky.class);
 		v.registerPlugin(AngleCalculatorPlugin.class);
 		v.registerPlugin(NodePropertyEditor.class);
 		v.registerPlugin(RemoveGeodesicPlugin.class);

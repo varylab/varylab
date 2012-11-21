@@ -1,8 +1,12 @@
 package de.varylab.varylab.plugin.remeshing;
 
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.swing.JOptionPane;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -12,6 +16,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition4d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -54,17 +59,17 @@ public class FitTexturePlugin extends AlgorithmPlugin {
 			MatrixBuilder mb = MatrixBuilder.euclidean();
 			mb.scale(1.0/Rn.euclideanNorm(dir));
 			mb.rotateFromTo(new double[]{dir[0],dir[1],0}, new double[]{1,0,0});
-			mb.translate(Rn.negate(null, new double[]{tex1[0],tex1[1],0.0})).getMatrix();
+			mb.translate(Rn.negate(null, new double[]{tex1[0],tex1[1],0.0}));
 			
 			Matrix T = mb.getMatrix();
 			for(V v : hds.getVertices()) {
 				double[] coord = a.getD(TexturePosition4d.class, v);
 				T.transformVector(coord);
-				a.set(TexturePosition4d.class, v, coord);
+				a.set(TexturePosition.class, v, coord);
 			}
-			
-		} else { //do something
-		
+		} else {
+			JOptionPane.showMessageDialog(getOptionParent(), "Select at least two vertices", "Transform Texture", WARNING_MESSAGE);
+			return;
 		}
 		hi.set(hds);
 	}
