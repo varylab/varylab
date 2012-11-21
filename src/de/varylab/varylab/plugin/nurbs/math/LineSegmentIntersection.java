@@ -15,14 +15,7 @@ import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
 
-//import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
-//import de.jreality.scene.Appearance;
-//import de.jreality.scene.SceneGraphComponent;
-//import de.jreality.shader.DefaultGeometryShader;
-//import de.jreality.shader.DefaultPointShader;
-//import de.jreality.shader.ShaderUtility;
-//import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;

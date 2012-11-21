@@ -20,7 +20,7 @@ import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
-import de.varylab.varylab.math.GeodesicUtility;
+import de.varylab.varylab.utilities.GeodesicUtility;
 
 public class GeodesicCurvature extends Plugin implements DataSourceProvider {
 

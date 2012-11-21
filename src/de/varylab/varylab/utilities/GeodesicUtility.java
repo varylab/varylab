@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.utilities;
 
 import static de.jreality.math.Rn.euclideanAngle;
 import static de.jreality.math.Rn.subtract;
@@ -20,9 +20,9 @@ import de.varylab.varylab.hds.adapter.type.GeodesicLabel;
 
 public class GeodesicUtility {
 
-	public static double circumcircleCurvatureSquared(double[] s, double[] vv, double[] t) {
-		double[] vec1 = subtract(null, s, vv);
-		double[] vec2 = subtract(null, t, vv);
+	public static double circumcircleCurvatureSquared(double[] a, double[] b, double[] c) {
+		double[] vec1 = subtract(null, a, b);
+		double[] vec2 = subtract(null, c, b);
 		double alpha = euclideanAngle(vec1, vec2);
 		double[] vec3 = Rn.subtract(null, vec1, vec2);
 		double l2 = Rn.euclideanNormSquared(vec3);

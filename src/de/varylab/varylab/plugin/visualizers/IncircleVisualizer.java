@@ -46,6 +46,7 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.utilities.Disk;
+import de.varylab.varylab.utilities.GeometryUtility;
 
 public class IncircleVisualizer extends VisualizerPlugin implements ActionListener,ChangeListener {
 
@@ -125,7 +126,7 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 			if (ie * ie > l1 * 1E-2) continue;
 			SceneGraphComponent comp = new SceneGraphComponent("circle " + f.getIndex());
 			comp.setGeometry(geometry);
-			double[] c = ChristoffelTransform.getIncircle(f, a);
+			double[] c = GeometryUtility.getIncircle(f, a);
 			double[] N = a.getD(Normal.class, f);
 			MatrixBuilder mb = MatrixBuilder.euclidean();
 			mb.translate(c[0], c[1], c[2]);

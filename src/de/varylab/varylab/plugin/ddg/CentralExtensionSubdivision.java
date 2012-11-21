@@ -16,6 +16,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.varylab.varylab.utilities.GeometryUtility;
 
 public class CentralExtensionSubdivision extends AlgorithmPlugin {
 
@@ -60,7 +61,7 @@ public class CentralExtensionSubdivision extends AlgorithmPlugin {
 		);
 		for (F oldF : oldFnewVMap.keySet()) {
 			V v = oldFnewVMap.get(oldF);
-			double[] c = ChristoffelTransform.getIncircle(oldF, a);
+			double[] c = GeometryUtility.getIncircle(oldF, a);
 			a.set(Position.class, v, new double[]{c[0], c[1], c[2]});
 		}
 		for (E e : oldEnewVMap.keySet()) {
@@ -70,7 +71,7 @@ public class CentralExtensionSubdivision extends AlgorithmPlugin {
 			}
 			F oldF = e.getLeftFace();
 			assert oldF != null;
-			double[] c = ChristoffelTransform.getIncircle(oldF, a);
+			double[] c = GeometryUtility.getIncircle(oldF, a);
 			double r = c[3];
 			double[] p0 = a.getD(Position3d.class, e.getStartVertex());
 			double[] p1 = a.getD(Position3d.class, e.getTargetVertex());

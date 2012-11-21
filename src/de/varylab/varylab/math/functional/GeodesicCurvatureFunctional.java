@@ -19,7 +19,7 @@ import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.math.GeodesicUtility;
+import de.varylab.varylab.utilities.GeodesicUtility;
 
 public class GeodesicCurvatureFunctional <
 	V extends Vertex<V, E, F>, 

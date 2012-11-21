@@ -1,7 +1,6 @@
 package de.varylab.varylab.plugin.ddg;
 
 import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.decomposeEdgeLength;
-import static de.varylab.varylab.plugin.ddg.ChristoffelTransform.getIncircle;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
@@ -19,6 +18,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.projgeom.PlueckerLineGeometry;
+import de.varylab.varylab.utilities.GeometryUtility;
 
 public class KoebeSphereProjection extends AlgorithmPlugin {
 
@@ -40,8 +40,8 @@ public class KoebeSphereProjection extends AlgorithmPlugin {
 	> double[] getSphereCenter(E e, AdapterSet a) {
 		F fr = e.getRightFace();
 		F fl = e.getLeftFace();
-		double[] cr = getIncircle(fr, a);
-		double[] cl = getIncircle(fl, a);
+		double[] cr = GeometryUtility.getIncircle(fr, a);
+		double[] cl = GeometryUtility.getIncircle(fl, a);
 		double[] nr = a.getD(Normal.class, fr);
 		double[] nl = a.getD(Normal.class, fl);
 		cr[3] = 1;

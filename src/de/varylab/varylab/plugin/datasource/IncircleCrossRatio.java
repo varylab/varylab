@@ -12,7 +12,7 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.mfc.field.Complex;
-import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
+import de.varylab.varylab.utilities.GeometryUtility;
 
 public class IncircleCrossRatio extends Plugin implements DataSourceProvider {
 
@@ -31,7 +31,7 @@ public class IncircleCrossRatio extends Plugin implements DataSourceProvider {
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> Double getF(F f, AdapterSet a) {
-			double[] c = ChristoffelTransform.getIncircle(f, a);
+			double[] c = GeometryUtility.getIncircle(f, a);
 			double r = c[3];
 			double[] center = {c[0], c[1], c[2]};
 			E e0 = f.getBoundaryEdge();
