@@ -63,6 +63,7 @@ public class QuadTextureUtility {
 			}
 			V newV = newHDS.addNewVertex();
 			a.set(Position.class, newV, a.getD(Position.class, v));
+			a.set(TexturePosition.class, newV, a.getD(TexturePosition.class, v));
 			textureVertexMap.put(v, newV);
 			newBdVertices.add(newV);
 		}
