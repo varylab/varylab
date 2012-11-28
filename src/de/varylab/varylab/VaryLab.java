@@ -104,7 +104,6 @@ import de.varylab.varylab.plugin.topology.CollapseTrianglesPlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.topology.StitchCutPathPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
-import de.varylab.varylab.plugin.ui.AngleCalculatorPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.ui.VarylabMain;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
@@ -173,7 +172,6 @@ public class VaryLab {
 //		v.registerPlugin(WebContentLoader.class);
 		
 //		v.registerPlugin(Sky.class);
-		v.registerPlugin(AngleCalculatorPlugin.class);
 		v.registerPlugin(NodePropertyEditor.class);
 		v.registerPlugin(RemoveGeodesicPlugin.class);
 		v.registerPlugin(GeodesicSelection.class);
