@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -66,10 +64,11 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		hif = null;
 	private OptimizerPluginsPanel
 		pluginsPanel = null;
-	private JPanel
-		constraintsPanel = new JPanel();
+//	private JPanel
+//		constraintsPanel = new JPanel();
 	private ShrinkPanel
-		animationPanel = new ShrinkPanel("Animation");
+		animationPanel = new ShrinkPanel("Animation"),
+		constraintsPanel = new ShrinkPanel("Constraints");
 	private JButton
 		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png")),
 		initButton = new JButton("Init"),
@@ -121,7 +120,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		gbc2.insets = new Insets(2, 2, 2, 2);
 		
 		constraintsPanel.setLayout(new GridBagLayout());
-		constraintsPanel.setBorder(BorderFactory.createTitledBorder("Constraints"));
+//		constraintsPanel.setBorder(BorderFactory.createTitledBorder("Constraints"));
 		constraintsPanel.add(new JLabel("Global"), gbc1);
 		constraintsPanel.add(fixXChecker, gbc1);
 		constraintsPanel.add(fixYChecker, gbc1);
@@ -138,6 +137,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(tangentialConstraintChecker, gbc2);
 		constraintsPanel.add(smoothGradientChecker, gbc2);
 		constraintsPanel.add(smoothSurfaceChecker,gbc2);
+//		constraintsPanel.setShrinked(true);
 		shrinkPanel.add(constraintsPanel, gbc2);
 		
 		shrinkPanel.add(fixHeightChecker, gbc2);
@@ -454,6 +454,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		c.storeProperty(getClass(), "fixBoundaryY", fixBoundaryYChecker.isSelected());
 		c.storeProperty(getClass(), "fixBoundaryZ", fixBoundaryZChecker.isSelected());
 		c.storeProperty(getClass(), "boundaryMovement", moveAlongBoundaryChecker.isSelected());
+		c.storeProperty(getClass(), "constraintsShrinked", constraintsPanel.isShrinked());
 	}
 	
 	@Override
@@ -472,6 +473,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		fixBoundaryYChecker.setSelected(c.getProperty(getClass(), "fixBoundaryY", fixBoundaryYChecker.isSelected()));
 		fixBoundaryZChecker.setSelected(c.getProperty(getClass(), "fixBoundaryZ", fixBoundaryZChecker.isSelected()));
 		moveAlongBoundaryChecker.setSelected(c.getProperty(getClass(), "boundaryMovement", moveAlongBoundaryChecker.isSelected()));
+		constraintsPanel.setShrinked(c.getProperty(getClass(), "constraintsShrinked", true));
 	}
 	
 	
