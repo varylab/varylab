@@ -27,7 +27,6 @@ import de.jreality.scene.Appearance;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
-import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 import de.varylab.varylab.hds.VEdge;
@@ -84,22 +83,18 @@ public class NURBSSurfaceOptimizer extends VarylabOptimizerPlugin implements Act
 	}
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
+		if (S == null) {
+			StringReader sphereReader = new StringReader(nurbsSphere);
+			S = NurbsIO.readNURBS(sphereReader);	
+		}
 		functional.setNURBSSurface(S);
 		return functional;
 	}
 
 	@Override
-	public void install(Controller c) throws Exception {
-		super.install(c);
-		StringReader sphereReader = new StringReader(nurbsSphere);
-		S = NurbsIO.readNURBS(sphereReader);
-	}
-	
-	@Override
 	public JPanel getOptionPanel() {
 		return panel;
 	}
-	
 
 	@Override
 	public String getName() {
