@@ -211,9 +211,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		
 		Vec x = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
-			x.setValue(v.getIndex() * 3 + 0, v.P[0], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 1, v.P[1], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 2, v.P[2], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 0, v.P[0] / v.P[3], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 1, v.P[1] / v.P[3], InsertMode.INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 2, v.P[2] / v.P[3], InsertMode.INSERT_VALUES);
 		}
 		
 		double maxz_before = Double.NEGATIVE_INFINITY;
