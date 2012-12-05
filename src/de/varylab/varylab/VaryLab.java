@@ -87,6 +87,7 @@ import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
 import de.varylab.varylab.plugin.scripting.PythonConsole;
+import de.varylab.varylab.plugin.scripting.PythonConsole.MyJTextPane;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
@@ -124,6 +125,9 @@ import de.varylab.varylab.startup.VarylabSplashScreen;
 
 public class VaryLab {
 
+	public static MyJTextPane
+		scriptingTextPane = new MyJTextPane();
+	
 	private static void addVaryLabPlugins(JRViewer v) {
 		v.registerPlugin(VarylabMain.class);
 		

@@ -9,6 +9,7 @@ import java.net.URI;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.Keymap;
 
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -18,6 +19,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.varylab.varylab.VaryLab;
 
 public class PythonConsole extends ShrinkPanelPlugin implements FocusListener {
 
@@ -28,7 +30,7 @@ public class PythonConsole extends ShrinkPanelPlugin implements FocusListener {
 	private JScrollPane
 		contentPanel = new JScrollPane();
 	private JTextPane
-		textPane = new JTextPane();
+		textPane = VaryLab.scriptingTextPane;
 	
 	public PythonConsole() {
         setInitialPosition(ShrinkPanelPlugin.SHRINKER_BOTTOM);
@@ -43,13 +45,31 @@ public class PythonConsole extends ShrinkPanelPlugin implements FocusListener {
         textPane.setCaretColor(Color.BLACK);
 	}
 	
+	
+	public static class MyJTextPane extends JTextPane {
+		
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void setKeymap(Keymap map) {
+			if (map != null && !map.getName().contains("Substance")) {
+				super.setKeymap(map);
+			}
+		}
+		
+	}
 
 	@Override
 	public void focusGained(FocusEvent e) {
 		if (interpreter != null) return;
-		StartupThread startupThread = new StartupThread(controller);
-//		startupThread.start();
-		startupThread.run();
+		PySystemState.initialize();
+		interpreter = new PythonInterpreter();
+		interpreter.set("c", controller);
+		interpreter.set("hi", controller.getPlugin(HalfedgeInterface.class));
+		interpreter.set("textpane", textPane);
+		interpreter.exec("vars = {'c' : c, 'hi' : hi}");
+		interpreter.exec("from console import Console");
+		interpreter.exec("Console(vars, textpane)");
 	}
 	@Override
 	public void focusLost(FocusEvent e) {
@@ -60,30 +80,6 @@ public class PythonConsole extends ShrinkPanelPlugin implements FocusListener {
 		super.install(c);
 		this.controller = c;
 	}
-	
-	private class StartupThread extends Thread {
-		
-		private Controller
-			c = null;
-		
-		public StartupThread(Controller c) {
-			this.c = c;
-		}
-		
-		@Override
-		public void run() {
-			PySystemState.initialize();
-			interpreter = new PythonInterpreter();
-			interpreter.set("c", c);
-			interpreter.set("hi", c.getPlugin(HalfedgeInterface.class));
-			interpreter.set("textpane", textPane);
-			interpreter.exec("vars = {'c' : c, 'hi' : hi}");
-			interpreter.exec("from console import Console");
-			interpreter.exec("Console(vars, textpane)");
-		}
-		
-	}
-	
 	
 	public static void main(String[] args) {
 		try {
