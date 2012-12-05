@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="/jrworkspace"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/halfedge"/>
 	<classpathentry kind="lib" path="lib/numericalMethods.jar"/>
