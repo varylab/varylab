@@ -65,9 +65,9 @@ public class PythonConsole extends ShrinkPanelPlugin implements FocusListener {
 		PySystemState.initialize();
 		interpreter = new PythonInterpreter();
 		interpreter.set("c", controller);
-		interpreter.set("hi", controller.getPlugin(HalfedgeInterface.class));
+		interpreter.set("h", controller.getPlugin(HalfedgeInterface.class));
 		interpreter.set("textpane", textPane);
-		interpreter.exec("vars = {'c' : c, 'hi' : hi}");
+		interpreter.exec("vars = {'C' : c, 'H' : h}");
 		interpreter.exec("from console import Console");
 		interpreter.exec("Console(vars, textpane)");
 	}
