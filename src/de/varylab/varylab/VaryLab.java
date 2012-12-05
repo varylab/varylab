@@ -1,7 +1,5 @@
 package de.varylab.varylab;
 
-import java.util.Arrays;
-
 import javax.swing.SwingUtilities;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -337,7 +335,6 @@ public class VaryLab {
 			"-tao_nm_mu", "1.0",
 //			"-tao_fd_gradient", "1E-6"
 		};
-		System.out.println("initing tao: " + Arrays.toString(taoCommand));
 		Tao.Initialize("Tao Varylab", taoCommand, false);
 	}
 	
