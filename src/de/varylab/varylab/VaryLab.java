@@ -88,6 +88,7 @@ import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
+import de.varylab.varylab.plugin.scripting.PythonConsole;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
@@ -190,6 +191,8 @@ public class VaryLab {
 		
 		v.registerPlugin(DehomogenizeTexture.class);
 		v.registerPlugin(VertexSpheres.class);
+		
+		v.registerPlugin(PythonConsole.class);
 	}
 
 

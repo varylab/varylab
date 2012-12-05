@@ -42,7 +42,7 @@ public class ANetOptimizer extends VarylabOptimizerPlugin {
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("A Net Optimizer", "Thilo Rörig");
+		PluginInfo info = new PluginInfo(getName(), "Thilo Rörig");
 		info.icon = ImageHook.getIcon("combinatorics.png");
 		return info;
 	}
