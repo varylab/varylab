@@ -52,6 +52,7 @@ import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
@@ -88,6 +89,7 @@ import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.VertexComparator;
@@ -99,7 +101,6 @@ import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
-import de.varylab.varylab.plugin.nurbs.data.NURBSTree;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
@@ -150,8 +151,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		surfaces = new ArrayList<NURBSSurface>();
 
 	private SpinnerNumberModel
-		uSpinnerModel = new SpinnerNumberModel(30,0,100,2),
-		vSpinnerModel = new SpinnerNumberModel(30,0,100,2);
+		uSpinnerModel = new SpinnerNumberModel(10,0,100,2),
+		vSpinnerModel = new SpinnerNumberModel(10,0,100,2);
 	
 	private JSpinner
 		uSpinner = new JSpinner(uSpinnerModel),
@@ -743,8 +744,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		boolean pointCreated = false;
 		
-		private double[] point = {1,12,1,1};
+		public double[] point = {7.800142263040452, 10.033731175723906, 1.6825028572432208, 3.0};
 		
+//		point[3] = 1;
+//		private double[] point = {0, 0, -2, 1};
+//		private double[] point = {-4.177945148333993, -6.190601790318352, -2.9962723410639365, 1};
 		public PointDistancePanel() {
 			super("Point Distance");
 			setShrinked(true);
@@ -797,7 +801,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
 				        points[e.getIndex()]=e.getPosition(); 
 				        point = e.getPosition().clone();
-				        point[3] = 1.;
+				        Pn.dehomogenize(point, point);
+//				        point[3] = 1.;
+				        System.out.println(Arrays.toString(point));
+				    
 				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
 					}
 					
@@ -842,9 +849,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 		private double[] calculateClosestPoint(double[] point) {
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
-			NURBSTree nt = null;
-			double[] surfacePoint = ns.getClosestPoint(point, nt);
-			System.out.println("closest point with tree: " + Arrays.toString(surfacePoint));
+			double[] surfacePoint = ns.getClosestPointOrth(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
 //			
@@ -866,9 +871,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			DefaultPointShader ipointShaderPoint = (DefaultPointShader)idgsPoint.getPointShader();
 			ipointShaderPoint.setDiffuseColor(Color.red);
 			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
-			
 			return point;
-			
 		}
 		
 	}
@@ -1204,7 +1207,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	}
 //	
 	public NURBSSurface getSelectedSurface() {
-		return surfaces.get(surfacesTable.getSelectedRow());
+		NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
+		LinkedList<BoundaryLines> boundList = new LinkedList<NURBSSurface.BoundaryLines>();
+		boundList.add(BoundaryLines.u0);
+		boundList.add(BoundaryLines.um);
+		boundList.add(BoundaryLines.v0);
+		boundList.add(BoundaryLines.vn);
+		ns.setBoundLines(boundList);
+		return ns;
 	}
 	
 	

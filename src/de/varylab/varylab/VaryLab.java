@@ -48,7 +48,6 @@ import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.plugin.ddg.GaussMapFromDual;
 import de.varylab.varylab.plugin.ddg.KoebeSphereProjection;
 import de.varylab.varylab.plugin.ddg.LeastSquaresSphere;
-import de.varylab.varylab.plugin.ddg.VertexSpheres;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
 import de.varylab.varylab.plugin.editor.DehomogenizeTexture;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
@@ -192,7 +191,7 @@ public class VaryLab {
 		v.registerPlugin(Collapse2ValentPlugin.class);
 		
 		v.registerPlugin(DehomogenizeTexture.class);
-		v.registerPlugin(VertexSpheres.class);
+//		v.registerPlugin(VertexSpheres.class);
 		
 		v.registerPlugin(PythonConsole.class);
 	}

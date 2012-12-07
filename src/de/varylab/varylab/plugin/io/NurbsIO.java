@@ -323,27 +323,17 @@ public class NurbsIO {
 			for (int i = 0; i < U.length; i++) {
 				U[i] = surfKnotU.get(i);
 			}
-//			System.out.println("Knotvector U: " + Arrays.toString(U));
 			for (int i = 0; i < V.length; i++) {
 				V[i] = surfKnotV.get(i);
 			}
-//			System.out.println("Knotvector V: " + Arrays.toString(V));
 			int p = d[1];
-//			System.out.println("P: " + p);
 			int q = d[0];
-//			System.out.println("Q: " + q);
 			int n = U.length - p - 1;
 			int m = V.length - q - 1;
-//			System.out.println("MESH U " + m);
-//			System.out.println("MESH V " + n);
 			double[][][] controlMesh = new double[n][m][4];
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < m; j++) {
 					controlMesh[i][j] = ctrlPoints.get(i * m + j);
-//					System.out.println("i: " + j);
-//					System.out.println("j: " + i);
-//
-//					System.out.println(Arrays.toString(controlMesh[i][j]));
 				}
 			}
 			for (int i = 0; i < n; i++) {
@@ -363,7 +353,6 @@ public class NurbsIO {
 			System.out.println("gelesene NURBS flaeche");
 			System.out.println(ns.toString());
 			System.out.println("end");
-//			ns.setSurfDomain(surfDomain);
 
 
 		} catch (FileNotFoundException ex) {
