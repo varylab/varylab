@@ -9,6 +9,7 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.experimental.PythonConsole;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
@@ -85,8 +86,6 @@ import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
-import de.varylab.varylab.plugin.scripting.PythonConsole;
-import de.varylab.varylab.plugin.scripting.PythonConsole.MyJTextPane;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
@@ -124,9 +123,6 @@ import de.varylab.varylab.startup.VarylabSplashScreen;
 
 public class VaryLab {
 
-	public static MyJTextPane
-		scriptingTextPane = new MyJTextPane();
-	
 	private static void addVaryLabPlugins(JRViewer v) {
 		v.registerPlugin(VarylabMain.class);
 		
