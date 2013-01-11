@@ -320,6 +320,7 @@ public class VaryLab {
 		v.setShowMenuBar(true);
 		v.addBasicUI();
 		v.addContentUI();
+		v.addPythonSupport();
 		addVaryLabPlugins(v);
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.startup();
