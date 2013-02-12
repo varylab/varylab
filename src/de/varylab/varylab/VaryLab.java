@@ -9,7 +9,7 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
-import de.jreality.plugin.experimental.PythonConsole;
+import de.jreality.plugin.scripting.PythonConsole;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
