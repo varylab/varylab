@@ -364,14 +364,10 @@ public class PointProjection {
 	}
 	
 	public static double[] getClosestPoint(NURBSSurface nurbs, double[] point){
-//		if(nurbs.getRevolutionDir() != null){
-//			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
-//		}
+		if(nurbs.getRevolutionDir() != null){
+			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
+		}
 		double[] p = MathUtility.get3DPoint(point);
-//		double[] p = new double[3];
-//		p[0] = point[0] * point[3];
-//		p[1] = point[1] * point[3];
-//		p[2] = point[2] * point[3];
 		double[] closestPoint = new double[4];
 		double distNewton = Double.MAX_VALUE;
 		double dist = Double.MAX_VALUE;
@@ -389,7 +385,7 @@ public class PointProjection {
 		for (int i = 0; i < 15; i++) {
 			
 				// start of the newton method
-				if(i > 0 && i < 10){
+				if(i > 5 && i < 10){
 					for (NURBSSurface possibleNs : possiblePatches) {
 						double[] U = possibleNs.getUKnotVector();
 						double[] V = possibleNs.getVKnotVector();

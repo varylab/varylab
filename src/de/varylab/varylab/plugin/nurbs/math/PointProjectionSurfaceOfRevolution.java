@@ -354,16 +354,10 @@ public class PointProjectionSurfaceOfRevolution {
 
 	
 	public static LinkedList<NURBSCurve> getPossibleCurves(LinkedList<NURBSCurve> curveList, double[] p){
-//[][] closestControlPoints = getClosestSubcurve(curveList, p);
 		double eps = 0.000001;
-//		double closestMaxDistance = getMaxDist(p, closestControlPoints);
 		LinkedList<NURBSCurve> possibleCurves = new LinkedList<NURBSCurve>();
 		for (NURBSCurve nc : curveList) {
-			nc.toString();
-//			double[][] cp = MathUtility.get3DControlPoints(nc.getControlPoints());
-//			if(isPossibleCurveControlPoints(p, cp, closestMaxDistance) && isPossibleCurveEndPoint(nc, p, eps)){
-//				possibleCurves.add(nc);
-//			}
+//			nc.toString();
 			if(isPossibleCurveEndPoint(nc, p, eps)){
 				possibleCurves.add(nc);
 			}
@@ -372,12 +366,7 @@ public class PointProjectionSurfaceOfRevolution {
 	}
 	
 	public static double[] getClosestPointOnCurve(NURBSCurve nurbs, double[] point){
-		
 		double[] p = MathUtility.get3DPoint(point);
-//		double[] p = new double[3];
-//		p[0] = point[0] * point[3];
-//		p[1] = point[1] * point[3];
-//		p[2] = point[2] * point[3];
 		double[] closestPoint = new double[4];
 		double distNewton = Double.MAX_VALUE;
 		double dist = Double.MAX_VALUE;
@@ -388,7 +377,7 @@ public class PointProjectionSurfaceOfRevolution {
 		LinkedList<NURBSCurve>  possibleCurves = nurbs.decomposeIntoBezierCurvesList();
 		for (int i = 0; i < 15; i++) {
 			
-				// start of the newton method
+				// start of newton method
 //				if(i > 5 && i < 10){
 //					for (NURBSCurve possibleNc : possibleCurves) {
 //						double[] U = possibleNc.getUKnotVector();
@@ -456,18 +445,12 @@ public class PointProjectionSurfaceOfRevolution {
 	}
 	
 	public static double[] getClosestPoint(NURBSSurface ns, double[] point){
-//		System.out.println("THE ORIGINAL SURFACE");
-//		System.out.println(ns.toString());
 		double[] p = point.clone();
 		double[] closestPoint = new double[4];
 		LinkedList<EndPoints> ep = new LinkedList<NURBSCurve.EndPoints>();
 		ep.add(EndPoints.P0);
 		ep.add(EndPoints.Pm);
 		double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns);
-//		System.out.println("original axis");
-//		System.out.println("axis[0] = " + Arrays.toString(axis[0]));
-//		System.out.println("axis[1] = " + Arrays.toString(axis[1]));
-//		System.out.println(ns.toString());
 		double[][][]Pw = ns.getControlMesh().clone();
 		double[][][]P = new double [Pw.length][Pw[0].length][];
 		for (int i = 0; i < P.length; i++) {
@@ -480,20 +463,15 @@ public class PointProjectionSurfaceOfRevolution {
 		b1.translate(Rn.times(null, -1, axis[0]));
 		Matrix M1 = b1.getMatrix();
 		double[] axis1 = M1.multiplyVector(axis[1]).clone();
-//		System.out.println("translated axis[1] = " + Arrays.toString(axis[1]));
-//		System.out.println("translated axis1 = " + Arrays.toString(axis1));
 		// 1. rotation
 		double[] e2 = {0,1,0,1};
 		MatrixBuilder b2 = MatrixBuilder.euclidean();
 		b2.rotateFromTo(axis1, e2);
 		Matrix M2 = b2.getMatrix();
 		axis1 =  M2.multiplyVector(axis1);
-//		System.out.println("rotated axis1 = " + Arrays.toString(axis1));
 		double[] P00 = Pn.dehomogenize(null, P[0][0].clone());
-//		System.out.println("P00 " + Arrays.toString(P00));
 		P00 = M1.multiplyVector(P00);
 		P00 = M2.multiplyVector(P00);
-//		System.out.println(" first P00 " + Arrays.toString(P00));
 		P00[1] = 0;
 		P00[3] = 0;
 		double[] e1 = {1,0,0,1};
@@ -501,91 +479,51 @@ public class PointProjectionSurfaceOfRevolution {
 		b3.rotateFromTo(P00, e1);
 		Matrix M3 = b3.getMatrix();
 		P00 = M3.multiplyVector(P00);
-//		System.out.println("second P00 " + Arrays.toString(P00));
 		Matrix MCurve = M3;
 		MCurve.multiplyOnRight(M2);
 		MCurve.multiplyOnRight(M1);
 		double[][] controlPoints = new double[P.length][];
 		double[][] VcontrolPoints = new double[P[0].length][];
-//		System.out.println("new control points in u direction");
 		for (int j = 0; j < P[0].length; j++) {
 			VcontrolPoints[j] = MCurve.multiplyVector(P[0][j]);
-//			System.out.println("VcontrolPoint["+j+"] "+Arrays.toString(VcontrolPoints[j]));
 		}
 		for (int i = 0; i < P.length; i++) {
 			controlPoints[i] = MCurve.multiplyVector(P[i][0]);
-//			System.out.println("controlPoint["+i+"] "+Arrays.toString(controlPoints[i]));
 		}
-//		NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree());
-//		System.out.println("NURBS CURVE");
-//		System.out.println(nc.toString());
-//		System.out.println("p davor " + Arrays.toString(p));
 		p = MCurve.multiplyVector(p);
-//		System.out.println("p  " + Arrays.toString(p));
 		MatrixBuilder b4 = MatrixBuilder.euclidean();
 		//p translated to the x-z plane
 		double[] pTrans = {p[0],0, p[2],1};
 		
-		// check if project onto the interior of the surface
+		// check if projection is in the interior of the surface
 		boolean projIn = isInInterior(VcontrolPoints, pTrans);
-//		System.out.println();
-//		System.out.println("PROJECT INTERRIOR " + projIn);
-//		System.out.println();
 		if(!projIn){
-			
+			// check if the projection is on the other boundary curve
 			if(Rn.innerProduct(MathUtility.get3DPoint(pTrans), MathUtility.get3DPoint(VcontrolPoints[0])) < Rn.innerProduct(MathUtility.get3DPoint(pTrans), MathUtility.get3DPoint(VcontrolPoints[VcontrolPoints.length - 1]))){
-//				System.out.println();
-//				System.out.println("SECOND");
-//				System.out.println("OTHER SIDE");
 				for (int i = 0; i < P.length; i++) {
 					controlPoints[i] = MCurve.multiplyVector(P[i][P[0].length - 1]);
-//					System.out.println("hinten controlPoint["+i+"] "+Arrays.toString(controlPoints[i]));
-					
 				}
 				MCurve.invert();
 				NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
 				closestPoint = getClosestPointOnCurve(nc, p);
 				closestPoint = MCurve.multiplyVector(closestPoint);
-//				System.out.println(Arrays.toString(closestPoint));
 				return closestPoint;
 			}
 			MCurve.invert();
-//			System.out.println("EXTERRIOR");
 			NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
 			closestPoint = getClosestPointOnCurve(nc, p);
 			closestPoint = MCurve.multiplyVector(closestPoint);
-//			System.out.println(Arrays.toString(closestPoint));
 			return closestPoint;
 		}
-//		System.out.println("INTERIOR");
 		NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
 		b4.rotateFromTo(pTrans, e1);
 		Matrix M4 = b4.getMatrix();
 		p = M4.multiplyVector(p);
-//		System.out.println("p nach drehung " + Arrays.toString(p));
-//		if(Rn.innerProduct(controlPoints[0], p) < 0){
-//			System.out.println("point flipped");
-//			p[1] = -p[1];
-//		}
-		
-//		System.out.println("new point " + Arrays.toString(p));
-//		System.out.println("new control mesh with");
-//		for (int i = 0; i < P.length; i++) {
-//			for (int j = 0; j < P[0].length; j++) {
-//				Pn.dehomogenize(P[i][j], P[i][j]);
-//				System.out.println("P["+i+"]["+j+"] = " + Arrays.toString(P[i][j]));
-//			}
-//		}
-//		double[] closestPoint = new double[4];
 		closestPoint = getClosestPointOnCurve(nc, p);
-//		System.out.println("CLOSEST POINT1: " + Arrays.toString(closestPoint));
 		Matrix MPoint = M4;
 		MPoint.multiplyOnRight(MCurve);
 		MPoint.invert();
 		closestPoint = MPoint.multiplyVector(closestPoint);
-//		System.out.println("CLOSEST POINT: " + Arrays.toString(closestPoint));
-//		System.out.println("THE NEW SURFACE");
-//		System.out.println(ns.toString());
 		return closestPoint;
 	}
 	
