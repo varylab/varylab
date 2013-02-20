@@ -1,0 +1,276 @@
+
+.newlineLeft {
+	clear:left;
+}
+
+.newlineRight {
+	clear:right;
+}
+
+.content {
+    background-color:white;
+    color: black;
+/*    font-family: Arial, Helvetica, sans-serif;*/
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size:13px;
+}
+
+.hrline{
+	clear: left;
+	padding-bottom: 20px;
+    width:100%;
+    height:1px;
+}
+
+p {
+	color : #003366;
+	font-style:oblique;
+}
+
+.header {
+	padding-bottom: 10px;
+}
+
+.section {
+	text-align: justify;
+	clear: left;
+    	font-size:11px;
+	padding-bottom:20px;
+  }
+
+
+.section_title {
+    color : #003366;
+    font-size : 13px;
+    font-weight : bold;
+    text-align : left;
+    clear: left;
+	white-space:nowrap;
+  }
+
+
+.subsection {
+	
+	clear: left;
+    	font-size:11px;
+	padding-bottom:10px;
+	text-align:justify;
+  }
+
+
+.subsection_title {
+    color : #003366;
+    font-size : 12px;
+    font-weight : bold;
+    text-align : left;
+    clear: left;
+	white-space:nowrap;
+	padding-bottom:10px;
+  }
+
+
+.leftimage{
+	float:left; 
+	padding-right:20px; 
+	padding-top:0px;
+	padding-bottom:5px;
+	text-align:center;
+}
+
+
+.rightimage{
+	float:right; 
+	padding-left:20px; 
+	padding-top:0px;
+	padding-bottom:5px;
+	text-align:center;
+}
+
+
+.bibl{
+	text-transform:uppercase;
+}
+
+
+img {
+    border-width:0px;
+  }
+
+
+
+H1 {
+    color: #003366;
+    background: white;
+  }
+
+
+H2 {
+    color: #003366;
+    background: white;
+  }
+
+
+H3 {
+    color: #003366;
+    background: white;
+  }
+
+
+H4 {
+    color: #003366;
+    background: white;
+  }
+
+
+H5 {
+    color: #003366;
+    background: white;
+  }
+
+
+b, em, strong {
+    color: #003366;
+    background: white;
+  }
+
+
+.border {
+    color: white;
+    background: #003366;
+  }
+
+
+.small {
+    font-size:10px;
+  }
+
+
+a:link {
+    color: #003366;
+    background: white;
+	text-decoration:none;
+  }
+
+
+:visited {
+    color: #003366;
+    background: white;
+text-decoration:none;
+  }
+
+
+.borderh:link {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:none;
+  }
+
+
+.borderh:visited {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:none;
+  }
+
+
+.borderh:hover {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:underline;
+  }
+
+
+.borderh:active {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:underline;
+  }
+
+
+.borders:link {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    line-height:16px;
+    text-decoration:none;
+  }
+
+
+.borders:visited {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    line-height:16px;
+    text-decoration:none;
+  }
+
+
+.borders:hover {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:underline;
+  }
+
+
+.borders:active {
+    color: white;
+    background: #003366;
+    font-size:10px;
+    text-decoration:underline;
+  }
+
+
+.borderl:link {
+    color: white;
+    background: #003366;
+    line-height:24px;
+    font-size:12px;
+    text-decoration:none;
+  }
+
+
+.borderl:visited {
+    color: white;
+    background: #003366;
+    line-height:24px;
+    font-size:12px;
+    text-decoration:none;
+  }
+
+
+.borderl:hover {
+    color: white;
+    background: #003366;
+    line-height:24px;
+    font-size:12px;
+    text-decoration:underline;
+  }
+
+
+.borderl:active {
+    color: white;
+    background: #003366;
+    line-height:24px;
+    font-size:12px;
+    text-decoration:underline;
+  }
+
+
+.border:link {
+    color: white;
+    background: #003366;
+  }
+
+
+.border:visited {
+    color: white;
+    background: #003366;
+  }
+
+/* http://www.w3.org/TR/1999/REC-CSS1-19990111 */
+/* BG 003366 */
