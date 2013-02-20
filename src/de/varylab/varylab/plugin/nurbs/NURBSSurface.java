@@ -224,42 +224,6 @@ import de.varylab.varylab.utilities.MathUtility;
 			return name;
 		}
 		
-		@Override
-		public String toString() {
-			String str = new String();
-			str = str + "NURBSSurface" + '\n' + "U knot vector" + '\n';
-			for (int i = 0; i < U.length; i++) {
-				str = str + U[i] + ", ";
-			}
-			str = str + '\n' + "V knot vector" + '\n';
-			for (int i = 0; i < V.length; i++) {
-				str = str + V[i] + ", ";
-			}
-			str = str + '\n' + "p " + p;
-			str = str + '\n' + "q " + q;
-			str = str + '\n' + "control mesh";
-			for (int i = 0; i < controlMesh.length; i++) {
-				str = str + '\n';
-				for (int j = 0; j < controlMesh[0].length; j++) {
-					str = str + Arrays.toString(controlMesh[i][j]) + " ";
-				}
-			}
-			str = str + '\n' + "boundary lines: " + boundaryToString() + '\n';
-			
-			if(revDir == null){
-				str = str + "no surface of revolution ";
-			}else{
-				str = str + "surface of revolution ";
-				str = str + '\n' + revDir;
-			}
-			return str;
-		}
-		
-	
-
-		
-		
-		
 		
 		private LinkedList<double[][]> getBoundarySegments(){
 			LinkedList<double[][]> segList = new LinkedList<double[][]>();
@@ -647,8 +611,6 @@ import de.varylab.varylab.utilities.MathUtility;
  			return newPatches;
  		}
  		
- 
- 	
  		
 
 		
@@ -656,60 +618,7 @@ import de.varylab.varylab.utilities.MathUtility;
  			return PointProjection.getClosestPoint(this, point);
  		}
 	
-
 	
-		
-		
-		private double[] newtonMethodDist(double[] p, double eps, double u, double v){
-			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-			double[] S = getSurfacePoint(u, v);
-			double[] S3D = MathUtility.get3DPoint(getSurfacePoint(u, v));
-			double[] P3D = MathUtility.get3DPoint(p);
-			double[] Su = ci.getSu();
-			double[] Sv = ci.getSv();
-			double[] Suu = ci.getSuu();
-			double[] Suv = ci.getSuv();
-			double[] Svv = ci.getSvv();
-			
-			// we define the functional F(u,v):= sqrt(<S(u,v) - p,S(u,v) - p>) and minimize F
-			double F = Math.sqrt(Rn.innerProduct(Rn.subtract(null, S3D, P3D), Rn.subtract(null, S3D, P3D)));
-			double Fu = Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) / F;
-			double Fv = Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D)) / F;
-			double Fuu = ((Rn.innerProduct(Suu, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Su, Su)) * F - Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) * Fu) / (F * F);
-			double Fuv = ((Rn.innerProduct(Suv, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Su, Sv)) * F - Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) * Fv) / (F * F);
-			double Fvv = ((Rn.innerProduct(Svv, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Sv, Sv)) * F - Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D)) * Fv) / (F * F);
-			double deltaU = Double.MAX_VALUE;;
-			double deltaV = Double.MAX_VALUE;;
-			for(int i = 0; i < 12; i++){
-//				if(Fu < eps && Fv < eps && deltaU < eps && deltaV < eps){
-////					System.out.println("terminiert nach " + i + " Schritten");
-//					return S;
-//				}
-				deltaV = ((-Fv * Fuu + Fu * Fuv) /(Fuu * Fvv - Fuv * Fuv));
-				deltaU = -((Fu + (Fuv * deltaV)) / Fuu);
-				u = deltaU + u;
-				v = deltaV + v;
-				if(u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1]){
-//					System.out.println("not in patch dist");
-					return null;
-				}
-				ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-				S = getSurfacePoint(u, v);
-				S3D = MathUtility.get3DPoint(getSurfacePoint(u, v));
-				Su = ci.getSu();
-				Sv = ci.getSv();
-				Suu = ci.getSuu();
-				Suv = ci.getSuv();
-				Svv = ci.getSvv();
-				F = Math.sqrt(Rn.innerProduct(Rn.subtract(null, S3D, P3D), Rn.subtract(null, S3D, P3D)));
-				Fu = Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) / F;
-				Fv = Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D)) / F;
-				Fuu = ((Rn.innerProduct(Suu, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Su, Su)) * F - Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) * Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D))) / (F * F);
-				Fuv = ((Rn.innerProduct(Suv, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Su, Sv)) * F - Rn.innerProduct(Su, Rn.subtract(null, S3D, P3D)) * Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D))) / (F * F);
-				Fvv = ((Rn.innerProduct(Svv, Rn.subtract(null, S3D, P3D)) + Rn.innerProduct(Sv, Sv)) * F - Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D)) * Rn.innerProduct(Sv, Rn.subtract(null, S3D, P3D))) / (F * F);
-			}
-			return S;
-		}
 		
 		public String boundaryToString(){
 			String str = new String();
@@ -729,6 +638,38 @@ import de.varylab.varylab.utilities.MathUtility;
 			}
 			for (CornerPoints cp : cornerPoints) {
 				str = str + cp +", ";
+			}
+			return str;
+		}
+		
+		
+		@Override
+		public String toString() {
+			String str = new String();
+			str = str + "NURBSSurface" + '\n' + "U knot vector" + '\n';
+			for (int i = 0; i < U.length; i++) {
+				str = str + U[i] + ", ";
+			}
+			str = str + '\n' + "V knot vector" + '\n';
+			for (int i = 0; i < V.length; i++) {
+				str = str + V[i] + ", ";
+			}
+			str = str + '\n' + "p " + p;
+			str = str + '\n' + "q " + q;
+			str = str + '\n' + "control mesh";
+			for (int i = 0; i < controlMesh.length; i++) {
+				str = str + '\n';
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					str = str + Arrays.toString(controlMesh[i][j]) + " ";
+				}
+			}
+			str = str + '\n' + "boundary lines: " + boundaryToString() + '\n';
+			
+			if(revDir == null){
+				str = str + "no surface of revolution ";
+			}else{
+				str = str + "surface of revolution ";
+				str = str + '\n' + revDir;
 			}
 			return str;
 		}

@@ -89,13 +89,17 @@ public class NURBSCurve {
 			Aders[i][2] = CK1[i][2];
 		}
 		NURBSAlgorithm.RatCurveDerivs(Aders, wders, p, CK);
+		double[][] CDerivs = new double[3][3];
+		CDerivs[0] = CK[0];
+		CDerivs[1] = CK[1];
 		if(p == 1){
-			CK[2][0] = 0;
-			CK[2][1] = 0;
-			CK[2][2] = 0;
+			CDerivs[2][0] = 0.0;
+			CDerivs[2][1] = 0.0;
+			CDerivs[2][2] = 0.0;
+		}else{
+			CDerivs[2] = CK[2];
 		}
-			
-		return CK;
+		return CDerivs;
 	}
 	
 	public NURBSCurve CurveKnotInsertion(NURBSCurve nc, double u, int r){

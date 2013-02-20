@@ -148,6 +148,43 @@ public class SurfaceOfRevolutionTest {
 		Assert.assertTrue(newton);
 	}
 	
+//	@Test
+//	public void isPossibleCurveControlPointsTest(){
+//		System.out.println("isPossibleCurveControlPointsTest()");
+//		double[] point = {0,1,0,1};
+//		double[] p3 = MathUtility.get3DPoint(point);
+//		double[] P0 = {-1,0,0,1};
+//		double[] P1 = {1,0,0,1};
+//		double[][] cP = new double[2][];
+//		cP[0] = P0;
+//		cP[1] = P1;
+//		double[] U = {0,0,1,1};
+//		int p = 1;
+//		LinkedList<EndPoints> endList = new LinkedList<NURBSCurve.EndPoints>();
+//		NURBSCurve nc = new NURBSCurve(cP, U, p,endList);
+//		LinkedList<NURBSCurve> possibleCurves = nc.decomposeIntoBezierCurvesList();
+//		System.out.println("original curve");
+//		for (NURBSCurve n : possibleCurves) {
+//			System.out.println(n.toString());
+//		}
+//		for (int i = 0; i < 25; i++) {
+//			LinkedList<NURBSCurve> subdividedCurves = new LinkedList<NURBSCurve>();
+//			possibleCurves = PointProjectionSurfaceOfRevolution.getPossibleCurves(possibleCurves, p3);
+//			System.out.println("possiblePatches.size(): " + possibleCurves.size());
+//			for (NURBSCurve np : possibleCurves) {
+//				subdividedCurves.addAll(np.subdivideIntoTwoNewCurves());
+//			}
+//			possibleCurves = subdividedCurves;
+//		}
+//		int i = 0;
+//		for (NURBSCurve n : possibleCurves) {
+//			i++;
+//			System.out.println(i + ". curve");
+//			System.out.println(n.toString());
+//			
+//		}
+//	}
+	
 	@Test
 	public void isPossibleCurveControlPointsTest(){
 		System.out.println("isPossibleCurveControlPointsTest()");
@@ -163,28 +200,27 @@ public class SurfaceOfRevolutionTest {
 		LinkedList<EndPoints> endList = new LinkedList<NURBSCurve.EndPoints>();
 		NURBSCurve nc = new NURBSCurve(cP, U, p,endList);
 		LinkedList<NURBSCurve> possibleCurves = nc.decomposeIntoBezierCurvesList();
-		System.out.println("original curve");
-		for (NURBSCurve n : possibleCurves) {
-			System.out.println(n.toString());
-		}
-		for (int i = 0; i < 25; i++) {
+//		System.out.println("original curve");
+//		for (NURBSCurve n : possibleCurves) {
+//			System.out.println(n.toString());
+//		}
+		for (int i = 0; i < 10; i++) {
 			LinkedList<NURBSCurve> subdividedCurves = new LinkedList<NURBSCurve>();
-			possibleCurves = PointProjectionSurfaceOfRevolution.getPossibleCurves(possibleCurves, p3);
-			System.out.println("possiblePatches.size(): " + possibleCurves.size());
+			
+	//		System.out.println("possiblePatches.size(): " + possibleCurves.size());
 			for (NURBSCurve np : possibleCurves) {
 				subdividedCurves.addAll(np.subdivideIntoTwoNewCurves());
 			}
 			possibleCurves = subdividedCurves;
 		}
+		possibleCurves = PointProjectionSurfaceOfRevolution.getPossibleCurves(possibleCurves, p3);
 		int i = 0;
 		for (NURBSCurve n : possibleCurves) {
 			i++;
-			System.out.println(i + ". curve");
-			System.out.println(n.toString());
+//			System.out.println(i + ". curve");
+//			System.out.println(n.toString());
 			
 		}
-		
-		
 	}
 	
 //	@Test 

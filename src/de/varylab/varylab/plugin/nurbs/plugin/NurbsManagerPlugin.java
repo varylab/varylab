@@ -125,6 +125,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private Action
 		importAction = new ImportAction();
 	
+	private Action
+		importReferenceAction = new ImportAction();
+	
 	private GeodesicPanel
 		geodesicPanel = new GeodesicPanel();
 	
@@ -136,6 +139,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 	private JButton
 		importButton = new JButton(importAction),
+//		importReferenceButton = new JButton(importReferenceAction),
 		updateButton = new JButton("update");
 
 	private JTable
@@ -185,7 +189,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		c.weightx = 1.0;
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = GridBagConstraints.REMAINDER;
-
+		
 		configureFileChooser();
 		importButton.addActionListener(this);
 		importButton.setToolTipText("Load Nurbs surface");
@@ -201,6 +205,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		surfaceToolbar.add(importAction);
 		surfaceToolbar.add(new JToolBar.Separator());
+//		surfaceToolbar.add(importReferenceAction);
+//		surfaceToolbar.add(new JToolBar.Separator());
 		surfaceToolbar.add(vectorFieldBox);
 		surfaceToolbar.add(new JToolBar.Separator());
 		surfaceToolbar.add(uSpinner);
@@ -266,9 +272,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			serialVersionUID = 1L;
 
 		public ImportAction() {
-			putValue(NAME, "Import");
+			
 			putValue(SMALL_ICON, ImageHook.getIcon("folder.png"));
+			putValue(NAME, "Import");
 			putValue(SHORT_DESCRIPTION, "Import");
+			
 		}
 		
 		@Override

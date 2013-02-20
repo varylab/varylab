@@ -25,108 +25,6 @@ import de.varylab.varylab.utilities.MathUtility;
 
 public class PointProjectionSurfaceOfRevolution {
 	
-	private static EndPoints isP0(double[][] P, double[] p, double eps){
-		double[] P0 = P[0];
-		double[] pp0 = Rn.subtract(null, p, P0);
-		double[] cPoint;
-		boolean b0 = true;
-		for (int i = 0; i < P.length; i++) {
-			cPoint = Rn.subtract(null, P0, P[i]);
-			if(i != 0 && Rn.innerProduct(Rn.normalize(null, pp0), Rn.normalize(null, cPoint)) < eps){
-				b0 = false;
-			}
-		}
-		if(b0){
-			return EndPoints.P0;
-		}
-		return null;
-	}
-	
-	private static EndPoints isPm(double[][] P, double[] p, double eps){
-		double[] Pm = P[P.length - 1];
-		double[] ppm = Rn.subtract(null, p, Pm);
-		double[] cPoint;
-		boolean bm = true;
-		for (int i = 0; i < P.length; i++) {
-			cPoint = Rn.subtract(null, Pm, P[i]);
-			if(i != P.length - 1 && Rn.innerProduct(Rn.normalize(null, ppm), Rn.normalize(null, cPoint)) < eps){
-				bm = false;
-			}
-		}
-		if(bm){
-			return EndPoints.Pm;
-		}
-		return null;
-	}
-	
-	private static double getMinDist(double[] p, double[][] P){
-		double dist = Double.MAX_VALUE;
-		for (int i = 0; i < P.length; i++) {
-			if(dist > Rn.euclideanDistance(p, P[i])){
-				dist = Rn.euclideanDistance(p, P[i]);
-			}
-		}
-		return dist;
-	}
-	
-	public static double[][] getClosestSubcurve(LinkedList<NURBSCurve> curveList, double[] p){
-		double minDist = Double.MAX_VALUE;
-		NURBSCurve closestCurve = new NURBSCurve();
-		for (NURBSCurve nc : curveList) {
-			double dist = getMinDist(p, MathUtility.get3DControlPoints(nc.getControlPoints()));
-			if(minDist > dist){
-				minDist = dist;
-				closestCurve = nc;
-			}
-		}
-		System.out.println("CLOSEST CURVE");
-		if(closestCurve.getUKnotVector() == null){
-			System.out.println("NO CURVE");
-		}
-		System.out.println(closestCurve.toString());
-		return MathUtility.get3DControlPoints(closestCurve.getControlPoints());
-	}
-	
-	private static double getMaxDist(double[] p, double[][] P){
-		double dist = Double.MIN_VALUE;
-		for (int i = 0; i < P.length; i++) {
-			if(dist < Rn.euclideanDistance(p, P[i])){
-				dist = Rn.euclideanDistance(p, P[i]);
-			}
-		}
-		return dist;
-	}
-	
-	private static boolean isPossibleCurveControlPoints(double[] p, double[][] P, double closestMaxDistance){
-		double dist = getMinDist(p, P);
-		if(dist < closestMaxDistance){
-//			System.out.println("isPossibleCurveControlPoints true");
-				return true;
-		}
-//		System.out.println("isPossibleCurveControlPoints false");
-		return false;
-	}
-	
-	private static EndPoints isOnEndPoint(NURBSCurve nc, double[] p, double eps){
-		double[][] P = MathUtility.get3DControlPoints(nc.getControlPoints());
-		if(isP0(P,p,eps) != null){
-			return isP0(P,p,eps);
-		}
-		if(isPm(P,p,eps) != null){
-			return isPm(P,p,eps);
-		} 
-		return null;
-	}
-	
-	private static boolean isPossibleCurveEndPoint(NURBSCurve nc, double[] p, double eps){
-		if(isOnEndPoint(nc, p, eps) == null || nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
-			if(nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
-//				System.out.println("contains endpoints");
-			}
-			return true;
-		}
-		return false;
-	}
 	
 	public static double[] getMidpointFromCircle(double[] q1, double[] q2, double[] q3){
 		if(Rn.equals(q1, q2, 0.0001) && Rn.equals(q1, q3, 0.0001)){
@@ -295,7 +193,11 @@ public class PointProjectionSurfaceOfRevolution {
 		return dir;
 	}
 	
-	
+	/**
+	 * 
+	 * @param ns
+	 * @return the rotation axis if ns is a surface of revolution else null
+	 */
 	public static double[][] getRotationAxis(NURBSSurface ns){
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
@@ -333,7 +235,147 @@ public class PointProjectionSurfaceOfRevolution {
 		return null;
 	}
 	
+	private static EndPoints isP0(double[][] P, double[] p, double eps){
+		double[] P0 = P[0];
+		double[] pp0 = Rn.subtract(null, p, P0);
+		double[] cPoint;
+		boolean b0 = true;
+		for (int i = 0; i < P.length; i++) {
+			cPoint = Rn.subtract(null, P0, P[i]);
+			if(i != 0 && Rn.innerProduct(Rn.normalize(null, pp0), Rn.normalize(null, cPoint)) < eps){
+				b0 = false;
+			}
+		}
+		if(b0){
+			return EndPoints.P0;
+		}
+		return null;
+	}
+	
+	private static EndPoints isPm(double[][] P, double[] p, double eps){
+		double[] Pm = P[P.length - 1];
+		double[] ppm = Rn.subtract(null, p, Pm);
+		double[] cPoint;
+		boolean bm = true;
+		for (int i = 0; i < P.length; i++) {
+			cPoint = Rn.subtract(null, Pm, P[i]);
+			if(i != P.length - 1 && Rn.innerProduct(Rn.normalize(null, ppm), Rn.normalize(null, cPoint)) < eps){
+				bm = false;
+			}
+		}
+		if(bm){
+			return EndPoints.Pm;
+		}
+		return null;
+	}
+	
+	private static EndPoints isOnEndPoint(NURBSCurve nc, double[] p, double eps){
+		double[][] P = MathUtility.get3DControlPoints(nc.getControlPoints());
+		if(isP0(P,p,eps) != null){
+			return isP0(P,p,eps);
+		}
+		if(isPm(P,p,eps) != null){
+			return isPm(P,p,eps);
+		} 
+		return null;
+	}
+	
+	private static boolean isPossibleCurveEndPoint(NURBSCurve nc, double[] p, double eps){
+		if(isOnEndPoint(nc, p, eps) == null || nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
+			if(nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param p a 3D point
+	 * @param P 3D control points
+	 * @return min distance
+	 */
+	private static double getMinDist(double[] p, double[][] P){
+		double dist = Double.MAX_VALUE;
+		for (int i = 0; i < P.length; i++) {
+			if(dist > Rn.euclideanDistance(p, P[i])){
+				dist = Rn.euclideanDistance(p, P[i]);
+			}
+		}
+		return dist;
+	}
+	
+	/**
+	 * 
+	 * @param p a 3D point
+	 * @param P 3D control points
+	 * @return max distance
+	 */
+	private static double getMaxDist(double[] p, double[][] P){
+		double dist = Double.MIN_VALUE;
+		for (int i = 0; i < P.length; i++) {
+			if(dist < Rn.euclideanDistance(p, P[i])){
+				dist = Rn.euclideanDistance(p, P[i]);
+			}
+		}
+		return dist;
+	}
+	
+	/**
+	 * @param curveList: list of NURBS curves
+	 * @param p: a 3D point
+	 * @return closest control points in 3D coords
+	 */
+	
+	public static double[][] getClosestSubcurve(LinkedList<NURBSCurve> curveList, double[] p){
+		double minDist = Double.MAX_VALUE;
+		NURBSCurve closestCurve = new NURBSCurve();
+		for (NURBSCurve nc : curveList) {
+			double dist = getMinDist(p, MathUtility.get3DControlPoints(nc.getControlPoints()));
+			if(minDist > dist){
+				minDist = dist;
+				closestCurve = nc;
+			}
+		}
+//		System.out.println("CLOSEST CURVE");
+		if(closestCurve.getUKnotVector() == null){
+//			System.out.println("NO CURVE");
+		}
+//		System.out.println(closestCurve.toString());
+		return MathUtility.get3DControlPoints(closestCurve.getControlPoints());
+	}
+	
+	
+	
+	private static boolean isPossibleCurveControlPoints(double[] p, double[][] P, double closestMaxDistance){
+		double dist = getMinDist(p, P);
+		if(dist < closestMaxDistance){
+				return true;
+		}
+		return false;
+	}
+	
+	public static LinkedList<NURBSCurve> getPossibleCurves(LinkedList<NURBSCurve> curveList, double[] p){
+		double eps = 0.000001;
+		if(curveList.size() < 2){
+			return curveList;
+		}
+		LinkedList<NURBSCurve> possibleCurves = new LinkedList<NURBSCurve>();
+		double[][] closestCP = getClosestSubcurve(curveList, p);
+		for (NURBSCurve nc : curveList) {
+			double closestMaxDistance = getMaxDist(p, closestCP);
+			if(isPossibleCurveEndPoint(nc, p, eps) && isPossibleCurveControlPoints(p, nc.getControlPoints(), closestMaxDistance)){
+				possibleCurves.add(nc);
+			}
+		}
+		return possibleCurves ;
+	}
+	
+	
 	public static double[] NewtonMethod(NURBSCurve nc, double u, double[] point){
+		double[] U = nc.getUKnotVector();
+		double u0 = U[0];
+		double um = U[U.length - 1];
 		double[] p = MathUtility.get3DPoint(point);
 		double[][]Ck = nc.getCurveDerivs(u);
 		double[] C = Ck[0];
@@ -341,6 +383,9 @@ public class PointProjectionSurfaceOfRevolution {
 		double[] Cuu = Ck[2];
 		for (int i = 0; i < 12; i++) {
 			u = u - (Rn.innerProduct(Cu, Rn.subtract(null, C, p))) / (Rn.innerProduct(Cuu, Rn.subtract(null, C, p)) + Rn.innerProduct(Cu, Cu));
+			if(u < u0 || u > um){
+				return null;
+			}
 			Ck = nc.getCurveDerivs(u);
 			C = Ck[0];
 			Cu = Ck[1];
@@ -349,21 +394,7 @@ public class PointProjectionSurfaceOfRevolution {
 		return nc.getCurvePoint(u);
 	}
 	
-	
-	
 
-	
-	public static LinkedList<NURBSCurve> getPossibleCurves(LinkedList<NURBSCurve> curveList, double[] p){
-		double eps = 0.000001;
-		LinkedList<NURBSCurve> possibleCurves = new LinkedList<NURBSCurve>();
-		for (NURBSCurve nc : curveList) {
-//			nc.toString();
-			if(isPossibleCurveEndPoint(nc, p, eps)){
-				possibleCurves.add(nc);
-			}
-		}
-		return possibleCurves ;
-	}
 	
 	public static double[] getClosestPointOnCurve(NURBSCurve nurbs, double[] point){
 		double[] p = MathUtility.get3DPoint(point);
@@ -378,22 +409,22 @@ public class PointProjectionSurfaceOfRevolution {
 		for (int i = 0; i < 15; i++) {
 			
 				// start of newton method
-//				if(i > 5 && i < 10){
-//					for (NURBSCurve possibleNc : possibleCurves) {
-//						double[] U = possibleNc.getUKnotVector();
-//						double u = (U[0] + U[U.length - 1]) / 2;
-//						double[] homogCurvePoint = possibleNc.getCurvePoint(u);
-//						double[] curvePoint = MathUtility.get3DPoint(homogCurvePoint);
-//						if(distNewton > Rn.euclideanDistance(curvePoint, point)){
-//							distNewton = Rn.euclideanDistance(curvePoint, point);
-//							uStart = u;
-//						}
-//					}
-//				double[] result = NewtonMethod(nurbs, uStart, point);
-//					if(result != null){ // returns if successful
-//						return result;
-//					}
-//				}
+				if(i > 5 && i < 10){
+					for (NURBSCurve possibleNc : possibleCurves) {
+						double[] U = possibleNc.getUKnotVector();
+						double u = (U[0] + U[U.length - 1]) / 2;
+						double[] homogCurvePoint = possibleNc.getCurvePoint(u);
+						double[] curvePoint = MathUtility.get3DPoint(homogCurvePoint);
+						if(distNewton > Rn.euclideanDistance(curvePoint, point)){
+							distNewton = Rn.euclideanDistance(curvePoint, point);
+							uStart = u;
+						}
+					}
+				double[] result = NewtonMethod(nurbs, uStart, point);
+					if(result != null){ // returns if successful
+						return result;
+					}
+				}
 				// end of the newton method
 				
 				LinkedList<NURBSCurve> subdividedCurves = new LinkedList<NURBSCurve>();

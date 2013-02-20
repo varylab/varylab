@@ -28,7 +28,7 @@ public class PointProjection {
 		for (int i = 0; i < P.length; i++) {
 			for (int j = 0; j < P[0].length; j++) {
 				cMPoint = Rn.subtract(null, P00, P[i][j]);
-				if(!(i == 0 && j == 0) && Rn.innerProduct(pp00, cMPoint) < eps){
+				if(!(i == 0 && j == 0) && Rn.innerProduct(Rn.normalize(null, pp00), Rn.normalize(null, cMPoint)) < eps){
 					b00 = false;
 				}
 			}
@@ -47,7 +47,7 @@ public class PointProjection {
 		for (int i = 0; i < P.length; i++) {
 			for (int j = 0; j < P[0].length; j++) {
 				cMPoint = Rn.subtract(null, P0n, P[i][j]);
-				if(!(i == 0 && j == P[0].length - 1) && Rn.innerProduct(pp0n, cMPoint) < eps){
+				if(!(i == 0 && j == P[0].length - 1) && Rn.innerProduct(Rn.normalize(null, pp0n), Rn.normalize(null, cMPoint)) < eps){
 					b0n = false;
 				}
 			}
@@ -66,7 +66,7 @@ public class PointProjection {
 		for (int i = 0; i < P.length; i++) {
 			for (int j = 0; j < P[0].length; j++) {
 				cMPoint = Rn.subtract(null, Pm0, P[i][j]);
-				if(!(i == P.length - 1 && j == 0) && Rn.innerProduct(ppm0, cMPoint) < eps){
+				if(!(i == P.length - 1 && j == 0) && Rn.innerProduct(Rn.normalize(null, ppm0), Rn.normalize(null, cMPoint)) < eps){
 					bm0 = false;
 				}
 			}
@@ -85,7 +85,7 @@ public class PointProjection {
 		for (int i = 0; i < P.length; i++) {
 			for (int j = 0; j < P[0].length; j++) {
 				cMPoint = Rn.subtract(null, Pmn, P[i][j]);
-				if(!(i == P.length - 1 && j == P[0].length - 1) && Rn.innerProduct(ppmn, cMPoint) < eps){
+				if(!(i == P.length - 1 && j == P[0].length - 1) && Rn.innerProduct(Rn.normalize(null, ppmn), Rn.normalize(null, cMPoint)) < eps){
 					bmn = false;
 				}
 			}
@@ -276,8 +276,8 @@ public class PointProjection {
 	}
 	
 	/**
-	 * @param surfList list of NURBS surfaces
-	 * @param p a 3D point
+	 * @param surfList: list of NURBS surfaces
+	 * @param p: a 3D point
 	 * @return closest mesh in 3D coords
 	 */
 	
