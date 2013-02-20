@@ -5,25 +5,29 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
-import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariables;
-import de.jtem.numericalMethods.calculus.minimizing.NelderMead;
-import de.jtem.numericalMethods.calculus.rootFinding.NewtonRaphson;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
-import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjection;
+import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 import de.varylab.varylab.utilities.MathUtility;
 
+/**
+ * 
+ * @author seidel
+ *
+ */
 
 
 	public class NURBSSurface {
 		
 		public enum BoundaryLines{u0, um, v0, vn};
 		public enum CornerPoints{P00, Pm0, P0n, Pmn};
+		public enum RevolutionDir{uDir, vDir};
 		private LinkedList<BoundaryLines> boundLines = new LinkedList<NURBSSurface.BoundaryLines>();
 		private LinkedList<CornerPoints> cornerPoints = new LinkedList<CornerPoints>();
+		private RevolutionDir revDir = null;
 		private double[] U;
 		private double[] V;
 		private LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
@@ -50,6 +54,7 @@ import de.varylab.varylab.utilities.MathUtility;
 			boundLines.add(BoundaryLines.um);
 			boundLines.add(BoundaryLines.v0);
 			boundLines.add(BoundaryLines.vn);
+			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 		}
 		
 		public NURBSSurface(double[] UVec, double[] VVec, double[][][] cm, int pDegree, int qDegree, LinkedList<BoundaryLines> boundList, LinkedList<CornerPoints> cornerList){
@@ -60,8 +65,18 @@ import de.varylab.varylab.utilities.MathUtility;
 			q = qDegree;
 			cornerPoints = cornerList;
 			boundLines = boundList;
+			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 		}
 		
+		
+		public void setRevolutionDir(){
+			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
+		}
+		
+		public RevolutionDir getRevolutionDir(){
+			return revDir;
+		}
+
 		public LinkedList<CornerPoints> getCornerPoints() {
 			return cornerPoints;
 		}
@@ -229,9 +244,21 @@ import de.varylab.varylab.utilities.MathUtility;
 					str = str + Arrays.toString(controlMesh[i][j]) + " ";
 				}
 			}
-			str = str + '\n' + "boundary lines: " + boundaryToString();
+			str = str + '\n' + "boundary lines: " + boundaryToString() + '\n';
+			
+			if(revDir == null){
+				str = str + "no surface of revolution ";
+			}else{
+				str = str + "surface of revolution ";
+				str = str + '\n' + revDir;
+			}
 			return str;
 		}
+		
+	
+
+		
+		
 		
 		
 		private LinkedList<double[][]> getBoundarySegments(){
@@ -316,7 +343,7 @@ import de.varylab.varylab.utilities.MathUtility;
 		 * @param knotVector
 		 * @return multiplicity of a given knot in the knot vector
 		 */
-		private static int getMultiplicity(double knot, double[] knotVector){
+		public static int getMultiplicity(double knot, double[] knotVector){
 			int counter = 0;
 			for (int i = 0; i < knotVector.length; i++) {
 				if(knot == knotVector[i]){
@@ -332,7 +359,7 @@ import de.varylab.varylab.utilities.MathUtility;
 		 * @param knotVector
 		 * @return degree
 		 */
-		private static int getDegreeFromClampedKnotVector(double[] knotVector){
+		public static int getDegreeFromClampedKnotVector(double[] knotVector){
 			int count = 0;
 			double before = knotVector[0];
 			for (int i = 1; i < knotVector.length; i++) {
@@ -362,7 +389,7 @@ import de.varylab.varylab.utilities.MathUtility;
 		 * @param multiplicity (empty)
 		 * @return newKnots, multiplicity
 		 */
-		private static void getAllNewKnots(double[] knotVector,ArrayList<Double> newKnots, ArrayList<Integer> multiplicity){
+		public static void getAllNewKnots(double[] knotVector,ArrayList<Double> newKnots, ArrayList<Integer> multiplicity){
 			int p = getDegreeFromClampedKnotVector(knotVector);
 			double before = knotVector[p];
 			int count = 1;
@@ -391,7 +418,7 @@ import de.varylab.varylab.utilities.MathUtility;
 		 * @param p
 		 * @return the set of the multiset filled knot vector 
 		 */
-		private static double[] getAllDifferentKnotsFromFilledKnotVector(double[] knotVector, int p){
+		public static double[] getAllDifferentKnotsFromFilledKnotVector(double[] knotVector, int p){
 			int knotSize = (knotVector.length - 2) / p;
 			double[] knots = new double[knotSize];
 			for (int i = 0; i < knots.length; i++) {
@@ -609,13 +636,6 @@ import de.varylab.varylab.utilities.MathUtility;
 			return surfaceList;
 		}
 		
-//		private static double[] projectOnto(double[] pos, double[] v1, double[] v2, double[] v3) {
-//			double[] fn = Rn.crossProduct(null, Rn.subtract(null, v2, v1), Rn.subtract(null, v3, v1));
-//			double[] proj = Rn.subtract(null, pos, v1);
-//			Rn.projectOntoComplement(proj, proj, fn);
-//			return Rn.add(null,proj,v1);
-//		}
-		
  		
  		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
  			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
@@ -630,183 +650,14 @@ import de.varylab.varylab.utilities.MathUtility;
  
  	
  		
-//		public double[] getClosestPointDist(double[] point, NURBSTree nt){
-//			
-//			double[] p = new double[3];
-// 			int n = controlMesh.length;
-// 			int m = controlMesh[0].length; 
-// 			double[] pp00 = Rn.subtract(null, MathUtility.get3DPoint(point), MathUtility.get3DPoint(controlMesh[0][0]));
-// 			double[] pp01 = Rn.subtract(null, MathUtility.get3DPoint(point), MathUtility.get3DPoint(controlMesh[0][m - 1]));
-// 			double[] pp10 = Rn.subtract(null, MathUtility.get3DPoint(point), MathUtility.get3DPoint(controlMesh[n - 1][0]));
-// 			double[] pp11 = Rn.subtract(null, MathUtility.get3DPoint(point), MathUtility.get3DPoint(controlMesh[n - 1][m - 1]));
-// 			boolean b00 = true;
-// 			boolean b01 = true;
-// 			boolean b10 = true;
-// 			boolean b11 = true;
-// 			double[] cMPoint;
-// 			for (int i = 0; i < n; i++) {
-//				for (int j = 0; j < m; j++) {
-//					double[] ijPoint = MathUtility.get3DPoint(controlMesh[i][j]);
-//					cMPoint = Rn.subtract(null, ijPoint, MathUtility.get3DPoint(controlMesh[0][0]));
-//					if(Rn.innerProduct(pp00, cMPoint) > 0){
-//						b00 = false;
-//					}
-//					cMPoint = Rn.subtract(null, ijPoint,MathUtility. get3DPoint(controlMesh[0][m - 1]));
-//					if(Rn.innerProduct(pp01, cMPoint) > 0){
-//						b01 = false;
-//					}
-//					cMPoint = Rn.subtract(null, ijPoint, MathUtility.get3DPoint(controlMesh[n - 1][0]));
-//					if(Rn.innerProduct(pp10, cMPoint) > 0){
-//						b10 = false;
-//					}
-//					cMPoint = Rn.subtract(null, ijPoint, MathUtility.get3DPoint(controlMesh[n - 1][m - 1]));
-//					if(Rn.innerProduct(pp11, cMPoint) > 0){
-//						b11 = false;
-//					}
-//					
-//				}
-//			}
-// 			if(b00){
-// 				System.out.println("HALLO b00");
-// 				return controlMesh[0][0];
-// 			}
-// 			if(b01){
-// 				System.out.println("HALLO b01");
-// 				return controlMesh[0][m - 1];
-// 			}
-// 			if(b10){
-// 				System.out.println("HALLO b10");
-// 				return controlMesh[n - 1][0];
-// 			}
-// 			if(b11){
-// 				System.out.println("HALLO b11");
-// 				return controlMesh[n - 1][m - 1];
-// 			}
-// 			double dist = Double.MAX_VALUE;
-//			
-// 			if(nt == null){
-// 				nt = new NURBSTree(decomposeIntoBezierSurfacesList());
-// 			}
-// 			LinkedList<NURBSTreeNode> possiblePatches = nt.getDummy().getBezierList();
-// 			for (int i = 0; i < 10; i++) {
-// 				if(i == 11){
-// 					double uStart = 0.;
-// 					double vStart = 0.;
-// 					for (NURBSTreeNode ntn : possiblePatches) {
-// 						double[] U = ntn.getNs().getUKnotVector();
-// 						double[] V = ntn.getNs().getVKnotVector();
-// 						double u = (U[0] + U[U.length - 1]) / 2;
-// 						double v = (V[0] + V[V.length - 1]) / 2;
-// 						double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
-// 						double[] surfPoint = MathUtility.get3DPoint(homogSurfPoint);
-// 						if(dist > Rn.euclideanDistance(surfPoint, point)){
-// 							dist = Rn.euclideanDistance(surfPoint, point);
-// 							uStart = u;
-// 							vStart = v;
-// 						}
-// 					}
-//					double[] result = newtonMethodDist (point, 0.0000000000001,uStart, vStart);
-////					System.out.println("result in Dist " + Arrays.toString(result));
-// 					if(result != null){
-//// 						System.out.println("newtonMethodDist is sucsessful");
-// 						return result;
-// 					}
-// 				}
-// 				LinkedList<NURBSTreeNode> subdividedPatches = new LinkedList<NURBSTreeNode>();
-// 				possiblePatches = getPossiblePatches(possiblePatches, point);
-// 				for (NURBSTreeNode ntn : possiblePatches) {
-//					subdividedPatches.addAll(ntn.getAllChildNodes());
-//				}
-// 				possiblePatches = subdividedPatches;
-// 			}
-// //			System.out.println(nt.toString());
-// 			
-// 			
-// 			for (NURBSTreeNode ntn : possiblePatches) {
-//				double[] U = ntn.getNs().getUKnotVector();
-//				double[] V = ntn.getNs().getVKnotVector();
-//				double u = (U[0] + U[U.length - 1]) / 2;
-//				double v = (V[0] + V[V.length - 1]) / 2;
-//				double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
-//				double[] surfPoint = MathUtility.get3DPoint(homogSurfPoint);
-//				if(dist > Rn.euclideanDistance(surfPoint, point)){
-//					dist = Rn.euclideanDistance(surfPoint, point);
-//					p = homogSurfPoint;
-//				}
-//			}
-// 			return p;
-// 		}
+
 		
 		public double[] getClosestPointOrth(double[] point){
  			return PointProjection.getClosestPoint(this, point);
  		}
 	
 
-		private double[] newtonMethodOrthogonal(double[] P, double eps, double u, double v){
-			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-			double[] S = getSurfacePoint(u, v);
-			double[] S3D = MathUtility.get3DPoint(getSurfacePoint(u, v));
-			double[] P3D = MathUtility.get3DPoint(P);
-			double[] r = Rn.times(null, 1 / Rn.euclideanNorm(Rn.subtract(null, S3D, P3D)), Rn.subtract(null, S3D, P3D));
-			double[] Su = ci.getSu();
-			double[] Sv = ci.getSv();
-			double[] Suu = ci.getSuu();
-			double[] Suv = ci.getSuv();
-			double[] Svv = ci.getSvv();
-			double f = Rn.innerProduct(r, Su);
-			double g = Rn.innerProduct(r, Sv);
-			double fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
-			double fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
-			double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
-			double deltaU = Double.MAX_VALUE;
-			double deltaV = Double.MAX_VALUE;
-			double[]oldIteration = new double[2];
-			double[]newIteration = new double[2];
-			double patchDist = Math.min(U[U.length-1] - U[0], V[V.length-1] - V[0]) / 3.;
-			for(int i = 0; i < 12; i++){
-//				if(f < eps && g < eps && deltaU < eps && deltaV < eps){
-//				if(false){	
-//					System.out.println("terminiert nach " + i + " Schritten");
-//					return S;
-//					
-//				}
-//				else{
-				deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
-				deltaU = -((f + (fv * deltaV)) / fu);
-				oldIteration[0] = u;
-				oldIteration[1] = v;
-				u = deltaU + u;
-				v = deltaV + v;
-				newIteration[0] = u;
-				newIteration[1] = v;
-				if((u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1])){
-					return null;
-				}
-				if(Rn.euclideanDistance(newIteration, oldIteration) > patchDist){
-					return null;
-					
-				}
-				ci = NURBSCurvatureUtility.curvatureAndDirections(this, u, v);
-				S = getSurfacePoint(u, v);
-				S3D = MathUtility.get3DPoint(getSurfacePoint(u, v));
-				r = Rn.subtract(null, S3D, P);
-				Su = ci.getSu();
-				Sv = ci.getSv();
-				Suu = ci.getSuu();
-				Suv = ci.getSuv();
-				Svv = ci.getSvv();
-				f = Rn.innerProduct(r, Su);
-				g = Rn.innerProduct(r, Sv);
-				fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
-				fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
-				gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
-			}
-			if(f > eps || g > eps){
-				System.out.println("f " + f + " g " + g);
-			}
-			return S;
-		}
-		
+	
 		
 		
 		private double[] newtonMethodDist(double[] p, double eps, double u, double v){

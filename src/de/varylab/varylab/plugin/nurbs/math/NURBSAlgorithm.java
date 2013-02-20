@@ -108,7 +108,7 @@ public class NURBSAlgorithm {
 	/**
 	 * Algorithm A2.2 from the NURBS Book
 	 * 
-	 * @param i =  knot span computed by FindSpan
+	 * @param i =  knot span provided by FindSpan
 	 * @param u = parameter
 	 * @param p = degree
 	 * @param U = knot vector
@@ -289,6 +289,28 @@ public class NURBSAlgorithm {
 			ders[k] = nD[0]; /* kth derivative */
 		}
 	}
+	
+	/**
+	 * Algorithm A4.1 from the NURBS book 
+	 * @param p = degree of the basis functions
+	 * @param U = knot vector
+	 * @param Pw = control points
+	 * @param u = parameter
+	 * @param C = is the curve point
+	 */
+	
+	
+	public static void CurvePoint(int p, double[] U,double[][] Pw, double u, double[] C){
+		int n = Pw.length - 1;
+		int span = FindSpan(n, p, u, U);
+		double[] N = new double[p + 1];
+		BasisFuns(span, u, p, U, N);
+		double[] Cw = new double[4];
+		for (int j = 0; j <= p; j++) {
+			Rn.add(Cw, Cw, Rn.times(null, N[j], Pw[span - p + j]));
+		}
+		Rn.times(C, 1/Cw[3], Cw);
+	}
 
 	/**
 	 * Algorithm A3.2 from the NURBS Book
@@ -302,19 +324,35 @@ public class NURBSAlgorithm {
 	 * @param CK
 	 */
 
-	public static void CurveDerivatives(int n, int p, double[] U, double[] P, double u, int d, double[] CK) {
+	public static void CurveDerivatives(int p, double[] U, double[][] P, double u, int d, double[][] CK) {
+		int n = P.length - 1;
 		int du = Math.min(d, p);
-		for (int k = p + 1; k <= d; k++) {
-			CK[k] = 0;
-		}
 		int span = FindSpan(n, p, u, U);
 		double nders[][] = new double[du + 1][p + 1];
 		DersBasisFuns(span, u, p, du, U, nders);
 		for (int k = 0; k <= du; k++) {
-			CK[k] = 0;
 			for (int j = 0; j <= p; j++) {
-				CK[k] = CK[k] + nders[k][j] * P[span - p + j];
+				Rn.add(CK[k], CK[k], Rn.times(null, nders[k][j], P[span - p + j]));
 			}
+		}
+	}
+	
+	
+	/**
+	 * Algorithm A4.2 from the NURBS Book
+	 * @param Aders
+	 * @param wders
+	 * @param d
+	 * @param CK
+	 */
+	
+	public static void RatCurveDerivs(double[][]Aders, double[] wders, int d, double[][]CK){
+		for (int k = 0; k <= d; k++) {
+			double[] v = Aders[k];
+			for (int i = 1; i <= k; i++) {
+				Rn.subtract(v, v, Rn.times(null, binomialCoefficient(k, i) * wders[i], CK[k - i]));
+			}
+			Rn.times(CK[k], 1 / wders[0], v);
 		}
 	}
 	
@@ -336,27 +374,15 @@ public class NURBSAlgorithm {
 	public static void SurfaceDerivatives(int n, int p, double[] U,int m, int q, double [] V,double[][][]P,double u, double v, int d, double[][][]SKL){
 
 		int du = Math.min(d, p);
-		for(int k=p+1;k<=d;k++){
-			for(int l=0;l<=d-k;l++){
-			}
-		}
 		int dv = Math.min(d, q);
-//		System.out.println("n = " + n);
-//		System.out.println("p = " + p);
-//		System.out.println("u = " + u);
-//		System.out.println("U = " + Arrays.toString(U));
 		int uspan = FindSpan(n,p,u,U);
 		double [][] Nu = new double[du + 1][p + 1];
 		DersBasisFuns(uspan, u, p, du, U, Nu);
-//		System.out.println("m = " + m);
-//		System.out.println("q = " + q);
-//		System.out.println("v = " + v);
-//		System.out.println("V = " + Arrays.toString(V));
 		int vspan = FindSpan(m,q,v,V);
 		double [][] Nv = new double[dv + 1][q + 1];
 		DersBasisFuns(vspan, v, q, dv, V, Nv);
 		for(int k=0; k<=du; k++){
-			double[] []temp = new double[q + 1][4];
+			double[][] temp = new double[q + 1][4];
 			for(int s=0; s<=q; s++){
 				for(int r = 0; r<= p; r++){
 					Rn.add(temp[s], temp[s],Rn.times(null, Nu[k][r], P[uspan - p + r][vspan - q + s]));
@@ -385,37 +411,7 @@ public class NURBSAlgorithm {
 	 * @param v
 	 * @param S
 	 */
-//	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
-//		int n = Pw.length - 1;
-//		int m = Pw[0].length - 1;
-//		double[][][] P = new double[Pw.length][Pw[0].length][4];
-//		for (int i = 0; i < Pw.length; i++) {
-//			for (int j = 0; j < Pw[0].length; j++) {
-////				P[i][j] = Pw[i][j];
-//				Pn.dehomogenize(P[i][j] , Pw[i][j]);
-//				P[i][j][3] = 1 / Pw[i][j][3];
-//			}
-//		}
-//		int uspan = FindSpan(n, p, u, U);
-//		int vspan = FindSpan(m, q, v, V);
-//		double[] Nu = new double[p + 1];
-//		double[] Nv = new double[q + 1];
-//		BasisFuns(uspan, u, p, U, Nu);
-//		BasisFuns(vspan, v, q, V, Nv);
-//		double[][] temp = new double[q + 1][4];
-//		for (int l = 0; l <= q; l++) {
-//			for (int k = 0; k <= p; k++) {
-//				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], P[uspan - p + k][vspan - q + l]));
-//			}
-//		}
-//		
-//		for (int l = 0; l <= q; l++) {
-//			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
-//		}
-////		double weight = S[3];
-////		Pn.dehomogenize(S, S);
-////		S[3] = weight;
-//	}
+
 	
 	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
 		int n = Pw.length - 1;
@@ -438,31 +434,7 @@ public class NURBSAlgorithm {
 	}
 	
 	
-//	public static void SurfacePoint(int p, double[] U, int q, double[] V, double[][][] Pw, double u, double v, double[] S) {
-//		
-//		int n = Pw.length - 1;
-//		int m = Pw[0].length - 1;
-//		int uspan = FindSpan(n, p, u, U);
-//		int vspan = FindSpan(m, q, v, V);
-//		double[] Nu = new double[p + 1];
-//		double[] Nv = new double[q + 1];
-//		BasisFuns(uspan, u, p, U, Nu);
-//		BasisFuns(vspan, v, q, V, Nv);
-//		int uind = uspan - p;
-//		
-////		double[][] temp = new double[q + 1][4];
-//		for (int l = 0; l <= q; l++) {
-//			double[] temp = {0.0, 0.0};
-//			int vind = vspan - q + 1;
-//			for(int k = 0; k <= q; k++){
-////				temp = temp + Nu[k] * P[uind + k][vind];
-//				Rn.add(temp, temp, Rn.times(null, Nu[k], P[uind + k][vind]));
-//			}
-//			Rn.add(S, S, Rn.times(null, Nv[l], temp));
-//		}
-//		
-//		
-//	}
+
 
 	/**
 	 * Algorithm A4.4 from the NURBS Book
@@ -514,14 +486,14 @@ public class NURBSAlgorithm {
 	public static void CurveKnotIns(int np, int p, double[] UP, double[][]Pw, double u, int k, int s, int r, int nq, double[] UQ, double[][]Qw){
 		
 		int mp = np + p + 1; // == UP.length - 1
-		nq = np + r;
+//		nq = np + r;
 		int L = 0;
 		double[][] Rw = new double[p + 1][];
 		/* Load the knot vector */
 		for(int i = 0; i <= k; i++){
 			UQ[i] = UP[i];
 		}
-		for(int i = 0; i <= r; i++){
+		for(int i = 1; i <= r; i++){
 			UQ[k + i] = u;
 		}
 		for(int i = k + 1; i <= mp; i++){

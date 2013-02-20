@@ -21,11 +21,22 @@ public class MathUtility {
 	}
 	
 	public static double[] get3DPoint(double[] fourDPoint){
+		if(fourDPoint.length != 4){
+			System.out.println("NO 4D point");
+		}
 		double[] threeDPoint = new double[3];
 		threeDPoint[0] = fourDPoint[0] / fourDPoint[3];
 		threeDPoint[1] = fourDPoint[1] / fourDPoint[3];
 		threeDPoint[2] = fourDPoint[2] / fourDPoint[3];
 		return threeDPoint;
+	}
+	
+	public static double[][] get3DControlPoints(double[][]Pw){
+		double[][] P = new double[Pw.length][3];
+		for (int i = 0; i < P.length; i++) {
+			P[i] = get3DPoint(Pw[i]);
+		}
+		return P;
 	}
 	
 	public static double[][][] get3DControlmesh(double[][][]Pw){
@@ -37,5 +48,22 @@ public class MathUtility {
 		}
 		return P;
 	}
-
+	
+	public static double[] getFirstComponents(double[] fourDPoint){
+		double[] p = new double[3];
+		for (int i = 0; i < p.length; i++) {
+			p[i] = fourDPoint[i];
+		}
+		return p;
+	}
+	
+	public static double[][][] getFirstComponents3Controlmesh(double[][][]Pw){
+		double[][][] P = new double[Pw.length][Pw[0].length][3];
+		for (int i = 0; i < P.length; i++) {
+			for (int j = 0; j < P[0].length; j++) {
+				P[i][j] = getFirstComponents(Pw[i][j]);
+			}
+		}
+		return P;
+	}
 }

@@ -95,8 +95,8 @@ public class NurbsIO {
 			LinkedList<Integer> surfIndex = new LinkedList<Integer>();
 			double[] curveDomain = new double[2];
 			LinkedList<LinkedList<Integer>> index = new LinkedList<LinkedList<Integer>>();
-			int curveDeg = 0;
-			int curveDim = 0;
+//			int curveDeg = 0;
+//			int curveDim = 0;
 			int trimCounter = 0;
 			int holeCounter = 0;
 			int trimIndex;
@@ -244,10 +244,10 @@ public class NurbsIO {
 						}
 						ctrlPointsCurve.add(v);
 					} else if (mDegCurve.matches()) {
-						curveDeg = Integer.parseInt(splitLine[1]);
+//						curveDeg = Integer.parseInt(splitLine[1]);
 
 					} else if (mCurveDim.matches()) {
-						curveDim = Integer.parseInt(mCurveDim.group(1));
+//						curveDim = Integer.parseInt(mCurveDim.group(1));
 						for (int i = 1; i < splitLine.length; i++) {
 							curveIndex.add(Integer.parseInt(splitLine[i]));
 						}
@@ -261,8 +261,7 @@ public class NurbsIO {
 						}
 
 						index.add(curveIndex);
-						curves.add(new NURBSCurve(curveKnotU, curveDim,
-								curveDeg));
+						curves.add(new NURBSCurve());
 						curveIndex = new LinkedList<Integer>();
 
 					}
@@ -279,7 +278,7 @@ public class NurbsIO {
 				for (int j = 0; j < pts.length; j++) {
 					pts[j] = ctrlPointsCurve.get(index.get(i).get(j) - 1);
 				}
-				curves.get(i).setCtrlPoints(pts);
+				curves.get(i).setControlPoints(pts);
 			}
 			// hier wird das surf kontrollgitter mit index definiert
 //			for (int i = 0; i < vList.size(); i++) {
@@ -350,6 +349,7 @@ public class NurbsIO {
 			ns.setVKnotVector(V);
 			ns.setUDegree(p);
 			ns.setVDegree(q);
+			ns.setRevolutionDir();
 			System.out.println("gelesene NURBS flaeche");
 			System.out.println(ns.toString());
 			System.out.println("end");

@@ -744,11 +744,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		boolean pointCreated = false;
 		
-		public double[] point = {7.800142263040452, 10.033731175723906, 1.6825028572432208, 3.0};
+		public double[] point = {1., -0.5, 1., 1.};
 		
-//		point[3] = 1;
-//		private double[] point = {0, 0, -2, 1};
-//		private double[] point = {-4.177945148333993, -6.190601790318352, -2.9962723410639365, 1};
 		public PointDistancePanel() {
 			super("Point Distance");
 			setShrinked(true);
@@ -786,7 +783,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 				ipointShader.setDiffuseColor(Color.orange);
 				hif.getActiveLayer().addTemporaryGeometry(sgci);
-				System.out.println("point before dragging " + Arrays.toString(point));
+//				System.out.println("point before dragging " + Arrays.toString(point));
 				DragEventTool t = new DragEventTool();
 				t.addPointDragListener(new PointDragListener() {
 	
@@ -801,9 +798,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
 				        points[e.getIndex()]=e.getPosition(); 
 				        point = e.getPosition().clone();
-				        Pn.dehomogenize(point, point);
-//				        point[3] = 1.;
-				        System.out.println(Arrays.toString(point));
+//				        Pn.dehomogenize(point, point);
+				        point[3] = 1.;
+//				        System.out.println(Arrays.toString(point));
 				    
 				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
 					}
@@ -1113,10 +1110,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
 		for (VFace f : hds.getFaces()){
 			double result = indexAdapter.get(f, as);
-//			if(Math.abs(Math.abs(result) - 1) < 0.01){
 			if(Math.abs(Math.abs(result) - 1) < 0.01 || Math.abs(Math.abs(result) - 2) < 0.01){
-//			if((Math.abs((int)result)== 1 || Math.abs((int)result)== 2) && Math.abs(result - (int)result) < 0.001){
-//			if(Math.abs(result - (int)result) < 0.001){	
 				umbFaces.add(result);
 				umbilicFaces.add(f);
 			}

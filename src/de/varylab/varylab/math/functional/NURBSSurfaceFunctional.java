@@ -25,7 +25,6 @@ public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V,
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> void evaluate(HDS hds,
 			DomainValue x, Energy E, Gradient G, Hessian H) {
-		System.out.println("Start");
 		long start = System.currentTimeMillis();
 		if (refSurface == null) {
 			if (E != null)
@@ -52,7 +51,6 @@ public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V,
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Time: "+ (end - start));
-		System.out.println("End");
 		closestPointMap.clear();
 	}
 

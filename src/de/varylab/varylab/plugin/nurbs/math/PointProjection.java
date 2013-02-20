@@ -7,6 +7,7 @@ import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.CornerPoints;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.utilities.MathUtility;
 
 /**
@@ -336,19 +337,22 @@ public class PointProjection {
 //			boolean bound = false;
 //			boolean mesh = false;
 			double[][][] cm = MathUtility.get3DControlmesh(ns.getControlMesh());
-//			if(isPossiblePatchBoundary(ns, p, eps)){
+//			if(isPossiblePatchBoundary(ns, p, eps) && isPossiblePatchCornerPoint(ns, p, eps)){
 //				possiblePatches.add(ns);
 //			}
-			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
-				possiblePatches.add(ns);
-			}
+//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
+//				possiblePatches.add(ns);
+//			}
 //			if(isPossiblePatchCornerPoint(ns, p)){
 //				possiblePatches.add(ns);
 //			}
-//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchCornerPoint(ns, p, eps)){
+			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchCornerPoint(ns, p, eps)){
+				possiblePatches.add(ns);
+					}
+//			if(isPossiblePatchBoundary(ns, p, eps) && isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
 //				possiblePatches.add(ns);
 //			}
-//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchBoundary(ns, p, eps)){
+//			if(isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchBoundary(ns, p, eps)){
 //				possiblePatches.add(ns);
 //			}
 //			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchBoundary(ns, p, eps)){
@@ -360,6 +364,9 @@ public class PointProjection {
 	}
 	
 	public static double[] getClosestPoint(NURBSSurface nurbs, double[] point){
+//		if(nurbs.getRevolutionDir() != null){
+//			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
+//		}
 		double[] p = MathUtility.get3DPoint(point);
 //		double[] p = new double[3];
 //		p[0] = point[0] * point[3];
@@ -370,34 +377,39 @@ public class PointProjection {
 		double dist = Double.MAX_VALUE;
 		double uStart = 0.;
 		double vStart = 0.;
-		double eps = 0.000001;
+//		double eps = 0.000001;
 		LinkedList<BoundaryLines> firstBl = new LinkedList<NURBSSurface.BoundaryLines>();
 		firstBl.add(BoundaryLines.u0);
 		firstBl.add(BoundaryLines.um);
 		firstBl.add(BoundaryLines.v0);
 		firstBl.add(BoundaryLines.vn);
 		nurbs.setBoundLines(firstBl);
+		
 		LinkedList<NURBSSurface>  possiblePatches = nurbs.decomposeIntoBezierSurfacesList();
-		for (int i = 0; i < 12; i++) {
-//				if(i > 0 && i < 6){
-//					for (NURBSTreeNode ntn : possiblePatches) {
-//						double[] U = ntn.getNs().getUKnotVector();
-//						double[] V = ntn.getNs().getVKnotVector();
-//						double u = (U[0] + U[U.length - 1]) / 2;
-//						double v = (V[0] + V[V.length - 1]) / 2;
-//						double[] homogSurfPoint = ntn.getNs().getSurfacePoint(u, v);
-//						double[] surfPoint = get3DPoint(homogSurfPoint);
-//						if(distNewton > Rn.euclideanDistance(surfPoint, point)){
-//							distNewton = Rn.euclideanDistance(surfPoint, point);
-//							uStart = u;
-//							vStart = v;
-//						}
-//					}
-//				double[] result = newtonMethodOrthogonal (point, 0.0000000000001,uStart, vStart);
-//					if(result != null){
-//						return result;
-//					}
-//				}
+		for (int i = 0; i < 15; i++) {
+			
+				// start of the newton method
+				if(i > 0 && i < 10){
+					for (NURBSSurface possibleNs : possiblePatches) {
+						double[] U = possibleNs.getUKnotVector();
+						double[] V = possibleNs.getVKnotVector();
+						double u = (U[0] + U[U.length - 1]) / 2;
+						double v = (V[0] + V[V.length - 1]) / 2;
+						double[] homogSurfPoint = possibleNs.getSurfacePoint(u, v);
+						double[] surfPoint = MathUtility.get3DPoint(homogSurfPoint);
+						if(distNewton > Rn.euclideanDistance(surfPoint, point)){
+							distNewton = Rn.euclideanDistance(surfPoint, point);
+							uStart = u;
+							vStart = v;
+						}
+					}
+				double[] result = newtonMethod (nurbs, point, 0.0000000000001,uStart, vStart);
+					if(result != null){ // returns if successful
+						return result;
+					}
+				}
+				// end of the newton method
+				
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, p);
 //				System.out.println("possiblePatches.size(): " + possiblePatches.size());
@@ -433,6 +445,75 @@ public class PointProjection {
 		}
 		return str;
 	}
+	
+	
+	private static double[] newtonMethod(NURBSSurface ns, double[] P, double eps, double u, double v){
+		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, u, v);
+		double[] S = ns.getSurfacePoint(u, v);
+		double[] S3D = MathUtility.get3DPoint(S);
+		double[] P3D = MathUtility.get3DPoint(P);
+		double[] U = ns.getUKnotVector();
+		double[] V = ns.getVKnotVector();
+		double[] r = Rn.times(null, 1 / Rn.euclideanNorm(Rn.subtract(null, S3D, P3D)), Rn.subtract(null, S3D, P3D));
+		double[] Su = ci.getSu();
+		double[] Sv = ci.getSv();
+		double[] Suu = ci.getSuu();
+		double[] Suv = ci.getSuv();
+		double[] Svv = ci.getSvv();
+		double f = Rn.innerProduct(r, Su);
+		double g = Rn.innerProduct(r, Sv);
+		double fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
+		double fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
+		double gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
+		double deltaU = Double.MAX_VALUE;
+		double deltaV = Double.MAX_VALUE;
+		double[]oldIteration = new double[2];
+		double[]newIteration = new double[2];
+		double patchDist = Math.min(U[U.length-1] - U[0], V[V.length-1] - V[0]) / 3.;
+		for(int i = 0; i < 12; i++){
+//			if(f < eps && g < eps && deltaU < eps && deltaV < eps){
+//			if(false){	
+//				System.out.println("terminiert nach " + i + " Schritten");
+//				return S;
+//				
+//			}
+//			else{
+			deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
+			deltaU = -((f + (fv * deltaV)) / fu);
+			oldIteration[0] = u;
+			oldIteration[1] = v;
+			u = deltaU + u;
+			v = deltaV + v;
+			newIteration[0] = u;
+			newIteration[1] = v;
+			if((u < U[0] || u > U[U.length - 1] || v < V[0] || v > V[V.length - 1])){
+				return null;
+			}
+			if(Rn.euclideanDistance(newIteration, oldIteration) > patchDist){
+				return null;
+				
+			}
+			ci = NURBSCurvatureUtility.curvatureAndDirections(ns, u, v);
+			S = ns.getSurfacePoint(u, v);
+			S3D = MathUtility.get3DPoint(S);
+			r = Rn.subtract(null, S3D, P);
+			Su = ci.getSu();
+			Sv = ci.getSv();
+			Suu = ci.getSuu();
+			Suv = ci.getSuv();
+			Svv = ci.getSvv();
+			f = Rn.innerProduct(r, Su);
+			g = Rn.innerProduct(r, Sv);
+			fu = Rn.innerProduct(Su, Su) + Rn.innerProduct(r, Suu);
+			fv = Rn.innerProduct(Su, Sv) + Rn.innerProduct(r, Suv);
+			gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
+		}
+		if(f > eps || g > eps){
+			System.out.println("f " + f + " g " + g);
+		}
+		return S;
+	}
+	
 	
 	
 	
