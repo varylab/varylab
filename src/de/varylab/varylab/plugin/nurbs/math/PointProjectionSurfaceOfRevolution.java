@@ -580,7 +580,7 @@ public class PointProjectionSurfaceOfRevolution {
 		double[] P00 = Pn.dehomogenize(null, P[0][0].clone());
 		P00 = M1.multiplyVector(P00);
 		P00 = M2.multiplyVector(P00);
-		System.out.println(Arrays.toString(P00));
+//		System.out.println(Arrays.toString(P00));
 		P00[1] = 0;
 		double[] e1 = {1,0,0,1};
 		MatrixBuilder b3 = MatrixBuilder.euclidean();
