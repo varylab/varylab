@@ -52,7 +52,6 @@ import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
@@ -125,9 +124,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private Action
 		importAction = new ImportAction();
 	
-	private Action
-		importReferenceAction = new ImportAction();
-	
 	private GeodesicPanel
 		geodesicPanel = new GeodesicPanel();
 	
@@ -139,7 +135,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 	private JButton
 		importButton = new JButton(importAction),
-//		importReferenceButton = new JButton(importReferenceAction),
 		updateButton = new JButton("update");
 
 	private JTable
@@ -205,8 +200,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		surfaceToolbar.add(importAction);
 		surfaceToolbar.add(new JToolBar.Separator());
-//		surfaceToolbar.add(importReferenceAction);
-//		surfaceToolbar.add(new JToolBar.Separator());
 		surfaceToolbar.add(vectorFieldBox);
 		surfaceToolbar.add(new JToolBar.Separator());
 		surfaceToolbar.add(uSpinner);
@@ -854,7 +847,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 		private double[] calculateClosestPoint(double[] point) {
 			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
-			double[] surfacePoint = ns.getClosestPointOrth(point);
+			double[] surfacePoint = ns.getClosestPoint(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
 //			

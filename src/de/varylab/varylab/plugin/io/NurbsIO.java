@@ -350,9 +350,9 @@ public class NurbsIO {
 			ns.setUDegree(p);
 			ns.setVDegree(q);
 			ns.setRevolutionDir();
-			System.out.println("gelesene NURBS flaeche");
-			System.out.println(ns.toString());
-			System.out.println("end");
+//			System.out.println("gelesene NURBS flaeche");
+//			System.out.println(ns.toString());
+//			System.out.println("end");
 
 
 		} catch (FileNotFoundException ex) {

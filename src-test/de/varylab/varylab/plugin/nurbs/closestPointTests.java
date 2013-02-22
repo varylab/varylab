@@ -20,12 +20,12 @@ public class closestPointTests {
 		}
 		double[] point = {0.,0.,1.,1.};
 		double[] exactPoint1 = {0.,0.,0.,1.};
-		double[] closestPoint = ns.getClosestPointOrth(point);
+		double[] closestPoint = ns.getClosestPoint(point);
 		double delta = 0.01;
 		Assert.assertArrayEquals(null, exactPoint1, closestPoint,delta);
 		point[1] = 20.;
 		double[] exactPoint2 = {0.,10.,0.,1.};
-		closestPoint = ns.getClosestPointOrth(point);
+		closestPoint = ns.getClosestPoint(point);
 		Assert.assertArrayEquals(null, exactPoint2, closestPoint,delta);
 	}
 	

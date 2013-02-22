@@ -5,13 +5,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
-import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjection;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
-import de.varylab.varylab.utilities.MathUtility;
 
 /**
  * 
@@ -225,33 +222,6 @@ import de.varylab.varylab.utilities.MathUtility;
 		}
 		
 		
-		private LinkedList<double[][]> getBoundarySegments(){
-			LinkedList<double[][]> segList = new LinkedList<double[][]>();
-			double[] p1 = {U[0],V[0]}; 
-			double[] p2 = {U[U.length - 1],V[0]}; 
-			double[] p3 = {U[U.length - 1],V[V.length - 1]};
-			double[] p4 = {U[0],V[V.length - 1]};
-			double[][] seg1 = {p1,p2};
-			double[][] seg2 = {p2,p3};
-			double[][] seg3 = {p3,p4};
-			double[][] seg4 = {p4,p1};
-			segList.add(seg1); segList.add(seg2); segList.add(seg3); segList.add(seg4);
-			return segList;
-		}
-		
-		private static double[] intersectionPoint(double[][] first, double[][] second){
-			double s1 = first[0][0];
-			double s2 = first[0][1];
-			double t1 = first[1][0];
-			double t2 = first[1][1];
-			double p1 = second[0][0];
-			double p2 = second[0][1];
-			double q1 = second[1][0];
-			double q2 = second[1][1];
-			double lambda = ((p1 - s1) * (s2 - t2) - (p2 - s2) * (s1 - t1)) / ((q2 - p2) * (s1 - t1) - (q1 - p1) * (s2 - t2));
-			return Rn.add(null, second[0],Rn.times(null, lambda,Rn.subtract(null, second[1], second[0])));
-		}
-		
 		public static boolean twoSegmentIntersection(double[][] seg1, double[][] seg2){
 			double[] p1 = seg1[0];
 			double[] p2 = seg1[1]; 
@@ -276,16 +246,6 @@ import de.varylab.varylab.utilities.MathUtility;
 				return true;
 			}	
 		}
-		
-		private static double[] getBoundaryIntersection(double[][]seg, LinkedList<double[][]> boundary){
-			for (double[][] b : boundary) {
-				if(twoSegmentIntersection(seg, b)){
-					return intersectionPoint(seg, b);
-				}
-			}
-			return null;
-		}
-		
 		
 		
 		/**
@@ -614,7 +574,7 @@ import de.varylab.varylab.utilities.MathUtility;
  		
 
 		
-		public double[] getClosestPointOrth(double[] point){
+		public double[] getClosestPoint(double[] point){
  			return PointProjection.getClosestPoint(this, point);
  		}
 	

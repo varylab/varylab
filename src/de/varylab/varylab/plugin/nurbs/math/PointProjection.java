@@ -15,10 +15,18 @@ import de.varylab.varylab.utilities.MathUtility;
  * @author seidel <br>
  * 
  * This class provides methods for the computation of the point projection onto a NURBS surface<br/>
+ * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a>
  */
 
 public class PointProjection {
 		
+	/**
+	 * necessary condition whether a point is projected to the corner point P00
+	 * @param P
+	 * @param p
+	 * @param eps
+	 * @return P00 if the condition is satisfied, else null
+	 */
 	
 	private static CornerPoints isP00(double[][][] P, double[] p, double eps){
 		double[] P00 = P[0][0];
@@ -39,6 +47,14 @@ public class PointProjection {
 		return null;
 	}
 	
+	/**
+	 * necessary condition whether a point is projected to the corner point P0n
+	 * @param P
+	 * @param p
+	 * @param eps
+	 * @return P0n if the condition is satisfied, else null
+	 */
+	
 	private static CornerPoints isP0n(double[][][] P, double[] p, double eps){
 		double[] P0n = P[0][P[0].length - 1];
 		double[] pp0n = Rn.subtract(null, p, P0n);
@@ -58,6 +74,14 @@ public class PointProjection {
 		return null;
 	}
 	
+	/**
+	 * necessary condition whether a point is projected to the corner point Pm0
+	 * @param P
+	 * @param p
+	 * @param eps
+	 * @return Pm0 if the condition is satisfied, else null
+	 */
+	
 	private static CornerPoints isPm0(double[][][] P, double[] p, double eps){
 		double[] Pm0 = P[P.length - 1][0];
 		double[] ppm0 = Rn.subtract(null, p, Pm0);
@@ -76,6 +100,14 @@ public class PointProjection {
 		}
 		return null;
 	}
+	
+	/**
+	 * necessary condition whether a point is projected to the corner point Pmn
+	 * @param P
+	 * @param p
+	 * @param eps
+	 * @return Pmn if the condition is satisfied, else null
+	 */
 	
 	private static CornerPoints isPmn(double[][][] P, double[] p, double eps){
 		double[] Pmn = P[P.length - 1][P[0].length - 1];
@@ -99,10 +131,10 @@ public class PointProjection {
 	/**
 	 * 
 	 * @param ns
-	 * @param point is a point in the 4 dim space
-	 * @return
+	 * @param p
+	 * @param eps
+	 * @return a corner point if the condition is satisfied, else null
 	 */
-	
 	
 	private static CornerPoints isOnCornerPoint(NURBSSurface ns, double[] p, double eps){
 		double[][][] P = MathUtility.get3DControlmesh(ns.getControlMesh());
@@ -121,6 +153,24 @@ public class PointProjection {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param ns
+	 * @param p
+	 * @param eps
+	 * @return true if we can exclude the projection to a corner point
+	 */
+	
+	private static boolean isPossiblePatchCornerPoint(NURBSSurface ns, double[] p, double eps){
+		if(isOnCornerPoint(ns, p, eps) == null || ns.getCornerPoints().contains(isOnCornerPoint(ns, p, eps))){
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
 	private static double[] Dir(double[] Pi, double[] Pj){
 		double[] dir = new double[3];
 		dir[0] = Pi[3] * Pj[0] - Pj[3] * Pi[0];
@@ -131,6 +181,7 @@ public class PointProjection {
 	
 	/**
 	 * this is an estimation for the tangent cone in u direction
+	 * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a> section boundary estimation
 	 * @param ns
 	 * @return tangent cone Tu
 	 */
@@ -150,6 +201,13 @@ public class PointProjection {
 		}
 		return Tu;
 	}
+	
+	/**
+	 * this is an estimation for the tangent cone in u direction
+	* @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a> section boundary estimation
+	 * @param ns
+	 * @return tangent cone Tu
+	 */
 		
 	private static double[][][] getTv(NURBSSurface ns){
 		double[][][]Pw = ns.getControlMesh();
@@ -166,6 +224,14 @@ public class PointProjection {
 		return Tv;	
 	}
 	
+	/**
+	 * necessary condition whether a point is projected to a boundary line
+	 * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a> section boundary estimation
+	 * @param ns
+	 * @param p
+	 * @param eps
+	 * @return a boundary line if the condition is satisfied
+	 */
 	
 	private static BoundaryLines isOnBoundaryCurve(NURBSSurface ns, double[] p, double eps){
 		double[][][]Pw = ns.getControlMesh();
@@ -239,6 +305,21 @@ public class PointProjection {
 	
 	/**
 	 * 
+	 * @param ns
+	 * @param p
+	 * @param eps
+	 * @return true if we can exclude the projection to the boundary 
+	 */
+	
+	private static boolean isPossiblePatchBoundary(NURBSSurface ns, double[] p, double eps){
+		if(isOnBoundaryCurve(ns, p, eps) == null || ns.getBoundLines().contains(isOnBoundaryCurve(ns, p, eps))){
+			return true;
+		}
+		return false;	
+	}
+	
+	/**
+	 * 
 	 * @param p a 3D point
 	 * @param P a 3D control mesh
 	 * @return min distance
@@ -299,7 +380,7 @@ public class PointProjection {
 	 * @param p 3D point
 	 * @param P 3D control mesh
 	 * @param closestMaxDistance (the maximal distance between p and all points of the closest control mesh)
-	 * @return
+	 * @return true if the minimal distance between p and all points of the control mesh is less than closestMaxDistance
 	 */
 
 	private static boolean isPossiblePatchControlMesh(double[] p, double[][][] P, double closestMaxDistance){
@@ -310,55 +391,33 @@ public class PointProjection {
 		return false;
 	}
 	
-	private static boolean isPossiblePatchBoundary(NURBSSurface ns, double[] p, double eps){
-		if(isOnBoundaryCurve(ns, p, eps) == null || ns.getBoundLines().contains(isOnBoundaryCurve(ns, p, eps))){
-			return true;
-		}
-		return false;	
-	}
 	
-	private static boolean isPossiblePatchCornerPoint(NURBSSurface ns, double[] p, double eps){
-		if(isOnCornerPoint(ns, p, eps) == null || ns.getCornerPoints().contains(isOnCornerPoint(ns, p, eps))){
-			return true;
-		}
-		return false;
-	}
 	
+	/**
+	 * NOTE:<br/>
+	 * The runtime depends on the point p and the surface and we have no bound for the complexity
+	 * of the algorithm. Unfortunately measurements have shown that the boundary estimation
+	 * does not speed up the algorithm in general, because the computation of the bounds for the
+	 * tangent cones is very expansive. If you want speed up the algorithm try to use only the
+	 * control mash estimation and the corner point estimation.
+	 * @param surfList
+	 * @param p
+	 * @return all candidates of surfaces that can contain the projection
+	 */
 	
 	public static LinkedList<NURBSSurface> getPossiblePatches(LinkedList<NURBSSurface> surfList, double[] p){
 		double[][][] closestMesh = getClosestPatch(surfList, p);
-//		System.out.println("POINT");
-//		System.out.println(Arrays.toString(p));
-//		System.out.println();
 		double eps = 0.000001;
 		double closestMaxDistance = getMaxDist(p, closestMesh);
 		LinkedList<NURBSSurface> possiblePatches = new LinkedList<NURBSSurface>();
 		for (NURBSSurface ns : surfList) {
-//			boolean bound = false;
-//			boolean mesh = false;
 			double[][][] cm = MathUtility.get3DControlmesh(ns.getControlMesh());
-//			if(isPossiblePatchBoundary(ns, p, eps) && isPossiblePatchCornerPoint(ns, p, eps)){
+//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchCornerPoint(ns, p, eps)){
 //				possiblePatches.add(ns);
-//			}
-//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
-//				possiblePatches.add(ns);
-//			}
-//			if(isPossiblePatchCornerPoint(ns, p)){
-//				possiblePatches.add(ns);
-//			}
-			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchCornerPoint(ns, p, eps)){
+//					}
+			if(isPossiblePatchBoundary(ns, p, eps) && isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
 				possiblePatches.add(ns);
-					}
-//			if(isPossiblePatchBoundary(ns, p, eps) && isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchControlMesh(p, cm, closestMaxDistance)){
-//				possiblePatches.add(ns);
-//			}
-//			if(isPossiblePatchCornerPoint(ns, p, eps) && isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchBoundary(ns, p, eps)){
-//				possiblePatches.add(ns);
-//			}
-//			if(isPossiblePatchControlMesh(p, cm, closestMaxDistance) && isPossiblePatchBoundary(ns, p, eps)){
-//				possiblePatches.add(ns);
-//			}
-			
+			}
 		}
 		return possiblePatches ;
 	}
@@ -467,13 +526,6 @@ public class PointProjection {
 		double[]newIteration = new double[2];
 		double patchDist = Math.min(U[U.length-1] - U[0], V[V.length-1] - V[0]) / 3.;
 		for(int i = 0; i < 12; i++){
-//			if(f < eps && g < eps && deltaU < eps && deltaV < eps){
-//			if(false){	
-//				System.out.println("terminiert nach " + i + " Schritten");
-//				return S;
-//				
-//			}
-//			else{
 			deltaV = ((-g * fu + f * fv) /(fu * gv - fv * fv));
 			deltaU = -((f + (fv * deltaV)) / fu);
 			oldIteration[0] = u;
@@ -515,8 +567,6 @@ public class PointProjection {
 	
 	public static void main(String[] args){
 		LinkedList<BoundaryLines> bList = new LinkedList<NURBSSurface.BoundaryLines>();
-//		bList.add(BoundaryLines.u0);
-//		bList.add(BoundaryLines.v0);
 		System.out.println(bList.contains(null));
 	}
 }

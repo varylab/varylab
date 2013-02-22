@@ -10,8 +10,6 @@ import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSCurve;
 import de.varylab.varylab.plugin.nurbs.NURBSCurve.EndPoints;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface.CornerPoints;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.RevolutionDir;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.utilities.MathUtility;
@@ -20,10 +18,18 @@ import de.varylab.varylab.utilities.MathUtility;
 /**
  * 
  * @author seidel
- *
+ * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a>
  */
 
 public class PointProjectionSurfaceOfRevolution {
+	
+	/**
+	 * 
+	 * @param q1
+	 * @param q2
+	 * @param q3
+	 * @return midpoints
+	 */
 	
 	
 	public static double[] getMidpointFromCircle(double[] q1, double[] q2, double[] q3){
@@ -44,6 +50,13 @@ public class PointProjectionSurfaceOfRevolution {
 		Rn.add(m, m, q1);
 		return m;
 	}
+	
+	/**
+	 * 
+	 * @param points1 3 points in 3D coords defining a circle
+	 * @param points2 3 points in 3D coords defining a circle
+	 * @return true if the midpoints of the circles coincide
+	 */
 	
 	private static boolean isCircle(double[][]points1, double[][]points2){
 		double[] m1 = getMidpointFromCircle(points1[0], points1[1], points1[2]);
@@ -84,13 +97,17 @@ public class PointProjectionSurfaceOfRevolution {
 		return true;
 	}
 	
-	public static boolean pointsAreCollinear(double[][] points){
+	/**
+	 * 
+	 * @param points
+	 * @return true if all points lie on a common line
+	 */
+	
+	public static boolean pointsAreOnACommonLine(double[][] points){
 		double[] zero = {0.0,0.0,0.0};
-//		double[] vec1 = Rn.normalize(null, Rn.subtract(null, points[1], points[0]));
-		double[] vec1 = Rn.subtract(null, points[1], points[0]);
+		double[] vec1 = Rn.normalize(null, Rn.subtract(null, points[1], points[0]));
 		for (int i = 2; i < points.length; i++) {
-//			double[] vec2 = Rn.normalize(null, Rn.subtract(null, points[i], points[0]));
-			double[] vec2 = Rn.subtract(null, points[i], points[0]);
+			double[] vec2 = Rn.normalize(null, Rn.subtract(null, points[i], points[0]));
 			if(!Rn.equals(Rn.crossProduct(null, vec1, vec2), zero, 0.001)){
 				return false;
 			}
@@ -98,6 +115,12 @@ public class PointProjectionSurfaceOfRevolution {
 		return true;
 	}
 	
+	
+	/**
+	 * 
+	 * @param ns
+	 * @return true if the surface is a surface of revolution in u direction
+	 */
 	
 	public static boolean isSurfaceOfRevolutionUDir(NURBSSurface ns){
 		double[] U = ns.getUKnotVector();
@@ -134,11 +157,17 @@ public class PointProjectionSurfaceOfRevolution {
 				return false;
 			}
 		}
-		if(!pointsAreCollinear(midPointsU)){
+		if(!pointsAreOnACommonLine(midPointsU)){
 			return false;
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * @param ns
+	 * @return true if the surface is a surface of revolution in v direction
+	 */
 	
 	public static boolean isSurfaceOfRevolutionVDir(NURBSSurface ns){
 		double[] U = ns.getUKnotVector();
@@ -176,11 +205,17 @@ public class PointProjectionSurfaceOfRevolution {
 			}
 		}
 		
-		if(!pointsAreCollinear(midPointsV)){
+		if(!pointsAreOnACommonLine(midPointsV)){
 			return false;
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * @param ns
+	 * @return the direction of the rotation axis
+	 */
 	
 	public static RevolutionDir getRotationDir(NURBSSurface ns){
 		RevolutionDir dir = null;
@@ -195,8 +230,8 @@ public class PointProjectionSurfaceOfRevolution {
 	
 	/**
 	 * 
-	 * @param ns
-	 * @return the rotation axis if ns is a surface of revolution else null
+	 * @param ns NURBSSurface
+	 * @return the rotation axis if the NURBSSurface is a surface of revolution else null
 	 */
 	public static double[][] getRotationAxis(NURBSSurface ns){
 		double[] U = ns.getUKnotVector();
@@ -234,6 +269,14 @@ public class PointProjectionSurfaceOfRevolution {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param P control points in 3D coords
+	 * @param p point in 3D coords
+	 * @param eps tolerance
+	 * @return the endpoint P0 if the 
+	 */
 	
 	private static EndPoints isP0(double[][] P, double[] p, double eps){
 		double[] P0 = P[0];
@@ -324,7 +367,7 @@ public class PointProjectionSurfaceOfRevolution {
 	/**
 	 * @param curveList: list of NURBS curves
 	 * @param p: a 3D point
-	 * @return closest control points in 3D coords
+	 * @return the control points of the closest subcurve in 3D coords
 	 */
 	
 	public static double[][] getClosestSubcurve(LinkedList<NURBSCurve> curveList, double[] p){
@@ -337,15 +380,16 @@ public class PointProjectionSurfaceOfRevolution {
 				closestCurve = nc;
 			}
 		}
-//		System.out.println("CLOSEST CURVE");
-		if(closestCurve.getUKnotVector() == null){
-//			System.out.println("NO CURVE");
-		}
-//		System.out.println(closestCurve.toString());
 		return MathUtility.get3DControlPoints(closestCurve.getControlPoints());
 	}
 	
-	
+	/**
+	 * 
+	 * @param p point in 3D coords
+	 * @param P control points in 3D coords
+	 * @param closestMaxDistance maximal distance between p and the control points of the closest subcurve
+	 * @return true if the minimal distance between p and the control points is less than closestMaxDistance
+	 */
 	
 	private static boolean isPossibleCurveControlPoints(double[] p, double[][] P, double closestMaxDistance){
 		double dist = getMinDist(p, P);
@@ -354,6 +398,13 @@ public class PointProjectionSurfaceOfRevolution {
 		}
 		return false;
 	}
+	
+	/**
+	 * 
+	 * @param curveList
+	 * @param p
+	 * @return all candidates of curves that can contain the projection
+	 */
 	
 	public static LinkedList<NURBSCurve> getPossibleCurves(LinkedList<NURBSCurve> curveList, double[] p){
 		double eps = 0.000001;
@@ -371,6 +422,13 @@ public class PointProjectionSurfaceOfRevolution {
 		return possibleCurves ;
 	}
 	
+	/**
+	 * computes the closest point via the newton method
+	 * @param nc NURBSCurve
+	 * @param u start point in the domain
+	 * @param point 
+	 * @return the closest point on the curve if possible else null
+	 */
 	
 	public static double[] NewtonMethod(NURBSCurve nc, double u, double[] point){
 		double[] U = nc.getUKnotVector();
@@ -394,7 +452,12 @@ public class PointProjectionSurfaceOfRevolution {
 		return nc.getCurvePoint(u);
 	}
 	
-
+	/**
+	 * computes the closest point
+	 * @param nurbs NURBSCurve
+	 * @param point
+	 * @return the closest point on the curve
+	 */
 	
 	public static double[] getClosestPointOnCurve(NURBSCurve nurbs, double[] point){
 		double[] p = MathUtility.get3DPoint(point);
@@ -402,14 +465,10 @@ public class PointProjectionSurfaceOfRevolution {
 		double distNewton = Double.MAX_VALUE;
 		double dist = Double.MAX_VALUE;
 		double uStart = 0.;
-//		double eps = 0.000001;
-		
-		
 		LinkedList<NURBSCurve>  possibleCurves = nurbs.decomposeIntoBezierCurvesList();
 		for (int i = 0; i < 15; i++) {
-			
 				// start of newton method
-				if(i > 5 && i < 10){
+				if(i > 5 && i < 12){
 					for (NURBSCurve possibleNc : possibleCurves) {
 						double[] U = possibleNc.getUKnotVector();
 						double u = (U[0] + U[U.length - 1]) / 2;
@@ -429,14 +488,12 @@ public class PointProjectionSurfaceOfRevolution {
 				
 				LinkedList<NURBSCurve> subdividedCurves = new LinkedList<NURBSCurve>();
 				possibleCurves = getPossibleCurves(possibleCurves, p);
-//				System.out.println("possiblePatches.size(): " + possiblePatches.size());
 				for (NURBSCurve nc : possibleCurves) {
 					subdividedCurves.addAll(nc.subdivideIntoTwoNewCurves());
 				}
 				possibleCurves = subdividedCurves;
 			}
 			possibleCurves = getPossibleCurves(possibleCurves, p);
-//			System.out.println("listenlaenge = " + possibleCurves.size());
 			for (NURBSCurve nc : possibleCurves) {
 			double[] U = nc.getUKnotVector();
 			double u = (U[0] + U[U.length - 1]) / 2;
@@ -449,6 +506,14 @@ public class PointProjectionSurfaceOfRevolution {
 		}
 		return closestPoint;
 	}
+	
+	/**
+	 * we assume a surface of revolution in u direction
+	 * @param cpw control points
+	 * @param point
+	 * @return true if the point will be projected into the interior of a surface
+	 * of revolution 
+	 */
 	
 	public static boolean isInInterior(double[][] cpw, double[] point){
 		double[] p = Rn.normalize(null, MathUtility.get3DPoint(point));
@@ -475,12 +540,23 @@ public class PointProjectionSurfaceOfRevolution {
 		return false;
 	}
 	
+	/**
+	 * if this method is called, it is already checked that the surface is a surface of revolution.<br\>
+	 * 
+	 * 
+	 * @TODO in v direction
+	 * @param ns NURBSSurface of revolution
+	 * @param point
+	 * @return the closest closest point
+	 */
+	
 	public static double[] getClosestPoint(NURBSSurface ns, double[] point){
 		double[] p = point.clone();
 		double[] closestPoint = new double[4];
 		LinkedList<EndPoints> ep = new LinkedList<NURBSCurve.EndPoints>();
 		ep.add(EndPoints.P0);
 		ep.add(EndPoints.Pm);
+		// two points of the the rotation axis
 		double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns);
 		double[][][]Pw = ns.getControlMesh().clone();
 		double[][][]P = new double [Pw.length][Pw[0].length][];
@@ -490,11 +566,12 @@ public class PointProjectionSurfaceOfRevolution {
 			}
 		}
 		MatrixBuilder b1 = MatrixBuilder.euclidean();
-		//translation
+		//translate the first point of the rotation axis to (0,0,0)
 		b1.translate(Rn.times(null, -1, axis[0]));
 		Matrix M1 = b1.getMatrix();
 		double[] axis1 = M1.multiplyVector(axis[1]).clone();
 		// 1. rotation
+		// rotate the second point of the rotation axis to the y_axis
 		double[] e2 = {0,1,0,1};
 		MatrixBuilder b2 = MatrixBuilder.euclidean();
 		b2.rotateFromTo(axis1, e2);
@@ -503,8 +580,8 @@ public class PointProjectionSurfaceOfRevolution {
 		double[] P00 = Pn.dehomogenize(null, P[0][0].clone());
 		P00 = M1.multiplyVector(P00);
 		P00 = M2.multiplyVector(P00);
+		System.out.println(Arrays.toString(P00));
 		P00[1] = 0;
-		P00[3] = 0;
 		double[] e1 = {1,0,0,1};
 		MatrixBuilder b3 = MatrixBuilder.euclidean();
 		b3.rotateFromTo(P00, e1);

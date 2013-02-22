@@ -33,7 +33,7 @@ public class SurfaceOfRevolutionTest {
 		for (int i = 1; i < p.length; i++) {
 			p[i] = Rn.add(null, start, Rn.times(null, i * lambda, dir));
 		}
-		boolean col = PointProjectionSurfaceOfRevolution.pointsAreCollinear(p);
+		boolean col = PointProjectionSurfaceOfRevolution.pointsAreOnACommonLine(p);
 		Assert.assertTrue(col);
 	}
 	

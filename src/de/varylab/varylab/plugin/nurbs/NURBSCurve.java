@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import de.jreality.math.Rn;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 
 /**
@@ -76,6 +74,13 @@ public class NURBSCurve {
 		return C;
 	}
 	
+	/**
+	 * computes the k_th derivatives, where k is at least 2, we set the second derivative zero if
+	 * p = 1
+	 * @param u
+	 * @return all k_th derivatives 
+	 */
+	
 	public double[][] getCurveDerivs(double u){
 		double[][]CK1 = new double[p+1][4];
 		double[][]CK = new double[p+1][3];
@@ -102,6 +107,14 @@ public class NURBSCurve {
 		return CDerivs;
 	}
 	
+	/**
+	 * insert u r times into the knotvector U
+	 * @param nc NURBSCurve
+	 * @param u inserted knot
+	 * @param r multiplicity
+	 * @return NURBSCurve with new knotvector and adepted control points
+	 */
+	
 	public NURBSCurve CurveKnotInsertion(NURBSCurve nc, double u, int r){
 		double[] UP = nc.getUKnotVector();
 		double[][]Pw = nc.getControlPoints();
@@ -121,6 +134,13 @@ public class NURBSCurve {
 		NURBSCurve ncReturn = new NURBSCurve(Qw, UQ, p, nc.getEndPoints());
 		return ncReturn;
 	}
+	
+	/**
+	 * insert u r times into the knotvector U
+	 * @param u inserted knot
+	 * @param r multiplicity
+	 * @return NURBSCurve with new knotvector and adepted control points
+	 */
 	
 	public NURBSCurve CurveKnotInsertion(double u, int r){
 		double[] UP = this.getUKnotVector();
@@ -144,8 +164,8 @@ public class NURBSCurve {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * determine all distinct interior knots, insert each knot until its multiplicity is p
+	 * @return NURBSCurve with new knotvector and adepted control points
 	 */
 	
 	public NURBSCurve decomposeCurve(){
@@ -160,8 +180,8 @@ public class NURBSCurve {
 	}
 	
 	/**
-	 * split this curve such that each curve has a bezier representation
-	 * @return list of subcurves
+	 * split this curve at each interior knot, such that each curve has a bezier representation
+	 * @return Bezier subcurves
 	 */
 	
 	public NURBSCurve[] decomposeIntoBezierCurves(){
@@ -200,6 +220,11 @@ public class NURBSCurve {
 		return BezierCurves;
 	}
 	
+	/**
+	 * split this curve at each interior knot, such that each curve has a bezier representation
+	 * @return list of Bezier subcurves
+	 */
+	
 	public LinkedList<NURBSCurve> decomposeIntoBezierCurvesList(){
 		LinkedList<NURBSCurve> curveList = new LinkedList<NURBSCurve>();
 		NURBSCurve[] Bezier = decomposeIntoBezierCurves();
@@ -210,8 +235,8 @@ public class NURBSCurve {
 	}
 	
 	/**
-	 * split this curve at the middle
-	 * @return list of subcurves
+	 * split this Bezier curve in the middle
+	 * @return two Bezier curves
 	 */
 	
 	public LinkedList<NURBSCurve> subdivideIntoTwoNewCurves(){
@@ -260,73 +285,4 @@ public class NURBSCurve {
 		return str;
 	}
 	
-	public static void main(String[] args){
-		double[] P0 = {1,0,0,1};
-		double[] P1 = {1,1,0,1};
-		double[] P2 = {0,2,0,2};
-		double[][] cP = new double[3][];
-		cP[0] = P0;
-		cP[1] = P1;
-		cP[2] = P2;
-		double[] U = {0,0,0,1,1,1};
-		int p = 2;
-		NURBSCurve nc = new NURBSCurve(cP, U, p);
-		boolean orth = true;
-		for (int i = 0; i <= 10; i++) {
-			
-			double[] CK0 = nc.getCurveDerivs(i/10.0)[0];
-			System.out.println("point " + Arrays.toString(CK0));
-			double[] CK1 = nc.getCurveDerivs(i/10.0)[1];
-			System.out.println("deriv " + Arrays.toString(CK1));
-			System.out.println();
-			if(!(Math.abs(Rn.innerProduct(CK0, CK1)) < 0.001)){
-				orth = false;
-			}
-			
-		}
-		System.out.println(orth);
-//		System.out.println("C(0)" + Arrays.toString(nc.getCurvePoint(0)) + "CK[0] = " + Arrays.toString(nc.getCurveDerivs(0)[0]) + "CK[1] = " + Arrays.toString(nc.getCurveDerivs(0)[1]));
-//		System.out.println("C(0)" + Arrays.toString(nc.getCurvePoint(0)));
-//		System.out.println("C(0.1)" + Arrays.toString(nc.getCurvePoint(0.1)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.1)));
-//		System.out.println("C(0.2)" + Arrays.toString(nc.getCurvePoint(0.2)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.2)));
-//		System.out.println("C(0.3)" + Arrays.toString(nc.getCurvePoint(0.3)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.3)));
-//		System.out.println("C(1)" + Arrays.toString(nc.getCurvePoint(1)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(1)));
-//		
-//		double[] P0 = {1,0,0,1};
-//		double[] P1 = {0.7071067811865476,0.7071067811865476,0,0.7071067811865476};
-//		double[] P2 = {0,1,0,1};
-//		double[][] cP = new double[3][];
-//		cP[0] = P0;
-//		cP[1] = P1;
-//		cP[2] = P2;
-//		double[] U = {0,0,0,1,1,1};
-//		int p = 2;
-//		NURBSCurve nc = new NURBSCurve(cP, U, p);
-//		System.out.println("C(0)" + Arrays.toString(nc.getCurvePoint(0)));
-//		System.out.println("C(0.1)" + Arrays.toString(nc.getCurvePoint(0.1)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.1)));
-//		System.out.println("C(0.2)" + Arrays.toString(nc.getCurvePoint(0.2)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.2)));
-//		System.out.println("C(0.3)" + Arrays.toString(nc.getCurvePoint(0.3)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.3)));
-//		System.out.println("C(0.4)" + Arrays.toString(nc.getCurvePoint(0.4)) + " length = " + Rn.euclideanNorm(nc.getCurvePoint(0.4)));
-//		System.out.println("C(1)" + Arrays.toString(nc.getCurvePoint(1)));
-//		double[] P0 = {0,0,0,1};
-//		double[] P1 = {4,4,0,4};
-//		double[] P2 = {3,2,0,1};
-//		double[] P3 = {4,1,0,1};
-//		double[] P4 = {5,-1,0,1};
-//		double[][] cP = new double[5][];
-//		cP[0] = P0;
-//		cP[1] = P1;
-//		cP[2] = P2;
-//		cP[3] = P3;
-//		cP[4] = P4;
-//		double[] U = {0,0,0,1,2,3,3,3};
-//		int p = 2;
-//		NURBSCurve nc = new NURBSCurve(cP, U, p);
-//		System.out.println("C(1)" + Arrays.toString(nc.getCurvePoint(1)));
-	
-	}
-	
-
-	
-
 }

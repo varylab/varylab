@@ -38,7 +38,7 @@ public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V,
 			vpos[3] = 1.0;
 			for (V v : hds.getVertices()) {
 				FunctionalUtils.getPosition(v, x, vpos);
-				double[] p = refSurface.getClosestPointOrth(vpos);
+				double[] p = refSurface.getClosestPoint(vpos);
 				Pn.dehomogenize(p, p);
 				closestPointMap.put(v, p);
 			}
