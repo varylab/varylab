@@ -1,5 +1,7 @@
 package de.varylab.varylab;
 
+import java.awt.EventQueue;
+
 import javax.swing.SwingUtilities;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -11,6 +13,7 @@ import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.scripting.PythonConsole;
 import de.jreality.util.NativePathUtility;
+import de.jreality.util.Secure;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -303,29 +306,36 @@ public class VaryLab {
 		StaticSetup.includeLibraryJars();
 		View.setIcon(ImageHook.getIcon("main_03.png"));
 		View.setTitle("VaryLab[Ultimate]");
-		JRViewer v = new JRViewer();
 		installLookAndFeel();
-		VarylabSplashScreen splash = new VarylabSplashScreen();
+		final VarylabSplashScreen splash = new VarylabSplashScreen();
 		splash.setVisible(true);
-		v.setSplashScreen(splash);
-		v.getController().setManageLookAndFeel(false);
-		v.getController().setSaveOnExit(true);
-		v.getController().setAskBeforeSaveOnExit(false);
-		v.getController().setLoadFromUserPropertyFile(true);
-		v.setPropertiesFile("VaryLab.xml");
-		v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
-		v.setShowPanelSlots(true, true, true, true);
-		v.addContentSupport(ContentType.Raw);
-		v.setShowToolBar(true);
-		v.setShowMenuBar(true);
-		v.addBasicUI();
-		v.addContentUI();
-		v.addPythonSupport();
-		addVaryLabPlugins(v);
-		v.registerPlugins(ConformalLab.createConformalPlugins());
-		v.startup();
-		splash.setVisible(false);
-		System.out.println("Welcome to Varylab.");
+		// post-pone startup on the event queue
+		Runnable startupRun = new Runnable() {
+			@Override
+			public void run() {
+				JRViewer v = new JRViewer();
+				v.setSplashScreen(splash);
+				v.getController().setManageLookAndFeel(false);
+				v.getController().setSaveOnExit(true);
+				v.getController().setAskBeforeSaveOnExit(false);
+				v.getController().setLoadFromUserPropertyFile(true);
+				v.setPropertiesFile("VaryLab.xml");
+				v.setPropertiesResource(VaryLab.class, "VaryLab.xml");
+				v.setShowPanelSlots(true, true, true, true);
+				v.addContentSupport(ContentType.Raw);
+				v.setShowToolBar(true);
+				v.setShowMenuBar(true);
+				v.addBasicUI();
+				v.addContentUI();
+				v.addPythonSupport();
+				addVaryLabPlugins(v);
+				v.registerPlugins(ConformalLab.createConformalPlugins());
+				v.startup();
+				splash.setVisible(false);
+				System.out.println("Welcome to Varylab.");				
+			}
+		};
+		EventQueue.invokeLater(startupRun);
 	}
 	
 	static {
@@ -339,6 +349,7 @@ public class VaryLab {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		Secure.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "VaryLab[Ultimate]");
 		JRViewer.setApplicationIcon(ImageHook.getImage("main_03.png"));
 		SwingUtilities.invokeLater(new Runnable() {

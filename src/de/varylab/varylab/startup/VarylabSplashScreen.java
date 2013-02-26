@@ -13,6 +13,8 @@ import java.awt.geom.AffineTransform;
 
 import javax.swing.JProgressBar;
 
+import com.sun.awt.AWTUtilities;
+
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 import de.varylab.varylab.startup.image.SplashImageHook;
@@ -37,7 +39,7 @@ public class VarylabSplashScreen extends SplashScreen {
 			mt.waitForAll();
 		} catch (InterruptedException e) {
 		}
-		com.sun.awt.AWTUtilities.setWindowOpaque(this, false);
+		AWTUtilities.setWindowOpaque(this, false);
 		setAlwaysOnTop(true);
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
@@ -58,6 +60,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		setMinimumSize(size);
 	}
 	
+	
     public static int[] getDPI(final GraphicsConfiguration gc){
         // get the Graphics2D of a compatible image for this configuration
         final Graphics2D g2d = (Graphics2D) gc.createCompatibleImage(1, 1).getGraphics();
@@ -71,10 +74,9 @@ public class VarylabSplashScreen extends SplashScreen {
         return new int[]{(int) (oneInch.getScaleX() * 72), (int) (oneInch.getScaleY() * 72) };
     }
 	
-	@Override
-	public void paint(Graphics g) {
-		System.out.println("VarylabSplashScreen.paint()");
-		super.paint(g);
+    @Override
+    public void paint(Graphics g) {
+    	super.paintComponents(g);
 		Graphics2D g2d = (Graphics2D)g;
 		if (useHighRes) {
 			int w = hiResImage.getWidth(this);
@@ -85,22 +87,21 @@ public class VarylabSplashScreen extends SplashScreen {
 			int h = lowResImage.getHeight(this);
 			g2d.drawImage(lowResImage, 0, 0, w, h, this);
 		}
-	}
+    }
+    
 	
 	@Override
 	public void setStatus(String status) {
 		getLayout().layoutContainer(getRootPane());
 		progressBar.setString(status);
-		Rectangle r = new Rectangle(getWidth(), getHeight());
-		getRootPane().paintImmediately(r);
+		updateSplash();
 	}
 
 	@Override
 	public void setProgress(double progress) {
 		getLayout().layoutContainer(getRootPane());
 		progressBar.setValue((int)(progress * 100));
-		Rectangle r = new Rectangle(getWidth(), getHeight());
-		getRootPane().paintImmediately(r);
+		updateSplash();
 	}
 	
 	public static void main(String[] args) {
@@ -108,4 +109,9 @@ public class VarylabSplashScreen extends SplashScreen {
 		splash.setVisible(true);
 	}
 
+	protected void updateSplash() {
+		Rectangle r = new Rectangle(getWidth(), getHeight());
+		getRootPane().paintImmediately(r);
+	}
+	
 }
