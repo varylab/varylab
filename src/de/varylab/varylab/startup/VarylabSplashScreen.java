@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
@@ -29,7 +30,15 @@ public class VarylabSplashScreen extends SplashScreen {
 		useHighRes = false;
 	
 	public VarylabSplashScreen() {
+		MediaTracker mt = new MediaTracker(this);
+		mt.addImage(hiResImage, 0);
+		mt.addImage(lowResImage, 0);
+		try {
+			mt.waitForAll();
+		} catch (InterruptedException e) {
+		}
 		com.sun.awt.AWTUtilities.setWindowOpaque(this, false);
+		setAlwaysOnTop(true);
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 100;
@@ -64,6 +73,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	@Override
 	public void paint(Graphics g) {
+		System.out.println("VarylabSplashScreen.paint()");
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D)g;
 		if (useHighRes) {
