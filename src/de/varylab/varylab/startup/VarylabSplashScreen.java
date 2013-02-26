@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 
 import javax.swing.JProgressBar;
 
@@ -28,9 +30,10 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	public VarylabSplashScreen() {
 		com.sun.awt.AWTUtilities.setWindowOpaque(this, false);
-		int res = Toolkit.getDefaultToolkit().getScreenResolution();
-		useHighRes = res > 75;
-		System.out.println("Splash resolution: " + res + "dpi");
+		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		int[] dpi = getDPI(gc);
+		useHighRes = dpi[0] > 100;
+		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
 		setIconImage(ImageHook.getImage("main_03.png"));
 		setLayout(new BorderLayout());
 		Dimension size = new Dimension();
@@ -46,6 +49,19 @@ public class VarylabSplashScreen extends SplashScreen {
 		setMinimumSize(size);
 	}
 	
+    public static int[] getDPI(final GraphicsConfiguration gc){
+        // get the Graphics2D of a compatible image for this configuration
+        final Graphics2D g2d = (Graphics2D) gc.createCompatibleImage(1, 1).getGraphics();
+        
+        // after these transforms, 72 units in either direction == 1 inch; see JavaDoc for getNormalizingTransform()
+        g2d.setTransform(gc.getDefaultTransform() );
+        g2d.transform(gc.getNormalizingTransform() );
+        final AffineTransform oneInch = g2d.getTransform();
+        g2d.dispose();
+
+        return new int[]{(int) (oneInch.getScaleX() * 72), (int) (oneInch.getScaleY() * 72) };
+    }
+	
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
@@ -57,7 +73,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		} else {
 			int w = lowResImage.getWidth(this);
 			int h = lowResImage.getHeight(this);
-			g2d.drawImage(hiResImage, 0, 0, w, h, this);
+			g2d.drawImage(lowResImage, 0, 0, w, h, this);
 		}
 	}
 	
