@@ -24,7 +24,7 @@ public class MySoftClippedWindow extends JPanel     {
     public MySoftClippedWindow() {
         super();
         try {
-			image = ImageIO.read(MySoftClippedWindow.class.getResourceAsStream("varylab_color_01.png"));
+			image = ImageIO.read(MySoftClippedWindow.class.getResourceAsStream("varylab_01_high_res.png"));
 		} catch (IOException e1) {}
     }
 
@@ -49,7 +49,7 @@ public class MySoftClippedWindow extends JPanel     {
                 cp.add(new MySoftClippedWindow());
                 w.setAlwaysOnTop(true);
                 com.sun.awt.AWTUtilities.setWindowOpaque (w, false);
-                w.setSize(1017 / 2, 688 / 2);
+                w.setSize(1017 / 2, 850 / 2);
                 w.setLocationRelativeTo(null);
                 w.setVisible(true);
             }
