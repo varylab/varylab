@@ -1,6 +1,5 @@
 package de.varylab.varylab.plugin.nurbs;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.junit.Assert;
@@ -8,7 +7,6 @@ import org.junit.Test;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSCurve.EndPoints;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
@@ -214,13 +212,13 @@ public class SurfaceOfRevolutionTest {
 			possibleCurves = subdividedCurves;
 		}
 		possibleCurves = PointProjectionSurfaceOfRevolution.getPossibleCurves(possibleCurves, p3);
-		int i = 0;
-		for (NURBSCurve n : possibleCurves) {
-			i++;
-//			System.out.println(i + ". curve");
-//			System.out.println(n.toString());
-			
-		}
+//		int i = 0;
+//		for (NURBSCurve n : possibleCurves) {
+//			i++;
+////			System.out.println(i + ". curve");
+////			System.out.println(n.toString());
+//			
+//		}
 	}
 	
 //	@Test 

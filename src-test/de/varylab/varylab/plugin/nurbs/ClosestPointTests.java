@@ -1,6 +1,5 @@
 package de.varylab.varylab.plugin.nurbs;
 
-import java.io.File;
 import java.io.FileReader;
 
 import org.junit.Assert;
@@ -8,7 +7,7 @@ import org.junit.Test;
 
 import de.varylab.varylab.plugin.io.NurbsIO;
 
-public class closestPointTests {
+public class ClosestPointTests {
 	
 	@Test
 	public void closestPointTest1(){

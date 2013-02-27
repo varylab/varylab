@@ -1,6 +1,5 @@
 package de.varylab.varylab.plugin.nurbs;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.junit.Assert;
