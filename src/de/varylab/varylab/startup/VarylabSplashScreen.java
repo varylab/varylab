@@ -117,7 +117,7 @@ public class VarylabSplashScreen extends SplashScreen {
 //	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-	    	g2d.setComposite(AlphaComposite.DstOver);
+	    	g2d.setComposite(AlphaComposite.Src);
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
 				int h = hiResImage.getHeight(this);
@@ -146,7 +146,7 @@ public class VarylabSplashScreen extends SplashScreen {
 			int textX = (int)(statusX * getWidth());
 			int textY = (int)(statusY * getHeight());
 			System.out.println(progressString);
-			g2d.setComposite(AlphaComposite.Src);
+			g2d.setComposite(AlphaComposite.SrcAtop);
 			g2d.drawString(progressString, textX, textY);
 	    }
     
