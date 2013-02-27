@@ -1,5 +1,6 @@
 package de.varylab.varylab.startup.def;
 
+import java.awt.Image;
 import java.util.Set;
 
 import de.jreality.plugin.basic.ConsolePlugin;
@@ -29,10 +30,15 @@ import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
+import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
+import de.varylab.varylab.startup.image.SplashImageHook;
 
 public class VarylabGridshells extends VarylabStartupDefinition {
 
+	private VarylabSplashScreen
+	splash = null;
+	
 	@Override
 	public String getApplicationName() {
 		return "VaryLab[Gridshells]";
@@ -41,6 +47,15 @@ public class VarylabGridshells extends VarylabStartupDefinition {
 	@Override
 	public String getPropertyFileName() {
 		return "VarylabGridshells.xml";
+	}
+	
+	public VarylabSplashScreen getSplashScreen() {
+		if (splash == null) {
+			Image lowRes = SplashImageHook.getImage("varylab_grid_low_res.png");
+			Image highRes = SplashImageHook.getImage("varylab_grid_high_res.png");
+			splash = new VarylabSplashScreen(lowRes, highRes);
+		}
+		return splash;
 	}
 	
 	@Override

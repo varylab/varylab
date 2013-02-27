@@ -50,8 +50,8 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	public VarylabSplashScreen() {
 		this(
-			SplashImageHook.getImage("varylab_01_low_res.png"),
-			SplashImageHook.getImage("varylab_01_high_res.png")
+			SplashImageHook.getImage("varylab_ultimate_low_res.png"),
+			SplashImageHook.getImage("varylab_ultimate_high_res.png")
 		);
 	}
 	

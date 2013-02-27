@@ -126,8 +126,8 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 	
 	public VarylabSplashScreen getSplashScreen() {
 		if (splash == null) {
-			Image lowRes = SplashImageHook.getImage("varylab_01_low_res.png");
-			Image highRes = SplashImageHook.getImage("varylab_01_high_res.png");
+			Image lowRes = SplashImageHook.getImage("varylab_ultimate_low_res.png");
+			Image highRes = SplashImageHook.getImage("varylab_ultimate_high_res.png");
 			splash = new VarylabSplashScreen(lowRes, highRes);
 		}
 		return splash;
