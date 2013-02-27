@@ -2,19 +2,19 @@ package de.varylab.varylab.startup;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Random;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.sun.awt.AWTUtilities;
@@ -36,8 +36,6 @@ public class VarylabSplashScreen extends SplashScreen {
 		progress = 0.0;
 	private SplashComponent
 		splashComponent = new SplashComponent();
-	private JLabel
-		statusLabel = new JLabel("Status");
 	private boolean
 		useHighRes = false;
 	private Random 
@@ -73,8 +71,6 @@ public class VarylabSplashScreen extends SplashScreen {
 		
 		setLayout(new GridLayout());
 		add(splashComponent);
-		splashComponent.setLayout(new GridBagLayout());
-		splashComponent.add(new JLabel(status));
 	}
 	
 	
@@ -92,15 +88,24 @@ public class VarylabSplashScreen extends SplashScreen {
     
     private class SplashComponent extends JPanel {
 
-		private static final long serialVersionUID = 1L;
+		private static final long 
+			serialVersionUID = 1L;
+		private Color
+			clearColor = new Color(255, 255, 255, 0);
+		private Font	
+			font = new Font("verdana", Font.PLAIN, 8);
 	    
 		public SplashComponent() {
 		}
 		
 	    @Override
 	    public void paint(Graphics g) {
-	    	System.out.println("VarylabSplashScreen.SplashComponent.paint()");
 	    	Graphics2D g2d = (Graphics2D)g;
+	    	g2d.setBackground(clearColor);
+	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+	    	g2d.clearRect(0, 0, getWidth(), getHeight());
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
 				int h = hiResImage.getHeight(this);
@@ -110,10 +115,10 @@ public class VarylabSplashScreen extends SplashScreen {
 				int h = lowResImage.getHeight(this);
 				g2d.drawImage(lowResImage, 0, 0, w, h, this);
 			}
-			g2d.setColor(new Color(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat()));
-			g2d.fillOval(0, 0, 100, 100);
-			g2d.drawString(status, 0, 0);
-			super.paintComponents(g);
+			g2d.setColor(Color.BLACK);
+			g2d.setFont(font);
+			String[] statusArray = status.split("\\.");
+			g2d.drawString(statusArray[statusArray.length - 1], 230, 320);
 	    }
     
     }
@@ -142,7 +147,6 @@ public class VarylabSplashScreen extends SplashScreen {
 	protected void updateSplash() {
 		getLayout().layoutContainer(getRootPane());
 		Rectangle r = new Rectangle(getWidth(), getHeight());
-		statusLabel.setText(status);
 		splashComponent.paintImmediately(r);
 	}
 	
