@@ -1,5 +1,6 @@
 package de.varylab.varylab.startup;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -102,8 +103,8 @@ public class VarylabSplashScreen extends SplashScreen {
 
 		private static final long 
 			serialVersionUID = 1L;
-		private Color
-			clearColor = new Color(255, 255, 255, 0);
+//		private Color
+//			clearColor = new Color(255, 255, 255, 0);
 		private Font	
 			font = null;
 	    
@@ -112,13 +113,11 @@ public class VarylabSplashScreen extends SplashScreen {
 		
 	    @Override
 	    public void paint(Graphics g) {
-	    	super.paint(g);
 	    	Graphics2D g2d = (Graphics2D)g;
-	    	g2d.setBackground(clearColor);
 //	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-	    	g2d.clearRect(0, 0, getWidth(), getHeight());
+	    	g2d.setComposite(AlphaComposite.DstOver);
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
 				int h = hiResImage.getHeight(this);
@@ -132,6 +131,7 @@ public class VarylabSplashScreen extends SplashScreen {
 				int h = lowResImage.getHeight(this);
 				g2d.drawImage(lowResImage, 0, 0, w, h, this);
 			}
+			g2d.setBackground(Color.WHITE);
 			g2d.setColor(Color.BLACK);
 			g2d.setFont(getStatusFont());
 			String[] statusArray = status.split("\\.");
@@ -146,6 +146,7 @@ public class VarylabSplashScreen extends SplashScreen {
 			int textX = (int)(statusX * getWidth());
 			int textY = (int)(statusY * getHeight());
 			System.out.println(progressString);
+			g2d.setComposite(AlphaComposite.Src);
 			g2d.drawString(progressString, textX, textY);
 	    }
     
@@ -161,14 +162,20 @@ public class VarylabSplashScreen extends SplashScreen {
     
 	@Override
 	public void setStatus(String status) {
+		String oldStatus = this.status;
 		this.status = status;
-		updateSplash();
+		if (!oldStatus.equals(status)) {
+			updateSplash();
+		}
 	}
 
 	@Override
 	public void setProgress(double progress) {
+		double oldProgress = this.progress;
 		this.progress = progress;
-		updateSplash();
+		if (oldProgress != progress) {
+			updateSplash();
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
