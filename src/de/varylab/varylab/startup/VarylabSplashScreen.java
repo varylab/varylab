@@ -9,11 +9,9 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -28,8 +26,8 @@ public class VarylabSplashScreen extends SplashScreen {
 	private static final long 
 		serialVersionUID = 1L;
 	private Image
-		lowResImage = SplashImageHook.getImage("varylab_01_low_res.png"),
-		hiResImage = SplashImageHook.getImage("varylab_01_high_res.png");
+		lowResImage = null,
+		hiResImage = null;
 	private String
 		status = "Status";
 	private double
@@ -38,17 +36,17 @@ public class VarylabSplashScreen extends SplashScreen {
 		splashComponent = new SplashComponent();
 	private boolean
 		useHighRes = false;
-	private Random 
-		rnd = new Random();
 	
 	public VarylabSplashScreen() {
-		MediaTracker mt = new MediaTracker(this);
-		mt.addImage(hiResImage, 0);
-		mt.addImage(lowResImage, 0);
-		try {
-			mt.waitForAll();
-		} catch (InterruptedException e) {
-		}
+		this(
+			SplashImageHook.getImage("varylab_01_low_res.png"),
+			SplashImageHook.getImage("varylab_01_high_res.png")
+		);
+	}
+	
+	public VarylabSplashScreen(Image lowResImage, Image hiResImage) {
+		this.lowResImage = lowResImage;
+		this.hiResImage = hiResImage;
 		AWTUtilities.setWindowOpaque(this, false);
 		setAlwaysOnTop(true);
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
@@ -118,7 +116,15 @@ public class VarylabSplashScreen extends SplashScreen {
 			g2d.setColor(Color.BLACK);
 			g2d.setFont(font);
 			String[] statusArray = status.split("\\.");
-			g2d.drawString(statusArray[statusArray.length - 1], 230, 320);
+			int percentage = (int)Math.round(progress * 100);
+			String progressString = "";
+			if (progress == 0.0) {
+				progressString = "initializing - ";
+			} else {
+				progressString = percentage + "% - loading ";
+			}
+			progressString += statusArray[statusArray.length - 1];
+			g2d.drawString(progressString, 230, 320);
 	    }
     
     }

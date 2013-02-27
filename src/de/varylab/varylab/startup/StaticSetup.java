@@ -6,7 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import sun.misc.JarFilter;
-import de.varylab.varylab.VaryLab;
+import de.varylab.varylab.startup.def.VaryLabUltimate;
 
 public class StaticSetup {
 
@@ -22,7 +22,7 @@ public class StaticSetup {
 	}
 	
 	static {
-		ClassLoader sysLoader = VaryLab.class.getClassLoader();
+		ClassLoader sysLoader = VaryLabUltimate.class.getClassLoader();
 		varylabLoader = new VarlabClassLoader(sysLoader);
 		Thread.currentThread().setContextClassLoader(varylabLoader);
 	}
