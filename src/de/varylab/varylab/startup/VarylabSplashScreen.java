@@ -36,6 +36,16 @@ public class VarylabSplashScreen extends SplashScreen {
 		splashComponent = new SplashComponent();
 	private boolean
 		useHighRes = false;
+	private static boolean 
+		isWindows = false;
+	private double
+		statusX = 0.45,
+		statusY = 0.75,
+		fontSize = 0.02;
+	
+	static {
+		isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+	}
 	
 	public VarylabSplashScreen() {
 		this(
@@ -52,16 +62,20 @@ public class VarylabSplashScreen extends SplashScreen {
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 110;
-//		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
+		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
 		setIconImage(ImageHook.getImage("main_03.png"));
 		
 		Dimension size = new Dimension();
 		if (useHighRes) {
 			size.width = hiResImage.getWidth(this) / 2;
-			size.height = hiResImage.getWidth(this) / 2;
+			size.height = hiResImage.getHeight(this) / 2;
+			if (isWindows) {
+				size.width = hiResImage.getWidth(this);
+				size.height = hiResImage.getHeight(this);
+			}
 		} else {
 			size.width = lowResImage.getWidth(this);
-			size.height = lowResImage.getWidth(this);
+			size.height = lowResImage.getHeight(this);
 		}
 		setSize(size);
 		setPreferredSize(size);
@@ -91,30 +105,35 @@ public class VarylabSplashScreen extends SplashScreen {
 		private Color
 			clearColor = new Color(255, 255, 255, 0);
 		private Font	
-			font = new Font("verdana", Font.PLAIN, 8);
+			font = null;
 	    
 		public SplashComponent() {
 		}
 		
 	    @Override
 	    public void paint(Graphics g) {
+	    	super.paint(g);
 	    	Graphics2D g2d = (Graphics2D)g;
 	    	g2d.setBackground(clearColor);
-	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 	    	g2d.clearRect(0, 0, getWidth(), getHeight());
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
 				int h = hiResImage.getHeight(this);
-				g2d.drawImage(hiResImage, 0, 0, w/2, h/2, this);
+				if (!isWindows) {
+					w /= 2;
+					h /= 2;
+				}
+				g2d.drawImage(hiResImage, 0, 0, w, h, this);
 			} else {
 				int w = lowResImage.getWidth(this);
 				int h = lowResImage.getHeight(this);
 				g2d.drawImage(lowResImage, 0, 0, w, h, this);
 			}
 			g2d.setColor(Color.BLACK);
-			g2d.setFont(font);
+			g2d.setFont(getStatusFont());
 			String[] statusArray = status.split("\\.");
 			int percentage = (int)Math.round(progress * 100);
 			String progressString = "";
@@ -124,9 +143,20 @@ public class VarylabSplashScreen extends SplashScreen {
 				progressString = percentage + "% - loading ";
 			}
 			progressString += statusArray[statusArray.length - 1];
-			g2d.drawString(progressString, 230, 320);
+			int textX = (int)(statusX * getWidth());
+			int textY = (int)(statusY * getHeight());
+			System.out.println(progressString);
+			g2d.drawString(progressString, textX, textY);
 	    }
     
+	    private Font getStatusFont() {
+	    	if (font == null) {
+	    		int fontSize = (int)(VarylabSplashScreen.this.fontSize * getHeight());
+	    		font =new Font("verdana", Font.PLAIN, fontSize);
+	    	}
+	    	return font;
+	    }
+	    
     }
     
 	@Override
@@ -144,14 +174,9 @@ public class VarylabSplashScreen extends SplashScreen {
 	public static void main(String[] args) throws Exception {
 		VarylabSplashScreen splash = new VarylabSplashScreen();
 		splash.setVisible(true);
-		while (true) {
-			splash.repaint();
-			Thread.sleep(50);
-		}
 	}
 
 	protected void updateSplash() {
-		getLayout().layoutContainer(getRootPane());
 		Rectangle r = new Rectangle(getWidth(), getHeight());
 		splashComponent.paintImmediately(r);
 	}
