@@ -1,7 +1,8 @@
 package de.varylab.varylab.startup;
 
-import java.awt.EventQueue;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -14,6 +15,7 @@ import de.jreality.util.NativePathUtility;
 import de.jreality.util.Secure;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
 import de.jtem.jtao.Tao;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
@@ -21,6 +23,8 @@ public abstract class VarylabStartupDefinition {
 
 	private VarylabSplashScreen
 		splash = null;
+	private JRViewer 
+		v = null;
 	
 	public abstract void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances);
 
@@ -57,29 +61,26 @@ public abstract class VarylabStartupDefinition {
 	}
 	
 	protected void startup() {
-		if (!EventQueue.isDispatchThread()) {
-			Runnable delegate = new Runnable() {
-				@Override
-				public void run() {
-					startup();
-				}
-			};
-			EventQueue.invokeLater(delegate);
-			return;
-		}
-		JRHalfedgeViewer.initHalfedgeFronted();
-		StaticSetup.includePluginJars();
-		StaticSetup.includeLibraryJars();
-		View.setIcon(ImageHook.getIcon("main_03.png"));
-		View.setTitle(getApplicationName());
-		installLookAndFeel();
 		final VarylabSplashScreen splash = getSplashScreen();
+		splash.setStatus(getApplicationName() + " startup");
 		splash.setVisible(true);
-		// post-pone startup on the event queue
-		Runnable startupRun = new Runnable() {
+		Runnable jobStaticInit = new Runnable() {
 			@Override
 			public void run() {
-				JRViewer v = new JRViewer();
+				splash.setStatus("static init...");
+				JRHalfedgeViewer.initHalfedgeFronted();
+				StaticSetup.includePluginJars();
+				StaticSetup.includeLibraryJars();
+				View.setIcon(ImageHook.getIcon("main_03.png"));
+				View.setTitle(getApplicationName());
+				installLookAndFeel();
+			}
+		};
+		Runnable jobInitViewer = new Runnable() {
+			@Override
+			public void run() {
+				splash.setStatus("creating viewer...");
+				v = new JRViewer();
 				v.setSplashScreen(splash);
 				v.getController().setManageLookAndFeel(false);
 				v.getController().setSaveOnExit(true);
@@ -94,21 +95,54 @@ public abstract class VarylabStartupDefinition {
 				v.addBasicUI();
 				v.addContentUI();
 				v.addPythonSupport();
-				Set<Class<? extends Plugin>> classes = new HashSet<Class<? extends Plugin>>();
-				Set<Plugin> instances = new HashSet<Plugin>();
-				getPlugins(classes, instances);
-				for (Class<? extends Plugin> pc : classes) {
-					v.registerPlugin(pc);
-				}
-				for (Plugin instance : instances) {
-					v.registerPlugin(instance);
-				}
-				v.startup();
-				splash.setVisible(false);
-				System.out.println("Welcome to Varylab.");				
 			}
 		};
-		EventQueue.invokeLater(startupRun);
+		final Set<Class<? extends Plugin>> classes = new HashSet<Class<? extends Plugin>>();
+		final Set<Plugin> instances = new HashSet<Plugin>();
+		Runnable jobAssemblePlugins = new Runnable() {
+			@Override
+			public void run() {
+				splash.setStatus("assembling plugins...");
+				getPlugins(classes, instances);
+			}
+		};
+		
+		StartupChain initChain = new StartupChain();
+		initChain.appendJob(jobStaticInit);
+		initChain.appendJob(jobInitViewer);
+		initChain.appendJob(jobAssemblePlugins);
+		initChain.startQueuedAndWait();
+		
+		List<Runnable> jobsRegisterPlugins = new LinkedList<Runnable>();
+		for (final Class<? extends Plugin> pc : classes) {
+			Runnable job = new Runnable() {
+				@Override
+				public void run() {
+					splash.setStatus("register plug-in " + pc.getSimpleName());
+					v.registerPlugin(pc);					
+				}
+			};
+			jobsRegisterPlugins.add(job);
+		}
+		for (final Plugin instance : instances) {
+			Runnable job = new Runnable() {
+				@Override
+				public void run() {
+					splash.setStatus("register plug-in " + instance.getClass().getSimpleName());
+					v.registerPlugin(instance);					
+				}
+			};
+			jobsRegisterPlugins.add(job);
+		}
+		
+		StartupChain registrationChain = new StartupChain();
+		registrationChain.appendAll(jobsRegisterPlugins);
+		registrationChain.startQueuedAndWait();
+		
+		v.startup();
+		
+		splash.setVisible(false);
+		System.out.println("Welcome to Varylab.");				
 	}
 	
 }

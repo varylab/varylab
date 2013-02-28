@@ -10,7 +10,6 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
@@ -59,7 +58,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		this.lowResImage = lowResImage;
 		this.hiResImage = hiResImage;
 		AWTUtilities.setWindowOpaque(this, false);
-		setAlwaysOnTop(true);
+//		setAlwaysOnTop(true);
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 110;
@@ -109,6 +108,7 @@ public class VarylabSplashScreen extends SplashScreen {
 			font = null;
 	    
 		public SplashComponent() {
+			super(false);
 		}
 		
 	    @Override
@@ -116,7 +116,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	    	Graphics2D g2d = (Graphics2D)g;
 //	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+//	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 	    	g2d.setComposite(AlphaComposite.Src);
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
@@ -134,19 +134,24 @@ public class VarylabSplashScreen extends SplashScreen {
 			g2d.setBackground(Color.WHITE);
 			g2d.setColor(Color.BLACK);
 			g2d.setFont(getStatusFont());
-			String[] statusArray = status.split("\\.");
+			
 			int percentage = (int)Math.round(progress * 100);
 			String progressString = "";
 			if (progress == 0.0) {
-				progressString = "initializing - ";
+				progressString = "";
 			} else {
 				progressString = percentage + "% - loading ";
 			}
-			progressString += statusArray[statusArray.length - 1];
+			if (status.contains(".")) {
+				String[] statusArray = status.split("\\.");
+				progressString += statusArray[statusArray.length - 1];
+			} else {
+				progressString += status;
+			}
 			int textX = (int)(statusX * getWidth());
 			int textY = (int)(statusY * getHeight());
 			System.out.println(progressString);
-			g2d.setComposite(AlphaComposite.SrcAtop);
+			g2d.setComposite(AlphaComposite.SrcOver);
 			g2d.drawString(progressString, textX, textY);
 	    }
     
@@ -162,30 +167,19 @@ public class VarylabSplashScreen extends SplashScreen {
     
 	@Override
 	public void setStatus(String status) {
-		String oldStatus = this.status;
 		this.status = status;
-		if (!oldStatus.equals(status)) {
-			updateSplash();
-		}
+		repaint();
 	}
 
 	@Override
 	public void setProgress(double progress) {
-		double oldProgress = this.progress;
 		this.progress = progress;
-		if (oldProgress != progress) {
-			updateSplash();
-		}
+		repaint();
 	}
 	
 	public static void main(String[] args) throws Exception {
 		VarylabSplashScreen splash = new VarylabSplashScreen();
 		splash.setVisible(true);
-	}
-
-	protected void updateSplash() {
-		Rectangle r = new Rectangle(getWidth(), getHeight());
-		splashComponent.paintImmediately(r);
 	}
 	
 }
