@@ -87,7 +87,7 @@ public abstract class VarylabStartupDefinition {
 				v.getController().setAskBeforeSaveOnExit(false);
 				v.getController().setLoadFromUserPropertyFile(true);
 				v.setPropertiesFile(getPropertyFileName());
-				v.setPropertiesResource(this.getClass(), getPropertyFileName());
+				v.setPropertiesResource(VarylabStartupDefinition.this.getClass(), getPropertyFileName());
 				v.setShowPanelSlots(true, true, true, true);
 				v.addContentSupport(ContentType.Raw);
 				v.setShowToolBar(true);

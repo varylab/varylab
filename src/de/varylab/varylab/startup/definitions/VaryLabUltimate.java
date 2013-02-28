@@ -1,4 +1,4 @@
-package de.varylab.varylab.startup.def;
+package de.varylab.varylab.startup.definitions;
 
 import java.awt.Image;
 import java.util.Set;
@@ -124,6 +124,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		return "VaryLab.xml";
 	}
 	
+	@Override
 	public VarylabSplashScreen getSplashScreen() {
 		if (splash == null) {
 			Image lowRes = SplashImageHook.getImage("varylab_ultimate_low_res.png");

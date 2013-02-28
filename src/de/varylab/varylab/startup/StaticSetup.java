@@ -6,7 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import sun.misc.JarFilter;
-import de.varylab.varylab.startup.def.VaryLabUltimate;
+import de.varylab.varylab.startup.definitions.VaryLabUltimate;
 
 public class StaticSetup {
 

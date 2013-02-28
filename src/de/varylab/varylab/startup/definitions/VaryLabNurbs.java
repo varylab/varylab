@@ -1,4 +1,4 @@
-package de.varylab.varylab.startup.def;
+package de.varylab.varylab.startup.definitions;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
 
-public class VarylabNurbs extends VarylabStartupDefinition {
+public class VaryLabNurbs extends VarylabStartupDefinition {
 
 	@Override
 	public String getApplicationName() {
@@ -47,7 +47,7 @@ public class VarylabNurbs extends VarylabStartupDefinition {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new VarylabNurbs().startup();
+		new VaryLabNurbs().startup();
 	}
 
 }

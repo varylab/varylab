@@ -1,4 +1,4 @@
-package de.varylab.varylab.startup.def;
+package de.varylab.varylab.startup.definitions;
 
 import java.awt.Image;
 import java.util.Set;
@@ -34,7 +34,7 @@ import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
 import de.varylab.varylab.startup.image.SplashImageHook;
 
-public class VarylabGridshells extends VarylabStartupDefinition {
+public class VaryLabGridshells extends VarylabStartupDefinition {
 
 	private VarylabSplashScreen
 	splash = null;
@@ -49,6 +49,7 @@ public class VarylabGridshells extends VarylabStartupDefinition {
 		return "VarylabGridshells.xml";
 	}
 	
+	@Override
 	public VarylabSplashScreen getSplashScreen() {
 		if (splash == null) {
 			Image lowRes = SplashImageHook.getImage("varylab_grid_low_res.png");
@@ -143,7 +144,7 @@ public class VarylabGridshells extends VarylabStartupDefinition {
 	
 
 	public static void main(String[] args) throws Exception {
-		new VarylabGridshells().startup();
+		new VaryLabGridshells().startup();
 	}
 	
 }
