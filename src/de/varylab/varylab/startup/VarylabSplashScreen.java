@@ -63,6 +63,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		try {
 			AWTUtilities.setWindowOpaque(this, false);
 		} catch (Throwable t) {
+			setBackground(Color.WHITE);
 			log.warning("non opaque windows not supported. " + t);
 		}
 		setAlwaysOnTop(true);
@@ -112,10 +113,6 @@ public class VarylabSplashScreen extends SplashScreen {
 		private Font	
 			font = null;
 	    
-		public SplashComponent() {
-			super(false);
-		}
-		
 	    @Override
 	    public void paint(Graphics g) {
 	    	Graphics2D g2d = (Graphics2D)g;
