@@ -12,6 +12,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
@@ -23,6 +24,8 @@ import de.varylab.varylab.startup.image.SplashImageHook;
 
 public class VarylabSplashScreen extends SplashScreen {
 
+	private Logger
+		log = Logger.getLogger(getClass().getName());
 	private static final long 
 		serialVersionUID = 1L;
 	private Image
@@ -57,8 +60,12 @@ public class VarylabSplashScreen extends SplashScreen {
 	public VarylabSplashScreen(Image lowResImage, Image hiResImage) {
 		this.lowResImage = lowResImage;
 		this.hiResImage = hiResImage;
-		AWTUtilities.setWindowOpaque(this, false);
-//		setAlwaysOnTop(true);
+		try {
+			AWTUtilities.setWindowOpaque(this, false);
+		} catch (Throwable t) {
+			log.warning("non opaque windows not supported. " + t);
+		}
+		setAlwaysOnTop(true);
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 110;
@@ -102,8 +109,6 @@ public class VarylabSplashScreen extends SplashScreen {
 
 		private static final long 
 			serialVersionUID = 1L;
-//		private Color
-//			clearColor = new Color(255, 255, 255, 0);
 		private Font	
 			font = null;
 	    
@@ -114,9 +119,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	    @Override
 	    public void paint(Graphics g) {
 	    	Graphics2D g2d = (Graphics2D)g;
-//	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//	    	g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 	    	g2d.setComposite(AlphaComposite.Src);
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
@@ -137,10 +140,8 @@ public class VarylabSplashScreen extends SplashScreen {
 			
 			int percentage = (int)Math.round(progress * 100);
 			String progressString = "";
-			if (progress == 0.0) {
-				progressString = "";
-			} else {
-				progressString = percentage + "% - loading ";
+			if (progress != 0.0) {
+				progressString = percentage + "% - ";
 			}
 			if (status.contains(".")) {
 				String[] statusArray = status.split("\\.");
