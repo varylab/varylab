@@ -40,7 +40,8 @@ public class VarylabSplashScreen extends SplashScreen {
 	private boolean
 		useHighRes = false;
 	private static boolean 
-		isWindows = false;
+		isWindows = false,
+		isLinux = false;
 	private double
 		statusX = 0.45,
 		statusY = 0.75,
@@ -48,6 +49,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	static {
 		isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+		isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
 	}
 	
 	public VarylabSplashScreen() {
@@ -61,6 +63,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		this.lowResImage = lowResImage;
 		this.hiResImage = hiResImage;
 		try {
+			if (isLinux) throw new Exception();
 			AWTUtilities.setWindowOpaque(this, false);
 		} catch (Throwable t) {
 			setBackground(Color.WHITE);
@@ -117,7 +120,13 @@ public class VarylabSplashScreen extends SplashScreen {
 	    public void paint(Graphics g) {
 	    	Graphics2D g2d = (Graphics2D)g;
 	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-	    	g2d.setComposite(AlphaComposite.Src);
+	    	if (isLinux) {
+	    		g2d.setBackground(Color.WHITE);
+	    		g2d.clearRect(0, 0, getWidth(), getHeight());
+	    		g2d.setComposite(AlphaComposite.SrcAtop);
+	    	} else {
+	    		g2d.setComposite(AlphaComposite.Src);
+	    	}
 			if (useHighRes) {
 				int w = hiResImage.getWidth(this);
 				int h = hiResImage.getHeight(this);
@@ -131,7 +140,6 @@ public class VarylabSplashScreen extends SplashScreen {
 				int h = lowResImage.getHeight(this);
 				g2d.drawImage(lowResImage, 0, 0, w, h, this);
 			}
-			g2d.setBackground(Color.WHITE);
 			g2d.setColor(Color.BLACK);
 			g2d.setFont(getStatusFont());
 			
