@@ -44,7 +44,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		isLinux = false;
 	private double
 		statusX = 0.45,
-		statusY = 0.75,
+		statusY = 0.747,
 		fontSize = 0.02;
 	
 	static {
