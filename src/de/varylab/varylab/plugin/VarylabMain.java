@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin;
 
+import de.jreality.plugin.basic.InfoOverlayPlugin;
 import de.jreality.plugin.menu.BackgroundColor;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -31,6 +32,8 @@ public class VarylabMain extends Plugin {
 			BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
 			bgColorPlugin.setColor("UI Background");
 		}
+		InfoOverlayPlugin iol = c.getPlugin(InfoOverlayPlugin.class);
+		iol.getInfoOverlay().setVisible(false);
 	}
 	
 	
