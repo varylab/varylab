@@ -73,6 +73,9 @@ public class VarylabSplashScreen extends SplashScreen {
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 110;
+		if (isLinux) {
+			useHighRes = false;
+		}
 		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
 		setIconImage(ImageHook.getImage("main_03.png"));
 		
@@ -119,7 +122,7 @@ public class VarylabSplashScreen extends SplashScreen {
 	    @Override
 	    public void paint(Graphics g) {
 	    	Graphics2D g2d = (Graphics2D)g;
-	    	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	    	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    	if (isLinux) {
 	    		g2d.setBackground(Color.WHITE);
 	    		g2d.clearRect(0, 0, getWidth(), getHeight());
