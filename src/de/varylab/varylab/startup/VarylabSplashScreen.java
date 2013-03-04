@@ -147,15 +147,9 @@ public class VarylabSplashScreen extends SplashScreen {
 			g2d.setFont(getStatusFont());
 			
 			int percentage = (int)Math.round(progress * 100);
-			String progressString = "";
+			String progressString = status;
 			if (progress != 0.0) {
-				progressString = percentage + "% - ";
-			}
-			if (status.contains(".")) {
-				String[] statusArray = status.split("\\.");
-				progressString += statusArray[statusArray.length - 1];
-			} else {
-				progressString += status;
+				progressString = percentage + "% - " + progressString;
 			}
 			int textX = (int)(statusX * getWidth());
 			int textY = (int)(statusY * getHeight());
