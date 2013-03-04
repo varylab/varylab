@@ -43,6 +43,7 @@ import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.math.functional.NURBSSurfaceFunctional;
+import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
@@ -126,6 +127,7 @@ public class NURBSSurfaceOptimizer extends VarylabOptimizerPlugin implements Act
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		c.getPlugin(VarylabMain.class);
 		refSurfaceLayer = new HalfedgeLayer(hif);
 		refSurfaceLayer.set(new VHDS());
 		refSurfaceLayer.setName("NURBS Reference Surface");

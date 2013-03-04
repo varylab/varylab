@@ -76,7 +76,7 @@ public class VarylabSplashScreen extends SplashScreen {
 		if (isLinux) {
 			useHighRes = false;
 		}
-		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
+//		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
 		setIconImage(ImageHook.getImage("main_03.png"));
 		
 		Dimension size = new Dimension();
@@ -153,7 +153,6 @@ public class VarylabSplashScreen extends SplashScreen {
 			}
 			int textX = (int)(statusX * getWidth());
 			int textY = (int)(statusY * getHeight());
-			System.out.println(progressString);
 			g2d.setComposite(AlphaComposite.SrcOver);
 			g2d.drawString(progressString, textX, textY);
 	    }
