@@ -57,7 +57,7 @@ public abstract class VarylabStartupDefinition {
 			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
 			FontPolicy newFontPolicy = new FontPolicy() {
 				public FontSet getFontSet(String lafName, UIDefaults table) {
-					return new TahomaFontSet(11);
+					return new TahomaFontSet(10);
 				}
 			};
 			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);
@@ -66,7 +66,28 @@ public abstract class VarylabStartupDefinition {
 		}
 	}
 	
+	private void staticInit() {
+		NativePathUtility.set("native");
+		String[] taoCommand = new String[] {
+			"-tao_nm_lamda", "0.01", 
+			"-tao_nm_mu", "1.0"
+		};
+		Tao.Initialize("Tao Varylab", taoCommand, false);
+		JRHalfedgeViewer.initHalfedgeFronted();
+		StaticSetup.includePluginJars();
+		StaticSetup.includeLibraryJars();
+		Image appIcon = ImageHook.getImage("main_03.png");
+		JRViewer.setApplicationIcon(appIcon);
+		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
+		View.setIcon(ImageHook.getIcon("main_03.png"));
+		View.setTitle(getApplicationName());
+	}
+	
+	
 	protected void startup() {
+		Secure.setProperty("apple.laf.useScreenMenuBar", "true");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", getApplicationName());
 		final VarylabSplashScreen splash = getSplashScreen();
 		splash.setStatus(getApplicationName() + " startup");
 		splash.setVisible(true);
@@ -74,23 +95,13 @@ public abstract class VarylabStartupDefinition {
 			@Override
 			public void run() {
 				splash.setStatus("static init...");
-				NativePathUtility.set("native");
-				String[] taoCommand = new String[] {
-					"-tao_nm_lamda", "0.01", 
-					"-tao_nm_mu", "1.0"
-				};
-				Tao.Initialize("Tao Varylab", taoCommand, false);
-				Secure.setProperty("apple.laf.useScreenMenuBar", "true");
-				System.setProperty("com.apple.mrj.application.apple.menu.about.name", getApplicationName());
-				JRHalfedgeViewer.initHalfedgeFronted();
-				StaticSetup.includePluginJars();
-				StaticSetup.includeLibraryJars();
-				Image appIcon = ImageHook.getImage("main_03.png");
-				JRViewer.setApplicationIcon(appIcon);
-				JPopupMenu.setDefaultLightWeightPopupEnabled(true);
-				ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
-				View.setIcon(ImageHook.getIcon("main_03.png"));
-				View.setTitle(getApplicationName());
+				staticInit();
+			}
+		};		
+		Runnable jobLookAndFeel = new Runnable() {
+			@Override
+			public void run() {
+				splash.setStatus("install substance look and feel...");
 				installLookAndFeel();
 			}
 		};
@@ -127,6 +138,7 @@ public abstract class VarylabStartupDefinition {
 		
 		StartupChain initChain = new StartupChain();
 		initChain.appendJob(jobStaticInit);
+		initChain.appendJob(jobLookAndFeel);
 		initChain.appendJob(jobInitViewer);
 		initChain.appendJob(jobAssemblePlugins);
 		initChain.startQueuedAndWait();

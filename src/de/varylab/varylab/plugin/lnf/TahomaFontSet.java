@@ -12,7 +12,7 @@ public class TahomaFontSet implements FontSet {
 		tahoma11 = null;
 
 	public TahomaFontSet(int size) {
-		tahoma11 = new FontUIResource("Tahoma", Font.PLAIN, 9);
+		tahoma11 = new FontUIResource("Tahoma", Font.PLAIN, size);
 	}
 	
 	public FontUIResource getControlFont() {
