@@ -1,12 +1,21 @@
 package de.varylab.varylab.startup;
 
+import java.awt.Image;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JPopupMenu;
+import javax.swing.LookAndFeel;
+import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
-import org.pushingpixels.substance.api.skin.GraphiteAquaSkin;
+import org.pushingpixels.substance.api.fonts.FontPolicy;
+import org.pushingpixels.substance.api.fonts.FontSet;
+import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -17,6 +26,7 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
 import de.jtem.jtao.Tao;
+import de.varylab.varylab.plugin.lnf.TahomaFontSet;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public abstract class VarylabStartupDefinition {
@@ -39,22 +49,18 @@ public abstract class VarylabStartupDefinition {
 		return splash;
 	}
 	
-	static {
-		NativePathUtility.set("native");
-		String[] taoCommand = new String[] {
-			"-tao_nm_lamda", "0.01", 
-			"-tao_nm_mu", "1.0",
-//			"-tao_fd_gradient", "1E-6"
-		};
-		Tao.Initialize("Tao Varylab", taoCommand, false);
-		Secure.setProperty("apple.laf.useScreenMenuBar", "true");
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "VaryLab[Ultimate]");
-		JRViewer.setApplicationIcon(ImageHook.getImage("main_03.png"));
-	}
-	
 	private void installLookAndFeel() {
 		try {
-			SubstanceLookAndFeel.setSkin(new GraphiteAquaSkin());
+			LookAndFeel laf = new SubstanceGraphiteAquaLookAndFeel();
+			UIManager.setLookAndFeel(laf);
+			SubstanceLookAndFeel.setToUseConstantThemesOnDialogs(true);
+			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
+			FontPolicy newFontPolicy = new FontPolicy() {
+				public FontSet getFontSet(String lafName, UIDefaults table) {
+					return new TahomaFontSet(11);
+				}
+			};
+			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -68,9 +74,21 @@ public abstract class VarylabStartupDefinition {
 			@Override
 			public void run() {
 				splash.setStatus("static init...");
+				NativePathUtility.set("native");
+				String[] taoCommand = new String[] {
+					"-tao_nm_lamda", "0.01", 
+					"-tao_nm_mu", "1.0"
+				};
+				Tao.Initialize("Tao Varylab", taoCommand, false);
+				Secure.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name", getApplicationName());
 				JRHalfedgeViewer.initHalfedgeFronted();
 				StaticSetup.includePluginJars();
 				StaticSetup.includeLibraryJars();
+				Image appIcon = ImageHook.getImage("main_03.png");
+				JRViewer.setApplicationIcon(appIcon);
+				JPopupMenu.setDefaultLightWeightPopupEnabled(true);
+				ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
 				View.setIcon(ImageHook.getIcon("main_03.png"));
 				View.setTitle(getApplicationName());
 				installLookAndFeel();
