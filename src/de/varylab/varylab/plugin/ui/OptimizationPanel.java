@@ -79,8 +79,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		playButton = new JButton("Play",ImageHook.getIcon("Play24.gif")),
 		pauseButton = new JButton("Pause",ImageHook.getIcon("Pause24.gif")),
 		evaluateButton = new JButton("Evaluate");
-	private JComboBox<Method>
-		methodCombo = new JComboBox<Method>(Tao.Method.values());
+	private JComboBox
+		methodCombo = new JComboBox(Tao.Method.values());
 
 	private JCheckBox
 		fixSelectionXChecker = new JCheckBox("X", true),
