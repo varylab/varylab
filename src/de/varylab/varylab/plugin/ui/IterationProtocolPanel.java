@@ -1,20 +1,30 @@
 package de.varylab.varylab.plugin.ui;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.plugin.VarylabShrinkPlugin;
 
-public class OptimizationProtocolPanel extends VarylabShrinkPlugin {
+public class IterationProtocolPanel extends VarylabShrinkPlugin {
 
+	private List<IterationProtocol>
+		protocolList = new LinkedList<IterationProtocol>();
 	
 	
 	
-	public OptimizationProtocolPanel() {
+	public IterationProtocolPanel() {
 		setInitialPosition(SHRINKER_TOP);
 		shrinkPanel.setTitle("Optimization Protocol");
 	}
-
 	
+	public void appendIterationProtocol(IterationProtocol p) {
+		protocolList.add(p);
+	}
+	public void resetProtokoll() {
+		protocolList.clear();
+	}
 	
 	@Override
 	public void install(Controller c) throws Exception {

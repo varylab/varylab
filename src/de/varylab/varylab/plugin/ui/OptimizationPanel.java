@@ -45,6 +45,8 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
+import de.jtem.jtao.Tao.Method;
+import de.jtem.jtao.TaoMonitor;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
@@ -58,12 +60,14 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener {
+public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, TaoMonitor {
 	
 	private HalfedgeInterface
 		hif = null;
 	private OptimizerPluginsPanel
 		pluginsPanel = null;
+	private IterationProtocolPanel
+		protocolPanel = null;
 //	private JPanel
 //		constraintsPanel = new JPanel();
 	private ShrinkPanel
@@ -75,9 +79,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		playButton = new JButton("Play",ImageHook.getIcon("Play24.gif")),
 		pauseButton = new JButton("Pause",ImageHook.getIcon("Pause24.gif")),
 		evaluateButton = new JButton("Evaluate");
-	private JComboBox
-		methodCombo = new JComboBox(Tao.Method.values());
-	
+	private JComboBox<Method>
+		methodCombo = new JComboBox<Method>(Tao.Method.values());
+
 	private JCheckBox
 		fixSelectionXChecker = new JCheckBox("X", true),
 		fixSelectionYChecker = new JCheckBox("Y", true),
@@ -174,6 +178,16 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	
+	@Override
+	public int monitor(Tao solver) {
+		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+			IterationProtocol p = op.getIterationProtocol(solver);
+			protocolPanel.appendIterationProtocol(p);
+		}
+		return 0;
+	}
+	
+	
 	private void optimize() {
 		VHDS hds = hif.get(new VHDS());
 		int dim = hds.numVertices() * 3;
@@ -194,7 +208,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			fixYChecker.isSelected(), 
 			fixZChecker.isSelected()
 		);
-		
 		
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
@@ -252,6 +265,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				break;
 			}
 		}
+		optimizer.setMonitor(this);
 		optimizer.setApplication(app);
 		optimizer.setGradientTolerances(acc, acc, 0);
 		optimizer.setMaximumIterates(maxIter);
@@ -482,6 +496,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		pluginsPanel = c.getPlugin(OptimizerPluginsPanel.class);
+		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
 	}
 	
 	@Override

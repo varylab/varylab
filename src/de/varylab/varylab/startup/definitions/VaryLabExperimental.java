@@ -11,8 +11,8 @@ import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
+import de.varylab.varylab.plugin.ui.IterationProtocolPanel;
 import de.varylab.varylab.plugin.ui.OptimizationPanel;
-import de.varylab.varylab.plugin.ui.OptimizationProtocolPanel;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
 
 public class VaryLabExperimental extends VarylabStartupDefinition {
@@ -30,7 +30,7 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 	@Override
 	public void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances) {
 		classes.add(VarylabMain.class);
-		classes.add(OptimizationProtocolPanel.class);
+		classes.add(IterationProtocolPanel.class);
 		addOptimizationPlugins(classes);
 		classes.add(MarqueeWidget.class);
 		classes.add(ContextMenuWidget.class);
