@@ -12,7 +12,7 @@ import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.plugin.ui.IterationProtocol;
+import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.plugin.ui.OptimizerPluginsPanel;
 
 public abstract class VarylabOptimizerPlugin extends Plugin implements UIFlavor {

@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.ui;
 
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -55,11 +56,14 @@ import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableTao;
 import de.varylab.varylab.math.FixingConstraint;
 import de.varylab.varylab.math.TangentialConstraint;
+import de.varylab.varylab.optimization.IterationProtocol;
+import de.varylab.varylab.optimization.OptimizationListener;
+import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, TaoMonitor {
+public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, TaoMonitor, OptimizationListener {
 	
 	private HalfedgeInterface
 		hif = null;
@@ -67,6 +71,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		pluginsPanel = null;
 	private IterationProtocolPanel
 		protocolPanel = null;
+	private OptimizationThread
+		activeJob = null;
 //	private JPanel
 //		constraintsPanel = new JPanel();
 	private ShrinkPanel
@@ -105,6 +111,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		maxIterationSpinner = new JSpinner(maxIterationsModel);
 	private OptimizerThread 
 		optThread = new OptimizerThread();
+	
+	private double 
+		maxz_before = Double.NEGATIVE_INFINITY;
 		
 	
 	public OptimizationPanel() {
@@ -188,6 +197,16 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	private void optimize() {
+		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+		if (activeJob != null && activeJob.isAlive()) {
+			JOptionPane.showMessageDialog(
+				w, 
+				"Optimization still running.", 
+				"Please wait.", 
+				WARNING_MESSAGE
+			);
+			return;
+		}
 		VHDS hds = hif.get(new VHDS());
 		int dim = hds.numVertices() * 3;
 		CombinedFunctional fun = createFunctional(hds);
@@ -228,7 +247,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			x.setValue(v.getIndex() * 3 + 2, v.P[2] / v.P[3], InsertMode.INSERT_VALUES);
 		}
 		
-		double maxz_before = Double.NEGATIVE_INFINITY;
+		maxz_before = Double.NEGATIVE_INFINITY;
 		if(fixHeightChecker.isSelected()) {
 			for (int i = 0; i < x.getSize()/3;++i) {
 				if(maxz_before < Math.abs(x.getValue(3*i+2))) {
@@ -246,7 +265,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			H.assemble();
 			app.setHessianMat(H, H);
 		} else {
-			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			switch (getTaoMethod()) {
 			case NLS:
 			case NTR:
@@ -269,8 +287,14 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		optimizer.setGradientTolerances(acc, acc, 0);
 		optimizer.setMaximumIterates(maxIter);
 		optimizer.setTolerances(0.0, 0.0, 0.0, 0.0);
-		optimizer.solve();
 		
+		activeJob = new OptimizationThread(optimizer, x);
+		activeJob.addOptimizationListener(this);
+		activeJob.start();
+	}
+	
+	@Override
+	public void optimizationFinished(Tao optimizer, Vec x) {
 		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
 		String status = stat.toString().replace("getSolutionStatus : ", "");
 		System.out.println("optimization status ------------------------------------");
@@ -288,9 +312,16 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		
 		double zScale = maxz_before/maxz_after;
-		CoordinatePetscAdapter posAdapter = new CoordinatePetscAdapter(x, zScale);
-		hif.updateGeometry(posAdapter);
+		final CoordinatePetscAdapter posAdapter = new CoordinatePetscAdapter(x, zScale);
+		Runnable updater = new Runnable() {
+			@Override
+			public void run() {
+				hif.updateGeometry(posAdapter);
+			}
+		};
+		EventQueue.invokeLater(updater);
 	}
+	
 	
 	private void evaluate() {
 		VHDS hds = hif.get(new VHDS());

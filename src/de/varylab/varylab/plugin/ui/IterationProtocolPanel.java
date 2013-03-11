@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.plugin.VarylabShrinkPlugin;
 
 public class IterationProtocolPanel extends VarylabShrinkPlugin {
