@@ -45,7 +45,6 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
-import de.jtem.jtao.Tao.Method;
 import de.jtem.jtao.TaoMonitor;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
