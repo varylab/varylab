@@ -280,13 +280,8 @@ public class NurbsIO {
 				}
 				curves.get(i).setControlPoints(pts);
 			}
-			// hier wird das surf kontrollgitter mit index definiert
-//			for (int i = 0; i < vList.size(); i++) {
-//				System.out.println("vList: " + Arrays.toString(vList.get(i)));
-//			}
-//			System.out.println(surfIndex);
+			
 			for (int i = 0; i < surfIndex.size(); i++) {
-//				System.out.println(i);
 				ctrlPoints.add(vList.get(surfIndex.get(i) - 1));
 			}
 			for (int i = 0; i < ctrlPoints.size(); i++) {
@@ -322,11 +317,15 @@ public class NurbsIO {
 			for (int i = 0; i < U.length; i++) {
 				U[i] = surfKnotU.get(i);
 			}
+//			System.out.println("U  = " + Arrays.toString(U));
 			for (int i = 0; i < V.length; i++) {
 				V[i] = surfKnotV.get(i);
 			}
+//			System.out.println("V  = " + Arrays.toString(V));
 			int p = d[1];
+//			System.out.println("p = " + p);
 			int q = d[0];
+//			System.out.println("q = "+ q);
 			int n = U.length - p - 1;
 			int m = V.length - q - 1;
 			double[][][] controlMesh = new double[n][m][4];
