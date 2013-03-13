@@ -1,10 +1,11 @@
 package de.varylab.varylab.optimization;
 
-import de.jtem.jpetsc.Vec;
-import de.jtem.jtao.Tao;
+import de.jtem.jtao.TaoApplication;
 
 public interface OptimizationListener {
 
-	public void optimizationFinished(Tao solver, Vec solution);
+	public void optimizationStarted(TaoApplication app, int maxIterations);
+	public void optimizationProgress(TaoApplication app, int interation);
+	public void optimizationFinished(TaoApplication app);
 	
 }

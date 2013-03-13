@@ -20,6 +20,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -45,7 +46,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
-import de.jtem.jtao.Tao.GetSolutionStatusResult;
+import de.jtem.jtao.TaoApplication;
 import de.jtem.jtao.TaoMonitor;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
@@ -73,8 +74,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		protocolPanel = null;
 	private OptimizationThread
 		activeJob = null;
-//	private JPanel
-//		constraintsPanel = new JPanel();
+	private JProgressBar
+		progressBar = new JProgressBar();
 	private ShrinkPanel
 		animationPanel = new ShrinkPanel("Animation"),
 		constraintsPanel = new ShrinkPanel("Constraints");
@@ -132,7 +133,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		gbc2.insets = new Insets(2, 2, 2, 2);
 		
 		constraintsPanel.setLayout(new GridBagLayout());
-//		constraintsPanel.setBorder(BorderFactory.createTitledBorder("Constraints"));
 		constraintsPanel.add(new JLabel("Global"), gbc1);
 		constraintsPanel.add(fixXChecker, gbc1);
 		constraintsPanel.add(fixYChecker, gbc1);
@@ -149,12 +149,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(tangentialConstraintChecker, gbc2);
 		constraintsPanel.add(smoothGradientChecker, gbc2);
 		constraintsPanel.add(smoothSurfaceChecker,gbc2);
-//		constraintsPanel.setShrinked(true);
 		shrinkPanel.add(constraintsPanel, gbc2);
-		
 		shrinkPanel.add(fixHeightChecker, gbc2);
-		
-		
 		
 		shrinkPanel.add(new JLabel("Tolerance"), gbc1);
 		shrinkPanel.add(accuracySpinner, gbc2);
@@ -164,15 +160,16 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		shrinkPanel.add(methodCombo, gbc2);		
 		
 		animationPanel.setLayout(new GridBagLayout());
-		animationPanel.add(initButton,gbc1);
-		animationPanel.add(playButton,gbc1);
-		animationPanel.add(pauseButton,gbc2);
+		animationPanel.add(initButton, gbc1);
+		animationPanel.add(playButton, gbc1);
+		animationPanel.add(pauseButton, gbc2);
 		animationPanel.setShrinked(true);
-		shrinkPanel.add(animationPanel,gbc2);
+		shrinkPanel.add(animationPanel, gbc2);
 		
-		shrinkPanel.add(evaluateButton,gbc1);
-		shrinkPanel.add(optimizeButton,gbc2);
-
+		shrinkPanel.add(evaluateButton, gbc1);
+		shrinkPanel.add(optimizeButton, gbc2);
+		shrinkPanel.add(progressBar, gbc2);
+		
 
 		optimizeButton.addActionListener(this);
 		evaluateButton.addActionListener(this);
@@ -259,7 +256,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		
 		app.setInitialSolutionVec(x);
-		Tao optimizer = new Tao(getTaoMethod());
 		if (fun.hasHessian()) {
 			Mat H = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, getPETScNonZeros(hds, fun));
 			H.assemble();
@@ -282,24 +278,33 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				break;
 			}
 		}
-		optimizer.setMonitor(this);
-		optimizer.setApplication(app);
-		optimizer.setGradientTolerances(acc, acc, 0);
-		optimizer.setMaximumIterates(maxIter);
-		optimizer.setTolerances(0.0, 0.0, 0.0, 0.0);
-		
-		activeJob = new OptimizationThread(optimizer, x);
+		activeJob = new OptimizationThread(app);
 		activeJob.addOptimizationListener(this);
+		activeJob.setMethod(getTaoMethod());
+		activeJob.setTolerances(0.0, 0.0, 0.0, 0.0);
+		activeJob.setGradientTolerances(acc, acc, 0);
+		activeJob.setMaximumIterates(maxIter);
 		activeJob.start();
 	}
 	
+	public void optimizationStarted(TaoApplication app, int maxIterations) {
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(maxIterations);
+		progressBar.setValue(0);
+	}
+	
+	public void optimizationProgress(TaoApplication app, int interation) {
+		progressBar.setValue(interation);
+	}
+	
+	
 	@Override
-	public void optimizationFinished(Tao optimizer, Vec x) {
-		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
-		String status = stat.toString().replace("getSolutionStatus : ", "");
-		System.out.println("optimization status ------------------------------------");
-		System.out.println(status);
-		
+	public void optimizationFinished(TaoApplication app) {
+//		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
+//		String status = stat.toString().replace("getSolutionStatus : ", "");
+//		System.out.println("optimization status ------------------------------------");
+//		System.out.println(status);
+		Vec x = app.getSolutionVec();
 		double maxz_after= Double.NEGATIVE_INFINITY;
 		if(fixHeightChecker.isSelected()) {
 			for (int i = 0; i < x.getSize()/3;++i) {

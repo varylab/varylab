@@ -74,6 +74,7 @@ public class VaryLabGridshells extends VarylabStartupDefinition {
 		instances.addAll(HalfedgePluginFactory.createSubdivisionPlugins());
 		instances.addAll(HalfedgePluginFactory.createEditingPlugins());
 		instances.addAll(HalfedgePluginFactory.createDataVisualizationPlugins());
+		instances.addAll(HalfedgePluginFactory.createEditorModePlugins());
 		classes.add(AlgorithmDropdownToolbar.class);
 		classes.add(MarqueeWidget.class);
 		classes.add(ViewSwitchWidget.class);
