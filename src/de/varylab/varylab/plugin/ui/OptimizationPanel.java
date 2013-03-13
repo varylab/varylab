@@ -179,6 +179,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		pauseButton.addActionListener(this);
 		pauseButton.setEnabled(false);
 		
+		progressBar.setString("Optimization Progress");
+		progressBar.setStringPainted(true);
+		
 		optThread.start();
 	}
 	
@@ -278,28 +281,33 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				break;
 			}
 		}
-		activeJob = new OptimizationThread(app);
-		activeJob.addOptimizationListener(this);
-		activeJob.setMethod(getTaoMethod());
+		activeJob = new OptimizationThread(app, getTaoMethod());
 		activeJob.setTolerances(0.0, 0.0, 0.0, 0.0);
 		activeJob.setGradientTolerances(acc, acc, 0);
 		activeJob.setMaximumIterates(maxIter);
+		activeJob.addOptimizationListener(this);
 		activeJob.start();
 	}
 	
+	@Override
 	public void optimizationStarted(TaoApplication app, int maxIterations) {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(maxIterations);
 		progressBar.setValue(0);
+		progressBar.setStringPainted(true);
+		progressBar.setString("0");
 	}
 	
-	public void optimizationProgress(TaoApplication app, int interation) {
-		progressBar.setValue(interation);
+	@Override
+	public void optimizationProgress(TaoApplication app, int iteration) {
+		progressBar.setValue(iteration);
+		progressBar.setString("" + iteration);
 	}
 	
 	
 	@Override
 	public void optimizationFinished(TaoApplication app) {
+		progressBar.setString("Finished");
 //		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
 //		String status = stat.toString().replace("getSolutionStatus : ", "");
 //		System.out.println("optimization status ------------------------------------");

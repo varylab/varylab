@@ -1,5 +1,6 @@
 package de.varylab.varylab.optimization;
 
+import java.awt.EventQueue;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +13,7 @@ import de.jtem.jtao.TaoMonitor;
 public class OptimizationThread extends Thread implements TaoMonitor {
 
 	private Tao
-		solver = new Tao(Method.LMVM);
+		solver = null;
 	private TaoApplication
 		application = null;
 	private int 
@@ -22,11 +23,16 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 		listeners = Collections.synchronizedList(new LinkedList<OptimizationListener>());
 	
 	
-	public OptimizationThread(TaoApplication app) {
+	public OptimizationThread(TaoApplication app, Method method) {
 		super("Optimization Thread");
 		this.application = app;
-		solver.setApplication(app);
+		createSolver(method);
+	}
+	
+	private void createSolver(Method method) {
+		solver = new Tao(method);
 		solver.setMonitor(this);
+		solver.setApplication(application);
 		solver.setMaximumIterates(maxIterations);
 	}
 	
@@ -53,29 +59,44 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 
 	protected void fireOptimizationStarted() {
 		synchronized (listeners) {
-			for (OptimizationListener l : listeners) {
-				l.optimizationStarted(application, maxIterations);
+			for (final OptimizationListener l : listeners) {
+				Runnable delegate = new Runnable() {
+					@Override
+					public void run() {
+						l.optimizationStarted(application, maxIterations);						
+					}
+				};
+				EventQueue.invokeLater(delegate);
 			}
 		}
 	}
-	protected void fireOptimizationProgress(int iteration) {
+	protected void fireOptimizationProgress(final int iteration) {
 		synchronized (listeners) {
-			for (OptimizationListener l : listeners) {
-				l.optimizationProgress(application, iteration);
+			for (final OptimizationListener l : listeners) {
+				Runnable delegate = new Runnable() {
+					@Override
+					public void run() {
+						l.optimizationProgress(application, iteration);
+					}
+				};
+				EventQueue.invokeLater(delegate);
 			}
 		}
 	}
 	protected void fireOptimizationFinished() {
 		synchronized (listeners) {
-			for (OptimizationListener l : listeners) {
-				l.optimizationFinished(application);
+			for (final OptimizationListener l : listeners) {
+				Runnable delegate = new Runnable() {
+					@Override
+					public void run() {
+						l.optimizationFinished(application);
+					}
+				};
+				EventQueue.invokeLater(delegate);
 			}
 		}
 	}
 	
-	public void setMethod(Method m) {
-		solver.setMethod(m);
-	}
 	public void setMaximumIterates(int num) {
 		this.maxIterations = num;
 		solver.setMaximumIterates(num);
