@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="VaryLab" default="default">
+    <description>
+            This is the VaryLab ant build file.
+    </description>
+	
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+	<property name="src" value="src"/>
+	<property name="lib" value="lib"/>
+	<property name="build" value="build"/>
+	<property name="release" value="release"/>
+	
+	<path id="conformallab.libraryclasspath">
+		<pathelement location="${lib}/conformallab/DiscreteConformalLab.jar"/>
+		<pathelement location="${lib}/conformallab/batik-awt-util.jar"/>
+		<pathelement location="${lib}/conformallab/batik-svggen.jar"/>
+		<pathelement location="${lib}/conformallab/itext-xtra-5.1.3.jar"/>
+		<pathelement location="${lib}/conformallab/itextpdf-5.1.3.jar"/>
+	</path>	
+	
+	<path id="jfreechart.libraryclasspath">
+		<pathelement location="${lib}/jfreechart/jfreechart-1.0.13.jar"/>	
+		<pathelement location="${lib}/jfreechart/jcommon-1.0.16.jar"/>	
+	</path>
+	
+	<path id="jogamp.libraryclasspath">
+		<pathelement location="${lib}/jogamp/jogl-all.jar"/>
+		<pathelement location="${lib}/jogamp/gluegen-rt.jar"/>
+	</path>	
+	
+	<path id="jreality.libraryclasspath">
+		<pathelement location="${lib}/jreality/jReality.jar"/>
+		<pathelement location="${lib}/jreality/colorpicker.jar"/>
+		<pathelement location="${lib}/jreality/janino.jar"/>
+		<pathelement location="${lib}/jreality/jterm.jar"/>
+		<pathelement location="${lib}/jreality/jythonconsole.jar"/>
+		<pathelement location="${lib}/jreality/jython-standalone-2.5.3.jar"/>
+		<pathelement location="${lib}/jreality/NetUtil.jar"/>
+		<pathelement location="${lib}/jreality/sunflow.jar"/>
+	</path>
+	
+   	<path id="jtem.libraryclasspath">
+        <pathelement location="${lib}/jtem/beans.jar"/>
+        <pathelement location="${lib}/jtem/ellipticFunctions.jar"/>
+        <pathelement location="${lib}/jtem/halfedge.jar"/>
+        <pathelement location="${lib}/jtem/halfedgetools.jar"/>
+        <pathelement location="${lib}/jtem/java2d.jar"/>
+        <pathelement location="${lib}/jtem/java2dx.jar"/>
+        <pathelement location="${lib}/jtem/jpetsctao.jar"/>
+        <pathelement location="${lib}/jtem/jrworkspace.jar"/>
+        <pathelement location="${lib}/jtem/mfc.jar"/>
+        <pathelement location="${lib}/jtem/modelling.jar"/>
+        <pathelement location="${lib}/jtem/numericalMethods.jar"/>
+        <pathelement location="${lib}/jtem/projgeom.jar"/>
+    </path>
+
+	<path id="substance.libraryclasspath">
+		<pathelement location="${lib}/substance/substance-6.0.jar"/>	
+		<pathelement location="${lib}/substance/trident-6.0.jar"/>	
+	</path>
+
+	<path id="xstream.libraryclasspath">
+		<pathelement location="${lib}/xstream/xstream-1.3.1.jar"/>	
+		<pathelement location="${lib}/xstream/xpp3-1.1.4c.jar"/>	
+	</path>
+	
+	<path id="misc.libraryclasspath">
+		<pathelement location="${lib}/bsh-1.3.0.jar"/>	
+		<pathelement location="${lib}/commons-math3-3.0.jar"/>	
+		<pathelement location="${lib}/CompGeom-0.3_seidel.jar"/>	
+		<pathelement location="${lib}/HyperbolicNets.jar"/>	
+		<pathelement location="${lib}/JLink.jar"/>	
+		<pathelement location="${lib}/mtj.jar"/>	
+		<pathelement location="${lib}/MathematicaPlugin.jar"/>
+	</path>
+
+    <target name="default" description="This is the VaryLab ant build file.">
+        
+    </target>
+
+	
+	<target name="compile">
+        <javac destdir="${build}" source="${source}" target="${target}">
+            <src path="${src}"/>
+            <classpath refid="conformallab.libraryclasspath"/>
+            <classpath refid="jfreechart.libraryclasspath"/>
+            <classpath refid="jogamp.libraryclasspath"/>
+            <classpath refid="jreality.libraryclasspath"/>
+            <classpath refid="jtem.libraryclasspath"/>
+            <classpath refid="substance.libraryclasspath"/>
+            <classpath refid="xstream.libraryclasspath"/>
+            <classpath refid="misc.libraryclasspath"/>
+        </javac>
+	</target>
+	
+	<target name="api jar" depends="compile">
+		<mkdir dir="tmp"/>
+		<unjar src="${lib}/jtem/halfedge.jar" dest="${build}"/>
+		<unjar src="${lib}/jtem/halfedgetools.jar" dest="${build}"/>
+		<unjar src="${lib}/jtem/jpetsctao.jar" dest="${build}"/>
+		<unjar src="${lib}/jtem/jrworkspace.jar" dest="${build}"/>
+		<jar destfile="${release}/VaryLabAPI.jar">
+			<fileset includes="${build}/de/varylab/varylab/optimization/IterationProtocol**"/>
+			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
+			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
+			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabPlugin**"/>
+			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabShrinkPlugin**"/>
+		</jar>
+		<delete dir="tmp"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build}"/>
+	</target>
+	
+	
+	<target name="update dependencies">
+		
+	</target>
+	
+
+</project>

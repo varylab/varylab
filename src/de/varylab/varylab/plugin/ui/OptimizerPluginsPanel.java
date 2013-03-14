@@ -304,6 +304,15 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	
 	
 	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		List<VarylabOptimizerPlugin> plugins = c.getPlugins(VarylabOptimizerPlugin.class);
+		for (VarylabOptimizerPlugin p : plugins) {
+			addOptimizerPlugin(p);
+		}
+	}
+	
+	@Override
 	public void storeStates(Controller c) throws Exception {
 		super.storeStates(c);
 		c.storeProperty(getClass(), "activationSet", activateSet);
