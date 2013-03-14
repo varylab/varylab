@@ -56,6 +56,7 @@ public abstract class VarylabStartupDefinition {
 			SubstanceLookAndFeel.setToUseConstantThemesOnDialogs(true);
 			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
 			FontPolicy newFontPolicy = new FontPolicy() {
+				@Override
 				public FontSet getFontSet(String lafName, UIDefaults table) {
 					return new TahomaFontSet(10);
 				}
@@ -114,7 +115,8 @@ public abstract class VarylabStartupDefinition {
 				v.getController().setManageLookAndFeel(false);
 				v.getController().setSaveOnExit(true);
 				v.getController().setAskBeforeSaveOnExit(false);
-				v.getController().setLoadFromUserPropertyFile(true);
+				v.getController().setLoadFromUserPropertyFile(false);
+				v.getController().setUserPropertyFile(getPropertyFileName());
 				v.setPropertiesFile(getPropertyFileName());
 				v.setPropertiesResource(VarylabStartupDefinition.this.getClass(), getPropertyFileName());
 				v.setShowPanelSlots(true, true, true, true);

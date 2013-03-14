@@ -1,9 +1,5 @@
 package de.varylab.varylab.hds.adapter;
 
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.Node;
-import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.varylab.varylab.hds.VEdge;
@@ -19,34 +15,13 @@ public class GeodesicLabelAdapter extends AbstractTypedAdapter<VVertex, VEdge, V
 	}
 
 	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		N extends Node<V, E, F>
-	> Integer get(N n, AdapterSet a) {
-		if (n instanceof VEdge) {
-			return ((VEdge) n).getGeodesicLabel();
-		}
-		return -1;
+	public Integer getEdgeValue(VEdge e, AdapterSet a) {
+		return e.getGeodesicLabel();
 	}
 	
 	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		N extends Node<V, E, F>
-	> void set(N n, Integer label, AdapterSet a) {
-		if (n instanceof VEdge) {
-			((VEdge) n).setGeodesicLabel(label);
-		}
-	}
-	
-
-	@Override
-	public double getPriority() {
-		return 0;
+	public void setEdgeValue(VEdge e, Integer value, AdapterSet a) {
+		e.setGeodesicLabel(value);
 	}
 
 }

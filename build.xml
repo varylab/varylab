@@ -5,12 +5,18 @@
             This is the VaryLab ant build file.
     </description>
 	
+	<tstamp><format property="time" pattern="yyyyMMddHHmm" /></tstamp>
+	<tstamp><format property="date" pattern="yyyy-MM-dd" /></tstamp>
+	<property name = "version" value = "B${time}"/>
+	<property name="vendor" value="VaryLab Development Team"/>
+	
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
 	<property name="src" value="src"/>
 	<property name="lib" value="lib"/>
 	<property name="build" value="build"/>
 	<property name="release" value="release"/>
+	<property name="tmp" value="tmp"/>
 	
 	<path id="conformallab.libraryclasspath">
 		<pathelement location="${lib}/conformallab/DiscreteConformalLab.jar"/>
@@ -76,13 +82,20 @@
 		<pathelement location="${lib}/MathematicaPlugin.jar"/>
 	</path>
 
-    <target name="default" description="This is the VaryLab ant build file.">
-        
-    </target>
+    <target name="default" description="This is the VaryLab ant build file." depends="compile"/>
 
+	<target name="create tmp folder">
+		<delete dir="${tmp}"/>
+		<mkdir dir="${tmp}"/>
+	</target>
 	
-	<target name="compile">
-        <javac destdir="${build}" source="${source}" target="${target}">
+	<target name="create build folders">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${release}"/>
+	</target>
+	
+	<target name="compile" depends="create build folders">
+        <javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false">
             <src path="${src}"/>
             <classpath refid="conformallab.libraryclasspath"/>
             <classpath refid="jfreechart.libraryclasspath"/>
@@ -93,32 +106,112 @@
             <classpath refid="xstream.libraryclasspath"/>
             <classpath refid="misc.libraryclasspath"/>
         </javac>
+		<copy todir="${build}" description="copy resources to output folder">
+			<fileset dir="${src}">
+				<include name="de/varylab/varylab/startup/image/**"/>
+				<exclude name="**/SplashImageHook.java"/>
+			</fileset>
+			<fileset dir="${src}">
+				<include name="de/varylab/varylab/plugin/ui/image/**"/>
+				<exclude name="**/ImageHook.java"/>
+			</fileset>
+		</copy>
 	</target>
 	
-	<target name="api jar" depends="compile">
-		<mkdir dir="tmp"/>
-		<unjar src="${lib}/jtem/halfedge.jar" dest="${build}"/>
-		<unjar src="${lib}/jtem/halfedgetools.jar" dest="${build}"/>
-		<unjar src="${lib}/jtem/jpetsctao.jar" dest="${build}"/>
-		<unjar src="${lib}/jtem/jrworkspace.jar" dest="${build}"/>
-		<jar destfile="${release}/VaryLabAPI.jar">
-			<fileset includes="${build}/de/varylab/varylab/optimization/IterationProtocol**"/>
-			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
-			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
-			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabPlugin**"/>
-			<fileset includes="${build}/de/varylab/varylab/plugin/VarylabShrinkPlugin**"/>
+	<target name="release jar [ultimate]" depends="compile, create tmp folder">
+		<unjar dest="${tmp}">
+			<fileset dir="${lib}">
+		        <include name="**/*.jar"/>
+		        <exclude name="**/jogamp/**"/>
+				<exclude name="**/substance/**"/>
+		        <exclude name="commons-math3-3.0-javadoc.jar"/>
+		        <exclude name="commons-math3-3.0-sources.jar"/>
+		    </fileset>
+		</unjar>
+		<delete dir="${tmp}/META-INF"/>
+		<property name="appfolder" value="${release}/VaryLabUltimate-${date}"/>
+		<mkdir dir="${appfolder}"/>
+		<jar jarfile="${appfolder}/VaryLabUltimate-${date}.jar" update="false">
+			<fileset dir="${build}">
+				<include name="**"/>	
+			</fileset>
+			<fileset dir="${tmp}">
+				<include name="**"/>
+			</fileset>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Implementation-Vendor" value="${vendor}"/>
+				<attribute name="Implementation-Title" value="VaryLab[Ultimate]"/>
+				<attribute name="Implementation-Version" value="${version}"/>
+				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
+				<attribute name="Main-Class" value="de.varylab.varylab.VaryLab"/>
+				<attribute name="Class-Path" value="
+					lib/jogl-all.jar
+					lib/gluegen-rt.jar
+					lib/substance-6.0.jar
+					lib/trident-6.0.jar
+				"/>
+			</manifest>
 		</jar>
-		<delete dir="tmp"/>
+		<copy todir="${appfolder}/lib" description="creating app library folder">
+			<fileset dir="${lib}/jogamp">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="${lib}/substance">
+				<include name="**"/>
+			</fileset>
+		</copy>
+		<copy todir="${appfolder}/native" description="copy native library filder">
+			<fileset dir="native">
+				<include name="**/**jpetsctao**"/>
+				<exclude name="**mpi**"/>
+			</fileset>
+		</copy>
+		<copy todir="${appfolder}" description="copy initial properties file">
+			<fileset dir="etc" includes="VaryLab.xml"/>
+		</copy>
 	</target>
 	
-	<target name="clean">
-		<delete dir="${build}"/>
+	<target name="api jar" depends="compile, create tmp folder">
+		<unjar src="${lib}/jtem/halfedge.jar" dest="${tmp}"/>
+		<unjar src="${lib}/jtem/halfedgetools.jar" dest="${tmp}"/>
+		<unjar src="${lib}/jtem/jpetsctao.jar" dest="${tmp}"/>
+		<unjar src="${lib}/jtem/jrworkspace.jar" dest="${tmp}"/>
+		<unjar src="${lib}/jreality/jReality.jar" dest="${tmp}"/>
+		<delete dir="${tmp}/META-INF"/>
+		<jar jarfile="${release}/VaryLabAPI-${date}.jar" update="false">
+			<fileset dir="${build}">
+				<include name="de/varylab/varylab/hds/*"/>	
+				<include name="de/varylab/varylab/optimization/IterationProtocol**"/>	
+				<include name="de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>	
+				<include name="de/varylab/varylab/plugin/VarylabPlugin**"/>	
+				<include name="de/varylab/varylab/plugin/VarylabShrinkPlugin**"/>	
+			</fileset>
+			<fileset dir="${tmp}">
+				<include name="de/jtem/halfedge/**"/>
+				<include name="de/jtem/halfedgetools/functional/*"/>
+				<include name="de/jtem/jrworkspace/plugin/**"/>
+				<include name="de/jreality/math/**"/>
+				<include name="de/jreality/scene/**"/>
+			</fileset>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Implementation-Vendor" value="${vendor}"/>
+				<attribute name="Implementation-Title" value="VaryLab Plugin API"/>
+				<attribute name="Implementation-Version" value="${version}"/>
+				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
+			</manifest>
+		</jar>
 	</target>
-	
 	
 	<target name="update dependencies">
 		
 	</target>
 	
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${release}"/>
+		<delete dir="${tmp}"/>
+	</target>
 
 </project>

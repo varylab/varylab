@@ -1,9 +1,5 @@
 package de.varylab.varylab.hds.adapter;
 
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.Node;
-import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Weight;
@@ -19,46 +15,29 @@ public class NodeWeigthAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFac
 	}
 
 	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		N extends Node<V, E, F>
-	> Double get(N n, AdapterSet a) {
-		if (n instanceof VVertex) {
-			return ((VVertex) n).getWeight();
-		}
-		if (n instanceof VEdge) {
-			return ((VEdge) n).getWeight();
-		}
-		if (n instanceof VFace) {
-			return ((VFace) n).getWeight();
-		}
-		return 0.0;
+	public Double getVertexValue(VVertex v, AdapterSet a) {
+		return v.getWeight();
+	}
+	@Override
+	public Double getEdgeValue(VEdge e, AdapterSet a) {
+		return e.getWeight();
+	}
+	@Override
+	public Double getFaceValue(VFace f, AdapterSet a) {
+		return f.getWeight();
 	}
 	
 	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		N extends Node<V, E, F>
-	> void set(N n, Double w, AdapterSet a) {
-		if (n instanceof VVertex) {
-			((VVertex) n).setWeight(w);
-		}
-		if (n instanceof VEdge) {
-			((VEdge) n).setWeight(w);
-		}
-		if (n instanceof VFace) {
-			((VFace) n).setWeight(w);
-		}
+	public void setVertexValue(VVertex v, Double value, AdapterSet a) {
+		v.setWeight(value);
 	}
-	
-
 	@Override
-	public double getPriority() {
-		return 0;
+	public void setEdgeValue(VEdge e, Double value, AdapterSet a) {
+		e.setWeight(value);
+	}
+	@Override
+	public void setFaceValue(VFace f, Double value, AdapterSet a) {
+		f.setWeight(value);
 	}
 
 }

@@ -19,7 +19,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
@@ -125,8 +125,12 @@ public class WeightsVisualizer extends VisualizerPlugin implements ActionListene
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void initVisualization(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		// find max and min of all weights
-		if (!(hds instanceof VHDS)) return;
-		VHDS vhds = (VHDS)hds;
+		VHDS vhds = null;
+		try {
+			vhds = VHDS.class.cast(hds);
+		} catch (ClassCastException cce) {
+			return;
+		}
 		minV = Double.MAX_VALUE;
 		minE = Double.MAX_VALUE;
 		minF = Double.MAX_VALUE;
@@ -164,10 +168,10 @@ public class WeightsVisualizer extends VisualizerPlugin implements ActionListene
 	
 	
 	@Label
-	private class WeightsLabelAdapter extends AbstractAdapter<String> {
+	private class WeightsLabelAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, String> {
 	
 		public WeightsLabelAdapter() {
-			super(String.class, true, false);
+			super(VVertex.class, VEdge.class, VFace.class, String.class, true, false);
 		}
 	
 		@Override
@@ -185,98 +189,62 @@ public class WeightsVisualizer extends VisualizerPlugin implements ActionListene
 		}
 	
 		@Override
-		public double getPriority() {
-			return 0;
+		public String getVertexValue(VVertex v, AdapterSet a) {
+			return format.format(v.getWeight());
 		}
-	
 		@Override
-		public <
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>,
-			N extends Node<V, E, F>
-		> String get(N n, AdapterSet a) {
-			double w = 1.0;
-			if (n instanceof VVertex) {
-				w = ((VVertex) n).getWeight();
-			}
-			if (n instanceof VEdge) {
-				w = ((VEdge) n).getWeight();
-			}
-			if (n instanceof VFace) {
-				w = ((VFace) n).getWeight();
-			}
-			return format.format(w);
+		public String getEdgeValue(VEdge e, AdapterSet a) {
+			return format.format(e.getWeight());
+		}
+		@Override
+		public String getFaceValue(VFace f, AdapterSet a) {
+			return format.format(f.getWeight());
 		}
 		
 	}
 	
 	
 	@Color
-	private class WeightsColorAdapter extends AbstractAdapter<double[]> {
+	private class WeightsColorAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 	
 		private double[]
 		    minColor = {0, 0, 1},
 		    maxColor = {1, 1, 0};
 		
-		
 		public WeightsColorAdapter() {
-			super(double[].class, true, false);
+			super(VVertex.class, VEdge.class, VFace.class, double[].class, true, false);
 		}
 	
 		@Override
-		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-			if (VVertex.class.isAssignableFrom(nodeClass)) {
-				return showVertices.isSelected();
+		public double[] getVertexValue(VVertex v, AdapterSet a) {
+			double w = v.getWeight();
+			double alpha = w - minV;
+			if (spanV == 0) {
+				alpha = 1.0;
+			} else {
+				alpha /= spanV;
 			}
-			if (VEdge.class.isAssignableFrom(nodeClass)) {
-				return showEdges.isSelected();
-			}
-			if (VFace.class.isAssignableFrom(nodeClass)) {
-				return showFaces.isSelected();
-			}
-			return false;
+			return Rn.linearCombination(null, 1 - alpha, minColor, alpha, maxColor);
 		}
-	
 		@Override
-		public double getPriority() {
-			return 0;
+		public double[] getEdgeValue(VEdge e, AdapterSet a) {
+			double w = e.getWeight();
+			double alpha = w - minE;
+			if (spanE == 0) {
+				alpha = 1.0;
+			} else {
+				alpha /= spanE;
+			}
+			return Rn.linearCombination(null, 1 - alpha, minColor, alpha, maxColor);
 		}
-	
 		@Override
-		public <
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>,
-			N extends Node<V, E, F>
-		> double[] get(N n, AdapterSet a) {
-			double alpha = 1.0;
-			if (n instanceof VVertex) {
-				double w = ((VVertex) n).getWeight();
-				alpha = w - minV;
-				if (spanV == 0) {
-					alpha = 1.0;
-				} else {
-					alpha /= spanV;
-				}
-			}
-			if (n instanceof VEdge) {
-				double w = ((VEdge) n).getWeight();
-				alpha = w - minE;
-				if (spanE == 0) {
-					alpha = 1.0;
-				} else {
-					alpha /= spanE;
-				}
-			}
-			if (n instanceof VFace) {
-				double w = ((VFace) n).getWeight();
-				alpha = w - minF;
-				if (spanF == 0) {
-					alpha = 1.0;
-				} else {
-					alpha /= spanF;
-				}
+		public double[] getFaceValue(VFace f, AdapterSet a) {
+			double w = f.getWeight();
+			double alpha = w - minF;
+			if (spanF == 0) {
+				alpha = 1.0;
+			} else {
+				alpha /= spanF;
 			}
 			return Rn.linearCombination(null, 1 - alpha, minColor, alpha, maxColor);
 		}
