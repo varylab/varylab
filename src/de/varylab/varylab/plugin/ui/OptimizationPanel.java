@@ -64,7 +64,7 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
 import de.varylab.varylab.plugin.ui.image.ImageHook;
 
-public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, TaoMonitor, OptimizationListener {
+public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
 	
 	private HalfedgeInterface
 		hif = null;
@@ -185,17 +185,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		optThread.start();
 	}
 	
-	
-	@Override
-	public int monitor(Tao solver) {
-		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-			IterationProtocol p = op.getIterationProtocol(solver);
-			protocolPanel.appendIterationProtocol(p);
-		}
-		return 0;
-	}
-	
-	
 	private void optimize() {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 		if (activeJob != null && activeJob.isAlive()) {
@@ -302,6 +291,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	public void optimizationProgress(TaoApplication app, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
+		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+//			IterationProtocol p = op.getIterationProtocol(solver);
+//			protocolPanel.appendIterationProtocol(p);
+		}
 	}
 	
 	
