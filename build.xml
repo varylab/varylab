@@ -170,6 +170,7 @@
 			<fileset dir="etc" includes="VaryLab.xml"/>
 			<fileset dir="${release}" includes="${api_jar}"/>
 		</copy>
+		<mkdir dir="${appfolder}/plugin"/>
 	</target>
 	
 	<target name="api jar" depends="compile">
@@ -202,13 +203,6 @@
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
 			</manifest>
 		</jar>
-	</target>
-	
-	<target name="update dependencies">
-		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
-		<copy todir="lib/jtem">
-			<fileset dir="../jrworkspace/jar" includes="jrworkspace.jar"/>
-		</copy>
 	</target>
 	
 	<target name="clean">
