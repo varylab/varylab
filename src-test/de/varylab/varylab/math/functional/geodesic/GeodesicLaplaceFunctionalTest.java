@@ -43,6 +43,10 @@ public class GeodesicLaplaceFunctionalTest
 	}
 	
 	@Test@Override@Ignore
+	public void testGradient() throws Exception {
+		super.testGradient();
+	}
+	@Test@Override@Ignore
 	public void testHessian() throws Exception {
 		super.testHessian();
 	}

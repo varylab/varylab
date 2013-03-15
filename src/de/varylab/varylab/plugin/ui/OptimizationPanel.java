@@ -68,8 +68,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		hif = null;
 	private OptimizerPluginsPanel
 		pluginsPanel = null;
-	private IterationProtocolPanel
-		protocolPanel = null;
+//	private IterationProtocolPanel
+//		protocolPanel = null;
 	private OptimizationThread
 		activeJob = null;
 	private JProgressBar
@@ -289,10 +289,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	public void optimizationProgress(TaoApplication app, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
-		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+//		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
 //			IterationProtocol p = op.getIterationProtocol(solver);
 //			protocolPanel.appendIterationProtocol(p);
-		}
+//		}
 	}
 	
 	
@@ -530,7 +530,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		pluginsPanel = c.getPlugin(OptimizerPluginsPanel.class);
-		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
+//		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
 	}
 	
 	@Override

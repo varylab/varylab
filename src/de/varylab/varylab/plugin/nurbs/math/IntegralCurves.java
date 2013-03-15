@@ -22,7 +22,7 @@ public class IntegralCurves {
 //	/**
 //	 * <p><strong>computes the curvature lines</strong></p>
 //	 * 
-//	 * this is a step-size controlled runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
+//	 * this is a step-size controlled runge kutta (Bogacki-Shampine) method with the following pseudo code</br>
 //	 * </br>
 //	 * <strong>while</strong> (!nearby)
 //	 * 
@@ -284,7 +284,7 @@ public class IntegralCurves {
 	/**
 	 * <p><strong>computes the curvature lines</strong></p>
 	 * 
-	 * this is a step adaptive runge kutta (Bogacki–Shampine) method with the following pseudo code</br>
+	 * this is a step adaptive runge kutta (Bogacki-Shampine) method with the following pseudo code</br>
 	 * </br>
 	 * <strong>while</strong> (!nearby)
 	 * 

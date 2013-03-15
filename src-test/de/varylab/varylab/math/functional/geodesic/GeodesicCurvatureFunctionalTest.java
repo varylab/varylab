@@ -49,6 +49,10 @@ public class GeodesicCurvatureFunctionalTest extends FunctionalTest<DefaultJRVer
 	}
 	
 	@Test@Override@Ignore
+	public void testGradient() throws Exception {
+		super.testGradient();
+	}
+	@Test@Override@Ignore
 	public void testHessian() throws Exception {
 		super.testHessian();
 	}

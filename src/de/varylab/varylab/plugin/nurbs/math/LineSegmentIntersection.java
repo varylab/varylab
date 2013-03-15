@@ -157,8 +157,8 @@ public class LineSegmentIntersection {
 				}
 			}
 
-		System.out.println("anfanglänge: " + segList.size());
-		System.out.println("endlänge: " + finalSegmentTree.size());
+		System.out.println("anfanglaenge: " + segList.size());
+		System.out.println("endlaenge: " + finalSegmentTree.size());
 		LinkedList<LineSegment> finalSegmentList = new LinkedList<LineSegment>();
 		for (LineSegment ls : finalSegmentTree) {
 			finalSegmentList.add(ls);
