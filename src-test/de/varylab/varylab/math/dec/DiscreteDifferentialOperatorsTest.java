@@ -1,12 +1,12 @@
 package de.varylab.varylab.math.dec;
 
-import junit.framework.Assert;
 import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Matrix.Norm;
 import no.uib.cipr.matrix.sparse.CompColMatrix;
 import no.uib.cipr.matrix.sparse.CompDiagMatrix;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -84,7 +84,7 @@ public class DiscreteDifferentialOperatorsTest {
 			D1 = DiscreteDifferentialOperators.getDifferential(hds,as,1),
 			product = new DenseMatrix(hds.numFaces(),hds.numVertices());
 		D1.mult(D0, product);
-		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
+		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue), 0.0, 1E-10);
 	}
 	
 	@Test
@@ -143,7 +143,7 @@ public class DiscreteDifferentialOperatorsTest {
 			d1 = DiscreteDifferentialOperators.getBoundaryOperator(hds,as,1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
-		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
+		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue), 0.0, 1E-10);
 	}
 
 	@Test
@@ -161,6 +161,6 @@ public class DiscreteDifferentialOperatorsTest {
 			d1 = DiscreteDifferentialOperators.getBoundaryOperator(hds,as,1);
 		Matrix product = new DenseMatrix(hds.numVertices(),hds.numFaces());
 		d0.mult(d1, product);
-		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue),0.0);
+		Assert.assertEquals(product.norm(Matrix.Norm.Maxvalue), 0.0, 1E-10);
 	}
 }
