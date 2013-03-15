@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin;
 
 import de.jreality.plugin.basic.InfoOverlayPlugin;
+import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewToolBar;
 import de.jreality.plugin.menu.BackgroundColor;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
@@ -8,6 +9,7 @@ import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.discreteconformal.plugin.DomainVisualisationPlugin;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.hds.adapter.NodeWeigthAdapter;
@@ -34,6 +36,8 @@ public class VarylabMain extends Plugin {
 			BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
 			bgColorPlugin.setColor("UI Background");
 		}
+		c.getPlugin(View.class);
+		c.getPlugin(DomainVisualisationPlugin.class);
 		InfoOverlayPlugin iol = c.getPlugin(InfoOverlayPlugin.class);
 		iol.getInfoOverlay().setVisible(false);
 		ViewToolBar toolbar = c.getPlugin(ViewToolBar.class);

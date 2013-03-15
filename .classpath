@@ -24,7 +24,7 @@
 	<classpathentry kind="lib" path="lib/conformallab/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/batik-util.jar"/>
-	<classpathentry kind="lib" path="lib/conformallab/DiscreteConformalLab.jar"/>
+	<classpathentry kind="lib" path="lib/conformallab/DiscreteConformalLab.jar" sourcepath="/DiscreteConformalLab"/>
 	<classpathentry kind="lib" path="lib/conformallab/itext-xtra-5.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/itextpdf-5.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>

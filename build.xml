@@ -19,7 +19,6 @@
 	<property name="tmp" value="tmp"/>
 	
 	<property name="api_jar" value="VaryLabAPI-${date}.jar"/>
-	<property name="release_jar_ultimate" value="VaryLabUltimate-${date}.jar"/>
 	
 	<path id="conformallab.libraryclasspath">
 		<pathelement location="${lib}/conformallab/DiscreteConformalLab.jar"/>
@@ -117,7 +116,24 @@
 		</copy>
 	</target>
 	
-	<target name="release jar [ultimate]" depends="compile, api jar">
+	<target name="release [ultimate]">
+		<antcall target="release generic">
+			<param name="release-name" value="Ultimate"/>
+	    	<param name="main-class" value="de.varylab.varylab.VaryLab"/>
+			<param name="etc-properties-file" value="VaryLab.xml"/>
+	    </antcall>
+	</target>
+	
+	<target name="release [gridshells]">
+		<antcall target="release generic">
+			<param name="release-name" value="Gridshells"/>
+	    	<param name="main-class" value="de.varylab.varylab.startup.definitions.VaryLabGridshells"/>
+			<param name="etc-properties-file" value="VarylabGridshells.xml"/>
+	    </antcall>
+	</target>
+	
+	
+	<target name="release generic" depends="compile, api jar" description="generic release target">
 		<unjar dest="${tmp}">
 			<fileset dir="${lib}">
 		        <include name="**/*.jar"/>
@@ -128,9 +144,9 @@
 		    </fileset>
 		</unjar>
 		<delete dir="${tmp}/META-INF"/>
-		<property name="appfolder" value="${release}/VaryLabUltimate-${date}"/>
+		<property name="appfolder" value="${release}/VaryLab${release-name}-${date}"/>
 		<mkdir dir="${appfolder}"/>
-		<jar jarfile="${appfolder}/${release_jar_ultimate}" update="false">
+		<jar jarfile="${appfolder}/VaryLab${release-name}-${date}.jar" update="false">
 			<fileset dir="${build}">
 				<include name="**"/>	
 			</fileset>
@@ -143,7 +159,7 @@
 				<attribute name="Implementation-Title" value="VaryLab[Ultimate]"/>
 				<attribute name="Implementation-Version" value="${version}"/>
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
-				<attribute name="Main-Class" value="de.varylab.varylab.VaryLab"/>
+				<attribute name="Main-Class" value="${main-class}"/>
 				<attribute name="Class-Path" value="
 					lib/jogl-all.jar
 					lib/gluegen-rt.jar
@@ -163,11 +179,11 @@
 		<copy todir="${appfolder}/native" description="copy native library filder">
 			<fileset dir="native">
 				<include name="**/**jpetsctao**"/>
-				<exclude name="**mpi**"/>
+				<exclude name="**/**mpi**"/>
 			</fileset>
 		</copy>
 		<copy todir="${appfolder}" description="copy initial properties file">
-			<fileset dir="etc" includes="VaryLab.xml"/>
+			<fileset dir="etc" includes="${etc-properties-file}"/>
 			<fileset dir="${release}" includes="${api_jar}"/>
 		</copy>
 		<mkdir dir="${appfolder}/plugin"/>
