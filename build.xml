@@ -113,6 +113,9 @@
 				<include name="de/varylab/varylab/plugin/ui/image/**"/>
 				<exclude name="**/ImageHook.java"/>
 			</fileset>
+			<fileset dir="${src}">
+				<include name="de/varylab/varylab/data/**"/>
+			</fileset>
 		</copy>
 	</target>
 	
