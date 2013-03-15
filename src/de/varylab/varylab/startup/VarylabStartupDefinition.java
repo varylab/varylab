@@ -20,7 +20,17 @@ import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
+import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.basic.ViewMenuBar;
+import de.jreality.plugin.basic.ViewToolBar;
+import de.jreality.plugin.content.ContentAppearance;
+import de.jreality.plugin.content.ContentLoader;
+import de.jreality.plugin.content.ContentTools;
+import de.jreality.plugin.menu.BackgroundColor;
+import de.jreality.plugin.menu.CameraMenu;
+import de.jreality.plugin.menu.DisplayOptions;
+import de.jreality.plugin.menu.ExportMenu;
 import de.jreality.util.NativePathUtility;
 import de.jreality.util.Secure;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
@@ -116,19 +126,25 @@ public abstract class VarylabStartupDefinition {
 				v.setSplashScreen(splash);
 				v.getController().setManageLookAndFeel(false);
 				v.getController().setSaveOnExit(true);
-//				v.getController().setAskBeforeSaveOnExit(false);
-//				v.getController().setLoadFromUserPropertyFile(false);
-//				v.getController().setUserPropertyFile(getPropertyFileName());
-//				v.setPropertiesFile(getPropertyFileName());
-//				v.setPropertiesResource(VarylabStartupDefinition.this.getClass(), getPropertyFileName());
 				v.getController().setPropertiesMode(PropertiesMode.StaticPropertiesFile);
 				v.getController().setStaticPropertiesFile(new File(getPropertyFileName()));
 				v.setShowPanelSlots(true, true, true, true);
-				v.addContentSupport(ContentType.Raw);
 				v.setShowToolBar(true);
 				v.setShowMenuBar(true);
-				v.addBasicUI();
-				v.addContentUI();
+				// basic ui
+				v.registerPlugin(Inspector.class);
+				v.registerPlugin(BackgroundColor.class);
+				v.registerPlugin(DisplayOptions.class);
+				v.registerPlugin(ViewMenuBar.class);
+				v.registerPlugin(ViewToolBar.class);
+				v.registerPlugin(ExportMenu.class);
+				v.registerPlugin(CameraMenu.class);
+				// content
+				v.addContentSupport(ContentType.Raw);
+				v.registerPlugin(ContentTools.class);
+				v.registerPlugin(ContentAppearance.class);
+				v.registerPlugin(ContentLoader.class);
+				// python scripting
 				v.addPythonSupport();
 			}
 		};
