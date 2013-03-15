@@ -9,6 +9,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
+import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
@@ -65,6 +66,7 @@ public class VaryLabGridshells extends VarylabStartupDefinition {
 		classes.add(VarylabMain.class);
 		classes.add(HalfedgeInterface.class);
 		classes.add(OptimizationPanel.class);
+		classes.add(VertexEditorPlugin.class);
 		
 		addOptimizationPlugins(classes);
 		addVisualizerPlugins(classes);
