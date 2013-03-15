@@ -18,6 +18,9 @@
 	<property name="release" value="release"/>
 	<property name="tmp" value="tmp"/>
 	
+	<property name="api_jar" value="VaryLabAPI-${date}.jar"/>
+	<property name="release_jar_ultimate" value="VaryLabUltimate-${date}.jar"/>
+	
 	<path id="conformallab.libraryclasspath">
 		<pathelement location="${lib}/conformallab/DiscreteConformalLab.jar"/>
 		<pathelement location="${lib}/conformallab/batik-awt-util.jar"/>
@@ -84,12 +87,8 @@
 
     <target name="default" description="This is the VaryLab ant build file." depends="compile"/>
 
-	<target name="create tmp folder">
-		<delete dir="${tmp}"/>
-		<mkdir dir="${tmp}"/>
-	</target>
-	
 	<target name="create build folders">
+		<mkdir dir="${tmp}"/>
 		<mkdir dir="${build}"/>
 		<mkdir dir="${release}"/>
 	</target>
@@ -118,7 +117,7 @@
 		</copy>
 	</target>
 	
-	<target name="release jar [ultimate]" depends="compile, create tmp folder">
+	<target name="release jar [ultimate]" depends="compile, api jar">
 		<unjar dest="${tmp}">
 			<fileset dir="${lib}">
 		        <include name="**/*.jar"/>
@@ -131,7 +130,7 @@
 		<delete dir="${tmp}/META-INF"/>
 		<property name="appfolder" value="${release}/VaryLabUltimate-${date}"/>
 		<mkdir dir="${appfolder}"/>
-		<jar jarfile="${appfolder}/VaryLabUltimate-${date}.jar" update="false">
+		<jar jarfile="${appfolder}/${release_jar_ultimate}" update="false">
 			<fileset dir="${build}">
 				<include name="**"/>	
 			</fileset>
@@ -169,17 +168,18 @@
 		</copy>
 		<copy todir="${appfolder}" description="copy initial properties file">
 			<fileset dir="etc" includes="VaryLab.xml"/>
+			<fileset dir="${release}" includes="${api_jar}"/>
 		</copy>
 	</target>
 	
-	<target name="api jar" depends="compile, create tmp folder">
+	<target name="api jar" depends="compile">
 		<unjar src="${lib}/jtem/halfedge.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jtem/halfedgetools.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jtem/jpetsctao.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jtem/jrworkspace.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jreality/jReality.jar" dest="${tmp}"/>
 		<delete dir="${tmp}/META-INF"/>
-		<jar jarfile="${release}/VaryLabAPI-${date}.jar" update="false">
+		<jar jarfile="${release}/${api_jar}" update="false">
 			<fileset dir="${build}">
 				<include name="de/varylab/varylab/hds/*"/>	
 				<include name="de/varylab/varylab/optimization/IterationProtocol**"/>	
@@ -205,12 +205,14 @@
 	</target>
 	
 	<target name="update dependencies">
-		
+		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
+		<copy todir="lib/jtem">
+			<fileset dir="../jrworkspace/jar" includes="jrworkspace.jar"/>
+		</copy>
 	</target>
 	
 	<target name="clean">
 		<delete dir="${build}"/>
-		<delete dir="${release}"/>
 		<delete dir="${tmp}"/>
 	</target>
 

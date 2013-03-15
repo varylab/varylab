@@ -1,6 +1,7 @@
 package de.varylab.varylab.startup;
 
 import java.awt.Image;
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import de.jreality.util.NativePathUtility;
 import de.jreality.util.Secure;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
 import de.jtem.jtao.Tao;
 import de.varylab.varylab.plugin.lnf.TahomaFontSet;
@@ -114,11 +116,13 @@ public abstract class VarylabStartupDefinition {
 				v.setSplashScreen(splash);
 				v.getController().setManageLookAndFeel(false);
 				v.getController().setSaveOnExit(true);
-				v.getController().setAskBeforeSaveOnExit(false);
-				v.getController().setLoadFromUserPropertyFile(false);
-				v.getController().setUserPropertyFile(getPropertyFileName());
-				v.setPropertiesFile(getPropertyFileName());
-				v.setPropertiesResource(VarylabStartupDefinition.this.getClass(), getPropertyFileName());
+//				v.getController().setAskBeforeSaveOnExit(false);
+//				v.getController().setLoadFromUserPropertyFile(false);
+//				v.getController().setUserPropertyFile(getPropertyFileName());
+//				v.setPropertiesFile(getPropertyFileName());
+//				v.setPropertiesResource(VarylabStartupDefinition.this.getClass(), getPropertyFileName());
+				v.getController().setPropertiesMode(PropertiesMode.StaticPropertiesFile);
+				v.getController().setStaticPropertiesFile(new File(getPropertyFileName()));
 				v.setShowPanelSlots(true, true, true, true);
 				v.addContentSupport(ContentType.Raw);
 				v.setShowToolBar(true);
