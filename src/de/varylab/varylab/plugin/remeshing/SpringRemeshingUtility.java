@@ -26,11 +26,11 @@ import de.jtem.jtao.Tao.GetSolutionStatusResult;
 import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
 import de.jtem.jtao.TaoAppAddHess;
 import de.jtem.jtao.TaoApplication;
-import de.varylab.varylab.math.CombinedOptimizableTao.TaoU;
-import de.varylab.varylab.math.SimpleEnergy;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.WeightFunction;
 import de.varylab.varylab.math.functional.SpringFunctional;
+import de.varylab.varylab.math.tao.TaoDomainValue;
+import de.varylab.varylab.math.tao.TaoEnergy;
 import de.varylab.varylab.math.tao.TaoGradient;
 import de.varylab.varylab.math.tao.TaoHessian;
 
@@ -363,9 +363,9 @@ public class SpringRemeshingUtility {
 		
 		@Override
 		public double evaluateObjectiveAndGradient(Vec x, Vec g) {
-			TaoU u = new TaoU(x);
+			TaoDomainValue u = new TaoDomainValue(x);
 			TaoGradient G = new TaoGradient(g);
-			SimpleEnergy E = new SimpleEnergy();
+			TaoEnergy E = new TaoEnergy();
 			fun.evaluate(hds, u, E, G, null);
 			applyConstraints(u, G, null);
 			g.assemble();
@@ -375,7 +375,7 @@ public class SpringRemeshingUtility {
 		
 		@Override
 		public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {
-			TaoU u = new TaoU(x);
+			TaoDomainValue u = new TaoDomainValue(x);
 			TaoHessian taoHess = new TaoHessian(H);
 			fun.evaluate(hds, u, null, null, taoHess);
 			applyConstraints(u, null, taoHess);

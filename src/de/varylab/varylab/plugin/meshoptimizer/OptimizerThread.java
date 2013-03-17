@@ -8,8 +8,8 @@ import de.varylab.varylab.hds.VVertex;
 import de.varylab.varylab.hds.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableNM;
-import de.varylab.varylab.math.ConjugateGradient;
-import de.varylab.varylab.math.Constraint;
+import de.varylab.varylab.math.constraint.Constraint;
+import de.varylab.varylab.math.util.ConjugateGradient;
 
 public class OptimizerThread extends Thread {
 

@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.math.constraint;
 
 import de.jreality.math.Rn;
 

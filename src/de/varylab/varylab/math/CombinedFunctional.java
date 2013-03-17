@@ -18,6 +18,9 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
 import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.math.mtj.MTJGradient;
+import de.varylab.varylab.math.mtj.MTJHessian;
+import de.varylab.varylab.math.tao.TaoEnergy;
 
 public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 
@@ -25,7 +28,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		funList = null;
 	private Map<Functional<?, ?, ?>, Double> 
 		coeffs = null;
-	private SimpleEnergy 
+	private TaoEnergy 
 		E2 = null;
 	private MTJGradient 
 		G2 = null;
@@ -40,7 +43,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		this.dim = dim;
 		this.funList = funList;
 		this.coeffs = coeffs;
-		E2 = new SimpleEnergy();
+		E2 = new TaoEnergy();
 		G2 = new MTJGradient(new DenseVector(dim));
 	}
 	
@@ -63,16 +66,16 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			if (coeff == null || coeff == 0.0) continue;
 			E2.setZero();
 			G2.setZero();
-			SimpleEnergy ener = E == null ? null : E2;
+			TaoEnergy ener = E == null ? null : E2;
 			MTJGradient grad = G == null ? null : G2;
 			MTJHessian hess = H == null ? null : new MTJHessian(new DenseMatrix(dim, dim));;
 			fun.evaluate(hds, x, ener, grad, hess);
 			if (E != null && ener != null) {
-				E.add(coeff * ener.E);
+				E.add(coeff * ener.get());
 			}
 			if (G != null && grad != null) {
 				for (int i = 0; i < dim; i++) {
-					double val = coeff * grad.G.get(i);
+					double val = coeff * grad.get(i);
 					if (val != 0.0) {
 						G.add(i, val);
 					}
@@ -81,7 +84,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			if (H != null && hess != null) {
 				for (int i = 0; i < dim; i++) {
 					for (int j = 0; j < dim; j++) {
-						double val = coeff * hess.H.get(i, j);
+						double val = coeff * hess.get(i, j);
 						if (val != 0.0) {
 							H.add(i, j, val);
 						}

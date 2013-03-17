@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.math.constraint;
 
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;

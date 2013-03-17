@@ -31,7 +31,7 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
-import de.varylab.varylab.math.CollectionUtility;
+import de.varylab.varylab.math.util.CollectionUtility;
 
 public class StarPlanarityVisualizer extends VisualizerPlugin implements ChangeListener, ActionListener {
 

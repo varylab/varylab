@@ -7,7 +7,6 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.jtem.jpetsc.InsertMode;
 import de.jtem.jpetsc.Mat;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
@@ -15,6 +14,11 @@ import de.jtem.jtao.TaoAppAddHess;
 import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.VertexDomainValueAdapter;
+import de.varylab.varylab.math.constraint.Constraint;
+import de.varylab.varylab.math.tao.TaoDomainValue;
+import de.varylab.varylab.math.tao.TaoEnergy;
+import de.varylab.varylab.math.tao.TaoGradient;
+import de.varylab.varylab.math.tao.TaoHessian;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class CombinedOptimizableTao extends TaoApplication implements
@@ -47,102 +51,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 		this.smoothing = smoothing;
 	}
 
-	public static class TaoU implements DomainValue {
 
-		private Vec
-			u = null;
-		
-		public TaoU(Vec u) {
-			this.u = u;
-		}
-
-		@Override
-		public void add(int i, double value) {
-			u.add(i, value);
-		}
-
-		@Override
-		public void set(int i, double value) {
-			u.setValue(i, value, InsertMode.INSERT_VALUES);
-		}
-
-		@Override
-		public void setZero() {
-			u.zeroEntries();
-		}
-
-		@Override
-		public double get(int i) {
-			return u.getValue(i);
-		}
-		
-	}
-	
-	
-	private static class TaoGradient implements Gradient {
-
-		private Vec
-			G = null;
-		
-		public TaoGradient(Vec G) {
-			this.G = G;
-		}
-		
-		@Override
-		public void add(int i, double value) {
-			G.add(i, value);
-		}
-
-		@Override
-		public void set(int i, double value) {
-			G.setValue(i, value, InsertMode.INSERT_VALUES);
-		}
-		
-		@Override
-		public void setZero() {
-			G.zeroEntries();
-		}
-
-		@Override
-		public double get(int i) {
-			return G.getValue(i);
-		}
-		
-	}
-	
-	
-	private static class TaoHessian implements Hessian {
-		
-		private Mat
-			H = null;
-		
-		public TaoHessian(Mat H) {
-			this.H = H;
-		}
-
-		@Override
-		public void add(int i, int j, double value) {
-			H.add(i, j, value);
-		}
-
-		@Override
-		public void setZero() {
-			H.zeroEntries();
-		}
-
-		@Override
-		public void set(int i, int j, double value) {
-			H.setValue(i, j, value, InsertMode.INSERT_VALUES);
-		}
-		
-		@Override
-		public double get(int i, int j) {
-			return H.getValue(i, j);
-		}
-		
-	}
-	
-	
 	private void applyConstraints(DomainValue x, Gradient G, Hessian H) {
 		for (Constraint c : constraints) {
 			if (G != null) {
@@ -157,9 +66,9 @@ public class CombinedOptimizableTao extends TaoApplication implements
 
 	@Override
 	public double evaluateObjectiveAndGradient(Vec x, Vec g) {
-		TaoU u = new TaoU(x);
+		TaoDomainValue u = new TaoDomainValue(x);
 		TaoGradient G = new TaoGradient(g);
-		SimpleEnergy E = new SimpleEnergy();
+		TaoEnergy E = new TaoEnergy();
 		fun.evaluate(hds, u, E, G, null);
 		applyConstraints(u, G, null);
 		if(smoothing) applySmoothing(u);
@@ -174,7 +83,7 @@ public class CombinedOptimizableTao extends TaoApplication implements
 
 	@Override
 	public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {
-		TaoU u = new TaoU(x);
+		TaoDomainValue u = new TaoDomainValue(x);
 		TaoHessian taoHess = new TaoHessian(H);
 		fun.evaluate(hds, u, null, null, taoHess);
 		applyConstraints(u, null, taoHess);

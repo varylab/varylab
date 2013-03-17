@@ -17,23 +17,24 @@ public class TaoHessian implements Hessian {
 	}
 
 	@Override
-	public void add(int i, int j, double value) {
-		H.add(i, j, value);
+	public double get(int i, int j) {
+		return H.getValue(i, j);
 	}
-
+	@Override
+	public void add(int i, int j, double value) {
+		H.setValue(i, j, value, InsertMode.ADD_VALUES);
+	}
+	@Override
+	public void set(int i, int j, double value) {
+		H.setValue(i, j, value, InsertMode.INSERT_VALUES);
+	}
 	@Override
 	public void setZero() {
 		H.zeroEntries();
 	}
 
-	@Override
-	public void set(int i, int j, double value) {
-		H.setValue(i, j, value, InsertMode.INSERT_VALUES);
-	}
-	
-	@Override
-	public double get(int i, int j) {
-		return H.getValue(i, j);
+	public Mat getMat() {
+		return H;
 	}
 	
 }

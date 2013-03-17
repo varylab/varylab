@@ -6,7 +6,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.VertexGradientAdapter;
-import de.varylab.varylab.math.Constraint;
+import de.varylab.varylab.math.constraint.Constraint;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class SmoothGradientConstraint implements Constraint {

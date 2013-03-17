@@ -4,6 +4,7 @@ import de.jreality.math.Rn;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
 import de.jtem.jtao.TaoApplication;
+import de.varylab.varylab.math.tao.TaoEnergy;
 
 public class LeastSquaresSphereTao extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad {
 
@@ -16,7 +17,7 @@ public class LeastSquaresSphereTao extends TaoApplication implements TaoAppAddCo
 	
 	@Override
 	public double evaluateObjectiveAndGradient(Vec x, Vec g) {
-		SimpleEnergy E = new SimpleEnergy();
+		TaoEnergy E = new TaoEnergy();
 		g.set(0);
 		double[] m = new double[]{x.getValue(0),x.getValue(1),x.getValue(2)};
 		double r = x.getValue(3);

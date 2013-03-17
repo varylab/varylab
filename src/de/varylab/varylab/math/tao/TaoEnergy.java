@@ -1,10 +1,10 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.math.tao;
 
 import de.jtem.halfedgetools.functional.Energy;
 
-public class SimpleEnergy implements Energy {
+public class TaoEnergy implements Energy {
 
-	protected double 
+	private double 
 		E = 0.0;
 	
 	@Override

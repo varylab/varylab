@@ -9,7 +9,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
-import de.varylab.varylab.math.CollectionUtility;
+import de.varylab.varylab.math.util.CollectionUtility;
 
 public class VolumeFunctionalUtils {
 
