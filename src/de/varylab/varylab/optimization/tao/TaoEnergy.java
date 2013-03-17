@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.tao;
+package de.varylab.varylab.optimization.tao;
 
 import de.jtem.halfedgetools.functional.Energy;
 

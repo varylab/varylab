@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.constraint;
+package de.varylab.varylab.optimization.constraint;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedgetools.functional.DomainValue;

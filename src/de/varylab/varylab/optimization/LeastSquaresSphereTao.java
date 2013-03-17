@@ -1,10 +1,10 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.optimization;
 
 import de.jreality.math.Rn;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.TaoAppAddCombinedObjectiveAndGrad;
 import de.jtem.jtao.TaoApplication;
-import de.varylab.varylab.math.tao.TaoEnergy;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
 
 public class LeastSquaresSphereTao extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad {
 

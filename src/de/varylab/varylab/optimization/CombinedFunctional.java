@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.optimization;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,9 +18,9 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.math.mtj.MTJGradient;
-import de.varylab.varylab.math.mtj.MTJHessian;
-import de.varylab.varylab.math.tao.TaoEnergy;
+import de.varylab.varylab.optimization.mtj.MTJGradient;
+import de.varylab.varylab.optimization.mtj.MTJHessian;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
 
 public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 

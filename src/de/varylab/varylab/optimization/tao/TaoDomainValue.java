@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.varylab.varylab.math.tao;
+package de.varylab.varylab.optimization.tao;
 
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.jpetsc.InsertMode;

@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.util;
+package de.varylab.varylab.optimization.util;
 
 import java.util.Collection;
 import java.util.Collections;

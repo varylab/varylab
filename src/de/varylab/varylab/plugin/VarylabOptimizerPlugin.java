@@ -12,7 +12,7 @@ import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.math.IterationProtocol;
+import de.varylab.varylab.optimization.IterationProtocol;
 
 public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UIFlavor {
 

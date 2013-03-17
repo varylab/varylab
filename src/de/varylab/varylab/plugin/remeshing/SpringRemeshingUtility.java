@@ -29,10 +29,10 @@ import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.functional.SpringFunctional;
 import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.functional.EdgeLengthAdapters.WeightFunction;
-import de.varylab.varylab.math.tao.TaoDomainValue;
-import de.varylab.varylab.math.tao.TaoEnergy;
-import de.varylab.varylab.math.tao.TaoGradient;
-import de.varylab.varylab.math.tao.TaoHessian;
+import de.varylab.varylab.optimization.tao.TaoDomainValue;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
+import de.varylab.varylab.optimization.tao.TaoGradient;
+import de.varylab.varylab.optimization.tao.TaoHessian;
 
 public class SpringRemeshingUtility {
 

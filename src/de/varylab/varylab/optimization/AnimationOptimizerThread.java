@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.meshoptimizer;
+package de.varylab.varylab.optimization;
 
 import javax.swing.SwingUtilities;
 
@@ -6,12 +6,10 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
-import de.varylab.varylab.math.CombinedFunctional;
-import de.varylab.varylab.math.CombinedOptimizableNM;
-import de.varylab.varylab.math.constraint.Constraint;
-import de.varylab.varylab.math.util.ConjugateGradient;
+import de.varylab.varylab.optimization.constraint.Constraint;
+import de.varylab.varylab.optimization.util.ConjugateGradient;
 
-public class OptimizerThread extends Thread {
+public class AnimationOptimizerThread extends Thread {
 
 	private CombinedOptimizableNM 
 		opt = null;
@@ -29,7 +27,7 @@ public class OptimizerThread extends Thread {
 
 	private boolean watchFunctionValue = true;
 
-	public OptimizerThread() {
+	public AnimationOptimizerThread() {
 		super("OptimizerThread");
 	}
 	

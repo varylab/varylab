@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.optimization;
 
 import java.awt.EventQueue;
 import java.util.Collections;

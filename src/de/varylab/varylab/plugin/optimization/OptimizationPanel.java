@@ -53,17 +53,17 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
-import de.varylab.varylab.math.CombinedFunctional;
-import de.varylab.varylab.math.CombinedOptimizableTao;
-import de.varylab.varylab.math.IterationProtocol;
-import de.varylab.varylab.math.OptimizationListener;
-import de.varylab.varylab.math.OptimizationThread;
-import de.varylab.varylab.math.constraint.FixingConstraint;
-import de.varylab.varylab.math.constraint.SmoothGradientConstraint;
-import de.varylab.varylab.math.constraint.TangentialConstraint;
+import de.varylab.varylab.optimization.AnimationOptimizerThread;
+import de.varylab.varylab.optimization.CombinedFunctional;
+import de.varylab.varylab.optimization.CombinedOptimizableTao;
+import de.varylab.varylab.optimization.IterationProtocol;
+import de.varylab.varylab.optimization.OptimizationListener;
+import de.varylab.varylab.optimization.OptimizationThread;
+import de.varylab.varylab.optimization.constraint.FixingConstraint;
+import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
+import de.varylab.varylab.optimization.constraint.TangentialConstraint;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.image.ImageHook;
-import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
 
 public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
 	
@@ -111,8 +111,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	private JSpinner
 		accuracySpinner = new JSpinner(accuracyModel),
 		maxIterationSpinner = new JSpinner(maxIterationsModel);
-	private OptimizerThread 
-		optThread = new OptimizerThread();
+	private AnimationOptimizerThread 
+		optThread = new AnimationOptimizerThread();
 	
 	private double 
 		maxz_before = Double.NEGATIVE_INFINITY;

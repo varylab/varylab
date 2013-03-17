@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.mtj;
+package de.varylab.varylab.optimization.mtj;
 
 import no.uib.cipr.matrix.Matrix;
 import de.jtem.halfedgetools.functional.Hessian;

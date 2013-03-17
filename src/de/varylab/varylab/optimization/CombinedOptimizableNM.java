@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.optimization;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,8 +9,8 @@ import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariablesWithGradient;
 import de.jtem.numericalMethods.util.Arrays;
 import de.varylab.varylab.halfedge.VHDS;
-import de.varylab.varylab.math.constraint.Constraint;
-import de.varylab.varylab.math.tao.TaoEnergy;
+import de.varylab.varylab.optimization.constraint.Constraint;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
 
 public class CombinedOptimizableNM implements RealFunctionOfSeveralVariablesWithGradient {
 

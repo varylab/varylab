@@ -1,4 +1,4 @@
-package de.varylab.varylab.math;
+package de.varylab.varylab.optimization;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,11 +14,11 @@ import de.jtem.jtao.TaoAppAddHess;
 import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.adapter.VertexDomainValueAdapter;
-import de.varylab.varylab.math.constraint.Constraint;
-import de.varylab.varylab.math.tao.TaoDomainValue;
-import de.varylab.varylab.math.tao.TaoEnergy;
-import de.varylab.varylab.math.tao.TaoGradient;
-import de.varylab.varylab.math.tao.TaoHessian;
+import de.varylab.varylab.optimization.constraint.Constraint;
+import de.varylab.varylab.optimization.tao.TaoDomainValue;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
+import de.varylab.varylab.optimization.tao.TaoGradient;
+import de.varylab.varylab.optimization.tao.TaoHessian;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class CombinedOptimizableTao extends TaoApplication implements

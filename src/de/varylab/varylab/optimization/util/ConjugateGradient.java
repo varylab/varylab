@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-package de.varylab.varylab.math.util;
+package de.varylab.varylab.optimization.util;
 
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariablesWithGradient;
 import de.jtem.numericalMethods.calculus.minimizing.BrentOnLine;

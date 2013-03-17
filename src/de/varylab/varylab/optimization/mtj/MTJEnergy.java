@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.mtj;
+package de.varylab.varylab.optimization.mtj;
 
 import de.jtem.halfedgetools.functional.Energy;
 

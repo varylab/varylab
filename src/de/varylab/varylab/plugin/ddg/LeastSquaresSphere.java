@@ -16,7 +16,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jpetsc.InsertMode;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
-import de.varylab.varylab.math.LeastSquaresSphereTao;
+import de.varylab.varylab.optimization.LeastSquaresSphereTao;
 
 public class LeastSquaresSphere extends AlgorithmPlugin {
 

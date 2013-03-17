@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.constraint;
+package de.varylab.varylab.optimization.constraint;
 
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;

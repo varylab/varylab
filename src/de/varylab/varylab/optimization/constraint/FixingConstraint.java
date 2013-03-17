@@ -1,4 +1,4 @@
-package de.varylab.varylab.math.constraint;
+package de.varylab.varylab.optimization.constraint;
 
 import java.util.Collection;
 
