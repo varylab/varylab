@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/HyperbolicNets.jar"/>
-	<classpathentry kind="lib" path="lib/jtem/jpetsctao.jar"/>
+	<classpathentry kind="lib" path="lib/jtem/jpetsctao.jar" sourcepath="/jPETSc"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedge.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedgetools.jar" sourcepath="/halfedgetools"/>
 	<classpathentry kind="lib" path="lib/jtem/jrworkspace.jar" sourcepath="/jrworkspace"/>

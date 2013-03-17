@@ -2,7 +2,7 @@ package de.varylab.varylab.halfedge.adapter;
 
 import java.util.Map;
 
-import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 
 public class MapLengthAdapter implements Length<VEdge> {

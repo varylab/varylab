@@ -1,7 +1,7 @@
 package de.varylab.varylab.halfedge.adapter;
 
 import de.jreality.math.Rn;
-import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;

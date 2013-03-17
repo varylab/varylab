@@ -1,7 +1,7 @@
 package de.varylab.varylab.halfedge.adapter;
 
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.varylab.varylab.functional.EdgeLengthAdapters.WeightFunction;
+import de.varylab.varylab.functional.adapter.WeightFunction;
 import de.varylab.varylab.halfedge.VEdge;
 
 public class ConstantWeight implements WeightFunction<VEdge> {

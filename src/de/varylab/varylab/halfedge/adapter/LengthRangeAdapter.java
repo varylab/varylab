@@ -3,7 +3,7 @@ package de.varylab.varylab.halfedge.adapter;
 import de.jreality.math.Rn;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
-import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 
 public class LengthRangeAdapter implements Length<VEdge> {

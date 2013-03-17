@@ -17,7 +17,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.DiagonalDistanceFunctional;
 import de.varylab.varylab.functional.VolumeFunctional;
-import de.varylab.varylab.functional.PlanarFacesAdapters.VolumeWeight;
+import de.varylab.varylab.functional.adapter.VolumeWeight;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;

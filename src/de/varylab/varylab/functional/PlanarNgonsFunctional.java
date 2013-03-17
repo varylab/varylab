@@ -10,7 +10,7 @@ import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.functional.PlanarFacesAdapters.VolumeWeight;
+import de.varylab.varylab.functional.adapter.VolumeWeight;
 
 public class PlanarNgonsFunctional <
 	V extends Vertex<V, E, F>,

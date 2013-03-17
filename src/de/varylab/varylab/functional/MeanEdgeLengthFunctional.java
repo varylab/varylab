@@ -16,8 +16,8 @@ import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
-import de.varylab.varylab.functional.EdgeLengthAdapters.WeightFunction;
+import de.varylab.varylab.functional.adapter.Length;
+import de.varylab.varylab.functional.adapter.WeightFunction;
 
 public class MeanEdgeLengthFunctional <
 	V extends Vertex<V, E, F>,

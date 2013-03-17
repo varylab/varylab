@@ -2,7 +2,7 @@ package de.varylab.varylab.halfedge.adapter;
 
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Weight;
-import de.varylab.varylab.functional.EdgeLengthAdapters.WeightFunction;
+import de.varylab.varylab.functional.adapter.WeightFunction;
 import de.varylab.varylab.halfedge.VEdge;
 
 public class AdaptedEdgeWeightFunction implements WeightFunction<VEdge> {

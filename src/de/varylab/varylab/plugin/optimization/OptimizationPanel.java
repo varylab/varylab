@@ -32,7 +32,6 @@ import de.jreality.plugin.basic.View;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.MyDomainValue;
 import de.jtem.halfedgetools.functional.MyEnergy;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -62,6 +61,8 @@ import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
+import de.varylab.varylab.optimization.mtj.MTJGradient;
+import de.varylab.varylab.optimization.tao.TaoUtility;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.image.ImageHook;
 
@@ -250,7 +251,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		
 		app.setInitialSolutionVec(x);
 		if (fun.hasHessian()) {
-			Mat H = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, getPETScNonZeros(hds, fun));
+			Mat H = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, TaoUtility.getPETScNonZeros(hds, fun));
 			H.assemble();
 			app.setHessianMat(H, H);
 		} else {
@@ -347,16 +348,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	
-	public static int[] getPETScNonZeros(VHDS hds, CombinedFunctional fun){
-		int [][] sparseStucture = fun.getNonZeroPattern(hds);
-		int [] nnz = new int[sparseStucture.length];
-		for(int i = 0; i < nnz.length; i++){
-			nnz[i] = sparseStucture[i].length;
-		}
-		return nnz;
-	}
-	
-	
 	public CombinedFunctional createFunctional(VHDS hds) {
 		int dim = hds.numVertices() * 3;
 		DomainValue x = createPositionValue(hds);
@@ -394,42 +385,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		return new MyDomainValue(u);
 	}
-	
-	
-	
-	protected static class MTJGradient implements Gradient {
-
-		protected Vector
-			G = null;
-		
-		public MTJGradient(Vector G) {
-			this.G = G;
-		}
-		
-		@Override
-		public void add(int i, double value) {
-			G.add(i, value);
-		}
-
-		@Override
-		public void set(int i, double value) {
-			G.set(i, value);
-		}
-		
-		@Override
-		public void setZero() {
-			G.zero();
-		}
-		
-		@Override
-		public double get(int i) {
-			return G.get(i);
-		}
-		
-	}
-	
-	
-	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -535,7 +490,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		pluginsPanel = c.getPlugin(OptimizerPluginsPanel.class);
-//		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
+		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
 	}
 	
 	@Override

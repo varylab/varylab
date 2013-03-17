@@ -24,7 +24,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.SpringFunctional;
-import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;

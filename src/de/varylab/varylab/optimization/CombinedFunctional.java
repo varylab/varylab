@@ -1,5 +1,7 @@
 package de.varylab.varylab.optimization;
 
+import static de.jtem.jpetsc.MatStructure.SAME_NONZERO_PATTERN;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -7,20 +9,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import no.uib.cipr.matrix.DenseMatrix;
-import no.uib.cipr.matrix.DenseVector;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
+import de.jtem.jpetsc.Mat;
+import de.jtem.jpetsc.PETSc;
+import de.jtem.jpetsc.Vec;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.optimization.mtj.MTJGradient;
-import de.varylab.varylab.optimization.mtj.MTJHessian;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
+import de.varylab.varylab.optimization.tao.TaoGradient;
+import de.varylab.varylab.optimization.tao.TaoHessian;
+import de.varylab.varylab.optimization.tao.TaoUtility;
 
 public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 
@@ -30,8 +34,10 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		coeffs = null;
 	private TaoEnergy 
 		E2 = null;
-	private MTJGradient 
+	private TaoGradient 
 		G2 = null;
+	private TaoHessian
+		H2 = null;
 	private int
 		dim = 0;
 	
@@ -44,7 +50,8 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 		this.funList = funList;
 		this.coeffs = coeffs;
 		E2 = new TaoEnergy();
-		G2 = new MTJGradient(new DenseVector(dim));
+		Vec gVec = new Vec(dim);
+		G2 = new TaoGradient(gVec);
 	}
 	
 	
@@ -60,33 +67,50 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 	) {
 		if (E != null) E.setZero();
 		if (G != null) G.setZero();
-		if (H != null) H.setZero();
+		if (H != null) {
+			H.setZero();
+			if (H2 == null) {
+				int[] taonzp = TaoUtility.getPETScNonZeros(hds, this);
+				Mat hMat = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, taonzp);
+				H2 = new TaoHessian(hMat);
+			}
+		}
 		for (Functional<VVertex, VEdge, VFace> fun : funList) {
 			Double coeff = coeffs.get(fun);
 			if (coeff == null || coeff == 0.0) continue;
 			E2.setZero();
 			G2.setZero();
 			TaoEnergy ener = E == null ? null : E2;
-			MTJGradient grad = G == null ? null : G2;
-			MTJHessian hess = H == null ? null : new MTJHessian(new DenseMatrix(dim, dim));;
+			TaoGradient grad = G == null ? null : G2;
+			TaoHessian hess = H == null ? null : H2;
 			fun.evaluate(hds, x, ener, grad, hess);
 			if (E != null && ener != null) {
 				E.add(coeff * ener.get());
 			}
 			if (G != null && grad != null) {
-				for (int i = 0; i < dim; i++) {
-					double val = coeff * grad.get(i);
-					if (val != 0.0) {
-						G.add(i, val);
+				if (G instanceof TaoGradient) {
+					TaoGradient cGrad = (TaoGradient)G;
+					cGrad.getVec().aXPY(coeff, grad.getVec());
+				} else {
+					for (int i = 0; i < dim; i++) {
+						double val = coeff * grad.get(i);
+						if (val != 0.0) {
+							G.add(i, val);
+						}
 					}
 				}
 			}
 			if (H != null && hess != null) {
-				for (int i = 0; i < dim; i++) {
-					for (int j = 0; j < dim; j++) {
-						double val = coeff * hess.get(i, j);
-						if (val != 0.0) {
-							H.add(i, j, val);
+				if (H instanceof TaoHessian) {
+					TaoHessian cHess = (TaoHessian)H;
+					cHess.getMat().aXPY(coeff, hess.getMat(), SAME_NONZERO_PATTERN);
+				} else {
+					for (int i = 0; i < dim; i++) {
+						for (int j = 0; j < dim; j++) {
+							double val = coeff * hess.get(i, j);
+							if (val != 0.0) {
+								H.add(i, j, val);
+							}
 						}
 					}
 				}

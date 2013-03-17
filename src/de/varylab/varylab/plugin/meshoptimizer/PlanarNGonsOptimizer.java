@@ -7,7 +7,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.PlanarNgonsFunctional;
-import de.varylab.varylab.functional.PlanarFacesAdapters.VolumeWeight;
+import de.varylab.varylab.functional.adapter.VolumeWeight;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
