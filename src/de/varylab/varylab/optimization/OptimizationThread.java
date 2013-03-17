@@ -63,7 +63,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationStarted(application, maxIterations);						
+						l.optimizationStarted(solver, application, maxIterations);						
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -76,7 +76,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationProgress(application, iteration);
+						l.optimizationProgress(solver, application, iteration);
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -89,7 +89,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationFinished(application);
+						l.optimizationFinished(solver, application);
 					}
 				};
 				EventQueue.invokeLater(delegate);

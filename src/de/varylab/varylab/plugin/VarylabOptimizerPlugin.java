@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin;
 
+import java.util.Random;
+
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -14,8 +16,13 @@ import de.varylab.varylab.optimization.IterationProtocol;
 
 public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UIFlavor {
 
-	public abstract Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds);
+	private final static Random
+		idRnd = new Random();
+	protected final long
+		gradientId = idRnd.nextLong(),
+		protocolId = idRnd.nextLong();
 	
+	public abstract Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds);
 	public abstract String getName();
 	
 	public JPanel getOptionPanel() {

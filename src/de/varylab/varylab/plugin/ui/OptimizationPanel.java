@@ -46,6 +46,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
+import de.jtem.jtao.Tao.GetSolutionStatusResult;
 import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.hds.VEdge;
 import de.varylab.varylab.hds.VFace;
@@ -56,6 +57,7 @@ import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableTao;
 import de.varylab.varylab.math.FixingConstraint;
 import de.varylab.varylab.math.TangentialConstraint;
+import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
@@ -68,8 +70,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		hif = null;
 	private OptimizerPluginsPanel
 		pluginsPanel = null;
-//	private IterationProtocolPanel
-//		protocolPanel = null;
+	private IterationProtocolPanel
+		protocolPanel = null;
 	private OptimizationThread
 		activeJob = null;
 	private JProgressBar
@@ -277,7 +279,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationStarted(TaoApplication app, int maxIterations) {
+	public void optimizationStarted(Tao solver, TaoApplication app, int maxIterations) {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(maxIterations);
 		progressBar.setValue(0);
@@ -286,23 +288,25 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationProgress(TaoApplication app, int iteration) {
+	public void optimizationProgress(Tao solver, TaoApplication app, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
-//		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-//			IterationProtocol p = op.getIterationProtocol(solver);
-//			protocolPanel.appendIterationProtocol(p);
-//		}
+		List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
+		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+			protocol.add(op.getIterationProtocol(solver));
+		}
+		protocolPanel.appendIterationProtocol(protocol);
 	}
 	
 	
 	@Override
-	public void optimizationFinished(TaoApplication app) {
-		progressBar.setString("Finished");
-//		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
-//		String status = stat.toString().replace("getSolutionStatus : ", "");
-//		System.out.println("optimization status ------------------------------------");
-//		System.out.println(status);
+	public void optimizationFinished(Tao solver, TaoApplication app) {
+		GetSolutionStatusResult stat = solver.getSolutionStatus();
+		String status = stat.toString().replace("getSolutionStatus : ", "");
+		System.out.println("optimization status ------------------------------------");
+		System.out.println(status);
+		progressBar.setString("Finished " + stat.reason);
+		
 		Vec x = app.getSolutionVec();
 		double maxz_after= Double.NEGATIVE_INFINITY;
 		if(fixHeightChecker.isSelected()) {

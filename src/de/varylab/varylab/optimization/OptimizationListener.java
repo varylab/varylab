@@ -1,11 +1,12 @@
 package de.varylab.varylab.optimization;
 
+import de.jtem.jtao.Tao;
 import de.jtem.jtao.TaoApplication;
 
 public interface OptimizationListener {
 
-	public void optimizationStarted(TaoApplication app, int maxIterations);
-	public void optimizationProgress(TaoApplication app, int interation);
-	public void optimizationFinished(TaoApplication app);
+	public void optimizationStarted(Tao solver, TaoApplication app, int maxIterations);
+	public void optimizationProgress(Tao solver, TaoApplication app, int interation);
+	public void optimizationFinished(Tao solver, TaoApplication app);
 	
 }
