@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui.nodeeditor;
+package de.varylab.varylab.plugin.nodeeditor;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;

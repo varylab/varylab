@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import com.sun.awt.AWTUtilities;
 
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 import de.varylab.varylab.startup.image.SplashImageHook;
 
 public class VarylabSplashScreen extends SplashScreen {

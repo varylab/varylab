@@ -37,7 +37,7 @@
  *
  */
 
-package de.varylab.varylab.plugin.ui.nodeeditor;
+package de.varylab.varylab.plugin.nodeeditor;
 
 import java.beans.BeanDescriptor;
 import java.beans.BeanInfo;

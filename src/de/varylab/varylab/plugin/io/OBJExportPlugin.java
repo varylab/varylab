@@ -23,7 +23,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class OBJExportPlugin extends AlgorithmPlugin implements UIFlavor {
 

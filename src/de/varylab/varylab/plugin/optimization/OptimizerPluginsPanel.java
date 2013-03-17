@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui;
+package de.varylab.varylab.plugin.optimization;
 
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 

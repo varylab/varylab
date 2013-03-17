@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui.nodeeditor;
+package de.varylab.varylab.plugin.nodeeditor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +7,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 
-public class IntegerValueContainer {
+public class BooleanValueContainer {
 	
 	protected List<Node<?,?,?>>
 		editedNodes = new LinkedList<Node<?,?,?>>();
@@ -15,21 +15,21 @@ public class IntegerValueContainer {
 		adapter = null;
 	protected AdapterSet
 		auxAdapters = new AdapterSet();
-	protected int
-		value = 0;
+	protected boolean
+		value = false;
 	
-	public IntegerValueContainer(int value, List<Node<?,?,?>> nodes, Adapter<Object> adapter, AdapterSet auxAdapters) {
+	public BooleanValueContainer(boolean value, List<Node<?,?,?>> nodes, Adapter<Object> adapter, AdapterSet auxAdapters) {
 		this.editedNodes = nodes;
 		this.value = value;
 		this.adapter = adapter;
 		this.auxAdapters = auxAdapters;
 	}
 	
-	public int getValue() {
+	public boolean getValue() {
 		return value;
 	}
 	
-	public void setValue(int value) {
+	public void setValue(boolean value) {
 		this.value = value;
 		for (Node<?,?,?> n : editedNodes) {
 			adapter.set(n, value, auxAdapters);

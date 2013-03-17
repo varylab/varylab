@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui;
+package de.varylab.varylab.plugin.optimization;
 
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
@@ -56,13 +56,14 @@ import de.varylab.varylab.hds.adapter.CoordinatePetscAdapter;
 import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableTao;
 import de.varylab.varylab.math.constraint.FixingConstraint;
+import de.varylab.varylab.math.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.math.constraint.TangentialConstraint;
 import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
+import de.varylab.varylab.plugin.image.ImageHook;
 import de.varylab.varylab.plugin.meshoptimizer.OptimizerThread;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
 	

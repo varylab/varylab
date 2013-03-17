@@ -14,7 +14,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class CollapseToNeighborPlugin extends AlgorithmPlugin{
 

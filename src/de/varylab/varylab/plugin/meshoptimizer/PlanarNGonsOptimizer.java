@@ -14,7 +14,7 @@ import de.varylab.varylab.hds.adapter.AdaptedFaceWeightFunction;
 import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.math.functional.PlanarNgonsFunctional;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class PlanarNGonsOptimizer extends VarylabOptimizerPlugin {
 

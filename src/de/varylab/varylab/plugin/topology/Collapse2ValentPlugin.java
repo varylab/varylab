@@ -15,7 +15,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class Collapse2ValentPlugin extends AlgorithmPlugin{
 

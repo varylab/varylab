@@ -12,8 +12,8 @@ import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
-import de.varylab.varylab.plugin.ui.IterationProtocolPanel;
-import de.varylab.varylab.plugin.ui.OptimizationPanel;
+import de.varylab.varylab.plugin.optimization.IterationProtocolPanel;
+import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
 
 public class VaryLabExperimental extends VarylabStartupDefinition {

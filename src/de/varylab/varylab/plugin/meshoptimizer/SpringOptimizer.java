@@ -35,7 +35,7 @@ import de.varylab.varylab.hds.adapter.OriginalLength;
 import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
 import de.varylab.varylab.math.functional.SpringFunctional;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeListener, ActionListener { 
 	

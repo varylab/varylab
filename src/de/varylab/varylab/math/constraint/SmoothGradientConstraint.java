@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui;
+package de.varylab.varylab.math.constraint;
 
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.DomainValue;
@@ -6,7 +6,6 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.hds.VHDS;
 import de.varylab.varylab.hds.adapter.VertexGradientAdapter;
-import de.varylab.varylab.math.constraint.Constraint;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class SmoothGradientConstraint implements Constraint {

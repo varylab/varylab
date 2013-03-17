@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.ui.image;
+package de.varylab.varylab.plugin.image;
 
 import static java.awt.Image.SCALE_SMOOTH;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;

@@ -38,8 +38,8 @@ import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
 import de.jtem.jtao.Tao;
+import de.varylab.varylab.plugin.image.ImageHook;
 import de.varylab.varylab.plugin.lnf.TahomaFontSet;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
 
 public abstract class VarylabStartupDefinition {
 

@@ -24,7 +24,7 @@ import de.varylab.varylab.math.functional.DiagonalDistanceFunctional;
 import de.varylab.varylab.math.functional.PlanarFacesAdapters.VolumeWeight;
 import de.varylab.varylab.math.functional.VolumeFunctional;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.ui.image.ImageHook;
+import de.varylab.varylab.plugin.image.ImageHook;
 
 public class PlanarQuadsOptimizer extends VarylabOptimizerPlugin {
 
