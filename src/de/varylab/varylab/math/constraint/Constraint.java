@@ -3,7 +3,7 @@ package de.varylab.varylab.math.constraint;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
-import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.halfedge.VHDS;
 
 public interface Constraint{
 	

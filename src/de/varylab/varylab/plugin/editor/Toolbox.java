@@ -19,8 +19,8 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class Toolbox extends ShrinkPanelPlugin implements ActionListener {

@@ -5,9 +5,9 @@ import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VVertex;
 
 public class OddVertexVisualizer extends VisualizerPlugin {
 

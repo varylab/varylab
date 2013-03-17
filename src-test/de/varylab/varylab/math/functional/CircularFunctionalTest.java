@@ -9,10 +9,11 @@ import org.junit.Test;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.MyDomainValue;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.functional.CircularFunctional;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 
 public class CircularFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace> {
 

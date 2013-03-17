@@ -4,11 +4,11 @@ import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.GeodesicCurvatureFunctional;
+import de.varylab.varylab.functional.GeodesicCurvatureFunctional;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.image.ImageHook;
 

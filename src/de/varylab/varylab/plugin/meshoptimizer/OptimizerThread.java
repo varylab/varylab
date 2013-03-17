@@ -3,9 +3,9 @@ package de.varylab.varylab.plugin.meshoptimizer;
 import javax.swing.SwingUtilities;
 
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.hds.adapter.CoordinateArrayAdapter;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.math.CombinedFunctional;
 import de.varylab.varylab.math.CombinedOptimizableNM;
 import de.varylab.varylab.math.constraint.Constraint;

@@ -26,10 +26,10 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 
 public class WeightsVisualizer extends VisualizerPlugin implements ActionListener, ChangeListener {
 

@@ -1,7 +1,7 @@
 package de.varylab.varylab.math.functional.edgelength;
 
 import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
-import de.varylab.varylab.math.functional.EdgeLengthAdapters.Length;
+import de.varylab.varylab.functional.EdgeLengthAdapters.Length;
 
 public class LengthAdapter implements Length<DefaultJREdge> {
 

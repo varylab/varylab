@@ -16,7 +16,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.varylab.varylab.hds.adapter.type.GeodesicLabel;
+import de.varylab.varylab.halfedge.adapter.type.GeodesicLabel;
 
 public class GeodesicUtility {
 

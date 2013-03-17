@@ -15,7 +15,7 @@ import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
-import de.varylab.varylab.math.functional.ElectrostaticFunctional;
+import de.varylab.varylab.functional.ElectrostaticFunctional;
 
 public class ElectrostaticFunctionalTest extends
 		FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {

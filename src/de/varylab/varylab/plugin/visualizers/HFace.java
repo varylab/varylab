@@ -9,9 +9,9 @@ import java.util.HashMap;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.projgeom.P5;
 import de.jtem.projgeom.PlueckerLineGeometry;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.utilities.SelectionUtility;
 
 

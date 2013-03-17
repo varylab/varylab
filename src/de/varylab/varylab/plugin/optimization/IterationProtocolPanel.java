@@ -13,7 +13,7 @@ import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.optimization.IterationProtocol;
+import de.varylab.varylab.math.IterationProtocol;
 import de.varylab.varylab.plugin.VarylabShrinkPlugin;
 
 public class IterationProtocolPanel extends VarylabShrinkPlugin {

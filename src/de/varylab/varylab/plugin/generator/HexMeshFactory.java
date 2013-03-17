@@ -2,8 +2,8 @@ package de.varylab.varylab.plugin.generator;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.utilities.Rectangle2D;
 
 public class HexMeshFactory {

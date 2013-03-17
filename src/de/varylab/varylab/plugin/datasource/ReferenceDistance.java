@@ -11,11 +11,11 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.ReferenceSurfaceFunctional;
+import de.varylab.varylab.functional.ReferenceSurfaceFunctional;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 
 public class ReferenceDistance extends Plugin implements DataSourceProvider {

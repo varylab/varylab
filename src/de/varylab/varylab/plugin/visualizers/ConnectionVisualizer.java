@@ -22,7 +22,7 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
-import de.varylab.varylab.hds.adapter.ConnectionAdapter;
+import de.varylab.varylab.halfedge.adapter.ConnectionAdapter;
 
 public class ConnectionVisualizer extends VisualizerPlugin implements ChangeListener {
 	

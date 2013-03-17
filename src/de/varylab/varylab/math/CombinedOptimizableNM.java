@@ -8,7 +8,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariablesWithGradient;
 import de.jtem.numericalMethods.util.Arrays;
-import de.varylab.varylab.hds.VHDS;
+import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.math.constraint.Constraint;
 import de.varylab.varylab.math.tao.TaoEnergy;
 

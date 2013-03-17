@@ -8,9 +8,9 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.Input;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.adapter.VPositionAdapter;
-import de.varylab.varylab.hds.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
+import de.varylab.varylab.halfedge.adapter.VTexturePositionAdapter;
 
 public class TestUtility {
 

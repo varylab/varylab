@@ -26,8 +26,8 @@ import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VVertex;
 
 public class RemeshingUtility {
 

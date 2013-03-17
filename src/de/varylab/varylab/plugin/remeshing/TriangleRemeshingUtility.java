@@ -3,8 +3,8 @@ package de.varylab.varylab.plugin.remeshing;
 import java.awt.geom.Rectangle2D;
 
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 
 public class TriangleRemeshingUtility {
 

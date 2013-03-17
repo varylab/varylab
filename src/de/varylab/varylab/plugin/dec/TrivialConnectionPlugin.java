@@ -26,9 +26,9 @@ import de.jtem.halfedgetools.dec.VectorFieldMapAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
-import de.varylab.varylab.hds.adapter.ConnectionAdapter;
-import de.varylab.varylab.hds.adapter.type.Connection;
-import de.varylab.varylab.hds.adapter.type.Singularity;
+import de.varylab.varylab.halfedge.adapter.ConnectionAdapter;
+import de.varylab.varylab.halfedge.adapter.type.Connection;
+import de.varylab.varylab.halfedge.adapter.type.Singularity;
 import de.varylab.varylab.utilities.ConnectionUtility;
 
 public class TrivialConnectionPlugin extends AlgorithmPlugin {

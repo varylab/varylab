@@ -17,7 +17,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.dec.VectorFieldMapAdapter;
-import de.varylab.varylab.hds.adapter.ConnectionAdapter;
+import de.varylab.varylab.halfedge.adapter.ConnectionAdapter;
 
 public class ConnectionUtility {
 

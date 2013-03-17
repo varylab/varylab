@@ -2,11 +2,11 @@ package de.varylab.varylab.plugin.meshoptimizer;
 
 
 import de.jtem.halfedgetools.functional.Functional;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.math.functional.EdgeLengthEqualizerFunctional;
+import de.varylab.varylab.functional.EdgeLengthEqualizerFunctional;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 /**

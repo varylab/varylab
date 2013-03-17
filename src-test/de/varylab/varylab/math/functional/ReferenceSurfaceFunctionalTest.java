@@ -11,11 +11,12 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.MyDomainValue;
-import de.varylab.varylab.hds.VEdge;
-import de.varylab.varylab.hds.VFace;
-import de.varylab.varylab.hds.VHDS;
-import de.varylab.varylab.hds.VVertex;
-import de.varylab.varylab.hds.adapter.VPositionAdapter;
+import de.varylab.varylab.functional.ReferenceSurfaceFunctional;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 
 public class ReferenceSurfaceFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace> {
 

@@ -17,7 +17,7 @@ import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
-import de.varylab.varylab.math.functional.GeodesicCurvatureFunctional;
+import de.varylab.varylab.functional.GeodesicCurvatureFunctional;
 
 public class GeodesicCurvatureFunctionalTest extends FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {
 
