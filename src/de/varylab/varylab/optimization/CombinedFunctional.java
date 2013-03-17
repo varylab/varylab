@@ -102,6 +102,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			}
 			if (H != null && hess != null) {
 				if (H instanceof TaoHessian) {
+					hess.getMat().assemble();
 					TaoHessian cHess = (TaoHessian)H;
 					cHess.getMat().aXPY(coeff, hess.getMat(), SAME_NONZERO_PATTERN);
 				} else {

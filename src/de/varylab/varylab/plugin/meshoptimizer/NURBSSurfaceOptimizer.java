@@ -38,7 +38,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.functional.NURBSSurfaceFunctional;
+import de.varylab.varylab.functional.NURBSReferenceSurfaceFunctional;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -51,8 +51,8 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 
 public class NURBSSurfaceOptimizer extends VarylabOptimizerPlugin implements ActionListener {
 
-	private NURBSSurfaceFunctional<VVertex, VEdge, VFace> 
-		functional = new NURBSSurfaceFunctional<VVertex, VEdge, VFace>();
+	private NURBSReferenceSurfaceFunctional<VVertex, VEdge, VFace> 
+		functional = new NURBSReferenceSurfaceFunctional<VVertex, VEdge, VFace>();
 	private NURBSSurface
 		activeSurface = null;
 	private NURBSSurfaceFactory

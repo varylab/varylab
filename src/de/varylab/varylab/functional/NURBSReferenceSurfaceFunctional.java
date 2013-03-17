@@ -16,7 +16,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
-public class NURBSSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>>
+public class NURBSReferenceSurfaceFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>>
 		implements Functional<V, E, F> {
 
 	private HashMap<V, double[]> closestPointMap = new HashMap<V, double[]>();

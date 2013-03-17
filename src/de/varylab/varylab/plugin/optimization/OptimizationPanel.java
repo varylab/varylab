@@ -293,6 +293,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	public void optimizationProgress(Tao solver, TaoApplication app, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
+		progressBar.repaint();
 		List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
 		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
 			protocol.add(op.getIterationProtocol(solver));
