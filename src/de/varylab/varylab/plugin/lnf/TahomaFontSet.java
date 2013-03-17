@@ -15,26 +15,32 @@ public class TahomaFontSet implements FontSet {
 		tahoma11 = new FontUIResource("Tahoma", Font.PLAIN, size);
 	}
 	
+	@Override
 	public FontUIResource getControlFont() {
 		return tahoma11;
 	}
 
+	@Override
 	public FontUIResource getMenuFont() {
 		return tahoma11;
 	}
 
+	@Override
 	public FontUIResource getMessageFont() {
 		return tahoma11;
 	}
 
+	@Override
 	public FontUIResource getSmallFont() {
 		return tahoma11;
 	}
 
+	@Override
 	public FontUIResource getTitleFont() {
 		return tahoma11;
 	}
 
+	@Override
 	public FontUIResource getWindowTitleFont() {
 		return tahoma11;
 	}

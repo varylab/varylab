@@ -247,7 +247,7 @@ public class NURBSCurve {
 		return newCurves;
 	}
 	
-	
+	@Override
 	public String toString() {
 		String str = new String();
 		str = str + "NURBSCurve" + '\n' + "U knot vector" + '\n';
