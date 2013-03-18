@@ -9,7 +9,7 @@ import de.varylab.varylab.optimization.tao.TaoEnergy;
 public class LeastSquaresSphereTao extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad {
 
 	private double[][] 
-	                 data = null;
+	    data = null;
 	
 	public LeastSquaresSphereTao(double[][] points) {
 		data = points;

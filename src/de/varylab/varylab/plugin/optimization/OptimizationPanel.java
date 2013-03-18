@@ -27,9 +27,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.Vector;
-import no.uib.cipr.matrix.Vector.Norm;
 import de.jreality.plugin.basic.View;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Functional;
@@ -61,7 +58,6 @@ import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
-import de.varylab.varylab.optimization.mtj.MTJGradient;
 import de.varylab.varylab.optimization.tao.TaoDomainValue;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
 import de.varylab.varylab.optimization.tao.TaoGradient;
@@ -341,12 +337,13 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		int dim = hds.numVertices() * 3;
 		TaoDomainValue x = createPositionValue(hds);
 		TaoEnergy E = new TaoEnergy();
-		TaoGradient G = new TaoGradient(new Vec(dim));
+		Vec gVec = new Vec(dim);
+		TaoGradient G = new TaoGradient(gVec);
 		CombinedFunctional fun = createFunctional(hds);
 		fun.evaluate(hds, x, E, G, null);
 		double energy = E.get();
 		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
-		System.out.println("Gradient Length: " + G.getVec().norm(NORM_FROBENIUS));
+		System.out.println("Gradient Length: " + gVec.norm(NORM_FROBENIUS));
 	}
 	
 	
@@ -361,10 +358,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			
 			double coeff = pluginsPanel.getCoefficient(op);
 			if (pluginsPanel.isNormalizeEnergies()) {
-				Vector G = new DenseVector(dim);
-				MTJGradient mtjG = new MTJGradient(G);
-				fun.evaluate(hds, x, null, mtjG, null);
-				double gl = G.norm(Norm.TwoRobust);
+				Vec gVec = new Vec(dim);
+				TaoGradient G = new TaoGradient(gVec);
+				fun.evaluate(hds, x, null, G, null);
+				double gl = gVec.norm(NORM_FROBENIUS);
 				if (gl > 1E-8) {
 					coeff /= gl;
 				}
