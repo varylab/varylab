@@ -24,6 +24,9 @@ public class TaoGradient implements Gradient {
 	public void add(int i, double value) {
 		G.setValue(i, value, InsertMode.ADD_VALUES);
 	}
+	public void add(double alpha, TaoGradient g) {
+		G.aXPY(alpha, g.getVec());
+	}
 	@Override
 	public void set(int i, double value) {
 		G.setValue(i, value, InsertMode.INSERT_VALUES);

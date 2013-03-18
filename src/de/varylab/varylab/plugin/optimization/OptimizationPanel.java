@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin.optimization;
 
+import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
+import static de.jtem.jpetsc.NormType.NORM_FROBENIUS;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
 import java.awt.EventQueue;
@@ -30,10 +32,7 @@ import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.Vector.Norm;
 import de.jreality.plugin.basic.View;
 import de.jtem.halfedgetools.functional.DomainValue;
-import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.MyDomainValue;
-import de.jtem.halfedgetools.functional.MyEnergy;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jpetsc.InsertMode;
 import de.jtem.jpetsc.Mat;
@@ -63,6 +62,9 @@ import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
 import de.varylab.varylab.optimization.mtj.MTJGradient;
+import de.varylab.varylab.optimization.tao.TaoDomainValue;
+import de.varylab.varylab.optimization.tao.TaoEnergy;
+import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoUtility;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
@@ -337,15 +339,14 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	private void evaluate() {
 		VHDS hds = hif.get(new VHDS());
 		int dim = hds.numVertices() * 3;
-		DomainValue x = createPositionValue(hds);
-		Energy E = new MyEnergy();
-		Vector G = new DenseVector(dim);
-		MTJGradient mtjG = new MTJGradient(G);
+		TaoDomainValue x = createPositionValue(hds);
+		TaoEnergy E = new TaoEnergy();
+		TaoGradient G = new TaoGradient(new Vec(dim));
 		CombinedFunctional fun = createFunctional(hds);
-		fun.evaluate(hds, x, E, mtjG, null);
+		fun.evaluate(hds, x, E, G, null);
 		double energy = E.get();
 		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
-		System.out.println("Gradient Length: " + G.norm(Norm.TwoRobust));
+		System.out.println("Gradient Length: " + G.getVec().norm(NORM_FROBENIUS));
 	}
 	
 	
@@ -376,15 +377,15 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	
-	public DomainValue createPositionValue(VHDS hds) {
+	public TaoDomainValue createPositionValue(VHDS hds) {
 		int dim = hds.numVertices() * 3;
-		DenseVector u = new DenseVector(dim);
+		Vec u = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
-			u.set(v.getIndex() * 3 + 0, v.P[0]);
-			u.set(v.getIndex() * 3 + 1, v.P[1]);
-			u.set(v.getIndex() * 3 + 2, v.P[2]);
+			u.setValue(v.getIndex() * 3 + 0, v.P[0], INSERT_VALUES);
+			u.setValue(v.getIndex() * 3 + 1, v.P[1], INSERT_VALUES);
+			u.setValue(v.getIndex() * 3 + 2, v.P[2], INSERT_VALUES);
 		}
-		return new MyDomainValue(u);
+		return new TaoDomainValue(u);
 	}
 	
 	@Override

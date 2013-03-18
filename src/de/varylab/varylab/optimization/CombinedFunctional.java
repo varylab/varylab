@@ -1,7 +1,5 @@
 package de.varylab.varylab.optimization;
 
-import static de.jtem.jpetsc.MatStructure.SAME_NONZERO_PATTERN;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,23 +8,21 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.functional.DomainValue;
-import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.Gradient;
-import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.jpetsc.Mat;
 import de.jtem.jpetsc.PETSc;
 import de.jtem.jpetsc.Vec;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.optimization.tao.TaoDomainValue;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
 import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
 import de.varylab.varylab.optimization.tao.TaoUtility;
 
-public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
+public class CombinedFunctional {
 
 	private List<Functional<VVertex, VEdge, VFace>>
 		funList = null;
@@ -55,16 +51,7 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 	}
 	
 	
-	@Override
-	public <
-		HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>
-	> void evaluate(
-		HDS hds, 
-		DomainValue x, 
-		Energy E, 
-		Gradient G, 
-		Hessian H
-	) {
+	public void evaluate(VHDS hds, TaoDomainValue x, TaoEnergy E, TaoGradient G, TaoHessian H) {
 		if (E != null) E.setZero();
 		if (G != null) G.setZero();
 		if (H != null) {
@@ -84,47 +71,22 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 			TaoGradient grad = G == null ? null : G2;
 			TaoHessian hess = H == null ? null : H2;
 			fun.evaluate(hds, x, ener, grad, hess);
-			if (E != null && ener != null) {
+			if (ener != null) {
 				E.add(coeff * ener.get());
 			}
-			if (G != null && grad != null) {
-				if (G instanceof TaoGradient) {
-					TaoGradient cGrad = (TaoGradient)G;
-					cGrad.getVec().aXPY(coeff, grad.getVec());
-				} else {
-					for (int i = 0; i < dim; i++) {
-						double val = coeff * grad.get(i);
-						if (val != 0.0) {
-							G.add(i, val);
-						}
-					}
-				}
+			if (grad != null) {
+				G.add(coeff, grad);
 			}
 			if (H != null && hess != null) {
-				if (H instanceof TaoHessian) {
-					hess.getMat().assemble();
-					TaoHessian cHess = (TaoHessian)H;
-					cHess.getMat().aXPY(coeff, hess.getMat(), SAME_NONZERO_PATTERN);
-				} else {
-					for (int i = 0; i < dim; i++) {
-						for (int j = 0; j < dim; j++) {
-							double val = coeff * hess.get(i, j);
-							if (val != 0.0) {
-								H.add(i, j, val);
-							}
-						}
-					}
-				}
+				H.add(coeff, hess);
 			}
 		}
 	}
 
-	@Override
 	public <HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>> int getDimension(HDS hds) {
 		return hds.numVertices() * 3;
 	}
 
-	@Override
 	public <HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>> int[][] getNonZeroPattern(HDS hds) {
 		if (funList.size() == 1) {
 			return funList.get(0).getNonZeroPattern(hds);
@@ -158,7 +120,6 @@ public class CombinedFunctional implements Functional<VVertex, VEdge, VFace> {
 	}
 	
 	
-	@Override
 	public boolean hasHessian() {
 		boolean hasHessian = true;
 		for (Functional<VVertex, VEdge, VFace> fun : funList) {
