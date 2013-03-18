@@ -23,8 +23,8 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.AdaptedFaceWeightFunction;
+import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.image.ImageHook;
 
 public class PlanarQuadsOptimizer extends VarylabOptimizerPlugin {
 

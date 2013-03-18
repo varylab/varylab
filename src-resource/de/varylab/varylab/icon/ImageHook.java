@@ -1,4 +1,4 @@
-package de.varylab.varylab.startup.image;
+package de.varylab.varylab.icon;
 
 import static java.awt.Image.SCALE_SMOOTH;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
@@ -23,13 +23,13 @@ import de.jreality.util.LoggingSystem;
  * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
  * @author Stefan Sechelmann
  */
-public class SplashImageHook { 
+public class ImageHook { 
 
 	private static Logger
-		log = LoggingSystem.getLogger(SplashImageHook.class);
+		log = LoggingSystem.getLogger(ImageHook.class);
 
 	public static Image getImage(String filename){ 
-		InputStream in = SplashImageHook.class.getResourceAsStream(filename);
+		InputStream in = ImageHook.class.getResourceAsStream(filename);
 		if (in == null)
 			return null;
 		Image result = null;

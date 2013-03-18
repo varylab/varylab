@@ -52,6 +52,7 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
+import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.optimization.AnimationOptimizerThread;
 import de.varylab.varylab.optimization.CombinedFunctional;
 import de.varylab.varylab.optimization.CombinedOptimizableTao;
@@ -64,7 +65,6 @@ import de.varylab.varylab.optimization.constraint.TangentialConstraint;
 import de.varylab.varylab.optimization.mtj.MTJGradient;
 import de.varylab.varylab.optimization.tao.TaoUtility;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.image.ImageHook;
 
 public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
 	

@@ -105,9 +105,9 @@ import de.varylab.varylab.plugin.visualizers.IncircleVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
+import de.varylab.varylab.startup.SplashImageHook;
 import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
-import de.varylab.varylab.startup.image.SplashImageHook;
 
 public class VaryLabUltimate extends VarylabStartupDefinition {
 

@@ -32,9 +32,9 @@ import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
+import de.varylab.varylab.startup.SplashImageHook;
 import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
-import de.varylab.varylab.startup.image.SplashImageHook;
 
 public class VaryLabGridshells extends VarylabStartupDefinition {
 

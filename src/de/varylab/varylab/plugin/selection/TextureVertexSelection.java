@@ -12,7 +12,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.image.ImageHook;
+import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.remeshing.QuadTextureUtility;
 
 public class TextureVertexSelection extends AlgorithmPlugin {

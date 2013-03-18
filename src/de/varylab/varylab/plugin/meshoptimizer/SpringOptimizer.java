@@ -34,8 +34,8 @@ import de.varylab.varylab.halfedge.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.halfedge.adapter.ConstantWeight;
 import de.varylab.varylab.halfedge.adapter.LengthRangeAdapter;
 import de.varylab.varylab.halfedge.adapter.OriginalLength;
+import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
-import de.varylab.varylab.plugin.image.ImageHook;
 
 public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeListener, ActionListener { 
 	

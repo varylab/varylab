@@ -20,7 +20,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
-import de.varylab.varylab.plugin.image.ImageHook;
+import de.varylab.varylab.icon.ImageHook;
 
 public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 

@@ -35,10 +35,10 @@ public class VarylabMain extends Plugin {
 		ti.getTextures().remove("2 Metal Grid");
 		ti.getTextures().remove("3 Metal Floor");
 		ti.getTextures().remove("4 Chain-Link Fence");
-		ti.getTextures().put("Quads", "de/varylab/varylab/data/quads01.png");
-		ti.getTextures().put("Checker", "de/varylab/varylab/data/checker03.png");
-		ti.getTextures().put("Hex", "de/varylab/varylab/data/hex_pattern.png");
-		ti.getTextures().put("Tri", "de/varylab/varylab/data/triangle_pattern.png");
+		ti.getTextures().put("Quads", "de/varylab/varylab/texture/quads01.png");
+		ti.getTextures().put("Checker", "de/varylab/varylab/texture/checker03.png");
+		ti.getTextures().put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
+		ti.getTextures().put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
 		String selectedTex = ti.getTexture();
 		ti.setTexture("Quads");
 		ti.setTexture(selectedTex);

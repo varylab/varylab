@@ -23,7 +23,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.plugin.image.ImageHook;
+import de.varylab.varylab.icon.ImageHook;
 
 public class HeightFieldEditor extends AlgorithmDialogPlugin {
 
