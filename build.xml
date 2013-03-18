@@ -100,7 +100,6 @@
 
 
 	<target name="create build folders">
-		<mkdir dir="${tmp}"/>
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build-test}"/>
 		<mkdir dir="${release}"/>
@@ -274,6 +273,7 @@
 	
 	
 	<target name="release API jar" depends="compile">
+		<mkdir dir="${tmp}"/>
 		<unjar src="${lib}/jtem/halfedge.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jtem/halfedgetools.jar" dest="${tmp}"/>
 		<unjar src="${lib}/jtem/jpetsctao.jar" dest="${tmp}"/>
