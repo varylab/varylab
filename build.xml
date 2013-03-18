@@ -10,6 +10,9 @@
     	depends="compile and run test suite"
    	/>
 	
+	<property file="custom.properties"/>
+	<property file="default.properties"/>
+	
 	<tstamp><format property="time" pattern="yyyyMMddHHmm" /></tstamp>
 	<tstamp><format property="date" pattern="yyyy-MM-dd" /></tstamp>
 	<property name = "version" value = "B${time}"/>
@@ -23,7 +26,7 @@
 	<property name="lib" value="lib"/>
 	<property name="build" value="build"/>
 	<property name="build-test" value="build-test"/>
-	<property name="release" value="release"/>
+	<property name="release" value="${release.dir}/${date}"/>
 	<property name="tmp" value="tmp"/>
 	
 	<property name="apijarfile" value="VaryLabAPI-${date}.jar"/>
@@ -173,6 +176,11 @@
 	</target>
 	
 	
+	<target name="release all">
+		<antcall target="release [ultimate]"/>
+		<antcall target="release [gridshells]"/>
+		<antcall target="release API jar"/>
+	</target>
 	
 	<target name="release [ultimate]">
 		<antcall target="release generic">
@@ -195,8 +203,10 @@
 	<target name="release generic" depends="compile" description="generic release target">
 		<property name="jarname" value="VaryLab${release-name}-${date}"/>
 		<property name="jarfile" value="VaryLab${release-name}-${date}.jar"/>
+		<property name="zipfile" value="VaryLab${release-name}-${date}.zip"/>
 		<property name="appfolder" value="${release}/${jarname}"/>
 		<property name="jarpath" value="${appfolder}/${jarfile}"/>
+		<property name="zippath" value="${release}/${zipfile}"/>
 		<mkdir dir="${appfolder}"/>
 		
 		<manifestclasspath property="manifest.conformallab.classpath" jarfile="${jarfile}">
@@ -267,6 +277,12 @@
 			<fileset dir="etc" includes="${etc-properties-file}"/>
 		</copy>
 		<mkdir dir="${appfolder}/plugin"/>
+		<zip destfile="${zippath}">
+			<fileset dir="${release}">
+				<include name="${jarname}/**"/>
+			</fileset>
+		</zip>
+		<delete dir="${appfolder}"/>
 	</target>
 	
 	
@@ -303,6 +319,7 @@
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
 			</manifest>
 		</jar>
+		<delete dir="${tmp}"/>
 	</target>
 	
 	
