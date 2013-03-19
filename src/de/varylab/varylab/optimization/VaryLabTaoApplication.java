@@ -21,19 +21,18 @@ import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
 import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
-public class CombinedOptimizableTao extends TaoApplication implements
-		TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess {
+public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess {
 
 	private VHDS
 		hds = null;
-	private CombinedFunctional
+	private VaryLabFunctional
 		fun = null;
 	private List<Constraint>
 		constraints = new LinkedList<Constraint>();
 	private boolean
 		smoothing = false;
 
-	public CombinedOptimizableTao(VHDS hds, CombinedFunctional fun) {
+	public VaryLabTaoApplication(VHDS hds, VaryLabFunctional fun) {
 		this.hds = hds;
 		this.fun = fun;
 	}

@@ -22,7 +22,7 @@ import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
 import de.varylab.varylab.optimization.tao.TaoUtility;
 
-public class CombinedFunctional {
+public class VaryLabFunctional {
 
 	private List<Functional<VVertex, VEdge, VFace>>
 		funList = null;
@@ -37,7 +37,7 @@ public class CombinedFunctional {
 	private int
 		dim = 0;
 	
-	public CombinedFunctional(
+	public VaryLabFunctional(
 		List<Functional<VVertex, VEdge, VFace>> funList, 
 		Map<Functional<?, ?, ?>, Double> coeffs,
 		int dim

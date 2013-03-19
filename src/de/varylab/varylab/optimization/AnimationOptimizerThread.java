@@ -19,7 +19,7 @@ public class AnimationOptimizerThread extends Thread {
 
 	private Tao
 		solver = new Tao(Method.CG);
-	private CombinedOptimizableTao
+	private VaryLabTaoApplication
 		opt = null;
 	private HalfedgeInterface
 		hif = null;
@@ -42,7 +42,7 @@ public class AnimationOptimizerThread extends Thread {
 	
 	public void initOptimizer(
 		HalfedgeInterface hif,
-		CombinedFunctional fun,
+		VaryLabFunctional fun,
 		Constraint constraint,
 		double accuracy,
 		int roundIterations 
@@ -54,7 +54,7 @@ public class AnimationOptimizerThread extends Thread {
 		xVec.setBlockSize(3);
 		xAdapter = new CoordinatePetscAdapter(xVec, 1);
 		
-		opt = new CombinedOptimizableTao(hds, fun);
+		opt = new VaryLabTaoApplication(hds, fun);
 		opt.addConstraint(constraint);
 		opt.setInitialSolutionVec(xVec);
 		

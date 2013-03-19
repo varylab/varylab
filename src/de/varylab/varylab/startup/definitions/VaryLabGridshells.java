@@ -39,7 +39,7 @@ import de.varylab.varylab.startup.VarylabStartupDefinition;
 public class VaryLabGridshells extends VarylabStartupDefinition {
 
 	private VarylabSplashScreen
-	splash = null;
+		splash = null;
 	
 	@Override
 	public String getApplicationName() {

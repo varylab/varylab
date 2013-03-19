@@ -50,11 +50,11 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.optimization.AnimationOptimizerThread;
-import de.varylab.varylab.optimization.CombinedFunctional;
-import de.varylab.varylab.optimization.CombinedOptimizableTao;
 import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.OptimizationThread;
+import de.varylab.varylab.optimization.VaryLabFunctional;
+import de.varylab.varylab.optimization.VaryLabTaoApplication;
 import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
@@ -198,7 +198,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		VHDS hds = hif.get(new VHDS());
 		int dim = hds.numVertices() * 3;
-		CombinedFunctional fun = createFunctional(hds);
+		VaryLabFunctional fun = createFunctional(hds);
 		
 		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hds);
 		
@@ -219,7 +219,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
 		Tao.Initialize();
-		CombinedOptimizableTao app = new CombinedOptimizableTao(hds, fun);
+		VaryLabTaoApplication app = new VaryLabTaoApplication(hds, fun);
 		app.addConstraint(fixConstraint);
 		if(tangentialConstraintChecker.isSelected()) {
 			app.addConstraint(new TangentialConstraint());
@@ -292,9 +292,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
+		VHDS hds = hif.get(new VHDS());
 		List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
 		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-			protocol.add(op.getIterationProtocol(solver));
+			protocol.add(op.getIterationProtocol(solver, app, hds));
 		}
 		protocolPanel.appendIterationProtocol(protocol);
 	}
@@ -339,7 +340,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		TaoEnergy E = new TaoEnergy();
 		Vec gVec = new Vec(dim);
 		TaoGradient G = new TaoGradient(gVec);
-		CombinedFunctional fun = createFunctional(hds);
+		VaryLabFunctional fun = createFunctional(hds);
 		fun.evaluate(hds, x, E, G, null);
 		double energy = E.get();
 		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
@@ -347,7 +348,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	
-	public CombinedFunctional createFunctional(VHDS hds) {
+	public VaryLabFunctional createFunctional(VHDS hds) {
 		int dim = hds.numVertices() * 3;
 		DomainValue x = createPositionValue(hds);
 		List<Functional<VVertex, VEdge, VFace>> funs = new LinkedList<Functional<VVertex,VEdge,VFace>>();
@@ -369,7 +370,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			
 			coeffs.put(fun, coeff);
 		}
-		return new CombinedFunctional(funs, coeffs, dim);
+		return new VaryLabFunctional(funs, coeffs, dim);
 	}
 	
 	
@@ -408,7 +409,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	private void initOptAnimation() {
 		VHDS hds = hif.get(new VHDS());
-		CombinedFunctional fun = createFunctional(hds);
+		VaryLabFunctional fun = createFunctional(hds);
 		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hif.get(new VHDS()));
 		
 		FixingConstraint fixConstraint = new FixingConstraint(

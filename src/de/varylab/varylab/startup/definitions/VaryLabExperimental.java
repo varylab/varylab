@@ -1,5 +1,6 @@
 package de.varylab.varylab.startup.definitions;
 
+import java.awt.Image;
 import java.util.Set;
 
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
@@ -14,10 +15,15 @@ import de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.optimization.IterationProtocolPanel;
 import de.varylab.varylab.plugin.optimization.OptimizationPanel;
+import de.varylab.varylab.startup.SplashImageHook;
+import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
 
 public class VaryLabExperimental extends VarylabStartupDefinition {
 
+	private VarylabSplashScreen
+		splash = null;
+	
 	@Override
 	public String getApplicationName() {
 		return "VaryLab[Experimental]";
@@ -26,6 +32,16 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 	@Override
 	public String getPropertyFileName() {
 		return "VaryLabExperimental.xml";
+	}
+	
+	@Override
+	public VarylabSplashScreen getSplashScreen() {
+		if (splash == null) {
+			Image lowRes = SplashImageHook.getImage("varylab_experimental_low_res.png");
+			Image highRes = SplashImageHook.getImage("varylab_experimental_high_res.png");
+			splash = new VarylabSplashScreen(lowRes, highRes);
+		}
+		return splash;
 	}
 	
 	@Override
