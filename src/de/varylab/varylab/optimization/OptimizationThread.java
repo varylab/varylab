@@ -1,11 +1,15 @@
 package de.varylab.varylab.optimization;
 
+import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
+
 import java.awt.EventQueue;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
+import de.jtem.jtao.Tao.GetSolutionStatusResult;
 import de.jtem.jtao.Tao.Method;
 import de.jtem.jtao.TaoApplication;
 import de.jtem.jtao.TaoMonitor;
@@ -63,7 +67,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationStarted(solver, application, maxIterations);						
+						l.optimizationStarted(maxIterations);						
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -71,12 +75,19 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 		}
 	}
 	protected void fireOptimizationProgress(final int iteration) {
+		Vec solution = application.getSolutionVec();
+		double[] solutionArr = solution.getArray();
+		final double[] newSolutionArr = solutionArr.clone();
+		solution.restoreArray();
 		synchronized (listeners) {
 			for (final OptimizationListener l : listeners) {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationProgress(solver, application, iteration);
+						Vec solution = new Vec(newSolutionArr.length);
+						solution.setBlockSize(solution.getSize());
+						solution.setValuesBlocked(1, new int[] {0}, newSolutionArr, INSERT_VALUES);
+						l.optimizationProgress(solution, iteration);
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -84,12 +95,20 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 		}
 	}
 	protected void fireOptimizationFinished() {
+		Vec solution = application.getSolutionVec();
+		double[] solutionArr = solution.getArray();
+		final double[] newSolutionArr = solutionArr.clone();
+		solution.restoreArray();
+		final GetSolutionStatusResult status = solver.getSolutionStatus();
 		synchronized (listeners) {
 			for (final OptimizationListener l : listeners) {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationFinished(solver, application);
+						Vec solution = new Vec(newSolutionArr.length);
+						solution.setBlockSize(solution.getSize());
+						solution.setValuesBlocked(1, new int[] {0}, newSolutionArr, INSERT_VALUES);
+						l.optimizationFinished(status, solution);
 					}
 				};
 				EventQueue.invokeLater(delegate);

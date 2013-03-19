@@ -42,7 +42,6 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
-import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -279,7 +278,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationStarted(Tao solver, TaoApplication app, int maxIterations) {
+	public void optimizationStarted(int maxIterations) {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(maxIterations);
 		progressBar.setValue(0);
@@ -288,28 +287,26 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationProgress(Tao solver, TaoApplication app, int iteration) {
+	public void optimizationProgress(Vec solution, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
 		VHDS hds = hif.get(new VHDS());
 		List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
 		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-			protocol.add(op.getIterationProtocol(solver, app, hds));
+			protocol.add(op.getIterationProtocol(solution, hds));
 		}
 		protocolPanel.appendIterationProtocol(protocol);
 	}
 	
 	
 	@Override
-	public void optimizationFinished(Tao solver, TaoApplication app) {
-		GetSolutionStatusResult stat = solver.getSolutionStatus();
+	public void optimizationFinished(GetSolutionStatusResult stat, Vec x) {
 		String status = stat.toString().replace("getSolutionStatus : ", "");
 		System.out.println("optimization status ------------------------------------");
 		System.out.println(status);
 		progressBar.setString("Finished " + stat.reason);
 		
-		Vec x = app.getSolutionVec();
 		double maxz_after= Double.NEGATIVE_INFINITY;
 		if(fixHeightChecker.isSelected()) {
 			for (int i = 0; i < x.getSize()/3;++i) {

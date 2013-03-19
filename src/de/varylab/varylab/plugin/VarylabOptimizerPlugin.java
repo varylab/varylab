@@ -12,8 +12,6 @@ import javax.swing.SwingUtilities;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
-import de.jtem.jtao.Tao;
-import de.jtem.jtao.TaoApplication;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -45,9 +43,9 @@ public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UI
 		return getName();
 	}
 	
-	public IterationProtocol getIterationProtocol(Tao solver, TaoApplication app, VHDS hds) {
+	public IterationProtocol getIterationProtocol(Vec solution, VHDS hds) {
 		Functional<VVertex, VEdge, VFace> f = getFunctional(hds);
-		TaoDomainValue x = new TaoDomainValue(app.getSolutionVec());
+		TaoDomainValue x = new TaoDomainValue(solution);
 		Vec Gvec = new Vec(f.getDimension(hds));
 		TaoGradient G = new TaoGradient(Gvec);
 		TaoEnergy E = new TaoEnergy();
