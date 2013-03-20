@@ -1,10 +1,16 @@
 package de.varylab.varylab.plugin.optimization;
 
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -67,13 +73,13 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		shrinkPanel.setTitle("Optimization Protocol");
 		shrinkPanel.setLayout(new BorderLayout(2, 2));
 		shrinkPanel.add(chartPanel, BorderLayout.CENTER);
-		shrinkPanel.add(controlsPanel, BorderLayout.WEST);
+		shrinkPanel.add(controlsPanel, BorderLayout.SOUTH);
 		controlsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.weightx = 1.0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth = GridBagConstraints.REMAINDER;
-//		controlsPanel.add(resetButton, c);
+		c.weightx = 0.0;
+		c.fill = GridBagConstraints.NONE;
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		controlsPanel.add(resetButton, c);
 		
 		resetButton.addActionListener(this);
 		
@@ -82,6 +88,9 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		plot.setGap(10.0);
 		domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		chart.removeLegend();
+		RenderingHints hints = new RenderingHints(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
+		hints.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+		chart.setRenderingHints(hints);
 		resetProtokoll();
 		updateBackgroundColors();
 		

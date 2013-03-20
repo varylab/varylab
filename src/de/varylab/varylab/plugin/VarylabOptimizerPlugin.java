@@ -1,7 +1,5 @@
 package de.varylab.varylab.plugin;
 
-import static de.jtem.jpetsc.NormType.NORM_FROBENIUS;
-
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,8 +8,8 @@ import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.jpetsc.Vec;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
@@ -19,9 +17,9 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.ProtocolValue;
-import de.varylab.varylab.optimization.tao.TaoDomainValue;
-import de.varylab.varylab.optimization.tao.TaoEnergy;
-import de.varylab.varylab.optimization.tao.TaoGradient;
+import de.varylab.varylab.optimization.array.ArrayDomainValue;
+import de.varylab.varylab.optimization.array.ArrayEnergy;
+import de.varylab.varylab.optimization.array.ArrayGradient;
 
 public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UIFlavor {
 
@@ -44,14 +42,14 @@ public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UI
 		return getName();
 	}
 	
-	public IterationProtocol getIterationProtocol(Vec solution, VHDS hds) {
+	public IterationProtocol getIterationProtocol(double[] solution, VHDS hds) {
 		Functional<VVertex, VEdge, VFace> f = getFunctional(hds);
-		TaoDomainValue x = new TaoDomainValue(solution);
-		Vec Gvec = new Vec(f.getDimension(hds));
-		TaoGradient G = new TaoGradient(Gvec);
-		TaoEnergy E = new TaoEnergy();
+		ArrayDomainValue x = new ArrayDomainValue(solution);
+		double[] Garr = new double[f.getDimension(hds)];
+		ArrayGradient G = new ArrayGradient(Garr);
+		ArrayEnergy E = new ArrayEnergy();
 		f.evaluate(hds, x, E, G, null);
-		double gNorm = Gvec.norm(NORM_FROBENIUS);
+		double gNorm = Rn.euclideanNorm(Garr);
 		ProtocolValue gVal = new ProtocolValue(gNorm, "Gradient Norm", gradientId);
 		ProtocolValue eVal = new ProtocolValue(E.get(), "Energy Value", energyId);
 		gVal.setColor(Color.MAGENTA);

@@ -28,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -46,7 +47,7 @@ import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
+import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.optimization.AnimationOptimizerThread;
 import de.varylab.varylab.optimization.IterationProtocol;
@@ -287,7 +288,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationProgress(Vec solution, int iteration) {
+	public void optimizationProgress(double[] solution, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
@@ -301,7 +302,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	@Override
-	public void optimizationFinished(GetSolutionStatusResult stat, Vec x) {
+	public void optimizationFinished(GetSolutionStatusResult stat, double[] x) {
 		String status = stat.toString().replace("getSolutionStatus : ", "");
 		System.out.println("optimization status ------------------------------------");
 		System.out.println(status);
@@ -309,9 +310,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		
 		double maxz_after= Double.NEGATIVE_INFINITY;
 		if(fixHeightChecker.isSelected()) {
-			for (int i = 0; i < x.getSize()/3;++i) {
-				if(maxz_after < Math.abs(x.getValue(3*i+2))) {
-					maxz_after = Math.abs(x.getValue(3*i+2));
+			for (int i = 0; i < x.length/3;++i) {
+				if(maxz_after < Math.abs(x[3*i+2])) {
+					maxz_after = Math.abs(x[3*i+2]);
 				}
 			}
 		} else {
@@ -319,7 +320,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		}
 		
 		double zScale = maxz_before/maxz_after;
-		final CoordinatePetscAdapter posAdapter = new CoordinatePetscAdapter(x, zScale);
+		final Adapter<double[]> posAdapter = new CoordinateArrayAdapter(x, zScale);
 		Runnable updater = new Runnable() {
 			@Override
 			public void run() {

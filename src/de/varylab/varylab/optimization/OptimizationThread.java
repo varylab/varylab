@@ -1,7 +1,5 @@
 package de.varylab.varylab.optimization;
 
-import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
-
 import java.awt.EventQueue;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -77,17 +75,14 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 	protected void fireOptimizationProgress(final int iteration) {
 		Vec solution = application.getSolutionVec();
 		double[] solutionArr = solution.getArray();
-		final double[] newSolutionArr = solutionArr.clone();
+		final double[] solutionCopy = solutionArr.clone();
 		solution.restoreArray();
 		synchronized (listeners) {
 			for (final OptimizationListener l : listeners) {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						Vec solution = new Vec(newSolutionArr.length);
-						solution.setBlockSize(solution.getSize());
-						solution.setValuesBlocked(1, new int[] {0}, newSolutionArr, INSERT_VALUES);
-						l.optimizationProgress(solution, iteration);
+						l.optimizationProgress(solutionCopy, iteration);
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -97,7 +92,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 	protected void fireOptimizationFinished() {
 		Vec solution = application.getSolutionVec();
 		double[] solutionArr = solution.getArray();
-		final double[] newSolutionArr = solutionArr.clone();
+		final double[] solutionCopy = solutionArr.clone();
 		solution.restoreArray();
 		final GetSolutionStatusResult status = solver.getSolutionStatus();
 		synchronized (listeners) {
@@ -105,10 +100,7 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						Vec solution = new Vec(newSolutionArr.length);
-						solution.setBlockSize(solution.getSize());
-						solution.setValuesBlocked(1, new int[] {0}, newSolutionArr, INSERT_VALUES);
-						l.optimizationFinished(status, solution);
+						l.optimizationFinished(status, solutionCopy);
 					}
 				};
 				EventQueue.invokeLater(delegate);
