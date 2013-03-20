@@ -41,8 +41,8 @@
 	</path>	
 	
 	<path id="jfreechart.libraryclasspath">
-		<pathelement location="${lib}/jfreechart/jfreechart-1.0.13.jar"/>	
-		<pathelement location="${lib}/jfreechart/jcommon-1.0.16.jar"/>	
+		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>	
+		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>	
 	</path>
 	
 	<path id="jogamp.libraryclasspath">
@@ -197,7 +197,6 @@
 			<param name="etc-properties-file" value="VarylabGridshells.xml"/>
 	    </antcall>
 	</target>
-	
 	
 	
 	<target name="release generic" depends="compile" description="generic release target">

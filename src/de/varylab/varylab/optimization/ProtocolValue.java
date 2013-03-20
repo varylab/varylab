@@ -1,5 +1,7 @@
 package de.varylab.varylab.optimization;
 
+import java.awt.Color;
+
 public class ProtocolValue {
 
 	private double
@@ -8,6 +10,8 @@ public class ProtocolValue {
 		name = "";
 	private long
 		seriesId = -1;
+	private Color
+		color = Color.WHITE;
 	
 	public ProtocolValue(double value, String name, long seriesId) {
 		super();
@@ -31,6 +35,12 @@ public class ProtocolValue {
 	}
 	public long getSeriesId() {
 		return seriesId;
+	}
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	public Color getColor() {
+		return color;
 	}
 	
 }

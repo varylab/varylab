@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin;
 
 import static de.jtem.jpetsc.NormType.NORM_FROBENIUS;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -53,9 +54,11 @@ public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UI
 		double gNorm = Gvec.norm(NORM_FROBENIUS);
 		ProtocolValue gVal = new ProtocolValue(gNorm, "Gradient Norm", gradientId);
 		ProtocolValue eVal = new ProtocolValue(E.get(), "Energy Value", energyId);
+		gVal.setColor(Color.MAGENTA);
+		eVal.setColor(Color.GREEN);
 		List<ProtocolValue> pList = new LinkedList<ProtocolValue>();
-		pList.add(eVal);
 		pList.add(gVal);
+		pList.add(eVal);
 		return new IterationProtocol(this, pList, protocolId);
 	}
 	

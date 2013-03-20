@@ -7,24 +7,30 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.LegendItem;
-import org.jfree.chart.LegendItemCollection;
+import org.jfree.chart.annotations.XYTitleAnnotation;
+import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleAnchor;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.skin.SkinChangeListener;
 
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.optimization.IterationProtocol;
@@ -41,6 +47,8 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		seriesMap = new HashMap<Long, XYSeries>();
 	private ValueAxis 
 		domainAxis = new NumberAxis();
+	private DecimalFormat
+		rangeFormat = new DecimalFormat("0.0E0");
 	private SamplingXYLineRenderer
 		plotRenderer = new SamplingXYLineRenderer();
 	private CombinedDomainXYPlot
@@ -65,16 +73,36 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		c.weightx = 1.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		controlsPanel.add(resetButton, c);
+//		controlsPanel.add(resetButton, c);
 		
 		resetButton.addActionListener(this);
 		
+		chartPanel.setPreferredSize(new Dimension(100, 450));
 		plot.setRenderer(plotRenderer);
-		plot.setBackgroundPaint(Color.DARK_GRAY);
+		plot.setGap(10.0);
 		domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-		chart.setBackgroundPaint(Color.DARK_GRAY);
+		chart.removeLegend();
 		resetProtokoll();
-		checkPreferredSize();
+		updateBackgroundColors();
+		
+		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
+			@Override
+			public void skinChanged() {
+				System.out.println("IterationProtocolPanel.IterationProtocolPanel().new SkinChangeListener() {...}.skinChanged()");
+				updateBackgroundColors();
+			}
+		
+        });
+
+	}
+	
+	public void updateBackgroundColors() {
+		Color bgColor = UIManager.getDefaults().getColor("Panel.background");
+		plot.setBackgroundPaint(bgColor);
+		chart.setBackgroundPaint(bgColor);
+		for (XYPlot p : plotMap.values()) {
+			p.setBackgroundPaint(bgColor);
+		}
 	}
 	
 	@Override
@@ -84,65 +112,60 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		}
 	}
 	
-	
-	private void checkPreferredSize() {
-		int numPlots = plot.getSubplots().size();
-		numPlots = numPlots == 0 ? 1 : numPlots;
-		chartPanel.setMinimumSize(new Dimension(100, 100 + 180 * numPlots));
-		shrinkPanel.revalidate();
-	}
-	
-	
-	private void checkLegendItems() {
-		LegendItemCollection lic = plot.getLegendItems();
-		for (int i = 0; i < lic.getItemCount(); i++) {
-			LegendItem item = lic.get(i);
-			item.setFillPaint(Color.DARK_GRAY);
-			item.setLabelPaint(Color.DARK_GRAY);
-			item.setLineVisible(true);
-			item.setShapeVisible(false);
+	public XYPlot getPlotForValue(IterationProtocol p, ProtocolValue v) {
+		long id = p.getSeriesId();
+		if (!plotMap.containsKey(id)) {
+			XYPlot subPlot = new XYPlot();
+			String plotName = p.getOptimizer().getName();
+			TextTitle plotTitle = new TextTitle(plotName);
+		    XYTitleAnnotation plotTitleAnnotation = new XYTitleAnnotation(0.95, 0.95, plotTitle, RectangleAnchor.TOP_RIGHT);
+			subPlot.addAnnotation(plotTitleAnnotation);
+			subPlot.setBackgroundPaint(plot.getBackgroundPaint());
+			plot.add(subPlot);
+			plotMap.put(id, subPlot);
 		}
+		return plotMap.get(id);
 	}
+	
+	public XYSeries getSeriesForValue(IterationProtocol p, ProtocolValue v) {
+		long id = v.getSeriesId();
+		if (!seriesMap.containsKey(id)) {
+			XYPlot subPlot = getPlotForValue(p, v);
+			// add a new axis
+			int index = subPlot.getSeriesCount();
+			String name = v.getName();
+			NumberAxis axis = new NumberAxis(name);
+			axis.setNumberFormatOverride(rangeFormat);
+			axis.setLabelPaint(v.getColor());
+			subPlot.setRangeAxis(index, axis);
+			subPlot.setRangeAxisLocation(index, AxisLocation.BOTTOM_OR_LEFT);
+			// data set
+			XYSeriesCollection xyDataSet = new XYSeriesCollection();
+			subPlot.setDataset(index, xyDataSet);
+			subPlot.mapDatasetToRangeAxis(index, index);
+			// renderer
+			SamplingXYLineRenderer renderer = new SamplingXYLineRenderer();
+			renderer.setSeriesPaint(0, v.getColor());
+			subPlot.setRenderer(index, renderer);
+			//data series
+			XYSeries s = new XYSeries(name);
+			xyDataSet.addSeries(s);
+			seriesMap.put(id, s);
+		}
+		return seriesMap.get(id);
+	}
+	
 	
 	public void appendIterationProtocol(List<IterationProtocol> pList) {
 		for (IterationProtocol p : pList) {
-			String optName = p.getOptimizer().getName();
-			long optId = p.getSeriesId();
-			if (!plotMap.containsKey(optId)) {
-				XYPlot subPlot = new XYPlot();
-				subPlot.setBackgroundPaint(Color.DARK_GRAY);
-				plot.add(subPlot);
-				plotMap.put(optId, subPlot);
-				checkPreferredSize();
-			}
-			for (ProtocolValue pv : p.getValues()) {
-				long id = pv.getSeriesId();
-				String name = optName + " " + pv.getName();
-				if (!seriesMap.containsKey(id)) {
-					XYPlot subPlot = plotMap.get(optId);
-					// add a new axis
-					int index = subPlot.getSeriesCount();
-					NumberAxis axis = new NumberAxis(name);
-					subPlot.setRangeAxis(index, axis);
-					// data set
-					XYSeriesCollection xyDataSet = new XYSeriesCollection();
-					subPlot.setDataset(index, xyDataSet);
-					subPlot.mapDatasetToRangeAxis(index, index);
-					// renderer
-					SamplingXYLineRenderer renderer = new SamplingXYLineRenderer();
-					subPlot.setRenderer(index, renderer);
-					//data series
-					XYSeries s = new XYSeries(name);
-					xyDataSet.addSeries(s);
-					seriesMap.put(id, s);
-					checkLegendItems();
-				}
-				XYSeries s = seriesMap.get(id);
-				s.add(activeIteration, pv.getValue());
+			for (ProtocolValue v : p.getValues()) {
+				XYSeries s = getSeriesForValue(p, v);
+				s.add(activeIteration, v.getValue());
 			}
 		}
 		activeIteration++;
 	}
+	
 	public void resetProtokoll() {
 		for (XYPlot p : plotMap.values()) {
 			plot.remove(p);
