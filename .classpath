@@ -7,7 +7,7 @@
 	<classpathentry kind="src" path="src-resource"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/CompGeom-0.3_seidel.jar"/>
-	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar"/>
+	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar" sourcepath="/Substance"/>
 	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/HyperbolicNets.jar"/>

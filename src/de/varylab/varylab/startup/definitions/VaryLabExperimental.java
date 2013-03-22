@@ -3,6 +3,8 @@ package de.varylab.varylab.startup.definitions;
 import java.awt.Image;
 import java.util.Set;
 
+import de.jreality.plugin.job.JobMonitorPlugin;
+import de.jreality.plugin.job.JobsTestPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
 import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
@@ -53,6 +55,8 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 		classes.add(MarqueeWidget.class);
 		classes.add(ContextMenuWidget.class);
 		
+		classes.add(JobMonitorPlugin.class);
+		classes.add(JobsTestPlugin.class);
 	}
 
 	private static void addOptimizationPlugins(Set<Class<? extends Plugin>> classes) {
