@@ -35,8 +35,6 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleAnchor;
-import org.pushingpixels.substance.api.SubstanceLookAndFeel;
-import org.pushingpixels.substance.api.skin.SkinChangeListener;
 
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.optimization.IterationProtocol;
@@ -93,18 +91,8 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		chart.setRenderingHints(hints);
 		resetProtokoll();
 		updateBackgroundColors();
-		
-		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
-			@Override
-			public void skinChanged() {
-				System.out.println("IterationProtocolPanel.IterationProtocolPanel().new SkinChangeListener() {...}.skinChanged()");
-				updateBackgroundColors();
-			}
-		
-        });
-
 	}
-	
+
 	public void updateBackgroundColors() {
 		Color bgColor = UIManager.getDefaults().getColor("Panel.background");
 		plot.setBackgroundPaint(bgColor);

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
@@ -93,6 +94,7 @@ public abstract class VarylabStartupDefinition {
 		JRViewer.setApplicationIcon(appIcon);
 		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		View.setIcon(ImageHook.getIcon("main_03.png"));
 		View.setTitle(getApplicationName());
 	}

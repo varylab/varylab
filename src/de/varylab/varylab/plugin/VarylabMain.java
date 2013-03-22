@@ -1,5 +1,8 @@
 package de.varylab.varylab.plugin;
 
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.skin.SkinChangeListener;
+
 import de.jreality.plugin.basic.InfoOverlayPlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewToolBar;
@@ -19,11 +22,12 @@ import de.varylab.varylab.halfedge.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.halfedge.adapter.SingularityAdapter;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.halfedge.adapter.VTexturePositionAdapter;
+import de.varylab.varylab.plugin.optimization.IterationProtocolPanel;
 
 public class VarylabMain extends Plugin {
 
 	@Override
-	public void install(Controller c) throws Exception {
+	public void install(final Controller c) throws Exception {
 		super.install(c);
 		configureHalfedgeInterface(c);
 		adapterViewToUI(c);
@@ -42,6 +46,17 @@ public class VarylabMain extends Plugin {
 		String selectedTex = ti.getTexture();
 		ti.setTexture("Quads");
 		ti.setTexture(selectedTex);
+		
+		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
+			@Override
+			public void skinChanged() {
+				IterationProtocolPanel ipp = c.getPlugin(IterationProtocolPanel.class);
+				ipp.updateBackgroundColors();
+				BackgroundColor viewBackground = c.getPlugin(BackgroundColor.class);
+				viewBackground.setColor("UI Background");
+			}
+		
+	    });
 	}
 
 
