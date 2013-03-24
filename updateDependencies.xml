@@ -9,6 +9,16 @@
 		<echo>Please choose a dependency target to update.</echo>
 	</target>
 	
+	<target name="all" depends="halfedgetools, jrworkspace, jreality">
+		<echo>Update all supported dependencies</echo>
+	</target>
+	
+	<target name="halfedgetools">
+		<ant antfile="build.xml" dir="../halfedgetools" target="release"/>
+		<copy todir="lib/jtem">
+			<fileset dir="../halfedgetools/release" includes="halfedgetools.jar"/>
+		</copy>
+	</target>
 	
 	<target name="jrworkspace">
 		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
