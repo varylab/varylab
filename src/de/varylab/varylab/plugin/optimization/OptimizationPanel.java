@@ -28,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Functional;
@@ -72,6 +73,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		pluginsPanel = null;
 	private IterationProtocolPanel
 		protocolPanel = null;
+	private JobQueuePlugin
+		jobQueue = null;
 	private OptimizationThread
 		activeJob = null;
 	private JProgressBar
@@ -187,15 +190,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	private void optimize() {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-		if (activeJob != null && activeJob.isAlive()) {
-			JOptionPane.showMessageDialog(
-				w, 
-				"Optimization still running.", 
-				"Please wait.", 
-				WARNING_MESSAGE
-			);
-			return;
-		}
 		VHDS hds = hif.get(new VHDS());
 		int dim = hds.numVertices() * 3;
 		VaryLabFunctional fun = createFunctional(hds);
@@ -270,7 +264,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				break;
 			}
 		}
-		activeJob = new OptimizationThread(app, getTaoMethod());
+		activeJob = new OptimizationThread(app, getTaoMethod(), jobQueue);
 		activeJob.setTolerances(0.0, 0.0, 0.0, 0.0);
 		activeJob.setGradientTolerances(acc, acc, 0);
 		activeJob.setMaximumIterates(maxIter);
@@ -489,6 +483,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		hif = c.getPlugin(HalfedgeInterface.class);
 		pluginsPanel = c.getPlugin(OptimizerPluginsPanel.class);
 		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 	}
 	
 	@Override

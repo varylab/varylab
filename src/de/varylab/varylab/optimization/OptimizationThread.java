@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jreality.plugin.job.AbstractCancelableJob;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
@@ -23,11 +25,16 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 		currentIteration = 0;
 	private List<OptimizationListener>
 		listeners = Collections.synchronizedList(new LinkedList<OptimizationListener>());
+	private JobQueuePlugin
+		jobQueue = null;
+	private OptimizationJob
+		optimizationJob = new OptimizationJob();
 	
 	
-	public OptimizationThread(TaoApplication app, Method method) {
-		super("Optimization Thread");
+	public OptimizationThread(TaoApplication app, Method method, JobQueuePlugin jobQueue) {
+		super("Optimization Thread " + method);
 		this.application = app;
+		this.jobQueue = jobQueue;
 		createSolver(method);
 	}
 	
@@ -38,17 +45,80 @@ public class OptimizationThread extends Thread implements TaoMonitor {
 		solver.setMaximumIterates(maxIterations);
 	}
 	
+	
+	protected class OptimizationJob extends AbstractCancelableJob {
+
+		@Override
+		public String getJobName() {
+			return "Optimization " + solver.getMethod();
+		}
+
+		@Override
+		public void execute() throws Exception {
+			if (isCancelRequested()) return;
+			synchronized (this) {
+				notifyAll();
+				// wait for optimization
+				try { wait(); } catch (Exception e){}
+			}
+			
+		}
+		
+		public void fireJobFinished() {
+			super.fireJobFinished(this);
+		}
+		public void fireJobProgress(double progress) {
+			super.fireJobProgress(this, progress);
+		}
+		public void fireJobStarted() {
+			super.fireJobStarted(this);
+		}
+		
+		@Override
+		public void requestCancel() {
+			super.requestCancel();
+			synchronized (this) {
+				notifyAll();
+			}
+		}
+		
+	}
+	
 	@Override
 	public void run() {
+		synchronized (optimizationJob) {
+			jobQueue.queueJob(optimizationJob);
+			// wait for job being started
+			try { optimizationJob.wait(); } catch (Exception e){}
+		}
+		if (optimizationJob.isCancelRequested()) {
+			synchronized (optimizationJob) {
+				optimizationJob.notifyAll();
+			}
+			return;
+		}
+		try {
+		optimizationJob.fireJobStarted();
 		fireOptimizationStarted();
 		solver.solve();
 		fireOptimizationFinished();
+		optimizationJob.fireJobFinished();
+		} finally {
+			// notify job
+			synchronized (optimizationJob) {
+				optimizationJob.notifyAll();
+			}
+		}
 	}
 	
 	@Override
 	public int monitor(Tao solver) {
 		currentIteration++;
 		fireOptimizationProgress(currentIteration);
+		optimizationJob.fireJobProgress(currentIteration / (double)maxIterations);
+		if (optimizationJob.isCancelRequested()) {
+			solver.setMaximumIterates(0);
+		}
 		return 0;
 	}
 	
