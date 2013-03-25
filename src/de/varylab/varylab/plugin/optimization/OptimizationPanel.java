@@ -1,14 +1,9 @@
 package de.varylab.varylab.plugin.optimization;
 
-import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
-import static de.jtem.jpetsc.NormType.NORM_FROBENIUS;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
-
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -21,22 +16,18 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
+import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 
+import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.jpetsc.InsertMode;
-import de.jtem.jpetsc.Mat;
-import de.jtem.jpetsc.PETSc;
-import de.jtem.jpetsc.Vec;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -55,14 +46,12 @@ import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.OptimizationThread;
 import de.varylab.varylab.optimization.VaryLabFunctional;
-import de.varylab.varylab.optimization.VaryLabTaoApplication;
+import de.varylab.varylab.optimization.array.ArrayDomainValue;
+import de.varylab.varylab.optimization.array.ArrayGradient;
+import de.varylab.varylab.optimization.constraint.Constraint;
 import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
-import de.varylab.varylab.optimization.tao.TaoDomainValue;
-import de.varylab.varylab.optimization.tao.TaoEnergy;
-import de.varylab.varylab.optimization.tao.TaoGradient;
-import de.varylab.varylab.optimization.tao.TaoUtility;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
@@ -82,11 +71,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	private ShrinkPanel
 		animationPanel = new ShrinkPanel("Animation"),
 		constraintsPanel = new ShrinkPanel("Constraints");
+	private JToggleButton
+		animateToggle = new JToggleButton("Animate");
 	private JButton
 		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png")),
-		initButton = new JButton("Init"),
-		playButton = new JButton("Play",ImageHook.getIcon("Play24.gif")),
-		pauseButton = new JButton("Pause",ImageHook.getIcon("Pause24.gif")),
 		evaluateButton = new JButton("Evaluate");
 	private JComboBox
 		methodCombo = new JComboBox(Tao.Method.values());
@@ -113,12 +101,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	private JSpinner
 		accuracySpinner = new JSpinner(accuracyModel),
 		maxIterationSpinner = new JSpinner(maxIterationsModel);
-	private AnimationOptimizerThread 
-		optThread = new AnimationOptimizerThread();
 	
-	private double 
-		maxz_before = Double.NEGATIVE_INFINITY;
-		
+	private AnimationOptimizerThread
+		animationOptimizer = null;
+	
 	
 	public OptimizationPanel() {
 		setInitialPosition(SHRINKER_RIGHT);
@@ -163,9 +149,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		shrinkPanel.add(methodCombo, gbc2);		
 		
 		animationPanel.setLayout(new GridBagLayout());
-		animationPanel.add(initButton, gbc1);
-		animationPanel.add(playButton, gbc1);
-		animationPanel.add(pauseButton, gbc2);
+		animationPanel.add(animateToggle, gbc2);
 		animationPanel.setShrinked(true);
 		shrinkPanel.add(animationPanel, gbc2);
 		
@@ -176,101 +160,41 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 
 		optimizeButton.addActionListener(this);
 		evaluateButton.addActionListener(this);
-		initButton.addActionListener(this);
-		playButton.addActionListener(this);
-		playButton.setEnabled(false);
-		pauseButton.addActionListener(this);
-		pauseButton.setEnabled(false);
+		animateToggle.addActionListener(this);
 		
 		progressBar.setString("Optimization Progress");
 		progressBar.setStringPainted(true);
-		
-		optThread.start();
 	}
 	
 	private void optimize() {
-		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 		VHDS hds = hif.get(new VHDS());
-		int dim = hds.numVertices() * 3;
 		VaryLabFunctional fun = createFunctional(hds);
-		
-		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hds);
-		
-		FixingConstraint fixConstraint = new FixingConstraint(
-			fixedVerts,
-			fixSelectionXChecker.isSelected(),
-			fixSelectionYChecker.isSelected(),
-			fixSelectionZChecker.isSelected(),
-			fixBoundaryXChecker.isSelected(), 
-			fixBoundaryYChecker.isSelected(), 
-			fixBoundaryZChecker.isSelected(), 
-			moveAlongBoundaryChecker.isSelected(),
-			fixXChecker.isSelected(), 
-			fixYChecker.isSelected(), 
-			fixZChecker.isSelected()
-		);
 		
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
-		Tao.Initialize();
-		VaryLabTaoApplication app = new VaryLabTaoApplication(hds, fun);
-		app.addConstraint(fixConstraint);
-		if(tangentialConstraintChecker.isSelected()) {
-			app.addConstraint(new TangentialConstraint());
-		}
-		if(smoothGradientChecker.isSelected()) {
-			app.addConstraint(new SmoothGradientConstraint());
-		}
-		app.enableSmoothing(smoothSurfaceChecker.isSelected());
 		
-		Vec x = new Vec(dim);
-		for (VVertex v : hds.getVertices()) {
-			x.setValue(v.getIndex() * 3 + 0, v.P[0] / v.P[3], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 1, v.P[1] / v.P[3], InsertMode.INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 2, v.P[2] / v.P[3], InsertMode.INSERT_VALUES);
-		}
-		
-		maxz_before = Double.NEGATIVE_INFINITY;
-		if(fixHeightChecker.isSelected()) {
-			for (int i = 0; i < x.getSize()/3;++i) {
-				if(maxz_before < Math.abs(x.getValue(3*i+2))) {
-					maxz_before = Math.abs(x.getValue(3*i+2));
-				}
-			}
-		} else {
-			maxz_before = 1.0;
-		}
-		
-		app.setInitialSolutionVec(x);
-		if (fun.hasHessian()) {
-			Mat H = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, TaoUtility.getPETScNonZeros(hds, fun));
-			H.assemble();
-			app.setHessianMat(H, H);
-		} else {
-			switch (getTaoMethod()) {
-			case NLS:
-			case NTR:
-			case GPCG:
-			case BQPIP:
-			case KT:
-				JOptionPane.showMessageDialog(
-					w, 
-					"Cannot use method " + getTaoMethod() + " without Hessian matrix", 
-					"Method Error", 
-					WARNING_MESSAGE
-				);
-				return;
-			default:
-				break;
-			}
-		}
-		activeJob = new OptimizationThread(app, getTaoMethod(), jobQueue);
-		activeJob.setTolerances(0.0, 0.0, 0.0, 0.0);
-		activeJob.setGradientTolerances(acc, acc, 0);
+		activeJob = new OptimizationThread(hds, fun);
+		activeJob.setCostraints(createConstraints(hds));
+		activeJob.setMethod(getTaoMethod());
+		activeJob.setTolerances(0.0);
+		activeJob.setGradientTolerances(acc);
 		activeJob.setMaximumIterates(maxIter);
+		activeJob.setSmoothingEnabled(smoothSurfaceChecker.isSelected());
 		activeJob.addOptimizationListener(this);
-		activeJob.start();
+		jobQueue.queueJob(activeJob);
 	}
+	
+	private void optimizeAnimated() {
+		if (animateToggle.isSelected()) {
+			VHDS hds = hif.get(new VHDS());
+			VaryLabFunctional fun = createFunctional(hds);
+			animationOptimizer = new AnimationOptimizerThread(fun, hif);
+			jobQueue.queueJob(animationOptimizer);
+		} else if (animationOptimizer != null) {
+			animationOptimizer.requestCancel();
+		}
+	}
+	
 	
 	@Override
 	public void optimizationStarted(int maxIterations) {
@@ -301,20 +225,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		System.out.println("optimization status ------------------------------------");
 		System.out.println(status);
 		progressBar.setString("Finished " + stat.reason);
-		
-		double maxz_after= Double.NEGATIVE_INFINITY;
-		if(fixHeightChecker.isSelected()) {
-			for (int i = 0; i < x.length/3;++i) {
-				if(maxz_after < Math.abs(x[3*i+2])) {
-					maxz_after = Math.abs(x[3*i+2]);
-				}
-			}
-		} else {
-			maxz_after = 1.0;
-		}
-		
-		double zScale = maxz_before/maxz_after;
-		final Adapter<double[]> posAdapter = new CoordinateArrayAdapter(x, zScale);
+		final Adapter<double[]> posAdapter = new CoordinateArrayAdapter(x, 1.0);
 		Runnable updater = new Runnable() {
 			@Override
 			public void run() {
@@ -326,17 +237,44 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	private void evaluate() {
-		VHDS hds = hif.get(new VHDS());
-		int dim = hds.numVertices() * 3;
-		TaoDomainValue x = createPositionValue(hds);
-		TaoEnergy E = new TaoEnergy();
-		Vec gVec = new Vec(dim);
-		TaoGradient G = new TaoGradient(gVec);
-		VaryLabFunctional fun = createFunctional(hds);
-		fun.evaluate(hds, x, E, G, null);
-		double energy = E.get();
-		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
-		System.out.println("Gradient Length: " + gVec.norm(NORM_FROBENIUS));
+		// TODO: create job and react on finish
+//		VHDS hds = hif.get(new VHDS());
+//		int dim = hds.numVertices() * 3;
+//		DomainValue x = createPositionValue(hds);
+//		Energy E = new ArrayEnergy();
+//		Vec gVec = new Vec(dim);
+//		TaoGradient G = new TaoGradient(gVec);
+//		VaryLabFunctional fun = createFunctional(hds);
+//		fun.evaluate(hds, x, E, G, null);
+//		double energy = E.get();
+//		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
+//		System.out.println("Gradient Length: " + gVec.norm(NORM_FROBENIUS));
+	}
+	
+	public List<Constraint> createConstraints(VHDS hds) {
+		List<Constraint> result = new LinkedList<Constraint>();
+		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hds);
+		FixingConstraint fixConstraint = new FixingConstraint(
+			fixedVerts,
+			fixSelectionXChecker.isSelected(),
+			fixSelectionYChecker.isSelected(),
+			fixSelectionZChecker.isSelected(),
+			fixBoundaryXChecker.isSelected(), 
+			fixBoundaryYChecker.isSelected(), 
+			fixBoundaryZChecker.isSelected(), 
+			moveAlongBoundaryChecker.isSelected(),
+			fixXChecker.isSelected(), 
+			fixYChecker.isSelected(), 
+			fixZChecker.isSelected()
+		);
+		result.add(fixConstraint);
+		if(tangentialConstraintChecker.isSelected()) {
+			result.add(new TangentialConstraint());
+		}
+		if(smoothGradientChecker.isSelected()) {
+			result.add(new SmoothGradientConstraint());
+		}
+		return result;
 	}
 	
 	
@@ -351,10 +289,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			
 			double coeff = pluginsPanel.getCoefficient(op);
 			if (pluginsPanel.isNormalizeEnergies()) {
-				Vec gVec = new Vec(dim);
-				TaoGradient G = new TaoGradient(gVec);
+				double[] gArr = new double[dim];
+				ArrayGradient G = new ArrayGradient(gArr);
 				fun.evaluate(hds, x, null, G, null);
-				double gl = gVec.norm(NORM_FROBENIUS);
+				double gl = Rn.euclideanNorm(gArr);
 				if (gl > 1E-8) {
 					coeff /= gl;
 				}
@@ -367,16 +305,17 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	
-	public TaoDomainValue createPositionValue(VHDS hds) {
+	public DomainValue createPositionValue(VHDS hds) {
 		int dim = hds.numVertices() * 3;
-		Vec u = new Vec(dim);
+		double[] x = new double[dim];
 		for (VVertex v : hds.getVertices()) {
-			u.setValue(v.getIndex() * 3 + 0, v.P[0], INSERT_VALUES);
-			u.setValue(v.getIndex() * 3 + 1, v.P[1], INSERT_VALUES);
-			u.setValue(v.getIndex() * 3 + 2, v.P[2], INSERT_VALUES);
+			x[v.getIndex() * 3 + 0] = v.P[0];
+			x[v.getIndex() * 3 + 1] = v.P[1];
+			x[v.getIndex() * 3 + 2] = v.P[2];
 		}
-		return new TaoDomainValue(u);
+		return new ArrayDomainValue(x);
 	}
+	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -385,48 +324,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			optimize();
 		} else if(evaluateButton == s) {
 			evaluate();
-		} else if(initButton == s) {
-			initOptAnimation();
-			playButton.setEnabled(true);
-		} else if(playButton == s) {
-			pauseButton.setEnabled(true);
-			playButton.setEnabled(false);
-			animateOptimization();
-		} else if(pauseButton == s) {
-			optThread.setPause(true);
-			pauseButton.setEnabled(false);
-			playButton.setEnabled(true);
+		} else if(animateToggle == s) {
+			optimizeAnimated();
 		}
 	}
-	
-	private void initOptAnimation() {
-		VHDS hds = hif.get(new VHDS());
-		VaryLabFunctional fun = createFunctional(hds);
-		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hif.get(new VHDS()));
-		
-		FixingConstraint fixConstraint = new FixingConstraint(
-			fixedVerts,
-			fixSelectionXChecker.isSelected(),
-			fixSelectionYChecker.isSelected(),
-			fixSelectionZChecker.isSelected(),
-			fixBoundaryXChecker.isSelected(), 
-			fixBoundaryYChecker.isSelected(), 
-			fixBoundaryZChecker.isSelected(), 
-			moveAlongBoundaryChecker.isSelected(),
-			fixXChecker.isSelected(), 
-			fixYChecker.isSelected(), 
-			fixZChecker.isSelected()
-		);
-		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
-		int step = maxIterationsModel.getNumber().intValue();
-		
-		optThread.initOptimizer(hif, fun, fixConstraint, acc, step);
-	}
-	
-	private void animateOptimization() {
-		optThread.setPause(false);
-	}
-	
 	
 	private Tao.Method getTaoMethod() {
 		return (Tao.Method)methodCombo.getSelectedItem();

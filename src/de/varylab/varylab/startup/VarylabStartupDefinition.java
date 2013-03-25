@@ -37,7 +37,6 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
-import de.jtem.jtao.Tao;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.lnf.TahomaFontSet;
 
@@ -81,11 +80,6 @@ public abstract class VarylabStartupDefinition {
 	
 	private void staticInit() {
 		NativePathUtility.set("native");
-		String[] taoCommand = new String[] {
-			"-tao_nm_lamda", "0.01", 
-			"-tao_nm_mu", "1.0"
-		};
-		Tao.Initialize("Tao Varylab", taoCommand, false);
 		JRHalfedgeViewer.initHalfedgeFronted();
 		StaticSetup.includePluginJars();
 		StaticSetup.includeLibraryJars();

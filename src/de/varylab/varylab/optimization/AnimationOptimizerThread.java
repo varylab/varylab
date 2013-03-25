@@ -1,11 +1,16 @@
 package de.varylab.varylab.optimization;
 
 import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
+import static de.jtem.jpetsc.PETSc.PETSC_DEFAULT;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.jreality.plugin.job.AbstractCancelableJob;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
@@ -15,69 +20,59 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
 import de.varylab.varylab.optimization.constraint.Constraint;
 
-public class AnimationOptimizerThread extends Thread {
+public class AnimationOptimizerThread extends AbstractCancelableJob {
 
-	private Tao
-		solver = new Tao(Method.CG);
-	private VaryLabTaoApplication
-		opt = null;
 	private HalfedgeInterface
 		hif = null;
-	private VHDS 
-		hds = null;
-
-	private Vec
-		xVec = null;
-	private CoordinatePetscAdapter 
-		xAdapter = null;
-	private boolean 
-		pause = true,
-		running = true;
+	private VaryLabFunctional
+		functional = null;
+	private List<Constraint>
+		constraints = new LinkedList<Constraint>();
 	private int 
 		gcCounter = 0;
 
-	public AnimationOptimizerThread() {
-		super("OptimizerThread");
+	public AnimationOptimizerThread(VaryLabFunctional fun, HalfedgeInterface hif) {
+		this.hif = hif;
+		this.functional = fun;
 	}
 	
-	public void initOptimizer(
-		HalfedgeInterface hif,
-		VaryLabFunctional fun,
-		Constraint constraint,
-		double accuracy,
-		int roundIterations 
-	) {
-		this.hif = hif;
-		this.hds = hif.get(new VHDS());
-		hif.update();
-		xVec = new Vec(hds.numVertices() * 3);
+	@Override
+	public String getJobName() {
+		return "Animated Optimization";
+	}
+	
+	@Override
+	public void execute() throws Exception {
+		Tao solver = new Tao(Method.CG);
+		VHDS hds = hif.get(new VHDS());
+		Vec xVec = new Vec(hds.numVertices() * 3);
 		xVec.setBlockSize(3);
-		xAdapter = new CoordinatePetscAdapter(xVec, 1);
+		CoordinatePetscAdapter xAdapter = new CoordinatePetscAdapter(xVec, 1);
 		
-		opt = new VaryLabTaoApplication(hds, fun);
-		opt.addConstraint(constraint);
+		VaryLabTaoApplication opt = new VaryLabTaoApplication(hds, functional);
+		opt.setConstraints(constraints);
 		opt.setInitialSolutionVec(xVec);
 		
-		solver.setMaximumIterates(roundIterations);
-		solver.setTolerances(accuracy, accuracy, accuracy, accuracy);
+		solver.setMaximumIterates(1);
+		solver.setTolerances(PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT);
+		solver.setGradientTolerances(PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT);
 		solver.setApplication(opt);
+		while (!isCancelRequested()) {
+			// update and solve
+			readPositionsToX(xVec, hds);
+			solver.solve();
+			writePositionsToHDS(xAdapter);
+			// clean memory from time to time
+			if (gcCounter++ > 200) {
+				System.gc();
+				gcCounter = 0;
+			}
+			Thread.sleep(30);
+		}
 	}
 	
-	public boolean isPaused() {
-		return pause;
-	}
 
-	public synchronized void setPause(boolean p) {
-		this.pause = p;
-		notify();
-	}
-	
-	public void terminate() {
-		running = false;
-	}
-	
-
-	public void readPositionsToX() throws InterruptedException, InvocationTargetException {
+	public void readPositionsToX(final Vec xVec, final VHDS hds) throws InterruptedException, InvocationTargetException {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
@@ -92,41 +87,13 @@ public class AnimationOptimizerThread extends Thread {
 	}
 	
 
-	public void writePositionsToHDS() throws InterruptedException, InvocationTargetException {
+	public void writePositionsToHDS(final Adapter<double[]> coords) throws InterruptedException, InvocationTargetException {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				hif.updateGeometryNoUndo(xAdapter);
+				hif.updateGeometryNoUndo(coords);
 			}
 		});
-	}
-	
-	
-	@Override
-	public void run() {
-		
-		while(running) {
-			try {
-				if(pause) {
-					synchronized (this) {
-						wait();
-					}
-				}
-				// update and solve
-				readPositionsToX();
-				solver.solve();
-				writePositionsToHDS();
-				// clean memory from time to time
-				if (gcCounter++ > 200) {
-					System.gc();
-					gcCounter = 0;
-				}
-				Thread.sleep(30);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 	}
 	
 }

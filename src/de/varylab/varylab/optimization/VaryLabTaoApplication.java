@@ -36,20 +36,6 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 		this.hds = hds;
 		this.fun = fun;
 	}
-	
-	
-	public void addConstraint(Constraint c) {
-		constraints.add(c);
-	}
-	
-	public void removeConstraint(Constraint c) {
-		constraints.remove(c);
-	}
-
-	public void enableSmoothing(boolean smoothing) {
-		this.smoothing = smoothing;
-	}
-
 
 	private void applyConstraints(DomainValue x, Gradient G, Hessian H) {
 		for (Constraint c : constraints) {
@@ -61,8 +47,12 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 			}
 		}
 	}
-	
 
+	private void applySmoothing(DomainValue x) {
+		LaplacianSmoothing.smoothCombinatorially(hds, new AdapterSet(new VertexDomainValueAdapter(x)), true);
+	}
+
+	
 	@Override
 	public double evaluateObjectiveAndGradient(Vec x, Vec g) {
 		TaoDomainValue u = new TaoDomainValue(x);
@@ -75,11 +65,6 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 		return E.get();
 	}
 
-	private void applySmoothing(DomainValue x) {
-		LaplacianSmoothing.smoothCombinatorially(hds, new AdapterSet(new VertexDomainValueAdapter(x)), true);
-	}
-
-
 	@Override
 	public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {
 		TaoDomainValue u = new TaoDomainValue(x);
@@ -90,10 +75,15 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 		return PreconditionerType.SAME_NONZERO_PATTERN;
 	}
 
-	
 	public int getDomainDimension() {
 		return hds.numVertices() * 3;
 	}
 	
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
+	}
+	public void setSmoothingEnabled(boolean smoothing) {
+		this.smoothing = smoothing;
+	}
 	
 }
