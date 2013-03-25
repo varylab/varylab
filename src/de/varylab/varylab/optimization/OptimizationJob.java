@@ -3,25 +3,21 @@ package de.varylab.varylab.optimization;
 import static de.jtem.jpetsc.InsertMode.INSERT_VALUES;
 import static de.jtem.jpetsc.PETSc.PETSC_DEFAULT;
 
-import java.awt.EventQueue;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.jreality.plugin.job.AbstractCancelableJob;
 import de.jtem.jpetsc.Mat;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
-import de.jtem.jtao.Tao.GetSolutionStatusResult;
 import de.jtem.jtao.Tao.Method;
 import de.jtem.jtao.TaoMonitor;
-import de.jtem.jtao.TaoVec;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.optimization.constraint.Constraint;
 import de.varylab.varylab.optimization.tao.TaoUtility;
+import de.varylab.varylab.optimization.util.PetscTaoUtility;
 
-public class OptimizationThread extends AbstractCancelableJob implements TaoMonitor {
+public class OptimizationJob extends AbstractOptimizationJob implements TaoMonitor {
 
 	private VHDS
 		hds = null;
@@ -39,37 +35,30 @@ public class OptimizationThread extends AbstractCancelableJob implements TaoMoni
 		smoothingEnabled = false;
 	private Method
 		method = Method.CG;
-	private List<OptimizationListener>
-		listeners = Collections.synchronizedList(new LinkedList<OptimizationListener>());
+	private VaryLabTaoApplication
+		activeApplication = null;
 	
-	public OptimizationThread(VHDS hds, VaryLabFunctional fun) {
+	public OptimizationJob(VHDS hds, VaryLabFunctional fun) {
+		super("Optimization");
 		this.hds = hds;
 		this.functional = fun;
 	}
 	
 	@Override
-	public String getJobName() {
-		return "Optimization " + method.getName();
-	}
-	
-	@Override
 	public void execute() throws Exception {
-		fireOptimizationStarted();
+		fireOptimizationStarted(maxIterations);
 		fireJobStarted(this);
-		String[] taoCommand = new String[] {
-			"-tao_nm_lamda", "0.01", 
-			"-tao_nm_mu", "1.0"
-		};
-		Tao.Initialize("Tao Varylab", taoCommand, false);
+		PetscTaoUtility.initializePetscTao();
+		functional.initializeTaoVectors(hds);
 		Tao solver = new Tao(method);
-		VaryLabTaoApplication app = createApplication();
-		solver.setApplication(app);
+		activeApplication = createApplication();
+		solver.setApplication(activeApplication);
 		solver.setMonitor(this);
 		solver.setMaximumIterates(maxIterations);
 		solver.setTolerances(tolerance, tolerance, tolerance, tolerance);
 		solver.setGradientTolerances(gradTolerance, gradTolerance, gradTolerance);
 		solver.solve();
-		fireOptimizationFinished(solver.getSolutionStatus(), solver.getSolution());
+		fireOptimizationFinished(solver.getSolutionStatus(), activeApplication.getSolutionVec());
 		fireJobFinished(this);
 	}
 	
@@ -106,63 +95,13 @@ public class OptimizationThread extends AbstractCancelableJob implements TaoMoni
 		return app;
 	}
 	
-	
 	@Override
 	public int monitor(Tao solver) {
 		currentIteration++;
-		fireOptimizationProgress(currentIteration, solver.getSolution());
+		fireOptimizationProgress(currentIteration, activeApplication.getSolutionVec());
 		fireJobProgress(this, currentIteration / (double)maxIterations);
 		if (isCancelRequested()) solver.setMaximumIterates(0);
 		return 0;
-	}
-	
-	public void addOptimizationListener(OptimizationListener l) {
-		listeners.add(l);
-	}
-	public void removeOptimizationListener(OptimizationListener l) {
-		listeners.remove(l);
-	}
-
-	protected void fireOptimizationStarted() {
-		synchronized (listeners) {
-			for (final OptimizationListener l : listeners) {
-				Runnable delegate = new Runnable() {
-					@Override
-					public void run() {
-						l.optimizationStarted(maxIterations);						
-					}
-				};
-				EventQueue.invokeLater(delegate);
-			}
-		}
-	}
-	protected void fireOptimizationProgress(final int iteration, TaoVec solution) {
-		final double[] solutionArr = solution.getArrayReadOnly();
-		synchronized (listeners) {
-			for (final OptimizationListener l : listeners) {
-				Runnable delegate = new Runnable() {
-					@Override
-					public void run() {
-						l.optimizationProgress(solutionArr, iteration);
-					}
-				};
-				EventQueue.invokeLater(delegate);
-			}
-		}
-	}
-	protected void fireOptimizationFinished(final GetSolutionStatusResult status, TaoVec solution) {
-		final double[] solutionArr = solution.getArrayReadOnly();
-		synchronized (listeners) {
-			for (final OptimizationListener l : listeners) {
-				Runnable delegate = new Runnable() {
-					@Override
-					public void run() {
-						l.optimizationFinished(status, solutionArr);
-					}
-				};
-				EventQueue.invokeLater(delegate);
-			}
-		}
 	}
 	
 	public void setCostraints(List<Constraint> costraints) {

@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.optimization;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
@@ -41,10 +43,10 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.icon.ImageHook;
-import de.varylab.varylab.optimization.AnimationOptimizerThread;
+import de.varylab.varylab.optimization.AnimatedOptimizationJob;
 import de.varylab.varylab.optimization.IterationProtocol;
 import de.varylab.varylab.optimization.OptimizationListener;
-import de.varylab.varylab.optimization.OptimizationThread;
+import de.varylab.varylab.optimization.OptimizationJob;
 import de.varylab.varylab.optimization.VaryLabFunctional;
 import de.varylab.varylab.optimization.array.ArrayDomainValue;
 import de.varylab.varylab.optimization.array.ArrayGradient;
@@ -64,18 +66,16 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		protocolPanel = null;
 	private JobQueuePlugin
 		jobQueue = null;
-	private OptimizationThread
-		activeJob = null;
 	private JProgressBar
 		progressBar = new JProgressBar();
 	private ShrinkPanel
-		animationPanel = new ShrinkPanel("Animation"),
 		constraintsPanel = new ShrinkPanel("Constraints");
+	private JPanel
+		buttonPanel = new JPanel();
 	private JToggleButton
-		animateToggle = new JToggleButton("Animate");
+		animateToggle = new JToggleButton("Animate", ImageHook.getIcon("animate.png"));
 	private JButton
-		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png")),
-		evaluateButton = new JButton("Evaluate");
+		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png"));
 	private JComboBox
 		methodCombo = new JComboBox(Tao.Method.values());
 
@@ -86,7 +86,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		fixBoundaryXChecker = new JCheckBox("X", true),
 		fixBoundaryYChecker = new JCheckBox("Y", true),
 		fixBoundaryZChecker = new JCheckBox("Z", true),
-		fixHeightChecker = new JCheckBox("Fix Height"),
 		moveAlongBoundaryChecker = new JCheckBox("Allow Inner Boundary Movements"),
 		fixXChecker = new JCheckBox("X"),
 		fixYChecker = new JCheckBox("Y"),
@@ -102,8 +101,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		accuracySpinner = new JSpinner(accuracyModel),
 		maxIterationSpinner = new JSpinner(maxIterationsModel);
 	
-	private AnimationOptimizerThread
-		animationOptimizer = null;
+	private AnimatedOptimizationJob
+		job = null;
 	
 	
 	public OptimizationPanel() {
@@ -139,7 +138,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		constraintsPanel.add(smoothGradientChecker, gbc2);
 		constraintsPanel.add(smoothSurfaceChecker,gbc2);
 		shrinkPanel.add(constraintsPanel, gbc2);
-		shrinkPanel.add(fixHeightChecker, gbc2);
 		
 		shrinkPanel.add(new JLabel("Tolerance"), gbc1);
 		shrinkPanel.add(accuracySpinner, gbc2);
@@ -148,18 +146,14 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		shrinkPanel.add(new JLabel("Method"), gbc1);
 		shrinkPanel.add(methodCombo, gbc2);		
 		
-		animationPanel.setLayout(new GridBagLayout());
-		animationPanel.add(animateToggle, gbc2);
-		animationPanel.setShrinked(true);
-		shrinkPanel.add(animationPanel, gbc2);
-		
-		shrinkPanel.add(evaluateButton, gbc1);
-		shrinkPanel.add(optimizeButton, gbc2);
+		shrinkPanel.add(buttonPanel, gbc2);
+		buttonPanel.setLayout(new GridLayout(1, 2, 2, 2));
+		buttonPanel.add(optimizeButton);
+		buttonPanel.add(animateToggle);
 		shrinkPanel.add(progressBar, gbc2);
 		
 
 		optimizeButton.addActionListener(this);
-		evaluateButton.addActionListener(this);
 		animateToggle.addActionListener(this);
 		
 		progressBar.setString("Optimization Progress");
@@ -173,25 +167,28 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
 		
-		activeJob = new OptimizationThread(hds, fun);
-		activeJob.setCostraints(createConstraints(hds));
-		activeJob.setMethod(getTaoMethod());
-		activeJob.setTolerances(0.0);
-		activeJob.setGradientTolerances(acc);
-		activeJob.setMaximumIterates(maxIter);
-		activeJob.setSmoothingEnabled(smoothSurfaceChecker.isSelected());
-		activeJob.addOptimizationListener(this);
-		jobQueue.queueJob(activeJob);
+		OptimizationJob job = new OptimizationJob(hds, fun);
+		job.setCostraints(createConstraints(hds));
+		job.setMethod(getTaoMethod());
+		job.setTolerances(0.0);
+		job.setGradientTolerances(acc);
+		job.setMaximumIterates(maxIter);
+		job.setSmoothingEnabled(smoothSurfaceChecker.isSelected());
+		job.addOptimizationListener(this);
+		jobQueue.queueJob(job);
 	}
 	
 	private void optimizeAnimated() {
 		if (animateToggle.isSelected()) {
 			VHDS hds = hif.get(new VHDS());
 			VaryLabFunctional fun = createFunctional(hds);
-			animationOptimizer = new AnimationOptimizerThread(fun, hif);
-			jobQueue.queueJob(animationOptimizer);
-		} else if (animationOptimizer != null) {
-			animationOptimizer.requestCancel();
+			job = new AnimatedOptimizationJob(fun, hif);
+			job.setMethod(getTaoMethod());
+			job.setConstraints(createConstraints(hds));
+			job.addOptimizationListener(this);
+			jobQueue.queueJob(job);
+		} else if (job != null) {
+			job.requestCancel();
 		}
 	}
 	
@@ -235,21 +232,6 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		EventQueue.invokeLater(updater);
 	}
 	
-	
-	private void evaluate() {
-		// TODO: create job and react on finish
-//		VHDS hds = hif.get(new VHDS());
-//		int dim = hds.numVertices() * 3;
-//		DomainValue x = createPositionValue(hds);
-//		Energy E = new ArrayEnergy();
-//		Vec gVec = new Vec(dim);
-//		TaoGradient G = new TaoGradient(gVec);
-//		VaryLabFunctional fun = createFunctional(hds);
-//		fun.evaluate(hds, x, E, G, null);
-//		double energy = E.get();
-//		System.out.println("Energy:" + energy +"(" + energy/(2*Math.PI) + "·2π)");
-//		System.out.println("Gradient Length: " + gVec.norm(NORM_FROBENIUS));
-	}
 	
 	public List<Constraint> createConstraints(VHDS hds) {
 		List<Constraint> result = new LinkedList<Constraint>();
@@ -322,9 +304,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		Object s = e.getSource();
 		if (optimizeButton == s) {
 			optimize();
-		} else if(evaluateButton == s) {
-			evaluate();
-		} else if(animateToggle == s) {
+		} 
+		if(animateToggle == s) {
 			optimizeAnimated();
 		}
 	}

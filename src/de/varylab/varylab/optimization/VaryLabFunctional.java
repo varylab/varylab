@@ -34,17 +34,18 @@ public class VaryLabFunctional {
 		G2 = null;
 	private TaoHessian
 		H2 = null;
-	private int
-		dim = 0;
 	
 	public VaryLabFunctional(
 		List<Functional<VVertex, VEdge, VFace>> funList, 
 		Map<Functional<?, ?, ?>, Double> coeffs,
 		int dim
 	) {
-		this.dim = dim;
 		this.funList = funList;
 		this.coeffs = coeffs;
+	}
+	
+	public void initializeTaoVectors(VHDS hds) {
+		int dim = getDimension(hds);
 		E2 = new TaoEnergy();
 		Vec gVec = new Vec(dim);
 		G2 = new TaoGradient(gVec);
@@ -52,6 +53,7 @@ public class VaryLabFunctional {
 	
 	
 	public void evaluate(VHDS hds, TaoDomainValue x, TaoEnergy E, TaoGradient G, TaoHessian H) {
+		int dim = getDimension(hds);
 		if (E != null) E.setZero();
 		if (G != null) G.setZero();
 		if (H != null) {
@@ -88,6 +90,7 @@ public class VaryLabFunctional {
 	}
 
 	public <HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>> int[][] getNonZeroPattern(HDS hds) {
+		int dim = getDimension(hds);
 		if (funList.size() == 1) {
 			return funList.get(0).getNonZeroPattern(hds);
 		}

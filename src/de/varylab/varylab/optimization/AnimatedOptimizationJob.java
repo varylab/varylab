@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import de.jreality.plugin.job.AbstractCancelableJob;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jpetsc.Vec;
@@ -19,8 +18,9 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinatePetscAdapter;
 import de.varylab.varylab.optimization.constraint.Constraint;
+import de.varylab.varylab.optimization.util.PetscTaoUtility;
 
-public class AnimationOptimizerThread extends AbstractCancelableJob {
+public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 
 	private HalfedgeInterface
 		hif = null;
@@ -28,35 +28,39 @@ public class AnimationOptimizerThread extends AbstractCancelableJob {
 		functional = null;
 	private List<Constraint>
 		constraints = new LinkedList<Constraint>();
+	private Method
+		method = Method.CG;
 	private int 
 		gcCounter = 0;
 
-	public AnimationOptimizerThread(VaryLabFunctional fun, HalfedgeInterface hif) {
+	public AnimatedOptimizationJob(VaryLabFunctional fun, HalfedgeInterface hif) {
+		super("Animated Optimization");
 		this.hif = hif;
 		this.functional = fun;
 	}
 	
 	@Override
-	public String getJobName() {
-		return "Animated Optimization";
-	}
-	
-	@Override
 	public void execute() throws Exception {
-		Tao solver = new Tao(Method.CG);
+		hif.update(); // create undo step
+		fireJobStarted(this);
+		fireOptimizationStarted(1);
+		PetscTaoUtility.initializePetscTao();
+		Tao solver = new Tao(method);
 		VHDS hds = hif.get(new VHDS());
 		Vec xVec = new Vec(hds.numVertices() * 3);
 		xVec.setBlockSize(3);
 		CoordinatePetscAdapter xAdapter = new CoordinatePetscAdapter(xVec, 1);
 		
-		VaryLabTaoApplication opt = new VaryLabTaoApplication(hds, functional);
-		opt.setConstraints(constraints);
-		opt.setInitialSolutionVec(xVec);
+		functional.initializeTaoVectors(hds);
+		VaryLabTaoApplication app = new VaryLabTaoApplication(hds, functional);
+		app.setConstraints(constraints);
+		app.setInitialSolutionVec(xVec);
 		
 		solver.setMaximumIterates(1);
 		solver.setTolerances(PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT);
 		solver.setGradientTolerances(PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT);
-		solver.setApplication(opt);
+		solver.setApplication(app);
+		int iterationCounter = 0;
 		while (!isCancelRequested()) {
 			// update and solve
 			readPositionsToX(xVec, hds);
@@ -67,8 +71,11 @@ public class AnimationOptimizerThread extends AbstractCancelableJob {
 				System.gc();
 				gcCounter = 0;
 			}
+			fireOptimizationProgress(iterationCounter++, app.getSolutionVec());
 			Thread.sleep(30);
 		}
+		fireJobFinished(this);
+		fireOptimizationFinished(solver.getSolutionStatus(), app.getSolutionVec());
 	}
 	
 
@@ -94,6 +101,14 @@ public class AnimationOptimizerThread extends AbstractCancelableJob {
 				hif.updateGeometryNoUndo(coords);
 			}
 		});
+	}
+	
+	public void setMethod(Method method) {
+		this.method = method;
+	}
+	
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
 	}
 	
 }
