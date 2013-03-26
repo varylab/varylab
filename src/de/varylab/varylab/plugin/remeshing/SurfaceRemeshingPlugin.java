@@ -28,6 +28,8 @@ import javax.swing.SwingUtilities;
 import de.jreality.math.Matrix;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.content.ContentAppearance;
+import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.ui.AppearanceInspector;
 import de.jreality.util.LoggingSystem;
 import de.jtem.halfedge.util.HalfEdgeUtils;
@@ -65,6 +67,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	// plug-in connection
 	private HalfedgeInterface
 		hcp = null;
+	private JobQueuePlugin
+		jobQueuePlugin = null;
 	
 	// ui components
 	private JComboBox
@@ -123,26 +127,49 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	}
 	
 	
+	private class RemeshingJob extends AbstractJob {
+
+		private Object 
+			actionSource = null;
+		
+		public RemeshingJob(Object actionSource) {
+			this.actionSource = actionSource;
+		}
+		
+		@Override
+		public String getJobName() {
+			return "Surface Remeshing";
+		}
+
+		@Override
+		public void execute() throws Exception {
+			Object s = actionSource; 
+			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+			if (s == meshingButton) {
+				try {
+					remeshSurface();
+				} catch(RemeshingException re) {
+					JOptionPane.showMessageDialog(w, re.getMessage(), "Error", WARNING_MESSAGE);
+					return;
+				}
+			}
+			if(s == liftingButton) {
+				if(!lifted) {
+					liftMesh();
+				} else {
+					flattenMesh();
+				}
+				lifted = !lifted;
+			}
+		}
+		
+	}
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object s = e.getSource(); 
-		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-		if (s == meshingButton) {
-			try {
-				remeshSurface();
-			} catch(RemeshingException re) {
-				JOptionPane.showMessageDialog(w, re.getMessage(), "Error", WARNING_MESSAGE);
-				return;
-			}
-		}
-		if(s == liftingButton) {
-			if(!lifted) {
-				liftMesh();
-			} else {
-				flattenMesh();
-			}
-			lifted = !lifted;
-		}
+		RemeshingJob job = new RemeshingJob(e.getSource());
+		jobQueuePlugin.queueJob(job);
 	}
 	
 	
@@ -349,6 +376,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		super.install(c);
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		contentAppearance = c.getPlugin(ContentAppearance.class);
+		jobQueuePlugin = c.getPlugin(JobQueuePlugin.class);
 	}
 	
 	
