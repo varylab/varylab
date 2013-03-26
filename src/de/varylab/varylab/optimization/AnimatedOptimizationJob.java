@@ -40,9 +40,8 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 	}
 	
 	@Override
-	public void execute() throws Exception {
+	public void executeJob() throws Exception {
 		hif.update(); // create undo step
-		fireJobStarted(this);
 		fireOptimizationStarted(1);
 		PetscTaoUtility.initializePetscTao();
 		Tao solver = new Tao(method);
@@ -74,7 +73,6 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 			fireOptimizationProgress(iterationCounter++, app.getSolutionVec());
 			Thread.sleep(30);
 		}
-		fireJobFinished(this);
 		fireOptimizationFinished(solver.getSolutionStatus(), app.getSolutionVec());
 	}
 	

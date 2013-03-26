@@ -1,11 +1,8 @@
 package de.varylab.varylab.plugin.remeshing;
 
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
@@ -21,9 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import de.jreality.math.Matrix;
 import de.jreality.plugin.basic.View;
@@ -142,14 +137,13 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		}
 
 		@Override
-		public void execute() throws Exception {
+		public void executeJob() throws Exception {
 			Object s = actionSource; 
-			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			if (s == meshingButton) {
 				try {
 					remeshSurface();
 				} catch(RemeshingException re) {
-					JOptionPane.showMessageDialog(w, re.getMessage(), "Error", WARNING_MESSAGE);
+					fireJobFailed(re);
 					return;
 				}
 			}

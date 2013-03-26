@@ -45,9 +45,8 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 	}
 	
 	@Override
-	public void execute() throws Exception {
+	public void executeJob() throws Exception {
 		fireOptimizationStarted(maxIterations);
-		fireJobStarted(this);
 		PetscTaoUtility.initializePetscTao();
 		functional.initializeTaoVectors(hds);
 		Tao solver = new Tao(method);
@@ -59,7 +58,6 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 		solver.setGradientTolerances(gradTolerance, gradTolerance, gradTolerance);
 		solver.solve();
 		fireOptimizationFinished(solver.getSolutionStatus(), activeApplication.getSolutionVec());
-		fireJobFinished(this);
 	}
 	
 	
@@ -99,7 +97,7 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 	public int monitor(Tao solver) {
 		currentIteration++;
 		fireOptimizationProgress(currentIteration, activeApplication.getSolutionVec());
-		fireJobProgress(this, currentIteration / (double)maxIterations);
+		fireJobProgress(currentIteration / (double)maxIterations);
 		if (isCancelRequested()) solver.setMaximumIterates(0);
 		return 0;
 	}
