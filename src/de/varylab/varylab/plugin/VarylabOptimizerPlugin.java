@@ -23,7 +23,7 @@ import de.varylab.varylab.optimization.array.ArrayGradient;
 
 public abstract class VarylabOptimizerPlugin extends VarylabPlugin implements UIFlavor {
 
-	private final static Random
+	protected final static Random
 		idRnd = new Random();
 	protected final long
 		energyId = idRnd.nextLong(),

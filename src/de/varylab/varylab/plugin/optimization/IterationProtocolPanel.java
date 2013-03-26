@@ -15,8 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -49,6 +51,10 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		plotMap = new HashMap<Long, XYPlot>();
 	private Map<Long, XYSeries>
 		seriesMap = new HashMap<Long, XYSeries>();
+	private Map<Long, Set<Integer>>
+		plotAxisIndicesMap = new HashMap<Long, Set<Integer>>();
+	private Map<Long, Integer>
+		axisIndexMap = new HashMap<Long, Integer>();
 	private ValueAxis 
 		domainAxis = new NumberAxis();
 	private DecimalFormat
@@ -109,6 +115,21 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		}
 	}
 	
+	public int getPlotAxisIndex(long protocolId, long valueId) {
+		if (axisIndexMap.containsKey(valueId)) {
+			return axisIndexMap.get(valueId);
+		}
+		if (!plotAxisIndicesMap.containsKey(protocolId)) {
+			Set<Integer> indexSet = new HashSet<Integer>();
+			plotAxisIndicesMap.put(protocolId, indexSet);
+		}
+		Set<Integer> axesSet = plotAxisIndicesMap.get(protocolId);
+		int index = axesSet.size();
+		axesSet.add(index);
+		return index;
+	}
+	
+	
 	public XYPlot getPlotForValue(IterationProtocol p, ProtocolValue v) {
 		long id = p.getSeriesId();
 		if (!plotMap.containsKey(id)) {
@@ -125,11 +146,13 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 	}
 	
 	public XYSeries getSeriesForValue(IterationProtocol p, ProtocolValue v) {
-		long id = v.getSeriesId();
-		if (!seriesMap.containsKey(id)) {
+		long pId = p.getSeriesId();
+		long vId = v.getSeriesId();
+		if (!seriesMap.containsKey(vId)) {
 			XYPlot subPlot = getPlotForValue(p, v);
 			// add a new axis
-			int index = subPlot.getSeriesCount();
+			int index = getPlotAxisIndex(pId, vId);
+			System.out.println("index of " + v.getName() + ": " + index);
 			String name = v.getName();
 			NumberAxis axis = new NumberAxis(name);
 			axis.setNumberFormatOverride(rangeFormat);
@@ -147,9 +170,9 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 			//data series
 			XYSeries s = new XYSeries(name);
 			xyDataSet.addSeries(s);
-			seriesMap.put(id, s);
+			seriesMap.put(vId, s);
 		}
-		return seriesMap.get(id);
+		return seriesMap.get(vId);
 	}
 	
 	
@@ -169,6 +192,8 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		}
 		plotMap.clear();
 		seriesMap.clear();
+		axisIndexMap.clear();
+		plotAxisIndicesMap.clear();
 		activeIteration = 0;
 	}
 	

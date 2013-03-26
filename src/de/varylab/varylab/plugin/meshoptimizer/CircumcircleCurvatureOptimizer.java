@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
+import java.awt.Color;
+
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -11,8 +13,10 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
+import de.varylab.varylab.halfedge.adapter.type.CircumcircleCurvature;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.optimization.IterationProtocol;
+import de.varylab.varylab.optimization.ProtocolValue;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 
@@ -24,6 +28,9 @@ public class CircumcircleCurvatureOptimizer extends VarylabOptimizerPlugin {
 		curvatureDatasource = null;
 	private CircumcircleCurvatureFunctional<VVertex, VEdge, VFace>
 		functional = new CircumcircleCurvatureFunctional<VVertex, VEdge, VFace>();
+	protected long
+		maxKId = idRnd.nextLong(),
+		meanKId = idRnd.nextLong();
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
@@ -57,9 +64,21 @@ public class CircumcircleCurvatureOptimizer extends VarylabOptimizerPlugin {
 		AdapterSet aSet = AdapterSet.createGenericAdapters();
 		aSet.add(coords);
 		aSet.addAll(curvatureDatasource.getDataSources());
-//		for (VEdge e : hds.getEdges()) {
-//			aSet.get(GeodesicCircumcircleCurvatureAdapter.class, null, null, null)
-//		}
+		double maxK = -Double.MAX_VALUE;
+		double meanK = 0;
+		for (VEdge e : hds.getEdges()) {
+			Double k = aSet.get(CircumcircleCurvature.class, e, Double.class);
+			if (k == null) continue; // boundary or odd valence
+			maxK = k > maxK ? k : maxK;
+			meanK += k;
+		}
+		meanK /= hds.numEdges();
+		ProtocolValue maxValue = new ProtocolValue(maxK, "Maximum Circumcircle Curvature", maxKId);
+		ProtocolValue meanValue = new ProtocolValue(meanK, "Mean Circumcircle Curvature", meanKId);
+		maxValue.setColor(Color.WHITE);
+		meanValue.setColor(Color.LIGHT_GRAY);
+		p.addValue(maxValue);
+		p.addValue(meanValue);
 		return p;
 	}
 

@@ -12,6 +12,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.varylab.halfedge.adapter.type.CircumcircleCurvature;
 import de.varylab.varylab.utilities.GeodesicUtility;
 
 public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceProvider {
@@ -19,6 +20,7 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 	private GeodesicCircumcircleCurvatureAdapter
 		adapter = new GeodesicCircumcircleCurvatureAdapter();
 	
+	@CircumcircleCurvature
 	private class GeodesicCircumcircleCurvatureAdapter extends AbstractAdapter<Double> {
 
 		public GeodesicCircumcircleCurvatureAdapter() {
