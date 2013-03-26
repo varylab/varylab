@@ -75,8 +75,8 @@ public class CircumcircleCurvatureOptimizer extends VarylabOptimizerPlugin {
 		meanK /= hds.numEdges();
 		ProtocolValue maxValue = new ProtocolValue(maxK, "Maximum Circumcircle Curvature", maxKId);
 		ProtocolValue meanValue = new ProtocolValue(meanK, "Mean Circumcircle Curvature", meanKId);
-		maxValue.setColor(Color.WHITE);
-		meanValue.setColor(Color.LIGHT_GRAY);
+		maxValue.setColor(Color.RED);
+		meanValue.setColor(Color.YELLOW);
 		p.addValue(maxValue);
 		p.addValue(meanValue);
 		return p;
