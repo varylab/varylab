@@ -27,6 +27,9 @@ public class IterationProtocol {
 	public List<ProtocolValue> getValues() {
 		return Collections.unmodifiableList(values);
 	}
+	public void addValue(ProtocolValue v) {
+		values.add(v);
+	}
 	public long getSeriesId() {
 		return id;
 	}
