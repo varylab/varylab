@@ -207,12 +207,14 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
-		VHDS hds = hif.get(new VHDS());
-		List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
-		for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-			protocol.add(op.getIterationProtocol(solution, hds));
+		if (protocolPanel.isProtocolActive()) {
+			VHDS hds = hif.get(new VHDS());
+			List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
+			for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
+				protocol.add(op.getIterationProtocol(solution, hds));
+			}
+			protocolPanel.appendIterationProtocol(protocol);
 		}
-		protocolPanel.appendIterationProtocol(protocol);
 	}
 	
 	

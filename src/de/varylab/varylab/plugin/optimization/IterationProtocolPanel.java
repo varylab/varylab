@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -71,6 +73,8 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		controlsPanel = new JPanel();
 	private JButton
 		resetButton = new JButton("Clear Protocol");
+	private JCheckBox
+		activeChecker = new JCheckBox("Protocol", true);
 	
 	public IterationProtocolPanel() {
 		setInitialPosition(SHRINKER_TOP);
@@ -83,6 +87,8 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		c.weightx = 0.0;
 		c.fill = GridBagConstraints.NONE;
 		c.gridwidth = GridBagConstraints.RELATIVE;
+		c.insets = new Insets(1, 2, 1, 2);
+		controlsPanel.add(activeChecker, c);
 		controlsPanel.add(resetButton, c);
 		
 		resetButton.addActionListener(this);
@@ -195,6 +201,10 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		axisIndexMap.clear();
 		plotAxisIndicesMap.clear();
 		activeIteration = 0;
+	}
+	
+	public boolean isProtocolActive() {
+		return activeChecker.isSelected();
 	}
 	
 	@Override
