@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.swing.JPopupMenu;
 import javax.swing.LookAndFeel;
@@ -46,6 +47,8 @@ public abstract class VarylabStartupDefinition {
 		splash = null;
 	private JRViewer 
 		v = null;
+	private Logger
+		log = Logger.getLogger(VarylabStartupDefinition.class.getName());
 	
 	public abstract void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances);
 
@@ -74,15 +77,19 @@ public abstract class VarylabStartupDefinition {
 			};
 			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning("could not install substance look and feel: " + e);
 		}
 	}
 	
 	private void staticInit() {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
-		StaticSetup.includePluginJars();
-		StaticSetup.includeLibraryJars();
+		try {
+			StaticSetup.includePluginJars();
+			StaticSetup.includeLibraryJars();
+		} catch (Exception e) {
+			log.warning("cound not setup drop-in plugin folder: " + e);
+		}
 		Image appIcon = ImageHook.getImage("main_03.png");
 		JRViewer.setApplicationIcon(appIcon);
 		JPopupMenu.setDefaultLightWeightPopupEnabled(true);

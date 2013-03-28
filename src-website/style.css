@@ -1,3 +1,6 @@
+.maintable {
+	width: 500px;	
+}
 
 .newlineLeft {
 	clear:left;
@@ -25,6 +28,11 @@
 p {
 	color : #003366;
 	font-style:oblique;
+}
+
+
+.bottom_space {
+	margin-bottom:10px;
 }
 
 .header {

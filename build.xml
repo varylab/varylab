@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="VaryLab" default="default">
-    <description>
+	<description>
             This is the VaryLab ant build file.
     </description>
-	
-    <target name="default" 
+
+	<target name="default" 
     	description="This is the VaryLab ant build file." 
     	depends="compile and run test suite"
    	/>
-	
+
 	<property file="custom.properties"/>
 	<property file="default.properties"/>
-	
-	<tstamp><format property="time" pattern="yyyyMMddHHmm" /></tstamp>
-	<tstamp><format property="date" pattern="yyyy-MM-dd" /></tstamp>
+
+	<tstamp>
+		<format property="time" pattern="yyyyMMddHHmm" />
+	</tstamp>
+	<tstamp>
+		<format property="date" pattern="yyyy-MM-dd" />
+	</tstamp>
 	<property name = "version" value = "B${time}"/>
 	<property name="vendor" value="VaryLab Development Team"/>
 
 	<property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+	<property name="source" value="1.6"/>
 	<property name="src" value="src"/>
 	<property name="src-test" value="src-test"/>
 	<property name="src-resource" value="src-resource"/>
@@ -27,10 +31,27 @@
 	<property name="build" value="build"/>
 	<property name="build-test" value="build-test"/>
 	<property name="release" value="${release.dir}/${date}"/>
+	<property name="release.service" value="${release.service.dir}/${date}"/>
 	<property name="tmp" value="tmp"/>
-	
+
 	<property name="apijarfile" value="VaryLabAPI-${date}.jar"/>
-	
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="etc/ant/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	<typedef resource="org/unintelligible/antjnlpwar/antjnlpwar.xml" format="xml">
+		<classpath>
+			<!--pathelement location="etc/ant/ant-jnlp-war.jar"/-->
+			<pathelement location="../ant-jnlp-war/bin"/>
+			<pathelement location="etc/ant/Pack200Task.jar"/>
+			<pathelement location="etc/ant/velocity-1.4.jar"/>
+			<pathelement location="etc/ant/commons-collections.jar"/>
+			<pathelement location="etc/ant/logkit-1.0.1.jar"/>
+		</classpath>
+	</typedef>
+
 	<path id="conformallab.libraryclasspath">
 		<pathelement location="${lib}/conformallab/DiscreteConformalLab.jar"/>
 		<pathelement location="${lib}/conformallab/batik-awt-util.jar"/>
@@ -38,18 +59,18 @@
 		<pathelement location="${lib}/conformallab/batik-util.jar"/>
 		<pathelement location="${lib}/conformallab/itext-xtra-5.1.3.jar"/>
 		<pathelement location="${lib}/conformallab/itextpdf-5.1.3.jar"/>
-	</path>	
-	
-	<path id="jfreechart.libraryclasspath">
-		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>	
-		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>	
 	</path>
-	
+
+	<path id="jfreechart.libraryclasspath">
+		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>
+		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>
+	</path>
+
 	<path id="jogamp.libraryclasspath">
 		<pathelement location="${lib}/jogamp/jogl-all.jar"/>
 		<pathelement location="${lib}/jogamp/gluegen-rt.jar"/>
-	</path>	
-	
+	</path>
+
 	<path id="jreality.libraryclasspath">
 		<pathelement location="${lib}/jreality/jReality.jar"/>
 		<pathelement location="${lib}/jreality/colorpicker.jar"/>
@@ -60,178 +81,73 @@
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
 	</path>
-	
-   	<path id="jtem.libraryclasspath">
-        <pathelement location="${lib}/jtem/beans.jar"/>
-        <pathelement location="${lib}/jtem/ellipticFunctions.jar"/>
-        <pathelement location="${lib}/jtem/halfedge.jar"/>
-        <pathelement location="${lib}/jtem/halfedgetools.jar"/>
-        <pathelement location="${lib}/jtem/java2d.jar"/>
-        <pathelement location="${lib}/jtem/java2dx.jar"/>
-        <pathelement location="${lib}/jtem/jpetsctao.jar"/>
-        <pathelement location="${lib}/jtem/jrworkspace.jar"/>
-        <pathelement location="${lib}/jtem/mfc.jar"/>
-        <pathelement location="${lib}/jtem/modelling.jar"/>
-        <pathelement location="${lib}/jtem/numericalMethods.jar"/>
-        <pathelement location="${lib}/jtem/projgeom.jar"/>
-    </path>
+
+	<path id="jtem.libraryclasspath">
+		<pathelement location="${lib}/jtem/beans.jar"/>
+		<pathelement location="${lib}/jtem/ellipticFunctions.jar"/>
+		<pathelement location="${lib}/jtem/halfedge.jar"/>
+		<pathelement location="${lib}/jtem/halfedgetools.jar"/>
+		<pathelement location="${lib}/jtem/java2d.jar"/>
+		<pathelement location="${lib}/jtem/java2dx.jar"/>
+		<pathelement location="${lib}/jtem/jpetsctao.jar"/>
+		<pathelement location="${lib}/jtem/jrworkspace.jar"/>
+		<pathelement location="${lib}/jtem/mfc.jar"/>
+		<pathelement location="${lib}/jtem/modelling.jar"/>
+		<pathelement location="${lib}/jtem/numericalMethods.jar"/>
+		<pathelement location="${lib}/jtem/projgeom.jar"/>
+	</path>
 
 	<path id="substance.libraryclasspath">
-		<pathelement location="${lib}/substance/substance-6.0.jar"/>	
-		<pathelement location="${lib}/substance/trident-6.0.jar"/>	
+		<pathelement location="${lib}/substance/substance-6.0.jar"/>
+		<pathelement location="${lib}/substance/trident-6.0.jar"/>
 	</path>
 
 	<path id="xstream.libraryclasspath">
-		<pathelement location="${lib}/xstream/xstream-1.3.1.jar"/>	
-		<pathelement location="${lib}/xstream/xpp3-1.1.4c.jar"/>	
+		<pathelement location="${lib}/xstream/xstream-1.3.1.jar"/>
+		<pathelement location="${lib}/xstream/xpp3-1.1.4c.jar"/>
 	</path>
-	
+
 	<path id="misc.libraryclasspath">
-		<pathelement location="${lib}/bsh-1.3.0.jar"/>	
-		<pathelement location="${lib}/commons-math3-3.0.jar"/>	
-		<pathelement location="${lib}/CompGeom-0.3_seidel.jar"/>	
-		<pathelement location="${lib}/HyperbolicNets.jar"/>	
-		<pathelement location="${lib}/JLink.jar"/>	
-		<pathelement location="${lib}/mtj.jar"/>	
-		<pathelement location="${lib}/MathematicaPlugin.jar"/>
+		<pathelement location="${lib}/misc/bsh-1.3.0.jar"/>
+		<pathelement location="${lib}/misc/commons-math3-3.0.jar"/>
+		<pathelement location="${lib}/misc/CompGeom-0.3_seidel.jar"/>
+		<pathelement location="${lib}/misc/HyperbolicNets.jar"/>
+		<pathelement location="${lib}/misc/JLink.jar"/>
+		<pathelement location="${lib}/misc/mtj.jar"/>
+		<pathelement location="${lib}/misc/MathematicaPlugin.jar"/>
 	</path>
-	
+
 	<path id="junit.libraryclasspath">
-		<pathelement location="${lib}/junit/junit-4.11.jar"/>	
-		<pathelement location="${lib}/junit/hamcrest-core-1.3.jar"/>	
-	</path>	
+		<pathelement location="${lib}/junit/junit-4.11.jar"/>
+		<pathelement location="${lib}/junit/hamcrest-core-1.3.jar"/>
+	</path>
 
 
-	<target name="create build folders">
-		<mkdir dir="${build}"/>
-		<mkdir dir="${build-test}"/>
-		<mkdir dir="${release}"/>
-	</target>
-	
-	
-	
-	<target name="compile" depends="create build folders">
-        <javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
-            <src path="${src}"/>
-            <src path="${src-resource}"/>
-            <classpath refid="conformallab.libraryclasspath"/>
-            <classpath refid="jfreechart.libraryclasspath"/>
-            <classpath refid="jogamp.libraryclasspath"/>
-            <classpath refid="jreality.libraryclasspath"/>
-            <classpath refid="jtem.libraryclasspath"/>
-            <classpath refid="substance.libraryclasspath"/>
-            <classpath refid="xstream.libraryclasspath"/>
-            <classpath refid="misc.libraryclasspath"/>
-        </javac>
-		<copy todir="${build}" description="copy resources to output folder">
-			<fileset dir="${src-resource}">
-				<include name="**/**"/>
-				<exclude name="**/SplashImageHook.java"/>
-				<exclude name="**/ImageHook.java"/>
-			</fileset>
-		</copy>
-	</target>
-	
-	
-	
-	
-	<target name="compile and run test suite" depends="compile">
-		<javac destdir="${build-test}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
-	        <compilerarg line="-Xlint:deprecation"/>
-			<src path="${src-test}"/>
-			<classpath path="${build}"/>
-	        <classpath refid="conformallab.libraryclasspath"/>
-	        <classpath refid="jfreechart.libraryclasspath"/>
-	        <classpath refid="jogamp.libraryclasspath"/>
-	        <classpath refid="jreality.libraryclasspath"/>
-	        <classpath refid="jtem.libraryclasspath"/>
-	        <classpath refid="substance.libraryclasspath"/>
-	        <classpath refid="xstream.libraryclasspath"/>
-	        <classpath refid="misc.libraryclasspath"/>
-	        <classpath refid="junit.libraryclasspath"/>
-	    </javac>
-		<copy todir="${build-test}">
-			<fileset dir="${src-test}" includes="**/testSegments.xml"/>
-		</copy>
-		<junit printsummary="yes" haltonfailure="yes">
-			<classpath path="${build}"/>
-			<classpath path="${build-test}"/>
-			<classpath refid="conformallab.libraryclasspath"/>
-            <classpath refid="jfreechart.libraryclasspath"/>
-            <classpath refid="jogamp.libraryclasspath"/>
-            <classpath refid="jreality.libraryclasspath"/>
-            <classpath refid="jtem.libraryclasspath"/>
-            <classpath refid="substance.libraryclasspath"/>
-            <classpath refid="xstream.libraryclasspath"/>
-            <classpath refid="misc.libraryclasspath"/>
-			<classpath refid="junit.libraryclasspath"/>
-			<batchtest>
-				<fileset dir="${src-test}">
-					<include name="**/*Test.java"/>
-					<include name="**/*Tests.java"/>
-				</fileset>
-				<formatter type="plain" usefile="false"/>
-			</batchtest>
-		</junit>
-	</target>
-	
-	
-	<target name="release all">
-		<antcall target="release [ultimate]"/>
-		<antcall target="release [gridshells]"/>
-		<antcall target="release API jar"/>
-	</target>
-	
-	<target name="release [ultimate]">
-		<antcall target="release generic">
-			<param name="release-name" value="Ultimate"/>
-	    	<param name="main-class" value="de.varylab.varylab.VaryLab"/>
-			<param name="etc-properties-file" value="VaryLab.xml"/>
-	    </antcall>
-	</target>
-	
-	<target name="release [gridshells]">
-		<antcall target="release generic">
-			<param name="release-name" value="Gridshells"/>
-	    	<param name="main-class" value="de.varylab.varylab.startup.definitions.VaryLabGridshells"/>
-			<param name="etc-properties-file" value="VarylabGridshells.xml"/>
-	    </antcall>
-	</target>
-	
-	
-	<target name="release generic" depends="compile" description="generic release target">
-		<property name="jarname" value="VaryLab${release-name}-${date}"/>
-		<property name="jarfile" value="VaryLab${release-name}-${date}.jar"/>
-		<property name="zipfile" value="VaryLab${release-name}-${date}.zip"/>
-		<property name="appfolder" value="${release}/${jarname}"/>
-		<property name="jarpath" value="${appfolder}/${jarfile}"/>
-		<property name="zippath" value="${release}/${zipfile}"/>
-		<mkdir dir="${appfolder}"/>
-		
+	<target name="assemble classpath">
 		<manifestclasspath property="manifest.conformallab.classpath" jarfile="${jarfile}">
-	        <classpath refid="conformallab.libraryclasspath"/>
-		</manifestclasspath>		
+			<classpath refid="conformallab.libraryclasspath"/>
+		</manifestclasspath>
 		<manifestclasspath property="manifest.jfreechart.classpath" jarfile="${jarfile}">
-        	<classpath refid="jfreechart.libraryclasspath"/>
+			<classpath refid="jfreechart.libraryclasspath"/>
 		</manifestclasspath>
 		<manifestclasspath property="manifest.jogamp.classpath" jarfile="${jarfile}">
-        	<classpath refid="jogamp.libraryclasspath"/>
+			<classpath refid="jogamp.libraryclasspath"/>
 		</manifestclasspath>
 		<manifestclasspath property="manifest.jreality.classpath" jarfile="${jarfile}">
-        	<classpath refid="jreality.libraryclasspath"/>
+			<classpath refid="jreality.libraryclasspath"/>
 		</manifestclasspath>
 		<manifestclasspath property="manifest.jtem.classpath" jarfile="${jarfile}">
-        	<classpath refid="jtem.libraryclasspath"/>
+			<classpath refid="jtem.libraryclasspath"/>
 		</manifestclasspath>
 		<manifestclasspath property="manifest.substance.classpath" jarfile="${jarfile}">
-        	<classpath refid="substance.libraryclasspath"/>
-		</manifestclasspath>	
+			<classpath refid="substance.libraryclasspath"/>
+		</manifestclasspath>
 		<manifestclasspath property="manifest.xstream.classpath" jarfile="${jarfile}">
-        	<classpath refid="xstream.libraryclasspath"/>
-		</manifestclasspath>			
+			<classpath refid="xstream.libraryclasspath"/>
+		</manifestclasspath>
 		<manifestclasspath property="manifest.misc.classpath" jarfile="${jarfile}">
-            <classpath refid="misc.libraryclasspath"/>
-	    </manifestclasspath>
+			<classpath refid="misc.libraryclasspath"/>
+		</manifestclasspath>
 		<property name="manifest.classpath" value="
 			${manifest.conformallab.classpath}
 			${manifest.jfreechart.classpath}
@@ -242,10 +158,119 @@
 			${manifest.xstream.classpath}
 			${manifest.misc.classpath}
 		"/>
-        	
+	</target>
+
+
+	<target name="create build folders">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build-test}"/>
+		<mkdir dir="${release}"/>
+		<mkdir dir="${release.service}"/>
+	</target>
+
+
+	<target name="compile" depends="create build folders">
+		<javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+			<src path="${src}"/>
+			<src path="${src-resource}"/>
+			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="jfreechart.libraryclasspath"/>
+			<classpath refid="jogamp.libraryclasspath"/>
+			<classpath refid="jreality.libraryclasspath"/>
+			<classpath refid="jtem.libraryclasspath"/>
+			<classpath refid="substance.libraryclasspath"/>
+			<classpath refid="xstream.libraryclasspath"/>
+			<classpath refid="misc.libraryclasspath"/>
+		</javac>
+		<copy todir="${build}" description="copy resources to output folder">
+			<fileset dir="${src-resource}">
+				<include name="**/**"/>
+				<exclude name="**/SplashImageHook.java"/>
+				<exclude name="**/ImageHook.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+
+
+
+	<target name="compile and run test suite" depends="compile">
+		<javac destdir="${build-test}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+			<compilerarg line="-Xlint:deprecation"/>
+			<src path="${src-test}"/>
+			<classpath path="${build}"/>
+			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="jfreechart.libraryclasspath"/>
+			<classpath refid="jogamp.libraryclasspath"/>
+			<classpath refid="jreality.libraryclasspath"/>
+			<classpath refid="jtem.libraryclasspath"/>
+			<classpath refid="substance.libraryclasspath"/>
+			<classpath refid="xstream.libraryclasspath"/>
+			<classpath refid="misc.libraryclasspath"/>
+			<classpath refid="junit.libraryclasspath"/>
+		</javac>
+		<copy todir="${build-test}">
+			<fileset dir="${src-test}" includes="**/testSegments.xml"/>
+		</copy>
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath path="${build}"/>
+			<classpath path="${build-test}"/>
+			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="jfreechart.libraryclasspath"/>
+			<classpath refid="jogamp.libraryclasspath"/>
+			<classpath refid="jreality.libraryclasspath"/>
+			<classpath refid="jtem.libraryclasspath"/>
+			<classpath refid="substance.libraryclasspath"/>
+			<classpath refid="xstream.libraryclasspath"/>
+			<classpath refid="misc.libraryclasspath"/>
+			<classpath refid="junit.libraryclasspath"/>
+			<batchtest>
+				<fileset dir="${src-test}">
+					<include name="**/*Test.java"/>
+					<include name="**/*Tests.java"/>
+				</fileset>
+				<formatter type="plain" usefile="false"/>
+			</batchtest>
+		</junit>
+	</target>
+
+
+	<target name="release all">
+		<antcall target="release [ultimate]"/>
+		<antcall target="release [gridshells]"/>
+		<antcall target="release API jar"/>
+	</target>
+
+	<target name="release [ultimate]">
+		<antcall target="release generic">
+			<param name="release-name" value="Ultimate"/>
+			<param name="main-class" value="de.varylab.varylab.VaryLab"/>
+			<param name="etc-properties-file" value="VaryLab.xml"/>
+		</antcall>
+	</target>
+
+	<target name="release [gridshells]">
+		<antcall target="release generic">
+			<param name="release-name" value="Gridshells"/>
+			<param name="main-class" value="de.varylab.varylab.startup.definitions.VaryLabGridshells"/>
+			<param name="etc-properties-file" value="VarylabGridshells.xml"/>
+		</antcall>
+	</target>
+
+
+	<target name="release generic" depends="compile" description="generic release target">
+		<property name="jarname" value="VaryLab${release-name}-${date}"/>
+		<property name="jarfile" value="VaryLab${release-name}-${date}.jar"/>
+		<property name="zipfile" value="VaryLab${release-name}-${date}.zip"/>
+		<property name="appfolder" value="${release}/${jarname}"/>
+		<property name="jarpath" value="${appfolder}/${jarfile}"/>
+		<property name="zippath" value="${release}/${zipfile}"/>
+		<mkdir dir="${appfolder}"/>
+
+		<antcallback target="assemble classpath" return="manifest.classpath"/>
 		<jar jarfile="${jarpath}" update="false">
 			<fileset dir="${build}">
-				<include name="**"/>	
+				<include name="**"/>
 			</fileset>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -257,6 +282,7 @@
 				<attribute name="Class-Path" value="${manifest.classpath}"/>
 			</manifest>
 		</jar>
+
 		<copy todir="${appfolder}" description="copy dependent libraries">
 			<fileset dir="." includes="${manifest.classpath}"/>
 		</copy>
@@ -265,8 +291,8 @@
 				<include name="lib/jogamp/gluegen-rt-natives**"/>
 				<include name="lib/jogamp/jogl-all-natives**"/>
 			</fileset>
-		</copy>		
-		<copy todir="${appfolder}/native" description="copy native library filder">
+		</copy>
+		<copy todir="${appfolder}/native" description="copy native library folder">
 			<fileset dir="native">
 				<include name="**/**jpetsctao**"/>
 				<exclude name="**/**mpi**"/>
@@ -275,17 +301,16 @@
 		<copy todir="${appfolder}" description="copy initial properties file">
 			<fileset dir="etc" includes="${etc-properties-file}"/>
 		</copy>
-		<mkdir dir="${appfolder}/plugin"/>
-		<zip destfile="${zippath}">
+		<mkdir dir="${appfolder}/plugin" description="create drop-in plugin folder"/>
+		<zip destfile="${zippath}" description="create release zip file">
 			<fileset dir="${release}">
 				<include name="${jarname}/**"/>
 			</fileset>
 		</zip>
 		<delete dir="${appfolder}"/>
 	</target>
-	
-	
-	
+
+
 	
 	<target name="release API jar" depends="compile">
 		<mkdir dir="${tmp}"/>
@@ -297,11 +322,11 @@
 		<delete dir="${tmp}/META-INF"/>
 		<jar jarfile="${release}/${apijarfile}" update="false">
 			<fileset dir="${build}">
-				<include name="de/varylab/varylab/hds/*"/>	
-				<include name="de/varylab/varylab/optimization/IterationProtocol**"/>	
-				<include name="de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>	
-				<include name="de/varylab/varylab/plugin/VarylabPlugin**"/>	
-				<include name="de/varylab/varylab/plugin/VarylabShrinkPlugin**"/>	
+				<include name="de/varylab/varylab/hds/*"/>
+				<include name="de/varylab/varylab/optimization/IterationProtocol**"/>
+				<include name="de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
+				<include name="de/varylab/varylab/plugin/VarylabPlugin**"/>
+				<include name="de/varylab/varylab/plugin/VarylabShrinkPlugin**"/>
 			</fileset>
 			<fileset dir="${tmp}">
 				<include name="de/jtem/halfedge/**"/>
@@ -320,9 +345,68 @@
 		</jar>
 		<delete dir="${tmp}"/>
 	</target>
+
+
+
+	<target name="release service" depends="compile">
+		<property name="release-name" value="VaryLabService-${date}"/>
+		<property name="jarfile" value="${release-name}.jar"/>
+		<property name="jarpath" value="${release.service}/${jarfile}"/>
+		<property name="mainclass" value="de.varylab.varylab.VaryLab"/>
+		<jar jarfile="${jarpath}" update="false">
+			<fileset dir="${build}">
+				<include name="**"/>
+			</fileset>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Implementation-Vendor" value="${vendor}"/>
+				<attribute name="Implementation-Title" value="VaryLab[Service]"/>
+				<attribute name="Implementation-Version" value="${version}"/>
+				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
+			</manifest>
+		</jar>
+		<antcallback target="assemble classpath" return="manifest.classpath"/>
+		<copy todir="${release.service}" description="copy dependent libraries">
+			<fileset dir="." includes="${manifest.classpath}"/>
+		</copy>
+		
+		<property name="warfile" value="${release-name}.war"/>
+		<property name="warpath" value="${release.service}/${warfile}"/>
+		<jnlpwar
+            tofile="${warpath}"
+            codebase="$$codebase"
+            title="VaryLab"
+            vendor="${vendor}"
+            pack200="false"
+            signStorepass="${signStorepass}"
+            signAlias="${signAlias}"
+			keystore="${keystore}"
+		>
+            <description>
+            	Varylab is a software developed at Berlin Institute of 
+            	Technology by members of the geometry group. It is supported 
+            	by the DFG Research Center MATHEON, and the SFB/TR 109 
+            	Discretization in Geometry and Dynamics. Varylab implements 
+            	various variational principles for discrete surfaces, e.g., 
+            	planarity of faces, equal lengths of edges, curvature of 
+            	parameter curves. It is designed to be an extensible and 
+            	modular tool for experiments with discrete surfaces in pure 
+            	mathematics and applications in industrial geometry.
+            </description>
+            <description kind="short">
+            	Varylab - Discrete Surface Optimization
+            </description>
+            <j2se minVersion="1.6" args="-Xmx512M"/>
+            <lib dir="${release.service}/lib">
+                <include name="**/*.jar"/>
+            </lib>
+            <application mainclass="${mainclass}" jar="${jarpath}"/>
+        </jnlpwar>
+
+	</target>
 	
 	
-	
+
 	<target name="clean">
 		<delete dir="${build}"/>
 		<delete dir="${build-test}"/>
