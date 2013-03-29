@@ -43,8 +43,8 @@
 	</taskdef>
 	<typedef resource="org/unintelligible/antjnlpwar/antjnlpwar.xml" format="xml">
 		<classpath>
-			<!--pathelement location="etc/ant/ant-jnlp-war.jar"/-->
-			<pathelement location="../ant-jnlp-war/bin"/>
+			<pathelement location="etc/ant/ant-jnlp-war.jar"/>
+			<!--pathelement location="../ant-jnlp-war/bin"/-->
 			<pathelement location="etc/ant/Pack200Task.jar"/>
 			<pathelement location="etc/ant/velocity-1.4.jar"/>
 			<pathelement location="etc/ant/commons-collections.jar"/>
@@ -76,7 +76,7 @@
 		<pathelement location="${lib}/jreality/colorpicker.jar"/>
 		<pathelement location="${lib}/jreality/janino.jar"/>
 		<pathelement location="${lib}/jreality/jterm.jar"/>
-		<pathelement location="${lib}/jreality/jythonconsole.jar"/>
+		<pathelement location="${lib}/jreality/jython_console.jar"/>
 		<pathelement location="${lib}/jreality/jython-standalone-2.5.3.jar"/>
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
@@ -373,8 +373,8 @@
 		<property name="warfile" value="${release-name}.war"/>
 		<property name="warpath" value="${release.service}/${warfile}"/>
 		<jnlpwar
+			codebase="http://127.0.0.1:8888/"	
             tofile="${warpath}"
-            codebase="$$codebase"
             title="VaryLab"
             vendor="${vendor}"
             pack200="false"
@@ -399,7 +399,18 @@
             <j2se minVersion="1.6" args="-Xmx512M"/>
             <lib dir="${release.service}/lib">
                 <include name="**/*.jar"/>
+            	<exclude name="**/jogl-all.jar"/>
+            	<exclude name="**/gluegen-rt.jar"/>
             </lib>
+			<lib dir="${lib}/jogamp">
+				<include name="*.jar"/>
+			</lib>
+			<nativelib os="Windows" arch="i586" dir="native/win32/" includes="jpetsctao.dll"/>
+			<nativelib os="Windows" arch="amd64" dir="native/win64/" includes="jpetsctao.dll"/>	
+			<nativelib os="Linux" arch="i586" dir="native/linux32/" includes="libjpetsctao.so"/>
+			<nativelib os="Linux" arch="amd64" dir="native/linux64/" includes="libjpetsctao.so"/>	
+			<nativelib os="Mac\ OS\ X" arch="i586" dir="native/macosx/" includes="libjpetsctao.dylib"/>
+			<nativelib os="Mac\ OS\ X" arch="x86_64" dir="native/macosx/" includes="libjpetsctao.dylib"/>					
             <application mainclass="${mainclass}" jar="${jarpath}"/>
         </jnlpwar>
 
