@@ -365,15 +365,11 @@
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
 			</manifest>
 		</jar>
-		<antcallback target="assemble classpath" return="manifest.classpath"/>
-		<copy todir="${release.service}" description="copy dependent libraries">
-			<fileset dir="." includes="${manifest.classpath}"/>
-		</copy>
-		
+
 		<property name="warfile" value="${release-name}.war"/>
 		<property name="warpath" value="${release.service}/${warfile}"/>
+		<antcallback target="assemble classpath" return="manifest.classpath"/>
 		<jnlpwar
-			codebase="http://127.0.0.1:8888/"	
             tofile="${warpath}"
             title="VaryLab"
             vendor="${vendor}"
@@ -381,6 +377,7 @@
             signStorepass="${signStorepass}"
             signAlias="${signAlias}"
 			keystore="${keystore}"
+			attemptjavadetection="true"
 		>
             <description>
             	Varylab is a software developed at Berlin Institute of 
@@ -397,13 +394,11 @@
             	Varylab - Discrete Surface Optimization
             </description>
             <j2se minVersion="1.6" args="-Xmx512M"/>
-            <lib dir="${release.service}/lib">
-                <include name="**/*.jar"/>
-            	<exclude name="**/jogl-all.jar"/>
-            	<exclude name="**/gluegen-rt.jar"/>
-            </lib>
+            <lib dir="." includes="${manifest.classpath}"/>
 			<lib dir="${lib}/jogamp">
 				<include name="*.jar"/>
+				<exclude name="**/jogl-all.jar"/>
+				<exclude name="**/gluegen-rt.jar"/>
 			</lib>
 			<nativelib os="Windows" arch="i586" dir="native/win32/" includes="jpetsctao.dll"/>
 			<nativelib os="Windows" arch="amd64" dir="native/win64/" includes="jpetsctao.dll"/>	
@@ -413,7 +408,7 @@
 			<nativelib os="Mac\ OS\ X" arch="x86_64" dir="native/macosx/" includes="libjpetsctao.dylib"/>					
             <application mainclass="${mainclass}" jar="${jarpath}"/>
         </jnlpwar>
-
+		<delete file="${jarpath}"/>
 	</target>
 	
 	
