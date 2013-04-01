@@ -352,7 +352,7 @@
 		<property name="release-name" value="VaryLabService-${date}"/>
 		<property name="jarfile" value="${release-name}.jar"/>
 		<property name="jarpath" value="${release.service}/${jarfile}"/>
-		<property name="mainclass" value="de.varylab.varylab.VaryLab"/>
+		<property name="mainclass" value="de.varylab.varylab.startup.definitions.VaryLabService"/>
 		<jar jarfile="${jarpath}" update="false">
 			<fileset dir="${build}">
 				<include name="**"/>
@@ -406,7 +406,11 @@
 			<nativelib os="Linux" arch="amd64" dir="native/linux64/" includes="libjpetsctao.so"/>	
 			<nativelib os="Mac\ OS\ X" arch="i586" dir="native/macosx/" includes="libjpetsctao.dylib"/>
 			<nativelib os="Mac\ OS\ X" arch="x86_64" dir="native/macosx/" includes="libjpetsctao.dylib"/>					
-            <application mainclass="${mainclass}" jar="${jarpath}"/>
+            <application 
+            	mainclass="${mainclass}" 
+            	jar="${jarpath}"
+            	arguments="##plugins##"
+            />
         </jnlpwar>
 		<delete file="${jarpath}"/>
 	</target>

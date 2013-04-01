@@ -93,7 +93,7 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		
 		resetButton.addActionListener(this);
 		
-		chartPanel.setPreferredSize(new Dimension(100, 450));
+		chartPanel.setPreferredSize(new Dimension(100, 350));
 		plot.setRenderer(plotRenderer);
 		plot.setGap(10.0);
 		domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
