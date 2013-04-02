@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.util.Set;
 
 import de.jreality.plugin.basic.ConsolePlugin;
+import de.jreality.plugin.basic.Inspector;
 import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
@@ -89,6 +90,7 @@ public class VaryLabGridshells extends VarylabStartupDefinition {
 		
 		classes.add(HalfedgePreferencePage.class);
 		classes.add(VisualizationInterface.class);
+		classes.add(Inspector.class);
 	}
 
 	private static void addVisualizerPlugins(Set<Class<? extends Plugin>> classes) {

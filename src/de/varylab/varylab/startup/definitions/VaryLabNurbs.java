@@ -3,6 +3,7 @@ package de.varylab.varylab.startup.definitions;
 import java.util.Set;
 
 import de.jreality.plugin.basic.ConsolePlugin;
+import de.jreality.plugin.basic.Inspector;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
@@ -44,6 +45,7 @@ public class VaryLabNurbs extends VarylabStartupDefinition {
 		pSet.add(NurbsManagerPlugin.class);
 		pSet.add(HalfedgePreferencePage.class);
 		pSet.add(VisualizationInterface.class);
+		pSet.add(Inspector.class);
 	}
 
 	public static void main(String[] args) throws Exception {

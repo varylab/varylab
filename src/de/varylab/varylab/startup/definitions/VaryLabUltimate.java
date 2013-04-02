@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.util.Set;
 
 import de.jreality.plugin.basic.ConsolePlugin;
+import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.scripting.PythonConsole;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
@@ -193,6 +194,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 //		pSet.add(VertexSpheres.class);
 		
 		pSet.add(PythonConsole.class);
+		pSet.add(Inspector.class);
 	}
 
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>2536876529756342</id>
+		<name>A-Net Optimizer</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		Mesh optimization towards planar vertex stars. A mesh in which 
+		the neighbors of each vertex lie in a plane is called a discrete
+		A-surface or discrete asymptotic net. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer"/>
+	
+</module>

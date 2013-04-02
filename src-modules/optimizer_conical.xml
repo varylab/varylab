@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>35267453udt4327r</id>
+		<name>Conical mesh Optimizer</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		Mesh optimization towards vertex stars where faces touch 
+		a common cone of revolution. Such a mesh is called a conical mesh.
+		Conical meshes approximate curvature line parameterized surface. In
+		addition to this they admit an edge offset where offset planes meet
+		at the cone axes. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer"/>
+	
+</module>

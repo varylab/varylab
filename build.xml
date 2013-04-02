@@ -347,9 +347,9 @@
 	</target>
 
 
-
-	<target name="release service" depends="compile">
-		<property name="release-name" value="VaryLabService-${date}"/>
+	
+	<target name="release service jar" depends="compile">
+		<property name="release-name" value="VaryLabService"/>
 		<property name="jarfile" value="${release-name}.jar"/>
 		<property name="jarpath" value="${release.service}/${jarfile}"/>
 		<property name="mainclass" value="de.varylab.varylab.startup.definitions.VaryLabService"/>
@@ -365,6 +365,16 @@
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
 			</manifest>
 		</jar>
+		<signjar alias="${signAlias}" jar="${jarpath}" keystore="${keystore}" storepass="${signStorepass}"/>
+	</target>
+	
+	
+
+	<target name="release complete service war" depends="release service jar">
+		<property name="release-name" value="VaryLabService-${date}"/>
+		<property name="jar-release-name" value="VaryLabService"/>
+		<property name="jarfile" value="${jar-release-name}.jar"/>
+		<property name="jarpath" value="${release.service}/${jarfile}"/>
 
 		<property name="warfile" value="${release-name}.war"/>
 		<property name="warpath" value="${release.service}/${warfile}"/>
@@ -409,10 +419,9 @@
             <application 
             	mainclass="${mainclass}" 
             	jar="${jarpath}"
-            	arguments="##plugins##"
+            	arguments="$$plugins"
             />
         </jnlpwar>
-		<delete file="${jarpath}"/>
 	</target>
 	
 	

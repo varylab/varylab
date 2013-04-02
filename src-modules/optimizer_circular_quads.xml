@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>54637286te53s643</id>
+		<name>Circular Quads Optimizer</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		A mesh with circular quads approximates a surface parameterized
+		along its directions of principle curvature. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer"/>
+	
+</module>

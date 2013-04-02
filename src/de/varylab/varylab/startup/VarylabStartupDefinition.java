@@ -21,7 +21,6 @@ import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
-import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jreality.plugin.basic.ViewToolBar;
@@ -133,7 +132,6 @@ public abstract class VarylabStartupDefinition {
 				v.setShowToolBar(true);
 				v.setShowMenuBar(true);
 				// basic ui
-				v.registerPlugin(Inspector.class);
 				v.registerPlugin(BackgroundColor.class);
 				v.registerPlugin(DisplayOptions.class);
 				v.registerPlugin(ViewMenuBar.class);
