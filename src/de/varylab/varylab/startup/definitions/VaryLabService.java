@@ -60,13 +60,14 @@ public class VaryLabService extends VarylabStartupDefinition {
 		// load custom classes
 		for (String className : pluginClassNames) {
 			try {
+				className = className.trim();
 				Class<?> clazz = Class.forName(className);
 				Object obj = clazz.newInstance();
 				if (obj instanceof Plugin) {
 					instances.add((Plugin)obj);
 				}
 			} catch (Exception e) {
-				log.warning("could not load plug-in class " + className + ": " + e);
+				log.warning("could not load plug-in class \"" + className + "\": " + e);
 			}
 		}
 	}
