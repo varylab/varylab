@@ -371,12 +371,8 @@
 	
 
 	<target name="release complete service war" depends="release service jar">
-		<property name="release-name" value="VaryLabService-${date}"/>
-		<property name="jar-release-name" value="VaryLabService"/>
-		<property name="jarfile" value="${jar-release-name}.jar"/>
-		<property name="jarpath" value="${release.service}/${jarfile}"/>
-
-		<property name="warfile" value="${release-name}.war"/>
+		<property name="war-release-name" value="VaryLabService-${date}"/>
+		<property name="warfile" value="${war-release-name}.war"/>
 		<property name="warpath" value="${release.service}/${warfile}"/>
 		<antcallback target="assemble classpath" return="manifest.classpath"/>
 		<jnlpwar
@@ -419,7 +415,7 @@
             <application 
             	mainclass="${mainclass}" 
             	jar="${jarpath}"
-            	arguments="$$plugins"
+            	arguments="$$$$plugins"
             />
         </jnlpwar>
 	</target>
