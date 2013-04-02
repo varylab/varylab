@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>4635263748596745</id>
+		<name>Planar Quads Optimizer</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		The planarization module is a surface mesh optimizer. It comes
+		with two energies: the volume of tetrahedra and the distance of 
+		diagonals of quadrilaterals. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer"/>
+	
+</module>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>5347493526786543</id>
+		<name>Circum-Circle Curvature Optimizer</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		This optimizer penalizes a discrete parameter curve curvature
+		defined as the inverse of the radius of a circle through three 
+		consecutive points on a parameter curve.
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer"/>
+	
+</module>

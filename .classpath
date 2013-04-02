@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="src-python"/>
 	<classpathentry kind="src" path="src-website"/>
 	<classpathentry kind="src" path="src-resource"/>
+	<classpathentry kind="src" path="src-modules"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar" sourcepath="/Substance"/>
 	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
