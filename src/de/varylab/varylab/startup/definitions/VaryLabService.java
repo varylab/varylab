@@ -1,6 +1,8 @@
 package de.varylab.varylab.startup.definitions;
 
 import java.awt.Image;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -20,13 +22,13 @@ public class VaryLabService extends VarylabStartupDefinition {
 		log = Logger.getLogger(VaryLabService.class.getName());
 	private VarylabSplashScreen
 		splash = null;
-	private String[]
-		pluginClassNames = {};
+	private List<String>
+		pluginClassNames = null;
 	
 	
-	public VaryLabService(String[] pluginClassNames) {
+	public VaryLabService(List<String> plugins) {
 		super();
-		this.pluginClassNames = pluginClassNames;
+		this.pluginClassNames = plugins;
 	}
 
 	@Override
@@ -60,7 +62,6 @@ public class VaryLabService extends VarylabStartupDefinition {
 		// load custom classes
 		for (String className : pluginClassNames) {
 			try {
-				className = className.trim();
 				Class<?> clazz = Class.forName(className);
 				Object obj = clazz.newInstance();
 				if (obj instanceof Plugin) {
@@ -74,7 +75,13 @@ public class VaryLabService extends VarylabStartupDefinition {
 
 	
 	public static void main(String[] args) throws Exception {
-		new VaryLabService(args).startup();
+		String pluginNames = args[0];
+		List<String> plugins = new LinkedList<String>();
+		for (String name : pluginNames.split(" ")) {
+			if (name.trim().isEmpty()) continue;
+			plugins.add(name.trim());
+		}
+		new VaryLabService(plugins).startup();
 	}
 
 }
