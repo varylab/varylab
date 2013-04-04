@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>js5dhr65st865gwr</id>
+		<name>Subdivision Essentials</name>
+		<revision>4311</revision>
+		<category>Subdivision</category>
+	</manifest>
+	<description>
+		This module contains global subdivision plug-ins. This is the
+		commonly used schemes as Catmull-Clark, Doo-Sabin, Loop, and Sqrt3.
+		Some of the plug-ins will work on meshes with boundary. For others we
+		will add boundary support in the future.
+	</description>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.DooSabinPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopLinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.MedialGraphLinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.QuadGraphLinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Triangulate"/>
+
+</module>

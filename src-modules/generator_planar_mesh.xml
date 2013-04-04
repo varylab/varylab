@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>sbdtznfe36dhe64f</id>
+		<name>Planar Mesh Generators</name>
+		<revision>4311</revision>
+		<category>Generator</category>
+	</manifest>
+	<description>
+		Generators for quadrilateral and hexagonal planar meshes.
+	</description>
+	<plugin class="de.varylab.varylab.plugin.generator.HexMeshGenerator"/>
+	<plugin class="de.varylab.varylab.plugin.generator.QuadMeshGenerator"/>
+	
+</module>

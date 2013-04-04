@@ -44,7 +44,6 @@ import de.varylab.varylab.plugin.editor.DehomogenizeTexture;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
-import de.varylab.varylab.plugin.generator.PrimitivesGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
@@ -202,7 +201,6 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(QuadMeshGenerator.class);
 		pSet.add(HexMeshGenerator.class);
 		pSet.add(SimpleRoofGenerator.class);
-		pSet.add(PrimitivesGenerator.class);
 		pSet.add(TschebyscheffSphereGenerator.class);
 	}
 

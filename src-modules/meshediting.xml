@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>shdztrsg35463jst</id>
+		<name>Mesh Editing Essentials</name>
+		<revision>4311</revision>
+		<category>Mesh Editing</category>
+	</manifest>
+	<description>
+		Mesh editing essentials contains the basic 
+		tools you will need to select, delete, and edit nodes of 
+		you mesh. 
+	</description>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.RemoveSelectedNodesPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.selection.ClearSelection"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryEdgeSelection"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryFaceSelection"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryVertexSelection"/>
+	<plugin class="de.jtem.halfedgetools.plugin.widget.MarqueeWidget"/>
+	<plugin class="de.jtem.halfedgetools.plugin.widget.ContextMenuWidget"/>
+	<plugin class="de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin"/>
+	
+</module>

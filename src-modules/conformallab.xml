@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>94zdhs5ejfz432sh</id>
+		<name>Conformal Lab</name>
+		<revision>4311</revision>
+		<category>Parameterization</category>
+	</manifest>
+	<description>
+		This module implements conformal parameterization of triangle
+		meshes. It works best for meshes with one boundary component.
+		It supports various boundary conditions, e.g., isometric boundary,
+		Neumann boundary conditions, special curvature adapted Neumann conditions.
+		Together with the remeshing module it builds the basis of a conformal 
+		mesh generator toolkit.
+	</description>
+	<plugin class="de.varylab.discreteconformal.plugin.DiscreteConformalPlugin"/>
+	
+</module>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>hdbtresg6dj743fs</id>
+		<name>Primitives Generator</name>
+		<revision>4311</revision>
+		<category>Generator</category>
+	</manifest>
+	<description>
+		A generator for primitive geometries. Generates single triangles,
+		cubes, open cubes, tetrahedra, and icosahedra.
+	</description>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.generator.PrimitivesGenerator"/>
+	
+</module>
