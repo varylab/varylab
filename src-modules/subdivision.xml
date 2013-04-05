@@ -25,6 +25,6 @@
 	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin"/>
 	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin"/>
 	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin"/>
-	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.Triangulate"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin"/>
 
 </module>
