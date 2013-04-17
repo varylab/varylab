@@ -17,6 +17,7 @@
 		Together with the remeshing module it builds the basis of a conformal 
 		mesh generator toolkit.
 	</description>
+	<documentation href="conformallab/doc.html"/>
 	<plugin class="de.varylab.discreteconformal.plugin.DiscreteConformalPlugin"/>
 	
 </module>
