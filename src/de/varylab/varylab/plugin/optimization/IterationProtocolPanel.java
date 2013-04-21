@@ -82,6 +82,7 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		shrinkPanel.setLayout(new BorderLayout(2, 2));
 		shrinkPanel.add(chartPanel, BorderLayout.CENTER);
 		shrinkPanel.add(controlsPanel, BorderLayout.SOUTH);
+		shrinkPanel.setShrinked(true);
 		controlsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx = 0.0;
