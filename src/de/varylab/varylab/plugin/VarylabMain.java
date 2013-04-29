@@ -15,7 +15,6 @@ import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
-import de.varylab.discreteconformal.plugin.DomainVisualisationPlugin;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.halfedge.adapter.NodeWeigthAdapter;
@@ -84,7 +83,6 @@ public class VarylabMain extends Plugin {
 
 	public void hideInfoOverlayWorkaround(Controller c) {
 		c.getPlugin(View.class);
-		c.getPlugin(DomainVisualisationPlugin.class);
 		InfoOverlayPlugin iol = c.getPlugin(InfoOverlayPlugin.class);
 		iol.getInfoOverlay().setVisible(false);
 		ViewToolBar toolbar = c.getPlugin(ViewToolBar.class);
