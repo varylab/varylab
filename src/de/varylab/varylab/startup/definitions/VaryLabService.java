@@ -1,6 +1,7 @@
 package de.varylab.varylab.startup.definitions;
 
 import java.awt.Image;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -24,11 +25,18 @@ public class VaryLabService extends VarylabStartupDefinition {
 		splash = null;
 	private List<String>
 		pluginClassNames = null;
+	private String
+		projectId = "default";
 	
+	static {
+		// create varylab preferences folder
+		new File(".varylab").mkdirs();
+	}
 	
-	public VaryLabService(List<String> plugins) {
+	public VaryLabService(List<String> plugins, String projectId) {
 		super();
 		this.pluginClassNames = plugins;
+		this.projectId = projectId;
 	}
 
 	@Override
@@ -38,7 +46,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 	
 	@Override
 	public String getPropertyFileName() {
-		return "VaryLabService.xml";
+		return ".varylab/project_" + projectId + ".xml";
 	}
 	
 	@Override
@@ -75,13 +83,22 @@ public class VaryLabService extends VarylabStartupDefinition {
 
 	
 	public static void main(String[] args) throws Exception {
-		String pluginNames = args[0];
+		// read plug-ins
 		List<String> plugins = new LinkedList<String>();
-		for (String name : pluginNames.split(" ")) {
-			if (name.trim().isEmpty()) continue;
-			plugins.add(name.trim());
+		if (args.length >= 1) {
+			String pluginNames = args[0];
+			for (String name : pluginNames.split(" ")) {
+				if (name.trim().isEmpty()) continue;
+				plugins.add(name.trim());
+			}
 		}
-		new VaryLabService(plugins).startup();
+		// get project id
+		String projectId = "default";
+		if (args.length >= 2) {
+			projectId = args[1];
+		}
+		
+		new VaryLabService(plugins, projectId).startup();
 	}
 
 }
