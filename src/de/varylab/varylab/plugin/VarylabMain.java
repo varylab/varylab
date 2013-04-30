@@ -31,20 +31,7 @@ public class VarylabMain extends Plugin {
 		configureHalfedgeInterface(c);
 		adapterViewToUI(c);
 		hideInfoOverlayWorkaround(c);
-		
-		ContentAppearance ca = c.getPlugin(ContentAppearance.class);
-		AppearanceInspector ai = ca.getAppearanceInspector();
-		TextureInspector ti = ai.getTextureInspector();
-		ti.getTextures().remove("2 Metal Grid");
-		ti.getTextures().remove("3 Metal Floor");
-		ti.getTextures().remove("4 Chain-Link Fence");
-		ti.getTextures().put("Quads", "de/varylab/varylab/texture/quads01.png");
-		ti.getTextures().put("Checker", "de/varylab/varylab/texture/checker03.png");
-		ti.getTextures().put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
-		ti.getTextures().put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
-		String selectedTex = ti.getTexture();
-		ti.setTexture("Quads");
-		ti.setTexture(selectedTex);
+		replaceDefaultTextures(c);
 		
 		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
 			@Override
@@ -59,7 +46,7 @@ public class VarylabMain extends Plugin {
 	}
 
 
-	public void adapterViewToUI(Controller c) {
+	protected void adapterViewToUI(Controller c) {
 		String color = c.getProperty(BackgroundColor.class, "color", "");
 		if (color.equals("")) {
 			BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
@@ -68,7 +55,7 @@ public class VarylabMain extends Plugin {
 	}
 
 
-	public void configureHalfedgeInterface(Controller c) {
+	protected void configureHalfedgeInterface(Controller c) {
 		HalfedgeInterface hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addAdapter(new VPositionAdapter(), true);
 		hif.addAdapter(new VTexturePositionAdapter(), true);
@@ -81,7 +68,7 @@ public class VarylabMain extends Plugin {
 	}
 
 
-	public void hideInfoOverlayWorkaround(Controller c) {
+	protected void hideInfoOverlayWorkaround(Controller c) {
 		c.getPlugin(View.class);
 		InfoOverlayPlugin iol = c.getPlugin(InfoOverlayPlugin.class);
 		iol.getInfoOverlay().setVisible(false);
@@ -91,10 +78,20 @@ public class VarylabMain extends Plugin {
 		algoToolbar.setFloatable(false);
 	}
 	
-	
-	protected void replaceDefaultTextures(ContentAppearance ca) {
-		
+	protected void replaceDefaultTextures(Controller c) {
+		ContentAppearance ca = c.getPlugin(ContentAppearance.class);
+		AppearanceInspector ai = ca.getAppearanceInspector();
+		TextureInspector ti = ai.getTextureInspector();
+		ti.getTextures().remove("2 Metal Grid");
+		ti.getTextures().remove("3 Metal Floor");
+		ti.getTextures().remove("4 Chain-Link Fence");
+		ti.getTextures().put("Quads", "de/varylab/varylab/texture/quads01.png");
+		ti.getTextures().put("Checker", "de/varylab/varylab/texture/checker03.png");
+		ti.getTextures().put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
+		ti.getTextures().put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
+		String selectedTex = ti.getTexture();
+		ti.setTexture("Quads");
+		ti.setTexture(selectedTex);
 	}
-	
 	
 }

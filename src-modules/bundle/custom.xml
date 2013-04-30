@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle
+	xmlns="http://www.varylab.com/bundle"
+	xmlns:vm="http://www.varylab.com/module" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<name>Custom Bundle</name>
+	<id>7dhfks76dhytw546</id>
+	<description>
+		This is an empty module bundle. You can add modules later.
+	</description>
+	<logoImage href="varylab_ultimate_low_res.png"/>	
+	
+</bundle>
