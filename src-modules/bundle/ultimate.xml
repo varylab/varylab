@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle
+	xmlns="http://www.varylab.com/bundle"
+	xmlns:vm="http://www.varylab.com/module" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<name>Ultimate</name>
+	<id>87uhfc409rq870d2</id>
+	<description>
+		This module bundle conatins all available modules. It comprises
+		every functionality ever implemented. At the same time the user 
+		interface can be quite cluttered. If you feel reckless this could 
+		be your choice otherwise it is recommended to use one of the 
+		specialized bundles designed for your task or compile your own 
+		module bundle.
+	</description>
+	<logoImage href="varylab_ultimate_low_res.png"/>	
+	
+	<moduleRef id="-1" alias="the ultimate module is treated as containing all modules"/>
+
+</bundle>
