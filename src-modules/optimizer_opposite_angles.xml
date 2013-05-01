@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>bdgtrs543h7fydtr</id>
+		<name>Curve Curvature Optimization (Opposite Angles)</name>
+		<revision>1</revision>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		This optimizer penalizes a notion of discrete curvature 
+		on discrete parameter curves. Only vertices with even valence
+		contribute. At a critical point opposite angles between edges
+		are equal.   
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature"/>
+	
+</module>

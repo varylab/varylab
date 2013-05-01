@@ -4,17 +4,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 >
 	<manifest>
-		<id>2536876529756342</id>
-		<name>A-Net Optimizer</name>
-		<revision>4311</revision>
-		<category>Mesh Editing</category>
-		<category>Optimization</category>
+		<id>shz4567e437gw423</id>
+		<name>Scene Graph Navigator</name>
+		<revision>1</revision>
+		<category>Poweruser</category>
 	</manifest>
 	<description>
-		Mesh optimization towards planar vertex stars. A mesh in which 
-		the neighbors of each vertex lie in a plane is called a discrete
-		A-surface or discrete asymptotic net. 
+		The Scene Graph Navigator lets you look behind the scenes of
+		the VaryLab rendering and scene engine. You can edit all parameters
+		e.g. lighting, transformations, appearances.  
 	</description>
-	<plugin class="de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer"/>
-	
+	<plugin class="de.jreality.plugin.basic.Inspector"/>
+		
 </module>

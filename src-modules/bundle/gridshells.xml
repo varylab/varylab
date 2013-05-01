@@ -7,10 +7,11 @@
 	<name>Gridshells</name>
 	<id>d3dh37fh38374hf7</id>
 	<description>
-		The gridshells module bundle contains parameterization and optimization
+		The Gridshells module bundle contains parameterization and optimization
 		plug-ins for the creation of meshes with constant beam length. These
 		can be developed into the plane.  
 	</description>
+	<blogURL href="http://dgd.service.tu-berlin.de/wordpress/varylab/gridshells/"/>
 	<logoImage href="varylab_grid_low_res.png"/>	
 	
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>

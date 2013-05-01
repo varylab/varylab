@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>jf65dg46ts4rkgy6</id>
+		<name>Reference Surface (NURBS)</name>
+		<revision>1</revision>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		Use a NURBS surface as reference surface during optimization. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.NURBSSurfaceOptimizer"/>
+	
+</module>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>jfgt56rw5r7yd543</id>
+		<name>Geodesic Curvature Optimization</name>
+		<revision>1</revision>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		This optimizer penalizes a notion of discrete geodesic curvature 
+		on discrete parameter curves. Two edges adjacent to the same vertex 
+		belong to the same discrete geodesic if they are opposite combinatorially.
+		Vertices with odd valence do not contribute.
+		The curvature is measures as the angle between edges after projection
+		onto the tangent plane at the vertex defined by a vertex normal.  
+	</description>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.GeodesicCurvatureOptimizer"/>
+	
+</module>

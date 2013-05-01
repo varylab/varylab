@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>hf65sgr98jdg5432</id>
+		<name>Reference Surface (Mesh)</name>
+		<revision>1</revision>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		Use a triangle mesh surface as reference surface during optimization. 
+	</description>
+	
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.ReferenceSurfaceOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.datasource.ReferenceDistance"/>
+	
+</module>

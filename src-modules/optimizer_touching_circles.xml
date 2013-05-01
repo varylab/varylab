@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>jfgt67hsr5gdt654</id>
+		<name>Touching Incircles Optimizer</name>
+		<revision>1</revision>
+		<category>Optimization</category>
+	</manifest>
+	<description>
+		At a critical point of this energy a planar quad-mesh that possesses
+		incircles has quads that touch at edges.
+	</description>
+	<plugin class="de.varylab.varylab.plugin.remeshing.TouchingIncirclesOptimizerCot"/>
+	
+</module>
