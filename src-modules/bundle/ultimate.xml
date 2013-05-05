@@ -14,7 +14,7 @@
 		specialized bundles designed for your task or compile your own 
 		module bundle.
 	</description>
-	<blogURL href="http://dgd.service.tu-berlin.de/wordpress/varylab/ultimate/"/>
+	<blogURL href="http://www.varylab.com/p/ultimate.html"/>
 	<logoImage href="varylab_ultimate_low_res.png"/>	
 	
 	<moduleRef id="-000000000000001" alias="the ultimate module is treated as containing all modules"/>
