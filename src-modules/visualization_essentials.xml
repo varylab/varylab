@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>hf65frs4356rfh54</id>
+		<name>Visualization Essentials</name>
+		<revision>1</revision>
+		<category>Visualization</category>
+	</manifest>
+	<description>
+		The visualization essentials module contains basic methods to visualize
+		data on discrete surfaces. There are multiple visualizers for scalar functions.
+		We show colored beads that can be scaled according to the function value. A histogram
+		lets you inspect the distribution and spreading of your data.
+		Vector valued data can be visualized in various ways. As arrows pointing in the direction
+		of a three vector, scaled beads, or as table data. 
+	</description>
+	<plugin class="de.jtem.halfedgetools.plugin.data.visualizer.ColoredBeadsVisualizer"/>
+	<plugin class="de.jtem.halfedgetools.plugin.data.visualizer.HistogramVisualizer"/>
+	<plugin class="de.jtem.halfedgetools.plugin.data.visualizer.LabelVisualizer"/>
+	<plugin class="de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer"/>
+	<plugin class="de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer"/>
+	
+</module>
