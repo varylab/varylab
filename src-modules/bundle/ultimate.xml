@@ -16,7 +16,5 @@
 	</description>
 	<blogURL href="http://www.varylab.com/p/ultimate.html"/>
 	<logoImage href="varylab_ultimate_low_res.png"/>	
-	
-	<moduleRef id="-000000000000001" alias="the ultimate module is treated as containing all modules"/>
 
 </bundle>
