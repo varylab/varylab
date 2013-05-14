@@ -67,6 +67,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		spinnerCellRenderer = new SpinnerCellEditor();
 	
 	public OptimizerPluginsPanel() {
+		setInitialPosition(SHRINKER_RIGHT);
 		shrinkPanel.setTitle("Optimizer Plugins");
 		tablePanel.setLayout(new GridLayout());
 		tablePanel.setBorder(BorderFactory.createTitledBorder("Optimizer Plugins"));

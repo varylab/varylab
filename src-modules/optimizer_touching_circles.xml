@@ -13,6 +13,6 @@
 		At a critical point of this energy a planar quad-mesh that possesses
 		incircles has quads that touch at edges.
 	</description>
-	<plugin class="de.varylab.varylab.plugin.remeshing.TouchingIncirclesOptimizerCot"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizerCot"/>
 	
 </module>

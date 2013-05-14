@@ -4,26 +4,27 @@
 	xmlns:vm="http://www.varylab.com/module" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 >
-	<name>Gridshells</name>
-	<id>d3dh37fh38374hf7</id>
+	<name>Planar Quad-Meshes</name>
+	<id>6dgtrs43ju986gr3</id>
 	<description>
-		The Gridshells module bundle contains parameterization and optimization
-		plug-ins for the creation of meshes with constant beam length. These
-		can be developed into the plane.  
+		This bundle contains all modules needed to create a mesh 
+		with planar quadrilaterals from an triangulated or NURBS input 
+		surface. It contains the respective parameterization, remeshing, 
+		and optimization modules.
 	</description>
-	<blogURL href="http://www.varylab.com/p/gridshells.html"/>
-	<logoImage href="varylab_grid_low_res.png"/>	
+	<logoImage href="varylab_ultimate_low_res.png"/>	
 	
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
 	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>
 	<moduleRef id="hf65frs4356rfh54" alias="visualization"/>
-	<moduleRef id="5347493526786543" alias="optimizer circum circle curvature"/>
-	<moduleRef id="jfgt56rw5r7yd543" alias="optimizer geodesic curvature"/>
+	<moduleRef id="4635263748596745" alias="planar quads optimizer"/>
+	<moduleRef id="jfgt67hsr5gdt654" alias="touching circles optimizer"/>
+	<moduleRef id="uf65dge567srt543" alias="incircles optimizer"/>
+	<moduleRef id="35267453udt4327r" alias="conical optimizer"/>
 	<moduleRef id="bdgtrs543h7fydtr" alias="optimizer opposite angles curvature"/>
 	<moduleRef id="hf65gs432dgfy789" alias="optimizer opposite edges curvature"/>
 	<moduleRef id="hf65sgr98jdg5432" alias="ref surface mesh"/>
 	<moduleRef id="jf65dg46ts4rkgy6" alias="ref surface nurbs"/>
 	<moduleRef id="0174554738654297" alias="remeshing"/>
-	<moduleRef id="js5dhr65st865gwr" alias="subdivision"/>
-
+	
 </bundle>
