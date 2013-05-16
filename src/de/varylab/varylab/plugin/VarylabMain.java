@@ -1,9 +1,7 @@
 package de.varylab.varylab.plugin;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -56,8 +54,8 @@ public class VarylabMain extends Plugin {
 
 	
 	protected void firstStartCofig(Controller c) {
-		String flag = c.getProperty(VarylabMain.class, "firstStartFlag", "false");
-		c.storeProperty(VarylabMain.class, "firstStartFlag", "true");
+		String flag = c.getProperty(VarylabMain.class, "firstStartFlag", "true");
+		c.storeProperty(VarylabMain.class, "firstStartFlag", "false");
 		if (flag.equals("false")) return;
 
 		// set background color
@@ -68,17 +66,12 @@ public class VarylabMain extends Plugin {
 		ContentAppearance ca = c.getPlugin(ContentAppearance.class);
 		AppearanceInspector ai = ca.getAppearanceInspector();
 		TextureInspector ti = ai.getTextureInspector();
-		Set<String> texNames = ti.getTextures().keySet();
-		for (String texName : new HashSet<String>(texNames)) {
-			if (texName.equals("1 None")) continue;
-			ti.removeTexture(texName);
-		}
 		Map<String, String> texMap = new HashMap<String, String>();
 		texMap.put("Quads", "de/varylab/varylab/texture/quads01.png");
 		texMap.put("Checker", "de/varylab/varylab/texture/checker03.png");
 		texMap.put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
 		texMap.put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
-		ti.addTextures(texMap);
+		ti.setTextures(texMap);
 		ti.setTexture("Quads");
 		
 		// window size

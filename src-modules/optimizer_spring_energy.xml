@@ -13,6 +13,6 @@
 		The spring energy optimizer is a collection of energies. You can 
 		have springs of constant, mean, or zero length.
 	</description>
-	<plugin class="de.varylab.varylab.plugin.remeshing.SpringOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer"/>
 	
 </module>

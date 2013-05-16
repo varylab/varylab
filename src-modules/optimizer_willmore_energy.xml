@@ -12,6 +12,6 @@
 	<description>
 		The discrete willmore energy for triangulated surfaces.
 	</description>
-	<plugin class="de.varylab.varylab.plugin.remeshing.WillmoreOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer"/>
 	
 </module>
