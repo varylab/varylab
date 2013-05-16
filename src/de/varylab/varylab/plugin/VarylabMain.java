@@ -1,10 +1,8 @@
 package de.varylab.varylab.plugin;
 
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.skin.SkinChangeListener;
@@ -74,10 +72,8 @@ public class VarylabMain extends Plugin {
 		ti.setTextures(texMap);
 		ti.setTexture("Quads");
 		
-		// window size
 		View view = c.getPlugin(View.class);
-		JFrame w = (JFrame)SwingUtilities.getWindowAncestor(view.getContentPanel());
-		w.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		view.getCenterComponent().setPreferredSize(new Dimension(1280, 800));
 	}
 	
 

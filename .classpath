@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="lib/jtem/jpetsctao.jar" sourcepath="/jTao"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedge.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedgetools.jar" sourcepath="/halfedgetools"/>
-	<classpathentry kind="lib" path="lib/jtem/jrworkspace.jar" sourcepath="/jrworkspace"/>
 	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/ellipticFunctions.jar"/>
@@ -54,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/misc/JLink.jar"/>
 	<classpathentry kind="lib" path="lib/misc/MathematicaPlugin.jar"/>
 	<classpathentry kind="lib" path="lib/misc/mtj.jar"/>
+	<classpathentry kind="lib" path="lib/jtem/jrworkspace.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
