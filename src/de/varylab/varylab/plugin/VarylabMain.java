@@ -1,5 +1,13 @@
 package de.varylab.varylab.plugin;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.skin.SkinChangeListener;
 
@@ -29,9 +37,8 @@ public class VarylabMain extends Plugin {
 	public void install(final Controller c) throws Exception {
 		super.install(c);
 		configureHalfedgeInterface(c);
-		adapterViewToUI(c);
 		hideInfoOverlayWorkaround(c);
-		replaceDefaultTextures(c);
+		firstStartCofig(c);
 		
 		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
 			@Override
@@ -39,20 +46,47 @@ public class VarylabMain extends Plugin {
 				IterationProtocolPanel ipp = c.getPlugin(IterationProtocolPanel.class);
 				ipp.updateBackgroundColors();
 				BackgroundColor viewBackground = c.getPlugin(BackgroundColor.class);
-				viewBackground.setColor("UI Background");
+				if (viewBackground.getColor().equals("UI Background")) {
+					viewBackground.setColor("UI Background");
+				}
 			}
 		
 	    });
 	}
 
+	
+	protected void firstStartCofig(Controller c) {
+		String flag = c.getProperty(VarylabMain.class, "firstStartFlag", "false");
+		c.storeProperty(VarylabMain.class, "firstStartFlag", "true");
+		if (flag.equals("false")) return;
 
-	protected void adapterViewToUI(Controller c) {
-		String color = c.getProperty(BackgroundColor.class, "color", "");
-		if (color.equals("")) {
-			BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
-			bgColorPlugin.setColor("UI Background");
+		// set background color
+		BackgroundColor bgColorPlugin = c.getPlugin(BackgroundColor.class);
+		bgColorPlugin.setColor("UI Background");
+		
+		// default textures
+		ContentAppearance ca = c.getPlugin(ContentAppearance.class);
+		AppearanceInspector ai = ca.getAppearanceInspector();
+		TextureInspector ti = ai.getTextureInspector();
+		Set<String> texNames = ti.getTextures().keySet();
+		for (String texName : new HashSet<String>(texNames)) {
+			if (texName.equals("1 None")) continue;
+			ti.removeTexture(texName);
 		}
+		Map<String, String> texMap = new HashMap<String, String>();
+		texMap.put("Quads", "de/varylab/varylab/texture/quads01.png");
+		texMap.put("Checker", "de/varylab/varylab/texture/checker03.png");
+		texMap.put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
+		texMap.put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
+		ti.addTextures(texMap);
+		ti.setTexture("Quads");
+		
+		// window size
+		View view = c.getPlugin(View.class);
+		JFrame w = (JFrame)SwingUtilities.getWindowAncestor(view.getContentPanel());
+		w.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
+	
 
 
 	protected void configureHalfedgeInterface(Controller c) {
@@ -76,22 +110,6 @@ public class VarylabMain extends Plugin {
 		toolbar.setFloatable(false);
 		AlgorithmDropdownToolbar algoToolbar = c.getPlugin(AlgorithmDropdownToolbar.class);
 		algoToolbar.setFloatable(false);
-	}
-	
-	protected void replaceDefaultTextures(Controller c) {
-		ContentAppearance ca = c.getPlugin(ContentAppearance.class);
-		AppearanceInspector ai = ca.getAppearanceInspector();
-		TextureInspector ti = ai.getTextureInspector();
-		ti.getTextures().remove("2 Metal Grid");
-		ti.getTextures().remove("3 Metal Floor");
-		ti.getTextures().remove("4 Chain-Link Fence");
-		ti.getTextures().put("Quads", "de/varylab/varylab/texture/quads01.png");
-		ti.getTextures().put("Checker", "de/varylab/varylab/texture/checker03.png");
-		ti.getTextures().put("Hex", "de/varylab/varylab/texture/hex_pattern.png");
-		ti.getTextures().put("Tri", "de/varylab/varylab/texture/triangle_pattern.png");
-		String selectedTex = ti.getTexture();
-		ti.setTexture("Quads");
-		ti.setTexture(selectedTex);
 	}
 	
 }
