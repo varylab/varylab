@@ -5,6 +5,10 @@
             This is the VaryLab dependency update ant build file.
     </description>
     
+	<tstamp>
+		<format property="date" pattern="yyyy-MM-dd" />
+	</tstamp>
+	
 	<target name="default">
 		<echo>Please choose a dependency target to update.</echo>
 	</target>
@@ -31,6 +35,13 @@
 		<ant antfile="build.xml" dir="../jreality" target="release-jar"/>
 		<copy todir="lib/jreality">
 			<fileset dir="../jreality/release" includes="jReality.jar"/>
+		</copy>
+	</target>
+	
+	<target name="discrete conformal lab">
+		<ant antfile="build.xml" dir="../DiscreteConformalLab" target="release"/>
+		<copy todir="lib/conformallab">
+			<fileset dir="../DiscreteConformalLab/release/${date}" includes="DiscreteConformalLab.jar"/>
 		</copy>
 	</target>
 	

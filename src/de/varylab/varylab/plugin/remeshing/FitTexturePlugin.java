@@ -1,12 +1,8 @@
 package de.varylab.varylab.plugin.remeshing;
 
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
-
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.swing.JOptionPane;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -68,8 +64,7 @@ public class FitTexturePlugin extends AlgorithmPlugin {
 				a.set(TexturePosition.class, v, coord);
 			}
 		} else {
-			JOptionPane.showMessageDialog(getOptionParent(), "Select at least two vertices", "Transform Texture", WARNING_MESSAGE);
-			return;
+			throw new RuntimeException("Select at least two vertices");
 		}
 		hi.set(hds);
 	}
