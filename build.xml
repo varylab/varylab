@@ -379,11 +379,13 @@
             tofile="${warpath}"
             title="VaryLab"
             vendor="${vendor}"
+			homepage="http://www.varylab.com"
             pack200="false"
             signStorepass="${signStorepass}"
             signAlias="${signAlias}"
 			keystore="${keystore}"
 			attemptjavadetection="true"
+			offlineallowed="true"
 		>
             <description>
             	Varylab is a software developed at Berlin Institute of 
