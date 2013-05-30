@@ -12,7 +12,8 @@
 		surface. It contains the respective parameterization, remeshing, 
 		and optimization modules.
 	</description>
-	<logoImage href="varylab_ultimate_low_res.png"/>	
+	<blogURL href="http://www.varylab.com/p/planar-quads.html"/>
+	<logoImage href="varylab_ultimate_low_res.png"/>
 	
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
 	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>

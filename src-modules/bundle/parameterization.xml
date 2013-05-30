@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle
+	xmlns="http://www.varylab.com/bundle"
+	xmlns:vm="http://www.varylab.com/module" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<name>Parameterization</name>
+	<id>6dhuinsgt54frtyb</id>
+	<description>
+		This bundle supports parameterizations of triangle meshes. Create 
+		conformal parameterizations with different boundary conditions and 
+		singularities.
+	</description>
+	<blogURL href="http://www.varylab.com/p/parameterization.html"/>
+	<logoImage href="varylab_ultimate_low_res.png"/>
+	
+	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
+	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>
+	
+</bundle>
