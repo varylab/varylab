@@ -385,7 +385,7 @@
             signAlias="${signAlias}"
 			keystore="${keystore}"
 			attemptjavadetection="true"
-			offlineallowed="true"
+			offlineallowed="false"
 		>
             <description>
             	Varylab is a software developed at Berlin Institute of 

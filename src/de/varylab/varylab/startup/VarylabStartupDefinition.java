@@ -82,6 +82,12 @@ public abstract class VarylabStartupDefinition {
 	
 	private void staticInit() {
 		NativePathUtility.set("native");
+		Image appIcon = SplashImageHook.getImage("icon_256.png");
+		JRViewer.setApplicationIcon(appIcon);
+		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
+		View.setIcon(ImageHook.getIcon("icon_256.png"));
+		View.setTitle(getApplicationName());		
 		JRHalfedgeViewer.initHalfedgeFronted();
 		try {
 			StaticSetup.includePluginJars();
@@ -89,12 +95,6 @@ public abstract class VarylabStartupDefinition {
 		} catch (Exception e) {
 			log.warning("cound not setup drop-in plugin folder: " + e);
 		}
-		Image appIcon = ImageHook.getImage("main_03.png");
-		JRViewer.setApplicationIcon(appIcon);
-		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
-		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
-		View.setIcon(ImageHook.getIcon("main_03.png"));
-		View.setTitle(getApplicationName());
 	}
 	
 	
