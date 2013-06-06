@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
-import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
+import de.jreality.plugin.basic.ConsolePlugin;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.plugin.VarylabMain;
-import de.varylab.varylab.plugin.optimization.IterationProtocolPanel;
-import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 import de.varylab.varylab.startup.SplashImageHook;
 import de.varylab.varylab.startup.VarylabSplashScreen;
 import de.varylab.varylab.startup.VarylabStartupDefinition;
@@ -27,10 +24,14 @@ public class VaryLabService extends VarylabStartupDefinition {
 		pluginClassNames = null;
 	private String
 		projectId = "default";
+	private static File
+		propertiesFolder = null;
 	
 	static {
 		// create varylab preferences folder
-		new File(".varylab").mkdirs();
+		String userHome = System.getProperty("user.home");
+		propertiesFolder = new File(userHome + "/.varylab");
+		propertiesFolder.mkdirs();
 	}
 	
 	public VaryLabService(List<String> plugins, String projectId) {
@@ -46,7 +47,9 @@ public class VaryLabService extends VarylabStartupDefinition {
 	
 	@Override
 	public String getPropertyFileName() {
-		return ".varylab/project_" + projectId + ".xml";
+		String prosFileName = "project_" + projectId + ".xml";
+		File propsFile = new File(propertiesFolder, prosFileName);
+		return propsFile.getAbsolutePath();
 	}
 	
 	@Override
@@ -62,10 +65,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 	@Override
 	public void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances) {
 		classes.add(VarylabMain.class);
-		classes.add(IterationProtocolPanel.class);
-		classes.add(OptimizationPanel.class);
-		classes.add(MarqueeWidget.class);
-		classes.add(ContextMenuWidget.class);
+		classes.add(ConsolePlugin.class);
 		
 		// load custom classes
 		for (String className : pluginClassNames) {

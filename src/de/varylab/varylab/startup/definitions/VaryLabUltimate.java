@@ -6,6 +6,8 @@ import java.util.Set;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.scripting.PythonConsole;
+import de.jreality.plugin.scripting.PythonToolsManager;
+import de.jreality.plugin.scripting.gui.NumberSpinnerGUI;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -192,6 +194,8 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(DehomogenizeTexture.class);
 //		pSet.add(VertexSpheres.class);
 		
+		pSet.add(PythonToolsManager.class);
+		pSet.add(NumberSpinnerGUI.class);
 		pSet.add(PythonConsole.class);
 		pSet.add(Inspector.class);
 	}

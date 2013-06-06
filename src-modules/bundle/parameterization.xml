@@ -16,5 +16,6 @@
 	
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
 	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>
+	<moduleRef id="8kgfd3ncuy5fvbsw" alias="python"/>
 	
 </bundle>

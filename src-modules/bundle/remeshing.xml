@@ -20,5 +20,6 @@
 	<moduleRef id="hf65sgr98jdg5432" alias="ref surface mesh"/>
 	<moduleRef id="jf65dg46ts4rkgy6" alias="ref surface nurbs"/>
 	<moduleRef id="0174554738654297" alias="remeshing"/>
+	<moduleRef id="8kgfd3ncuy5fvbsw" alias="python"/>
 	
 </bundle>
