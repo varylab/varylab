@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import com.sun.awt.AWTUtilities;
 
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
-import de.varylab.varylab.icon.ImageHook;
 
 public class VarylabSplashScreen extends SplashScreen {
 
@@ -75,9 +74,6 @@ public class VarylabSplashScreen extends SplashScreen {
 		if (isLinux) {
 			useHighRes = false;
 		}
-//		System.out.println("Splash is high resolution: " + useHighRes + " (" + dpi[0] + "dpi)");
-		setIconImage(ImageHook.getImage("main_03.png"));
-		
 		Dimension size = new Dimension();
 		if (useHighRes) {
 			size.width = hiResImage.getWidth(this) / 2;
