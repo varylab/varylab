@@ -188,6 +188,9 @@
 				<exclude name="**/SplashImageHook.java"/>
 				<exclude name="**/ImageHook.java"/>
 			</fileset>
+			<fileset dir="${src}">
+				<include name="**/*.xml"/>
+			</fileset>
 		</copy>
 	</target>
 

@@ -2,6 +2,10 @@ package de.varylab.varylab.startup.definitions;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +53,29 @@ public class VaryLabService extends VarylabStartupDefinition {
 	public String getPropertyFileName() {
 		String prosFileName = "project_" + projectId + ".xml";
 		File propsFile = new File(propertiesFolder, prosFileName);
+		checkPropertyFile(propsFile);
 		return propsFile.getAbsolutePath();
+	}
+	
+	private void checkPropertyFile(File propsFile) {
+		if (propsFile.exists()) {
+			return;
+		}
+		log.info("writing default property file to " + propsFile);
+		try {
+			InputStream in = getClass().getResourceAsStream("VaryLabDefault.xml");
+			Reader propsReader = new InputStreamReader(in);
+			FileWriter propsWriter = new FileWriter(propsFile);
+			char[] buffer = new char[1024];
+			int numRead;
+			while ((numRead = propsReader.read(buffer)) >= 0) {
+				propsWriter.write(buffer, 0, numRead);
+			}
+			propsWriter.close();
+			propsReader.close();
+		} catch (Exception e) {
+			log.warning("error writing default property file " + e);
+		}
 	}
 	
 	@Override
