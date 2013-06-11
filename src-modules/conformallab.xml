@@ -19,5 +19,6 @@
 	</description>
 	<documentation href="conformallab/doc.html"/>
 	<plugin class="de.varylab.discreteconformal.plugin.DiscreteConformalPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.vectorfield.CurvatureVectorFields"/>
 	
 </module>

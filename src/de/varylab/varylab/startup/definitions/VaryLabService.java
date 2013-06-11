@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.jreality.plugin.basic.ConsolePlugin;
+import de.jreality.plugin.job.JobMonitorPlugin;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.startup.SplashImageHook;
@@ -92,6 +93,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 	public void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances) {
 		classes.add(VarylabMain.class);
 		classes.add(ConsolePlugin.class);
+		classes.add(JobMonitorPlugin.class);
 		
 		// load custom classes
 		for (String className : pluginClassNames) {
