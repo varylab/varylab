@@ -37,7 +37,6 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
-import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.lnf.TahomaFontSet;
 
 public abstract class VarylabStartupDefinition {
@@ -86,7 +85,8 @@ public abstract class VarylabStartupDefinition {
 		JRViewer.setApplicationIcon(appIcon);
 		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
-		View.setIcon(ImageHook.getIcon("icon_256.png"));
+		View.setIcon(SplashImageHook.getIcon("icon_16.png"));
+		View.setIconList(StaticSetup.getMainIconList());
 		View.setTitle(getApplicationName());		
 		JRHalfedgeViewer.initHalfedgeFronted();
 		try {

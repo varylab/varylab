@@ -1,9 +1,12 @@
 package de.varylab.varylab.startup;
 
+import java.awt.Image;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.LinkedList;
+import java.util.List;
 
 import sun.misc.JarFilter;
 import de.varylab.varylab.startup.definitions.VaryLabUltimate;
@@ -25,6 +28,18 @@ public class StaticSetup {
 		ClassLoader sysLoader = VaryLabUltimate.class.getClassLoader();
 		varylabLoader = new VarlabClassLoader(sysLoader);
 		Thread.currentThread().setContextClassLoader(varylabLoader);
+	}
+	
+	
+	public static List<Image> getMainIconList() {
+		List<Image> iconList = new LinkedList<Image>();
+		iconList.add(SplashImageHook.getImage("icon_16.png"));
+		iconList.add(SplashImageHook.getImage("icon_24.png"));
+		iconList.add(SplashImageHook.getImage("icon_32.png"));
+		iconList.add(SplashImageHook.getImage("icon_64.png"));
+		iconList.add(SplashImageHook.getImage("icon_128.png"));
+		iconList.add(SplashImageHook.getImage("icon_256.png"));
+		return iconList;
 	}
 	
 	

@@ -58,6 +58,8 @@ public class VarylabSplashScreen extends SplashScreen {
 	}
 	
 	public VarylabSplashScreen(Image lowResImage, Image hiResImage) {
+		setIconImage(SplashImageHook.getImage("icon_24.png"));
+		setIconImages(StaticSetup.getMainIconList());
 		this.lowResImage = lowResImage;
 		this.hiResImage = hiResImage;
 		try {
