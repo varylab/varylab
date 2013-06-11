@@ -13,7 +13,7 @@
 		<echo>Please choose a dependency target to update.</echo>
 	</target>
 	
-	<target name="all" depends="halfedgetools, jrworkspace, jreality">
+	<target name="all" depends="halfedgetools, jrworkspace, jreality, discrete conformal lab">
 		<echo>Update all supported dependencies</echo>
 	</target>
 	
