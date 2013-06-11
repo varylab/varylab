@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
@@ -66,6 +67,7 @@ public abstract class VarylabStartupDefinition {
 			LookAndFeel laf = new SubstanceGraphiteAquaLookAndFeel();
 			UIManager.setLookAndFeel(laf);
 			SubstanceLookAndFeel.setToUseConstantThemesOnDialogs(true);
+			JFrame.setDefaultLookAndFeelDecorated(true);
 			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
 			FontPolicy newFontPolicy = new FontPolicy() {
 				@Override
