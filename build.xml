@@ -417,7 +417,8 @@
 			<nativelib os="Windows" arch="i586" dir="native/win32/" includes="jpetsctao.dll"/>
 			<nativelib os="Windows" arch="amd64" dir="native/win64/" includes="jpetsctao.dll"/>	
 			<nativelib os="Linux" arch="i586" dir="native/linux32/" includes="libjpetsctao.so"/>
-			<nativelib os="Linux" arch="amd64" dir="native/linux64/" includes="libjpetsctao.so"/>	
+			<nativelib os="Linux" arch="amd64" dir="native/linux64/" includes="libjpetsctao.so"/>
+			<nativelib os="Linux" arch="x86_64" dir="native/linux64/" includes="libjpetsctao.so"/>
 			<nativelib os="Mac\ OS\ X" arch="i586" dir="native/macosx/" includes="libjpetsctao.dylib"/>
 			<nativelib os="Mac\ OS\ X" arch="x86_64" dir="native/macosx/" includes="libjpetsctao.dylib"/>					
             <application 
