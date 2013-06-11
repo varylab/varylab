@@ -1,5 +1,6 @@
 package de.varylab.varylab.startup;
 
+import java.awt.EventQueue;
 import java.awt.Image;
 import java.io.File;
 import java.util.HashSet;
@@ -194,7 +195,13 @@ public abstract class VarylabStartupDefinition {
 		
 		v.startup();
 		
-		splash.setVisible(false);
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				splash.setVisible(false);				
+			}
+		};
+		EventQueue.invokeLater(r);
 		System.out.println("Welcome to Varylab.");				
 	}
 	
