@@ -21,6 +21,7 @@
 	<moduleRef id="5347493526786543" alias="optimizer circum circle curvature"/>
 	<moduleRef id="bdgtrs543h7fydtr" alias="optimizer opposite angles curvature"/>
 	<moduleRef id="hf65gs432dgfy789" alias="optimizer opposite edges curvature"/>
+	<moduleRef id="hf654fsknbgt5675" alias="optimizer spring energy"/>
 	<moduleRef id="hf65sgr98jdg5432" alias="ref surface mesh"/>
 	<moduleRef id="jf65dg46ts4rkgy6" alias="ref surface nurbs"/>
 	<moduleRef id="0174554738654297" alias="remeshing"/>

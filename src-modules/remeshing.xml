@@ -18,5 +18,6 @@
 		preview the result.
 	</description>
 	<plugin class="de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin"/>
+	<plugin class="de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator"/>
 	
 </module>
