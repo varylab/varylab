@@ -414,6 +414,7 @@
 				<exclude name="**/jogl-all.jar"/>
 				<exclude name="**/gluegen-rt.jar"/>
 			</lib>
+			<nativelib os="Windows" arch="x86" dir="native/win32/" includes="jpetsctao.dll"/>
 			<nativelib os="Windows" arch="i586" dir="native/win32/" includes="jpetsctao.dll"/>
 			<nativelib os="Windows" arch="amd64" dir="native/win64/" includes="jpetsctao.dll"/>	
 			<nativelib os="Linux" arch="i386" dir="native/linux32/" includes="libjpetsctao.so"/>
