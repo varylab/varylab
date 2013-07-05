@@ -12,7 +12,7 @@
 		can be developed into the plane.  
 	</description>
 	<blogURL href="http://www.varylab.com/p/gridshells.html"/>
-	<logoImage href="varylab_grid_low_res.png"/>	
+	<logoImage href="bundle_gridshells.png"/>	
 	
 	<moduleRef id="g56d45bnmr7xvnyd" alias="optimization essentials"/>
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
