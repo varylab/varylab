@@ -39,6 +39,8 @@ public class StaticSetup {
 		iconList.add(SplashImageHook.getImage("icon_64.png"));
 		iconList.add(SplashImageHook.getImage("icon_128.png"));
 		iconList.add(SplashImageHook.getImage("icon_256.png"));
+		iconList.add(SplashImageHook.getImage("icon_512.png"));
+		iconList.add(SplashImageHook.getImage("icon_1024.png"));
 		return iconList;
 	}
 	
