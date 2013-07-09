@@ -393,20 +393,8 @@
 			attemptjavadetection="true"
 			offlineallowed="false"
 		>
-            <description>
-            	Varylab is a software developed at Berlin Institute of 
-            	Technology by members of the geometry group. It is supported 
-            	by the DFG Research Center MATHEON, and the SFB/TR 109 
-            	Discretization in Geometry and Dynamics. Varylab implements 
-            	various variational principles for discrete surfaces, e.g., 
-            	planarity of faces, equal lengths of edges, curvature of 
-            	parameter curves. It is designed to be an extensible and 
-            	modular tool for experiments with discrete surfaces in pure 
-            	mathematics and applications in industrial geometry.
-            </description>
-            <description kind="short">
-            	Varylab - Discrete Surface Optimization
-            </description>
+            <description>Varylab - Discrete Surface Optimization</description>
+            <description kind="short">Varylab - Discrete Surface Optimization</description>
             <j2se minVersion="1.6" args="-Xmx512M"/>
             <lib dir="." includes="${manifest.classpath}"/>
 			<lib dir="${lib}/jogamp">
