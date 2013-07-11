@@ -41,10 +41,13 @@ import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.plugin.ddg.GaussMapFromDual;
 import de.varylab.varylab.plugin.ddg.KoebeSphereProjection;
 import de.varylab.varylab.plugin.ddg.LeastSquaresSphere;
+import de.varylab.varylab.plugin.ddg.VertexSpheres;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
 import de.varylab.varylab.plugin.editor.DehomogenizeTexture;
+import de.varylab.varylab.plugin.editor.EdgeCreatorPlugin;
 import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
+import de.varylab.varylab.plugin.editor.VertexCreatorPlugin;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
@@ -64,6 +67,7 @@ import de.varylab.varylab.plugin.meshoptimizer.GeodesicCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.MeanEdgeLengthOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.MinimalPathsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.NURBSSurfaceOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
@@ -164,6 +168,9 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(StripSubdivisionPlugin.class);
 		pSet.add(SplitFacePlugin.class);
 		pSet.add(Toolbox.class);
+		
+		pSet.add(VertexCreatorPlugin.class);
+		pSet.add(EdgeCreatorPlugin.class);
 		
 		pSet.add(SurfaceRemeshingPlugin.class);
 		pSet.add(DiscreteConformalPlugin.class);
@@ -269,6 +276,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(GeodesicCurvatureOptimizer.class);
 		pSet.add(CircumcircleCurvatureOptimizer.class);
 		pSet.add(NURBSSurfaceOptimizer.class);
+		pSet.add(MinimalPathsOptimizer.class);
 		
 	}
 	
@@ -293,6 +301,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(KoebeSphereProjection.class);
 		pSet.add(LeastSquaresSphere.class);
 		pSet.add(CurvatureLinesQualityVisualizer.class);
+		pSet.add(VertexSpheres.class);
 	}
 	
 	
