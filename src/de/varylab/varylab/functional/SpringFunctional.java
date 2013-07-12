@@ -91,21 +91,23 @@ public class SpringFunctional<
 		grad.setZero();
 		double[] s = new double[3];
 		double[] t = new double[3];
-		double[] smt = new double[3];
-		for (V v : hds.getVertices()) {
-			FunctionalUtils.getPosition(v, x, s);
-			for (E e : HalfEdgeUtils.incomingEdges(v)) {
-				double tl = length.getTargetLength(e);
-				FunctionalUtils.getPosition(e.getStartVertex(), x, t);
-				Rn.subtract(smt, s, t);
-				if(Rn.euclideanDistance(s,t)==0) {
-					continue;
-				}
-				double factor = (1-tl/Rn.euclideanDistance(s, t));
-				int off = v.getIndex() * 3;
-				for (int d = 0; d < 3; d++) {
-					grad.add(off + d, power*Math.pow((s[d] - t[d]),power-1.0) * factor * weight.getWeight(e));
-				}
+		for (E e : hds.getPositiveEdges()) {
+			double tl = length.getTargetLength(e);
+			V vt = e.getTargetVertex();
+			V vs = e.getStartVertex();
+			FunctionalUtils.getPosition(vs, x, s);
+			FunctionalUtils.getPosition(vt, x, t);
+			if(Rn.euclideanDistance(s,t)==0) {
+				continue;
+			}
+			double factor = (1.0-tl/Rn.euclideanDistance(s, t));
+			int off = vt.getIndex() * 3;
+			for (int d = 0; d < 3; d++) {
+				grad.add(off + d, power*Math.pow((t[d] - s[d]),power-1.0) * factor * weight.getWeight(e));
+			}
+			off = vs.getIndex() * 3;
+			for (int d = 0; d < 3; d++) {
+				grad.add(off + d, power*Math.pow((s[d] - t[d]),power-1.0) * factor * weight.getWeight(e));
 			}
 		}
 		if(diagonals) {
@@ -117,7 +119,6 @@ public class SpringFunctional<
 						  vj = vertices.get(j);
 						FunctionalUtils.getPosition(vi, x, s);
 						FunctionalUtils.getPosition(vj, x, t);
-						Rn.subtract(smt, s, t);
 						if(Rn.euclideanDistance(s,t)==0) {
 							continue;
 						}

@@ -49,7 +49,7 @@ public class EdgeCreatorPlugin extends AlgorithmPlugin {
 	
 	@Override
 	public KeyStroke getKeyboardShortcut() {
-		return KeyStroke.getKeyStroke('E', InputEvent.META_DOWN_MASK);
+		return KeyStroke.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK);
 	}
 
 	@Override
