@@ -39,6 +39,7 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
+import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 import de.varylab.varylab.plugin.lnf.TahomaFontSet;
 
 public abstract class VarylabStartupDefinition {
@@ -100,6 +101,10 @@ public abstract class VarylabStartupDefinition {
 		}
 	}
 	
+	
+	protected void postStartup(SplashScreen splash) {
+		
+	}
 	
 	protected void startup() {
 		Secure.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -194,6 +199,17 @@ public abstract class VarylabStartupDefinition {
 		registrationChain.startQueuedAndWait();
 		
 		v.startup();
+		
+		Runnable postStartupJob = new Runnable() {
+			@Override
+			public void run() {
+				splash.setStatus("running post stratup scripts");
+				postStartup(splash);
+			}
+		};
+		StartupChain postStartupChain = new StartupChain();
+		postStartupChain.appendJob(postStartupJob);
+		postStartupChain.startQueuedAndWait();
 		
 		Runnable r = new Runnable() {
 			@Override

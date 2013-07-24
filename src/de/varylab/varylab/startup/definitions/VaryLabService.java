@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.job.JobMonitorPlugin;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.startup.SplashImageHook;
 import de.varylab.varylab.startup.VarylabSplashScreen;
@@ -29,6 +30,8 @@ public class VaryLabService extends VarylabStartupDefinition {
 		pluginClassNames = null;
 	private String
 		projectId = "default";
+	private List<String>
+		modelURLs = new LinkedList<String>();
 	private static File
 		propertiesFolder = null;
 	
@@ -39,10 +42,11 @@ public class VaryLabService extends VarylabStartupDefinition {
 		propertiesFolder.mkdirs();
 	}
 	
-	public VaryLabService(List<String> plugins, String projectId) {
+	public VaryLabService(List<String> plugins, String projectId, List<String> models) {
 		super();
 		this.pluginClassNames = plugins;
 		this.projectId = projectId;
+		this.modelURLs = models;
 	}
 
 	@Override
@@ -108,6 +112,12 @@ public class VaryLabService extends VarylabStartupDefinition {
 			}
 		}
 	}
+	
+	
+	@Override
+	protected void postStartup(SplashScreen splash) {
+		splash.setStatus("loading online models");
+	}
 
 	
 	public static void main(String[] args) throws Exception {
@@ -126,7 +136,16 @@ public class VaryLabService extends VarylabStartupDefinition {
 			projectId = args[1];
 		}
 		
-		new VaryLabService(plugins, projectId).startup();
+		List<String> models = new LinkedList<String>();
+		if (args.length >= 3) {
+			String modelURLs = args[2];
+			for (String url : modelURLs.split(" ")) {
+				if (url.trim().isEmpty()) continue;
+				plugins.add(url.trim());
+			}
+		}
+		
+		new VaryLabService(plugins, projectId, models).startup();
 	}
 
 }
