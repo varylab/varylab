@@ -1,18 +1,29 @@
 package de.varylab.varylab.startup.definitions;
 
+import java.awt.EventQueue;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.job.JobMonitorPlugin;
+import de.jreality.reader.ReaderOBJ;
+import de.jreality.scene.Geometry;
+import de.jreality.scene.SceneGraphComponent;
+import de.jreality.util.SceneGraphUtility;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 import de.varylab.varylab.plugin.VarylabMain;
@@ -115,8 +126,36 @@ public class VaryLabService extends VarylabStartupDefinition {
 	
 	
 	@Override
-	protected void postStartup(SplashScreen splash) {
+	protected void postStartup(final JRViewer v, SplashScreen splash) {
 		splash.setStatus("loading online models");
+		final HalfedgeInterface hif = v.getPlugin(HalfedgeInterface.class);
+		for (String modelURL : modelURLs) {
+			URL url = null;
+			try {
+				url = new URL(modelURL);
+			} catch (MalformedURLException me) {
+				continue;
+			}
+			ReaderOBJ objreader = new ReaderOBJ();
+			int counter = 0;
+			try {
+				SceneGraphComponent sgc = objreader.read(url);
+				Geometry g = SceneGraphUtility.getFirstGeometry(sgc);
+				final HalfedgeLayer layer = new HalfedgeLayer(g, hif);
+				layer.setName("Online Model " + counter++);
+				Runnable addJob = new Runnable() {
+					@Override
+					public void run() {
+						hif.addLayer(layer);
+						hif.update();
+						v.encompassEuclidean();
+					}
+				};
+				EventQueue.invokeLater(addJob);
+			} catch (IOException e) {
+				continue;
+			}
+		}
 	}
 
 	
@@ -141,7 +180,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 			String modelURLs = args[2];
 			for (String url : modelURLs.split(" ")) {
 				if (url.trim().isEmpty()) continue;
-				plugins.add(url.trim());
+				models.add(url.trim());
 			}
 		}
 		

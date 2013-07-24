@@ -102,7 +102,7 @@ public abstract class VarylabStartupDefinition {
 	}
 	
 	
-	protected void postStartup(SplashScreen splash) {
+	protected void postStartup(JRViewer v, SplashScreen splash) {
 		
 	}
 	
@@ -204,7 +204,7 @@ public abstract class VarylabStartupDefinition {
 			@Override
 			public void run() {
 				splash.setStatus("running post stratup scripts");
-				postStartup(splash);
+				postStartup(v, splash);
 			}
 		};
 		StartupChain postStartupChain = new StartupChain();
