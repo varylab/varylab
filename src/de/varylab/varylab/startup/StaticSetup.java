@@ -16,20 +16,9 @@ public class StaticSetup {
 	private static ClassLoader
 		varylabLoader = null;
 
-	private static class VarlabClassLoader extends URLClassLoader {
-		
-		public VarlabClassLoader(ClassLoader parent) {
-			super(new URL[] {}, parent);
-		}
-		
-	}
-	
 	static {
-		ClassLoader sysLoader = VaryLabUltimate.class.getClassLoader();
-		varylabLoader = new VarlabClassLoader(sysLoader);
-		Thread.currentThread().setContextClassLoader(varylabLoader);
+		varylabLoader = VaryLabUltimate.class.getClassLoader();
 	}
-	
 	
 	public static List<Image> getMainIconList() {
 		List<Image> iconList = new LinkedList<Image>();

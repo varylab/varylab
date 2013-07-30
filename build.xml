@@ -19,7 +19,7 @@
 	<tstamp>
 		<format property="date" pattern="yyyy-MM-dd" />
 	</tstamp>
-	<property name = "version" value = "B${time}"/>
+	<property name="version" value="B${time}"/>
 	<property name="vendor" value="VaryLab Development Team"/>
 
 	<property name="target" value="1.6"/>
@@ -328,7 +328,7 @@
 		<delete dir="${tmp}/META-INF"/>
 		<jar jarfile="${release}/${apijarfile}" update="false">
 			<fileset dir="${build}">
-				<include name="de/varylab/varylab/hds/*"/>
+				<include name="de/varylab/varylab/halfedge/*.class"/>
 				<include name="de/varylab/varylab/optimization/IterationProtocol**"/>
 				<include name="de/varylab/varylab/plugin/VarylabOptimizerPlugin**"/>
 				<include name="de/varylab/varylab/plugin/VarylabPlugin**"/>
