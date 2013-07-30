@@ -3,6 +3,8 @@ package de.varylab.varylab.startup.definitions;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +12,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -42,22 +51,27 @@ public class VaryLabService extends VarylabStartupDefinition {
 	private String
 		projectId = "default";
 	private List<String>
-		modelURLs = new LinkedList<String>();
+		modelURLs = new LinkedList<String>(),
+		jarPlugins = new LinkedList<String>();
 	private static File
-		propertiesFolder = null;
+		propertiesFolder = null,
+		pluginsFolder = null;
 	
 	static {
 		// create varylab preferences folder
 		String userHome = System.getProperty("user.home");
 		propertiesFolder = new File(userHome + "/.varylab");
 		propertiesFolder.mkdirs();
+		pluginsFolder = new File(propertiesFolder, "plugins");
+		pluginsFolder.mkdirs();
 	}
 	
-	public VaryLabService(List<String> plugins, String projectId, List<String> models) {
+	public VaryLabService(List<String> plugins, String projectId, List<String> models, List<String> jarPlugins) {
 		super();
 		this.pluginClassNames = plugins;
 		this.projectId = projectId;
 		this.modelURLs = models;
+		this.jarPlugins = jarPlugins;
 	}
 
 	@Override
@@ -122,6 +136,71 @@ public class VaryLabService extends VarylabStartupDefinition {
 				log.warning("could not load plug-in class \"" + className + "\": " + e);
 			}
 		}
+		
+		// load jar plugin classes
+		registerJarPlugins(jarPlugins, instances);
+	}
+	
+	
+	public void registerJarPlugins(List<String> jarPlugins, Set<Plugin> instances) {
+		ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
+		for (String jarURLString : jarPlugins) {
+			URL jarURL = null;
+			try {
+				jarURL = new URL(jarURLString);
+			} catch (MalformedURLException e) {
+				log.warning("cannot download plugin: " + e);
+				continue;
+			}
+			InputStream in = null;
+			try{
+				URLConnection con = jarURL.openConnection();
+				in = con.getInputStream();
+			} catch (IOException e) {
+				log.warning("cannot download plugin: " + e);
+			}
+			
+			File nameFile = new File(jarURL.getPath());
+			String pluginName = nameFile.getName();
+			File pluginFile = new File(pluginsFolder, pluginName);
+			if (in != null) {
+				log.info("downloading plugin file " + jarURL);
+				try {
+					pluginFile.createNewFile();
+					FileOutputStream fOut = new FileOutputStream(pluginFile);
+					ReadableByteChannel inChannel = Channels.newChannel(in);
+					WritableByteChannel outChannel = Channels.newChannel(fOut);
+					while (inChannel.read(buffer) != -1) {
+						outChannel.write(buffer);
+						buffer.rewind();
+					}
+					in.close();
+					fOut.close();
+				} catch (FileNotFoundException fnfe) {
+					log.warning(fnfe.toString());
+				} catch (IOException e) {
+					log.warning("could not create plugin file " + e);
+				}
+			}
+			if (pluginFile.exists()) {
+				URL pluginFileURL = null;
+				try {
+					pluginFileURL = pluginFile.toURI().toURL();
+				} catch (MalformedURLException e) {
+					log.warning(e.toString());
+					continue;
+				}
+				URL[] urls = {pluginFileURL};
+				URLClassLoader pluginLoader = new URLClassLoader(urls);
+				ServiceLoader<Plugin> sl = ServiceLoader.load(Plugin.class, pluginLoader);
+				for (Plugin p : sl) {
+					instances.add(p);
+					log.info("adding jar plugin " + p.getClass().getName());
+				}
+			} else {
+				log.warning("could not load plugin from " + pluginFile);
+			}
+		}
 	}
 	
 	
@@ -184,7 +263,16 @@ public class VaryLabService extends VarylabStartupDefinition {
 			}
 		}
 		
-		new VaryLabService(plugins, projectId, models).startup();
+		List<String> jarPlugins = new LinkedList<String>();
+		if (args.length >= 4) {
+			String pluginURLs = args[3];
+			for (String url : pluginURLs.split(" ")) {
+				if (url.trim().isEmpty()) continue;
+				jarPlugins.add(url.trim());
+			}
+		}
+		
+		new VaryLabService(plugins, projectId, models, jarPlugins).startup();
 	}
 
 }
