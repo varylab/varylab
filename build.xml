@@ -414,7 +414,7 @@
             <application 
             	mainclass="${mainclass}" 
             	jar="${jarpath}"
-            	arguments="$$$$plugins $$$$project $$$$models"
+            	arguments="$$$$plugins $$$$project $$$$models $$$$jarplugins"
             />
         </jnlpwar>
 	</target>

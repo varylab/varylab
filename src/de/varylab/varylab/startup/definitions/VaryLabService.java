@@ -14,12 +14,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -42,7 +40,7 @@ import de.varylab.varylab.startup.VarylabStartupDefinition;
 
 public class VaryLabService extends VarylabStartupDefinition {
 
-	private Logger
+	private final static Logger
 		log = Logger.getLogger(VaryLabService.class.getName());
 	private VarylabSplashScreen
 		splash = null;
@@ -51,8 +49,9 @@ public class VaryLabService extends VarylabStartupDefinition {
 	private String
 		projectId = "default";
 	private List<String>
-		modelURLs = new LinkedList<String>(),
-		jarPlugins = new LinkedList<String>();
+		modelURLs = new LinkedList<String>();
+	private Map<String, String>	
+		jarPlugins = new HashMap<String, String>();
 	private static File
 		propertiesFolder = null,
 		pluginsFolder = null;
@@ -66,7 +65,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 		pluginsFolder.mkdirs();
 	}
 	
-	public VaryLabService(List<String> plugins, String projectId, List<String> models, List<String> jarPlugins) {
+	public VaryLabService(List<String> plugins, String projectId, List<String> models, Map<String, String> jarPlugins) {
 		super();
 		this.pluginClassNames = plugins;
 		this.projectId = projectId;
@@ -142,9 +141,10 @@ public class VaryLabService extends VarylabStartupDefinition {
 	}
 	
 	
-	public void registerJarPlugins(List<String> jarPlugins, Set<Plugin> instances) {
-		ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
-		for (String jarURLString : jarPlugins) {
+	public void registerJarPlugins(Map<String, String> jarPlugins, Set<Plugin> instances) {
+		byte[] buffer = new byte[1024 * 1024];
+		for (String jarPluginId : jarPlugins.keySet()) {
+			String jarURLString = jarPlugins.get(jarPluginId);
 			URL jarURL = null;
 			try {
 				jarURL = new URL(jarURLString);
@@ -160,7 +160,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 				log.warning("cannot download plugin: " + e);
 			}
 			
-			File nameFile = new File(jarURL.getPath());
+			File nameFile = new File(jarPluginId + ".jar");
 			String pluginName = nameFile.getName();
 			File pluginFile = new File(pluginsFolder, pluginName);
 			if (in != null) {
@@ -168,11 +168,9 @@ public class VaryLabService extends VarylabStartupDefinition {
 				try {
 					pluginFile.createNewFile();
 					FileOutputStream fOut = new FileOutputStream(pluginFile);
-					ReadableByteChannel inChannel = Channels.newChannel(in);
-					WritableByteChannel outChannel = Channels.newChannel(fOut);
-					while (inChannel.read(buffer) != -1) {
-						outChannel.write(buffer);
-						buffer.rewind();
+					int read = 0;
+					while ((read = in.read(buffer)) != -1) {
+						fOut.write(buffer, 0, read);
 					}
 					in.close();
 					fOut.close();
@@ -191,7 +189,8 @@ public class VaryLabService extends VarylabStartupDefinition {
 					continue;
 				}
 				URL[] urls = {pluginFileURL};
-				URLClassLoader pluginLoader = new URLClassLoader(urls);
+				ClassLoader parentLoader = VaryLabService.class.getClassLoader();
+				URLClassLoader pluginLoader = new URLClassLoader(urls, parentLoader);
 				ServiceLoader<Plugin> sl = ServiceLoader.load(Plugin.class, pluginLoader);
 				for (Plugin p : sl) {
 					instances.add(p);
@@ -263,12 +262,18 @@ public class VaryLabService extends VarylabStartupDefinition {
 			}
 		}
 		
-		List<String> jarPlugins = new LinkedList<String>();
+		Map<String, String> jarPlugins = new HashMap<String, String>();
 		if (args.length >= 4) {
 			String pluginURLs = args[3];
-			for (String url : pluginURLs.split(" ")) {
+			String[] idAndJars = pluginURLs.split(" ");
+			if (idAndJars.length % 2 != 0) {
+				log.warning("illegal jar plugin parameter");
+			}
+			for (int i = 0; i < idAndJars.length / 2; i++) {
+				String id = idAndJars[i * 2 + 0].trim();
+				String url = idAndJars[i * 2 + 1].trim();
 				if (url.trim().isEmpty()) continue;
-				jarPlugins.add(url.trim());
+				jarPlugins.put(id, url);
 			}
 		}
 		
