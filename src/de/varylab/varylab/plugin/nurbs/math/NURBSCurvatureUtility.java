@@ -61,6 +61,14 @@ public class NURBSCurvatureUtility {
 		double F = Rn.innerProduct(SKL[1][0], SKL[0][1]);
 		double G = Rn.innerProduct(SKL[0][1], SKL[0][1]);
 		
+		double[][] R = new double[2][2];
+		R[0][0] = E;
+		R[0][1] = F;
+		R[1][0] = F;
+		R[1][1] = G;
+		dG.setRiemannianMetric(R);
+		
+		
 		double[] normal = new double[3];
 	
 		Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
@@ -71,6 +79,14 @@ public class NURBSCurvatureUtility {
 		double l = Rn.innerProduct(normal,dG.getSuu());
 		double m = Rn.innerProduct(normal, SKL[1][1]);
 		double n = Rn.innerProduct(normal,dG.getSvv());
+		
+		double[][] secondF = new double[2][2];
+		secondF[0][0] = l;
+		secondF[0][1] = m;
+		secondF[1][0] = m;
+		secondF[1][1] = n;
+		dG.setSecondFundamental(secondF);
+		
 
 		FFs[0] = E;
 		FFs[1] = F;

@@ -329,36 +329,74 @@ public class LineSegmentIntersection {
 	}
 	
 	
+	public static boolean twoSegmentIntersection(LineSegment seg1, LineSegment seg2){
+		double[] p1 = {seg1.getSegment()[0][0], seg1.getSegment()[0][1], 1};
+		double[] p2 = {seg1.getSegment()[1][0], seg1.getSegment()[1][1], 1}; 
+		double[] p3 = {seg2.getSegment()[0][0], seg2.getSegment()[0][1], 1}; 
+		double[] p4 = {seg2.getSegment()[1][0], seg2.getSegment()[1][1], 1}; 
+		double[] normal1 = Rn.crossProduct(null, p1, p2);
+		double[] normal2 = Rn.crossProduct(null, p3, p4);
+		if(Math.signum(Rn.innerProduct(p3, normal1)) == Math.signum(Rn.innerProduct(p4, normal1))){
+			return false;
+		}
+		else if(Math.signum(Rn.innerProduct(p1, normal2)) == Math.signum(Rn.innerProduct(p2, normal2))){
+			return false;
+		}
+
+		return true;
+		
+		
+//		if(LineSegmentIntersection.counterClockWiseOrder(p1, p3, p4) == LineSegmentIntersection.counterClockWiseOrder(p2, p3, p4)){
+//		return false;
+//	}
+//	else if(LineSegmentIntersection.counterClockWiseOrder(p1, p2, p3) == LineSegmentIntersection.counterClockWiseOrder(p1, p2, p4)){
+//		return false;
+//	}
+//	else{
+//		return true;
+//	}	
+	}
+	
 
 	
-	public static boolean twoSegmentIntersection( LineSegment seg1, LineSegment seg2){
-		double[] p1 = seg1.getSegment()[0];
-		double[] p2 = seg1.getSegment()[1]; 
-		double[] p3 = seg2.getSegment()[0]; 
-		double[] p4 = seg2.getSegment()[1];
-		double lengthSeg1 = Rn.euclideanDistance(p1, p2);
-		double lengthSeg2 = Rn.euclideanDistance(p3, p4);
-		double[] p2MinusP1 = Rn.add(null, p2, Rn.times(null, -1, p1));
-		double[] q2 = Rn.add(null, p2, Rn.times(null, lengthSeg1 / 100, p2MinusP1));	
-//		System.out.println("p2 "+Arrays.toString(p2)+"q2 "+Arrays.toString(q2));
-		double[] q1 = Rn.add(null, p1, Rn.times(null, lengthSeg1 / -100, p2MinusP1));
-//		System.out.println("p1 "+Arrays.toString(p1)+"q1 "+Arrays.toString(q1));
-		double[] p4MinusP3 = Rn.add(null, p4, Rn.times(null, -1, p3));
-		double[] q4 = Rn.add(null, p4, Rn.times(null, lengthSeg2 / 100, p4MinusP3));	
-//		System.out.println("p4 "+Arrays.toString(p4)+"q4 "+Arrays.toString(q4));
-		double[] q3 = Rn.add(null, p3, Rn.times(null, lengthSeg2 / -100, p4MinusP3));
-//		System.out.println("p3 "+Arrays.toString(p3)+"q3 "+Arrays.toString(q3));
-		
-		if(LineSegmentIntersection.counterClockWiseOrder(q1, q3, q4) == LineSegmentIntersection.counterClockWiseOrder(q2, q3, q4)){
-			return false;
-		}
-		else if(LineSegmentIntersection.counterClockWiseOrder(q1, q2, q3) == LineSegmentIntersection.counterClockWiseOrder(q1, q2, q4)){
-			return false;
-		}
-		else{
-			return true;
-		}	
-	}
+//	public static boolean twoSegmentIntersection(LineSegment seg1, LineSegment seg2){
+//		double[] p1 = seg1.getSegment()[0];
+//		double[] p2 = seg1.getSegment()[1]; 
+//		double[] p3 = seg2.getSegment()[0]; 
+//		double[] p4 = seg2.getSegment()[1];
+//		double lengthSeg1 = Rn.euclideanDistance(p1, p2);
+//		double lengthSeg2 = Rn.euclideanDistance(p3, p4);
+//		double[] p2MinusP1 = Rn.add(null, p2, Rn.times(null, -1, p1));
+//		double[] q2 = Rn.add(null, p2, Rn.times(null, lengthSeg1 / 100, p2MinusP1));	
+////		System.out.println("p2 "+Arrays.toString(p2)+"q2 "+Arrays.toString(q2));
+//		double[] q1 = Rn.add(null, p1, Rn.times(null, lengthSeg1 / -100, p2MinusP1));
+////		System.out.println("p1 "+Arrays.toString(p1)+"q1 "+Arrays.toString(q1));
+//		double[] p4MinusP3 = Rn.add(null, p4, Rn.times(null, -1, p3));
+//		double[] q4 = Rn.add(null, p4, Rn.times(null, lengthSeg2 / 100, p4MinusP3));	
+////		System.out.println("p4 "+Arrays.toString(p4)+"q4 "+Arrays.toString(q4));
+//		double[] q3 = Rn.add(null, p3, Rn.times(null, lengthSeg2 / -100, p4MinusP3));
+////		System.out.println("p3 "+Arrays.toString(p3)+"q3 "+Arrays.toString(q3));
+//		
+//		if(LineSegmentIntersection.counterClockWiseOrder(q1, q3, q4) == LineSegmentIntersection.counterClockWiseOrder(q2, q3, q4)){
+//			return false;
+//		}
+//		else if(LineSegmentIntersection.counterClockWiseOrder(q1, q2, q3) == LineSegmentIntersection.counterClockWiseOrder(q1, q2, q4)){
+//			return false;
+//		}
+//		else{
+//			return true;
+//		}
+//		
+////		if(LineSegmentIntersection.counterClockWiseOrder(p1, p3, p4) == LineSegmentIntersection.counterClockWiseOrder(p2, p3, p4)){
+////		return false;
+////	}
+////	else if(LineSegmentIntersection.counterClockWiseOrder(p1, p2, p3) == LineSegmentIntersection.counterClockWiseOrder(p1, p2, p4)){
+////		return false;
+////	}
+////	else{
+////		return true;
+////	}	
+//	}
 
 	public static LinkedList<HalfedgePoint> findAllNbrs(LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();

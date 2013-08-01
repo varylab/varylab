@@ -4,36 +4,59 @@ import java.util.Arrays;
 
 public class CurvatureInfo {
 	
-	protected double [] Su;
-	protected double [] Sv;
-	protected double [] Suu;
-	protected double [] Suv;
-	protected double [] Svv;
-	protected double [] normal;
+	private double [] Su;
+	private double [] Sv;
+	private double [] Suu;
+	private double [] Suv;
+	private double [] Svv;
+	private double [] normal;
 
-	protected double [][] curvatureDirectionsManifold;
-	protected double [][] curvatureDirectionsDomain;
-	protected double minCurvature;
-	protected double maxCurvature;
-	protected double [][] Weingartenoperator;
-	protected double GaussCurvature;
-	protected double MainCurvature;
+	private double [][] curvatureDirectionsManifold;
+	private double [][] curvatureDirectionsDomain;
+	private double minCurvature;
+	private double maxCurvature;
+	private double [][] Weingartenoperator;
+	private double [][] RiemannianMetric;
+	private double[][] secondFundamental;
+	private double GaussCurvature;
+	private double MainCurvature;
 	
-	public CurvatureInfo(double[][]cM,double[][]cD, double l, double m, double [][]W){
+	public CurvatureInfo(double[][]cM,double[][]cD, double l, double m, double[][] W, double[][] R){
 		curvatureDirectionsManifold = cM;
 		curvatureDirectionsDomain = cD;
 		minCurvature = l;
 		maxCurvature = m;
 		Weingartenoperator = W;
+		RiemannianMetric = R;
 		
 	}
 	
+
 	public CurvatureInfo(){
 		curvatureDirectionsManifold = null;
 		curvatureDirectionsDomain = null;
 		minCurvature = 0;
 		maxCurvature = 0;
 		Weingartenoperator = null;
+		RiemannianMetric = null;
+	}
+	
+	public double[][] getSecondFundamental() {
+		return secondFundamental;
+	}
+
+
+	public void setSecondFundamental(double[][] secondFundamental) {
+		this.secondFundamental = secondFundamental;
+	}
+
+	
+	public double[][] getRiemannianMetric() {
+		return RiemannianMetric;
+	}
+
+	public void setRiemannianMetric(double[][] riemannianMetric) {
+		RiemannianMetric = riemannianMetric;
 	}
 	
 	public double[] getSuu() {
@@ -59,14 +82,6 @@ public class CurvatureInfo {
 
 	public void setSvv(double[] svv) {
 		Svv = svv;
-	}
-
-	public double[][] getWeingartenoperator() {
-		return Weingartenoperator;
-	}
-
-	public void setWeingartenoperator(double[][] weingartenoperator) {
-		Weingartenoperator = weingartenoperator;
 	}
 
 	public double getMainCurvature() {

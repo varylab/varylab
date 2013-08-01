@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.plugin.nurbs.math.PointProjectionCurve;
 
 /**
  * 
@@ -185,13 +186,13 @@ public class NURBSCurve {
 	 */
 	
 	public NURBSCurve[] decomposeIntoBezierCurves(){
-		NURBSCurve nsDecompose = decomposeCurve();
-		double[] U = nsDecompose.getUKnotVector();
+		NURBSCurve ncDecompose = decomposeCurve();
+		double[] U = ncDecompose.getUKnotVector();
 		LinkedList<EndPoints> originalEP = getEndPoints();
 		double u0 = U[0];
 		double um = U[U.length - 1];
-		double[][]Pw = nsDecompose.getControlPoints();
-		int p = NURBSSurface.getDegreeFromClampedKnotVector(U);
+		double[][]Pw = ncDecompose.getControlPoints();
+		int p = ncDecompose.getP();
 		double[] differentUknots = NURBSSurface.getAllDifferentKnotsFromFilledKnotVector(U, p);
 		NURBSCurve[] BezierCurves = new NURBSCurve[differentUknots.length - 1];
 		for (int i = 0; i < BezierCurves.length; i++) {
@@ -283,6 +284,10 @@ public class NURBSCurve {
 			}
 		}
 		return str;
+	}
+	
+	public double[] getClosestPoint(double [] point){
+		return PointProjectionCurve.getClosestPoint(this, point);
 	}
 	
 }

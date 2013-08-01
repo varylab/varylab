@@ -1,23 +1,20 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.LinkedList;
-
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSCurve;
 import de.varylab.varylab.plugin.nurbs.NURBSCurve.EndPoints;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.RevolutionDir;
-import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.utilities.MathUtility;
 
 
 /**
  * 
  * @author seidel
- * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a>
+ * @see <a href = "http://page.math.tu-berlin.de/~seidel/NURBS.pdf"> NURBS </a>
  */
 
 public class PointProjectionSurfaceOfRevolution {
@@ -136,8 +133,8 @@ public class PointProjectionSurfaceOfRevolution {
 			double[][] p1 = new double[3][];
 			double[][] p2 = new double[3][];
 			for (int j = 0; j < 3; j++) {
-				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + 2 * j / 5. * (vn - v0)));
-				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + (2 * j + 1) / 5. * (vn - v0)));
+				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + 2 * j / 6. * (vn - v0)));
+				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + (2 * j + 1) / 6. * (vn - v0)));
 			}
 			if(!isCircle(p1, p2)){
 				return false;
@@ -217,14 +214,13 @@ public class PointProjectionSurfaceOfRevolution {
 	 */
 	
 	public static RevolutionDir getRotationDir(NURBSSurface ns){
-		RevolutionDir dir = null;
-		if(isSurfaceOfRevolutionUDir(ns)){
-			dir = RevolutionDir.uDir;
-		}
 		if(isSurfaceOfRevolutionVDir(ns)){
-			dir = RevolutionDir.vDir;
+			return  RevolutionDir.vDir;
 		}
-		return dir;
+		if(isSurfaceOfRevolutionUDir(ns)){
+			return  RevolutionDir.uDir;
+		}
+		return null;
 	}
 	
 	/**
@@ -270,241 +266,64 @@ public class PointProjectionSurfaceOfRevolution {
 	}
 	
 	/**
-	 * 
-	 * @param P control points in 3D coords
-	 * @param p point in 3D coords
-	 * @param eps tolerance
-	 * @return the endpoint P0 if the 
+	 * we use QR decomposition
+	 * @param v 2D vector
+	 * @param w 2D vector
+	 * @param x := lambda * v + my * w
+	 * @return lambda , my
 	 */
 	
-	private static EndPoints isP0(double[][] P, double[] p, double eps){
-		double[] P0 = P[0];
-		double[] pp0 = Rn.subtract(null, p, P0);
-		double[] cPoint;
-		boolean b0 = true;
-		for (int i = 0; i < P.length; i++) {
-			cPoint = Rn.subtract(null, P0, P[i]);
-			if(i != 0 && Rn.innerProduct(Rn.normalize(null, pp0), Rn.normalize(null, cPoint)) < eps){
-				b0 = false;
-			}
-		}
-		if(b0){
-			return EndPoints.P0;
-		}
-		return null;
+	public static double[] getLinearCombination(double[] v, double[] w, double[] x){
+		double s = -v[1] / Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+		double c = v[0] / Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+		double my = (s * x[0] + c * x[1]) / (s * w[0] + c * w[1]);
+		double lambda = (c * x[0] - s * x[1] - my * (c * w[0] - s * w[1]))/ Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+		double[] comb = {lambda, my};
+		return comb;
 	}
 	
-	private static EndPoints isPm(double[][] P, double[] p, double eps){
-		double[] Pm = P[P.length - 1];
-		double[] ppm = Rn.subtract(null, p, Pm);
-		double[] cPoint;
-		boolean bm = true;
-		for (int i = 0; i < P.length; i++) {
-			cPoint = Rn.subtract(null, Pm, P[i]);
-			if(i != P.length - 1 && Rn.innerProduct(Rn.normalize(null, ppm), Rn.normalize(null, cPoint)) < eps){
-				bm = false;
-			}
-		}
-		if(bm){
-			return EndPoints.Pm;
-		}
-		return null;
-	}
-	
-	private static EndPoints isOnEndPoint(NURBSCurve nc, double[] p, double eps){
-		double[][] P = MathUtility.get3DControlPoints(nc.getControlPoints());
-		if(isP0(P,p,eps) != null){
-			return isP0(P,p,eps);
-		}
-		if(isPm(P,p,eps) != null){
-			return isPm(P,p,eps);
-		} 
-		return null;
-	}
-	
-	private static boolean isPossibleCurveEndPoint(NURBSCurve nc, double[] p, double eps){
-		if(isOnEndPoint(nc, p, eps) == null || nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
-			if(nc.getEndPoints().contains(isOnEndPoint(nc, p, eps))){
-			}
+		
+	/**
+	 * this is a special QR decomposition <br/>
+	 * we rotate the ray such that the y-component is 0, then we check if the x-components of v and w after rotation are positive
+	 * and finally we check if the y-components of v and w have opposite signs.
+	 * @param v first end point of the line segment
+	 * @param w second end point of the line segment
+	 * @param ray
+	 * @return true if ray intersect the line segment
+	 */
+	public static boolean rayIntersectLineSegment(double[] v, double[] w, double[] ray){
+		double s = -ray[1] / Math.sqrt(ray[0] * ray[0] + ray[1] * ray[1]);
+		double c = ray[0] / Math.sqrt(ray[0] * ray[0] + ray[1] * ray[1]);
+		double vRot0 = c * v[0] - s * v[1];
+		double wRot0 = c * w[0] - s * w[1];
+		double vRot1 = s * v[0] + c * v[1];
+		double wRot1 = s * w[0] + c * w[1];
+		if(vRot0 > 0 && wRot0 > 0 && (vRot1 <= 0 && wRot1 >= 0) || (wRot1 <= 0 && vRot1 >= 0)){
 			return true;
 		}
 		return false;
 	}
+		
 	
 	/**
-	 * 
-	 * @param p a 3D point
-	 * @param P 3D control points
-	 * @return min distance
+	 * check if ray is in the convex cone spanned be v and w
+	 * @param v first end point of the line segment
+	 * @param w second end point of the line segment
+	 * @param ray
+	 * @return true if ray intersect the line segment
 	 */
-	private static double getMinDist(double[] p, double[][] P){
-		double dist = Double.MAX_VALUE;
-		for (int i = 0; i < P.length; i++) {
-			if(dist > Rn.euclideanDistance(p, P[i])){
-				dist = Rn.euclideanDistance(p, P[i]);
-			}
-		}
-		return dist;
-	}
+//	public static boolean rayIntersectLineSegment(double[] v, double[] w, double[] ray){
+//		double[] comb = getLinearCombination(v, w, ray);
+//		if(comb[0] >= 0 && comb[1] >= 0){
+//			return true;
+//		}
+//		return false;
+//	}
 	
-	/**
-	 * 
-	 * @param p a 3D point
-	 * @param P 3D control points
-	 * @return max distance
-	 */
-	private static double getMaxDist(double[] p, double[][] P){
-		double dist = Double.MIN_VALUE;
-		for (int i = 0; i < P.length; i++) {
-			if(dist < Rn.euclideanDistance(p, P[i])){
-				dist = Rn.euclideanDistance(p, P[i]);
-			}
-		}
-		return dist;
-	}
 	
-	/**
-	 * @param curveList: list of NURBS curves
-	 * @param p: a 3D point
-	 * @return the control points of the closest subcurve in 3D coords
-	 */
 	
-	public static double[][] getClosestSubcurve(LinkedList<NURBSCurve> curveList, double[] p){
-		double minDist = Double.MAX_VALUE;
-		NURBSCurve closestCurve = new NURBSCurve();
-		for (NURBSCurve nc : curveList) {
-			double dist = getMinDist(p, MathUtility.get3DControlPoints(nc.getControlPoints()));
-			if(minDist > dist){
-				minDist = dist;
-				closestCurve = nc;
-			}
-		}
-		return MathUtility.get3DControlPoints(closestCurve.getControlPoints());
-	}
-	
-	/**
-	 * 
-	 * @param p point in 3D coords
-	 * @param P control points in 3D coords
-	 * @param closestMaxDistance maximal distance between p and the control points of the closest subcurve
-	 * @return true if the minimal distance between p and the control points is less than closestMaxDistance
-	 */
-	
-	private static boolean isPossibleCurveControlPoints(double[] p, double[][] P, double closestMaxDistance){
-		double dist = getMinDist(p, P);
-		if(dist < closestMaxDistance){
-				return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * 
-	 * @param curveList
-	 * @param p
-	 * @return all candidates of curves that can contain the projection
-	 */
-	
-	public static LinkedList<NURBSCurve> getPossibleCurves(LinkedList<NURBSCurve> curveList, double[] p){
-		double eps = 0.000001;
-		if(curveList.size() < 2){
-			return curveList;
-		}
-		LinkedList<NURBSCurve> possibleCurves = new LinkedList<NURBSCurve>();
-		double[][] closestCP = getClosestSubcurve(curveList, p);
-		for (NURBSCurve nc : curveList) {
-			double closestMaxDistance = getMaxDist(p, closestCP);
-			if(isPossibleCurveEndPoint(nc, p, eps) && isPossibleCurveControlPoints(p, nc.getControlPoints(), closestMaxDistance)){
-				possibleCurves.add(nc);
-			}
-		}
-		return possibleCurves ;
-	}
-	
-	/**
-	 * computes the closest point via the newton method
-	 * @param nc NURBSCurve
-	 * @param u start point in the domain
-	 * @param point 
-	 * @return the closest point on the curve if possible else null
-	 */
-	
-	public static double[] NewtonMethod(NURBSCurve nc, double u, double[] point){
-		double[] U = nc.getUKnotVector();
-		double u0 = U[0];
-		double um = U[U.length - 1];
-		double[] p = MathUtility.get3DPoint(point);
-		double[][]Ck = nc.getCurveDerivs(u);
-		double[] C = Ck[0];
-		double[] Cu = Ck[1];
-		double[] Cuu = Ck[2];
-		for (int i = 0; i < 12; i++) {
-			u = u - (Rn.innerProduct(Cu, Rn.subtract(null, C, p))) / (Rn.innerProduct(Cuu, Rn.subtract(null, C, p)) + Rn.innerProduct(Cu, Cu));
-			if(u < u0 || u > um){
-				return null;
-			}
-			Ck = nc.getCurveDerivs(u);
-			C = Ck[0];
-			Cu = Ck[1];
-			Cuu = Ck[2];
-		}
-		return nc.getCurvePoint(u);
-	}
-	
-	/**
-	 * computes the closest point
-	 * @param nurbs NURBSCurve
-	 * @param point
-	 * @return the closest point on the curve
-	 */
-	
-	public static double[] getClosestPointOnCurve(NURBSCurve nurbs, double[] point){
-		double[] p = MathUtility.get3DPoint(point);
-		double[] closestPoint = new double[4];
-		double distNewton = Double.MAX_VALUE;
-		double dist = Double.MAX_VALUE;
-		double uStart = 0.;
-		LinkedList<NURBSCurve>  possibleCurves = nurbs.decomposeIntoBezierCurvesList();
-		for (int i = 0; i < 15; i++) {
-				// start of newton method
-				if(i > 5 && i < 12){
-					for (NURBSCurve possibleNc : possibleCurves) {
-						double[] U = possibleNc.getUKnotVector();
-						double u = (U[0] + U[U.length - 1]) / 2;
-						double[] homogCurvePoint = possibleNc.getCurvePoint(u);
-						double[] curvePoint = MathUtility.get3DPoint(homogCurvePoint);
-						if(distNewton > Rn.euclideanDistance(curvePoint, point)){
-							distNewton = Rn.euclideanDistance(curvePoint, point);
-							uStart = u;
-						}
-					}
-				double[] result = NewtonMethod(nurbs, uStart, point);
-					if(result != null){ // returns if successful
-						return result;
-					}
-				}
-				// end of the newton method
-				
-				LinkedList<NURBSCurve> subdividedCurves = new LinkedList<NURBSCurve>();
-				possibleCurves = getPossibleCurves(possibleCurves, p);
-				for (NURBSCurve nc : possibleCurves) {
-					subdividedCurves.addAll(nc.subdivideIntoTwoNewCurves());
-				}
-				possibleCurves = subdividedCurves;
-			}
-			possibleCurves = getPossibleCurves(possibleCurves, p);
-			for (NURBSCurve nc : possibleCurves) {
-			double[] U = nc.getUKnotVector();
-			double u = (U[0] + U[U.length - 1]) / 2;
-			double[] homogCurvePoint = nc.getCurvePoint(u);
-			double[] curvePoint = MathUtility.get3DPoint(homogCurvePoint);
-			if(dist > Rn.euclideanDistance(curvePoint, p)){
-				dist = Rn.euclideanDistance(curvePoint, p);
-				closestPoint = homogCurvePoint;
-			}
-		}
-		return closestPoint;
-	}
+
 	
 	/**
 	 * we assume a surface of revolution in u direction
@@ -515,33 +334,264 @@ public class PointProjectionSurfaceOfRevolution {
 	 */
 	
 	public static boolean isInInterior(double[][] cpw, double[] point){
-		double[] p = Rn.normalize(null, MathUtility.get3DPoint(point));
-		double[][] cp = MathUtility.get3DControlPoints(cpw);
-		for (int i = 0; i < cp.length; i++) {
-			Rn.normalize(cp[i], cp[i]);
-		}
-		double[][] cpXZ = new double[cp.length][2];
-		for (int i = 0; i < cpXZ.length; i++) {
-			cpXZ[0] = cp[0];
-			cpXZ[1] = cp[2];
-		}
-		double[][] segPoint = {{p[0],p[2]},{0,0}};
-		LineSegment lsPoint = new LineSegment();
-		lsPoint.setSegment(segPoint);
+		double[][] cp = cpw;
+		double[] ray = {point[0], point[2]};
 		for (int i = 0; i < cp.length - 1; i++) {
-			double[][] seg = {{cp[i][0],cp[i][2]},{cp[i + 1][0],cp[i + 1][2]}};
-			LineSegment ls = new LineSegment();
-			ls.setSegment(seg);
-			if(LineSegmentIntersection.twoSegmentIntersection(lsPoint, ls)){
+			double[] v = {cp[i][0],cp[i][2]};
+			double[] w = {cp[i + 1][0],cp[i + 1][2]};
+			if(rayIntersectLineSegment(v, w, ray)){
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	public static double[] getOrthVector(double[] v, double[] w, double[] p){
+		double[] w1 = Rn.subtract(null, w, v); 
+		double[] p1 = Rn.subtract(null, p, v); 
+		double lambda = Rn.innerProduct(w1, p1) / Rn.innerProduct(w1, w1);
+		double[] proj = Rn.times(null, lambda, w1);
+		return Rn.subtract(null, p1, proj);
+	}
+	
+	/**
+	 * 
+	 * @param controlPoints
+	 * @param axis
+	 * @return the x- vector of the new frame
+	 */
+	
+	public static double[] getNewX(double[][] controlPoints, double[][] axis){
+		if(!Rn.equals(MathUtility.get3DPoint(controlPoints[0]), axis[0], 0.00001)){
+			return Rn.normalize(null, Rn.subtract(null, MathUtility.get3DPoint(controlPoints[0]), axis[0]));
+		}
+		else{
+			for (int i = 1; i < controlPoints.length; i++) {
+				double[] newX = getOrthVector(axis[0], axis[1], MathUtility.get3DPoint(controlPoints[i]));
+				if(!(Math.abs(Rn.euclideanNorm(newX)) < 0.0001)){
+					return Rn.normalize(null, newX);
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param points
+	 * @return true if all points are equal up to a small epsilon
+	 */
+	
+	public static boolean pointsAreEqual(double[][] points){
+		for (int i = 0; i < points.length - 1; i++) {
+			if(!Rn.equals(points[i], points[i + 1], 0.0001)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	public static double[][] getIthVControlPoints(int i, double[][][] Pw){
+		double[][] VcontrolPoints = new double[Pw[0].length][];
+		for (int j = 0; j < Pw[0].length; j++) {
+			VcontrolPoints[j] = MathUtility.get3DPoint(Pw[i][j].clone());
+		}
+		return VcontrolPoints;
+	}
+	
+	
+	
+	public static double[][] getJthUControlPoints(int j, double[][][] Pw){
+		double[][] UcontrolPoints = new double[Pw.length][];
+		for (int i = 0; i < Pw.length; i++) {
+			UcontrolPoints[i] = MathUtility.get3DPoint(Pw[i][j].clone());
+		}
+		return UcontrolPoints;
+	}
+	
+	/**
+	 * 
+	 * @param Pw
+	 * @return non equal control points in v direction
+	 */
+	
+	public static double[][] getDistinctVControlPoints(double[][][] Pw){
+		double[][] VcontrolPoints = new double[Pw[0].length][];
+		for (int i = 0; i < Pw.length; i++) {
+			VcontrolPoints = getIthVControlPoints(i, Pw);
+			if(!pointsAreEqual(VcontrolPoints)){
+				return VcontrolPoints;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param Pw
+	 * @return non equal control points in u direction
+	 */
+	
+	public static double[][] getDistinctUControlPoints(double[][][] Pw){
+		double[][] UcontrolPoints = new double[Pw.length][];
+		for (int j = 0; j < Pw[0].length; j++) {
+			UcontrolPoints = getJthUControlPoints(j, Pw);
+			if(!pointsAreEqual(UcontrolPoints)){
+				return UcontrolPoints;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param points
+	 * @return same points with y-component 0
+	 */
+	
+	public static double[][] tranlateToXZPlane(double[][] points){
+		for (int i = 0; i < points.length; i++) {
+			points[i][1] = 0.0;
+		}
+		return points;
+	}
+	
+	private static double[] getClosestPointUDir(NURBSSurface ns, double[] point){
+		double[] p = point.clone();
+		double[] closestPoint = new double[4];
+		LinkedList<EndPoints> ep = new LinkedList<NURBSCurve.EndPoints>();
+		ep.add(EndPoints.P0);
+		ep.add(EndPoints.Pm);
+		// two points of the the rotation axis
+		double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns); 
+		double[][][]Pw = ns.getControlMesh().clone(); 
+		double[][] controlPoints = new double[Pw.length][];
+		for (int i = 0; i < controlPoints.length; i++) {
+			controlPoints[i] = Pw[i][0].clone();
+		}
+		double[][] VcontrolPoints = getDistinctVControlPoints(Pw);
+		double[] P00 = controlPoints[0].clone();
+		double[] newX = getNewX(controlPoints, axis);
+		double[] newY = Rn.normalize(null, Rn.subtract(null, axis[1], axis[0]));
+		double[] newZ = Rn.crossProduct(null, newX, newY);
+		Matrix MCurve = new Matrix(newX[0], newY[0], newZ[0], axis[0][0], newX[1], newY[1], newZ[1], axis[0][1], newX[2], newY[2], newZ[2], axis[0][2], 0.0, 0.0, 0.0, 1.0);
+		MCurve.invert();
+		P00 = MCurve.multiplyVector(P00);
+		for (int i = 0; i < controlPoints.length; i++) {
+			controlPoints[i] = MCurve.multiplyVector(controlPoints[i]);
+		}
+		for (int j = 0; j < VcontrolPoints.length; j++) {
+			VcontrolPoints[j] = MCurve.multiplyVector(VcontrolPoints[j]);
+		}
+		p = MCurve.multiplyVector(p);
+		//p translated to the x-z plane
+		double[] pTrans = {p[0],0, p[2],1};
+//		Rn.normalize(pTrans, pTrans);/		VcontrolPoints = tranlateToXZPlane(VcontrolPoints);
+		// check if projection is in the interior of the surface
+		boolean projIn = isInInterior(VcontrolPoints, pTrans);
+		
+		if(!projIn){
+			if(Rn.innerProduct(MathUtility.get3DPoint(pTrans), VcontrolPoints[0]) < Rn.innerProduct(MathUtility.get3DPoint(pTrans), VcontrolPoints[VcontrolPoints.length - 1])){	
+				for (int i = 0; i < controlPoints.length; i++) {
+					controlPoints[i] = Pw[i][Pw[0].length - 1].clone();
+					controlPoints[i] = MCurve.multiplyVector(controlPoints[i]);
+				}
+				MCurve.invert();
+				NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
+				closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+				closestPoint = MCurve.multiplyVector(closestPoint);
+				return closestPoint;
+			}
+			MCurve.invert();
+			NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
+			closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+			closestPoint = MCurve.multiplyVector(closestPoint);
+			return closestPoint;
+		}
+		MatrixBuilder b4 = MatrixBuilder.euclidean();
+		double[] e1 = {1,0,0,1};
+		NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
+		b4.rotateFromTo(pTrans, e1);
+		Matrix M4 = b4.getMatrix();
+		p = M4.multiplyVector(p);
+		closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+		Matrix MPoint = M4;
+		MPoint.multiplyOnRight(MCurve);
+		MPoint.invert();
+		closestPoint = MPoint.multiplyVector(closestPoint);
+		return closestPoint;
+	}
+	
+	private static double[] getClosestPointVDir(NURBSSurface ns, double[] point){
+		double[] p = point.clone();
+		double[] closestPoint = new double[4];
+		LinkedList<EndPoints> ep = new LinkedList<NURBSCurve.EndPoints>();
+		ep.add(EndPoints.P0);
+		ep.add(EndPoints.Pm);
+		// two points of the the rotation axis
+		double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns); 
+		double[][][]Pw = ns.getControlMesh().clone(); 
+		double[][] controlPoints = new double[Pw[0].length][];
+		for (int j = 0; j < controlPoints.length; j++) {
+			controlPoints[j] = Pw[0][j].clone();
+		}
+		double[][] UcontrolPoints = getDistinctUControlPoints(Pw);
+		double[] P00 = controlPoints[0].clone();
+		double[] newX = getNewX(controlPoints, axis);
+		double[] newY = Rn.normalize(null, Rn.subtract(null, axis[1], axis[0]));
+		double[] newZ = Rn.crossProduct(null, newX, newY);
+		Matrix MCurve = new Matrix(newX[0], newY[0], newZ[0], axis[0][0], newX[1], newY[1], newZ[1], axis[0][1], newX[2], newY[2], newZ[2], axis[0][2], 0.0, 0.0, 0.0, 1.0);
+		MCurve.invert();
+		P00 = MCurve.multiplyVector(P00);
+		for (int i = 0; i < controlPoints.length; i++) {
+			controlPoints[i] = MCurve.multiplyVector(controlPoints[i]);
+		}
+		for (int j = 0; j < UcontrolPoints.length; j++) {
+			UcontrolPoints[j] = MCurve.multiplyVector(UcontrolPoints[j]);
+		}
+		p = MCurve.multiplyVector(p);
+		//p translated to the x-z plane
+		double[] pTrans = {p[0],0, p[2],1};
+		UcontrolPoints = tranlateToXZPlane(UcontrolPoints);
+		// check if projection is in the interior of the surface
+		boolean projIn = isInInterior(UcontrolPoints, pTrans);
+		
+		if(!projIn){
+			// check 
+			if(Rn.innerProduct(MathUtility.get3DPoint(pTrans), UcontrolPoints[0]) < Rn.innerProduct(MathUtility.get3DPoint(pTrans), UcontrolPoints[UcontrolPoints.length - 1])){	
+				for (int j = 0; j < controlPoints.length; j++) {
+					controlPoints[j] = Pw[Pw.length - 1][j].clone();
+					controlPoints[j] = MCurve.multiplyVector(controlPoints[j]);
+				}
+				MCurve.invert();
+				NURBSCurve nc = new NURBSCurve(controlPoints, ns.getVKnotVector(), ns.getVDegree(), ep);
+				closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+				closestPoint = MCurve.multiplyVector(closestPoint);
+				return closestPoint;
+			}
+			MCurve.invert();
+			NURBSCurve nc = new NURBSCurve(controlPoints, ns.getVKnotVector(), ns.getVDegree(), ep);
+			closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+			closestPoint = MCurve.multiplyVector(closestPoint);
+			return closestPoint;
+		}
+		MatrixBuilder b4 = MatrixBuilder.euclidean();
+		double[] e1 = {1,0,0,1};
+		NURBSCurve nc = new NURBSCurve(controlPoints, ns.getVKnotVector(), ns.getVDegree(), ep);
+		b4.rotateFromTo(pTrans, e1);
+		Matrix M4 = b4.getMatrix();
+		p = M4.multiplyVector(p);
+		closestPoint = PointProjectionCurve.getClosestPoint(nc, p);
+		Matrix MPoint = M4;
+		MPoint.multiplyOnRight(MCurve);
+		MPoint.invert();
+		closestPoint = MPoint.multiplyVector(closestPoint);
+		return closestPoint;
+	}
+	
 	/**
 	 * if this method is called, it is already checked that the surface is a surface of revolution.<br\>
-	 * 
 	 * 
 	 * @TODO in v direction
 	 * @param ns NURBSSurface of revolution
@@ -550,90 +600,16 @@ public class PointProjectionSurfaceOfRevolution {
 	 */
 	
 	public static double[] getClosestPoint(NURBSSurface ns, double[] point){
-		double[] p = point.clone();
-		double[] closestPoint = new double[4];
-		LinkedList<EndPoints> ep = new LinkedList<NURBSCurve.EndPoints>();
-		ep.add(EndPoints.P0);
-		ep.add(EndPoints.Pm);
-		// two points of the the rotation axis
-		double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns);
-		double[][][]Pw = ns.getControlMesh().clone();
-		double[][][]P = new double [Pw.length][Pw[0].length][];
-		for (int i = 0; i < P.length; i++) {
-			for (int j = 0; j < P[0].length; j++) {
-				P[i][j] = Pw[i][j].clone();
-			}
+		if(ns.getRevolutionDir() == RevolutionDir.uDir){
+			return getClosestPointUDir(ns, point);
 		}
-		MatrixBuilder b1 = MatrixBuilder.euclidean();
-		//translate the first point of the rotation axis to (0,0,0)
-		b1.translate(Rn.times(null, -1, axis[0]));
-		Matrix M1 = b1.getMatrix();
-		double[] axis1 = M1.multiplyVector(axis[1]).clone();
-		// 1. rotation
-		// rotate the second point of the rotation axis to the y_axis
-		double[] e2 = {0,1,0,1};
-		MatrixBuilder b2 = MatrixBuilder.euclidean();
-		b2.rotateFromTo(axis1, e2);
-		Matrix M2 = b2.getMatrix();
-		axis1 =  M2.multiplyVector(axis1);
-		double[] P00 = Pn.dehomogenize(null, P[0][0].clone());
-		P00 = M1.multiplyVector(P00);
-		P00 = M2.multiplyVector(P00);
-//		System.out.println(Arrays.toString(P00));
-		P00[1] = 0;
-		double[] e1 = {1,0,0,1};
-		MatrixBuilder b3 = MatrixBuilder.euclidean();
-		b3.rotateFromTo(P00, e1);
-		Matrix M3 = b3.getMatrix();
-		P00 = M3.multiplyVector(P00);
-		Matrix MCurve = M3;
-		MCurve.multiplyOnRight(M2);
-		MCurve.multiplyOnRight(M1);
-		double[][] controlPoints = new double[P.length][];
-		double[][] VcontrolPoints = new double[P[0].length][];
-		for (int j = 0; j < P[0].length; j++) {
-			VcontrolPoints[j] = MCurve.multiplyVector(P[0][j]);
+		else{
+			return getClosestPointVDir(ns, point);
 		}
-		for (int i = 0; i < P.length; i++) {
-			controlPoints[i] = MCurve.multiplyVector(P[i][0]);
-		}
-		p = MCurve.multiplyVector(p);
-		MatrixBuilder b4 = MatrixBuilder.euclidean();
-		//p translated to the x-z plane
-		double[] pTrans = {p[0],0, p[2],1};
 		
-		// check if projection is in the interior of the surface
-		boolean projIn = isInInterior(VcontrolPoints, pTrans);
-		if(!projIn){
-			// check if the projection is on the other boundary curve
-			if(Rn.innerProduct(MathUtility.get3DPoint(pTrans), MathUtility.get3DPoint(VcontrolPoints[0])) < Rn.innerProduct(MathUtility.get3DPoint(pTrans), MathUtility.get3DPoint(VcontrolPoints[VcontrolPoints.length - 1]))){
-				for (int i = 0; i < P.length; i++) {
-					controlPoints[i] = MCurve.multiplyVector(P[i][P[0].length - 1]);
-				}
-				MCurve.invert();
-				NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
-				closestPoint = getClosestPointOnCurve(nc, p);
-				closestPoint = MCurve.multiplyVector(closestPoint);
-				return closestPoint;
-			}
-			MCurve.invert();
-			NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
-			closestPoint = getClosestPointOnCurve(nc, p);
-			closestPoint = MCurve.multiplyVector(closestPoint);
-			return closestPoint;
-		}
-		NURBSCurve nc = new NURBSCurve(controlPoints, ns.getUKnotVector(), ns.getUDegree(), ep);
-		b4.rotateFromTo(pTrans, e1);
-		Matrix M4 = b4.getMatrix();
-		p = M4.multiplyVector(p);
-		closestPoint = getClosestPointOnCurve(nc, p);
-		Matrix MPoint = M4;
-		MPoint.multiplyOnRight(MCurve);
-		MPoint.invert();
-		closestPoint = MPoint.multiplyVector(closestPoint);
-		return closestPoint;
+		
 	}
 	
-	
+
 
 }

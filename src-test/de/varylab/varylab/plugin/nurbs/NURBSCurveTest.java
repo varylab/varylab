@@ -155,5 +155,23 @@ public class NURBSCurveTest {
 		Assert.assertArrayEquals(nc.getCurvePoint(0.25), curveList.get(0).getCurvePoint(0.25), 0.00001);
 		Assert.assertArrayEquals(nc.getCurvePoint(0.75), curveList.get(1).getCurvePoint(0.75), 0.00001);
 	}
+	
+	@Test
+	public void getClosestPointTest(){
+		double[] point = {2,2,0,1};
+		double[] P0 = {1,0,0,1};
+		double[] P1 = {1,1,0,1};
+		double[] P2 = {0,2,0,2};
+		double[][] cP = new double[3][];
+		cP[0] = P0;
+		cP[1] = P1;
+		cP[2] = P2;
+		double[] U = {0,0,0,1,1,1};
+		int p = 2;
+		NURBSCurve nc = new NURBSCurve(cP, U, p);
+		nc.getClosestPoint(point);
+		double[] result = {0.7071067811865475, 0.7071067811865475, 0.0, 1.0};
+		Assert.assertArrayEquals(result, nc.getClosestPoint(point), 0.00001);
+	}
 
 }

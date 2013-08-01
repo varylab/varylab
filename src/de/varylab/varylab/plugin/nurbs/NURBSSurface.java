@@ -3,12 +3,12 @@ package de.varylab.varylab.plugin.nurbs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-import de.varylab.varylab.plugin.nurbs.math.PointProjection;
+import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurface;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
+import de.varylab.varylab.utilities.MathUtility;
 
 /**
  * 
@@ -22,9 +22,11 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		public enum BoundaryLines{u0, um, v0, vn};
 		public enum CornerPoints{P00, Pm0, P0n, Pmn};
 		public enum RevolutionDir{uDir, vDir};
+		public enum ClosingDir{uClosed, vClosed, nonClosed};
 		private LinkedList<BoundaryLines> boundLines = new LinkedList<NURBSSurface.BoundaryLines>();
 		private LinkedList<CornerPoints> cornerPoints = new LinkedList<CornerPoints>();
 		private RevolutionDir revDir = null;
+		private ClosingDir closDir = null;
 		private double[] U;
 		private double[] V;
 		private LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
@@ -52,6 +54,7 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			boundLines.add(BoundaryLines.v0);
 			boundLines.add(BoundaryLines.vn);
 			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
+			closDir = getClosingDir();
 		}
 		
 		public NURBSSurface(double[] UVec, double[] VVec, double[][][] cm, int pDegree, int qDegree, LinkedList<BoundaryLines> boundList, LinkedList<CornerPoints> cornerList){
@@ -63,8 +66,12 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			cornerPoints = cornerList;
 			boundLines = boundList;
 			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
+			closDir = getClosingDir();
 		}
 		
+		/**
+		 * if this surface is no surface of revolution, then revDir = null
+		 */
 		
 		public void setRevolutionDir(){
 			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
@@ -155,6 +162,50 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			bl.add(BoundaryLines.v0);
 			bl.add(BoundaryLines.vn);
 		}
+		
+		private ClosingDir determineClosingCondition(){
+			if(isClosedUDir()){
+				return ClosingDir.uClosed;
+			}
+			if(isClosedVDir()){
+				return ClosingDir.vClosed;
+			}
+			else{
+				return ClosingDir.nonClosed;
+			}
+		}
+		
+		public ClosingDir getClosingDir(){
+			if(closDir == null){
+				return determineClosingCondition();
+			}
+			else{
+				return closDir;
+			}
+		}
+		
+		private boolean isClosedUDir(){
+			int m = controlMesh.length;
+			int n = controlMesh[0].length;
+			for (int j = 0; j < n; j++) {
+				if(Rn.euclideanDistance(controlMesh[0][j], controlMesh[m - 1][j]) > 0.0001){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean isClosedVDir(){
+			int m = controlMesh.length;
+			int n = controlMesh[0].length;
+			for (int i = 0; i < m; i++) {
+				if(Rn.euclideanDistance(controlMesh[i][0],  controlMesh[i][n - 1]) > 0.0001){
+					return false;
+				}
+			}
+			return true;
+		}
+		
 
 		/**
 		
@@ -340,7 +391,7 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		 * 
 		 * @param knotVector
 		 * @param p
-		 * @return the set of the multiset filled knot vector 
+		 * @return all distinct interior knots 
 		 */
 		public static double[] getAllDifferentKnotsFromFilledKnotVector(double[] knotVector, int p){
 			int knotSize = (knotVector.length - 2) / p;
@@ -352,12 +403,12 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		}
 		
 		/**
-		 * insert the knot uv r times into a knot vector of this surface. If dir == true into
+		 * insert the knot uv r times into the knot vector of this surface. If dir == true into
 		 *  U else into V
 		 * @param dir
 		 * @param uv
 		 * @param r
-		 * @return
+		 * @return the same surface defined by the new knot vector and an adapted control mesh
 		 */
 		
 		public NURBSSurface SurfaceKnotInsertion(boolean dir, double uv, int r){
@@ -392,12 +443,12 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		}
 		
 		/**
-		 * insert the knot uv r times into a knot vector of surface ns. If dir == true into
+		 * insert the knot uv r times into the knot vector of the surface ns. If dir == true into
 		 *  U else into V
 		 * @param dir
 		 * @param uv
 		 * @param r
-		 * @return
+		 * @return the same surface defined by the new knot vector and an adapted control mesh
 		 */
 		
 		public NURBSSurface SurfaceKnotInsertion(NURBSSurface ns, boolean dir, double uv, int r){
@@ -434,6 +485,79 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			return nsReturn;
 		}
 		
+		/**
+		 * 
+		 * @param KnotVec
+		 * @param knot
+		 * @return the position of the knot appearing the first time in the knot vector 
+		 */
+		
+		public static int getFirstPositionOfKnotInKnotVector(double[] KnotVec, double knot){
+			for (int i = 0; i < KnotVec.length; i++) {
+				if(KnotVec[i] == knot){
+					return i;
+				}
+			}
+			return Integer.MAX_VALUE;
+		}
+		
+		/**
+		 * 
+		 * @param dir
+		 * @param uv
+		 * @return 2 parts of the surface splitted at the knot uv
+		 */
+		
+		public NURBSSurface[] splitAtKnot(boolean dir, double uv){
+			NURBSSurface[] splitSurf = new NURBSSurface[2];
+			NURBSSurface nsFilled = this;
+			if(!dir){
+				int mult = getMultiplicity(uv, V);
+				int insertNumber = q - mult;
+				nsFilled = SurfaceKnotInsertion(nsFilled, false, uv, insertNumber);
+				double[][][] cmFilled = nsFilled.getControlMesh();
+				double[] filledV = nsFilled.getVKnotVector();
+				int first = getFirstPositionOfKnotInKnotVector(filledV, uv);
+				double[] V1 = new double[first + q + 1];
+				for (int i = 0; i < V1.length - 1; i++) {
+					V1[i] = filledV[i];
+				}
+				V1[V1.length - 1] = uv;
+				double[] V2 = new double[filledV.length - first + 1];
+				for (int i = 1; i < V2.length; i++) {
+					V2[i] = filledV[i + first - 1];
+				}
+				V2[0] = uv;
+				int l = V1.length - 1;
+				int k = V2.length - 1;
+				double[][][] cm1 = new double[cmFilled.length][l - q][];
+				for (int i = 0; i < cm1.length; i++) {
+					for (int j = 0; j < cm1[0].length; j++) {
+						cm1[i][j] = cmFilled[i][j];
+					}
+					
+				}
+				NURBSSurface ns1 = new NURBSSurface(U, V1, cm1, p, q);
+				System.out.println("ns1");
+				System.out.println(ns1.toObj());
+				double[][][] cm2 = new double[cmFilled.length][k - q][];
+				for (int i = 0; i < cm2.length; i++) {
+					for (int j = l - q - 1; j < cmFilled[0].length; j++) {
+						cm2[i][j - l + q + 1] = cmFilled[i][j];
+					}
+				}
+				NURBSSurface ns2 = new NURBSSurface(U, V2, cm2, p, q);
+				System.out.println("ns2");
+				System.out.println(ns2.toObj());
+				splitSurf[0] = ns1;
+				splitSurf[1] = ns2;
+				return splitSurf;
+			}
+			return splitSurf;
+		}
+		
+		
+		
 		
 		/**
 		 * decomposes both knot vectors of this surface s.t. both are filled<br/>
@@ -469,8 +593,8 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		
 		
 		/**
-		 * computes all Bezier patches from this surface
-		 * @return Bezier patches
+		 * the surface is splitted at each interior knot
+		 * @return all Bezier surfaces
 		 */
 		
 		public NURBSSurface[][] decomposeIntoBezierSurfaces(){
@@ -549,6 +673,11 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			return BezierSurfaces;
 		}
 		
+		/**
+		 * the surface is splitted at each interior knot
+		 * @return all Bezier surfaces
+		 */
+		
 		public LinkedList<NURBSSurface> decomposeIntoBezierSurfacesList(){
 			LinkedList<NURBSSurface> surfaceList = new LinkedList<NURBSSurface>();
 			NURBSSurface[][] Bezier = decomposeIntoBezierSurfaces();
@@ -560,7 +689,11 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			return surfaceList;
 		}
 		
- 		
+ 		/**
+ 		 * 
+ 		 * @return 
+ 		 */
+		
  		public LinkedList<NURBSSurface> subdivideIntoFourNewPatches(){
  			LinkedList<NURBSSurface> newPatches = new LinkedList<NURBSSurface>();
  			double uInsert = (U[U.length - 1] + U[0]) / 2.0;
@@ -572,11 +705,43 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
  		}
  		
  		
-
+ 		public boolean isSurfaceOfRevolution(){
+ 			if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionUDir(this) || PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionVDir(this)){
+ 				return true;
+ 			}
+ 			return false;
+ 		}
 		
 		public double[] getClosestPoint(double[] point){
- 			return PointProjection.getClosestPoint(this, point);
+ 			return PointProjectionSurface.getClosestPoint(this, point);
  		}
+		
+		public double[] getClosestPointDomain(double[] point){
+ 			return PointProjectionSurface.getClosestPointDomain(this, point);
+ 		}
+		
+		
+		/**
+		 * 
+		 * @return
+		 */
+		
+		public NURBSSurface interchangeUV(){
+			NURBSSurface nsEnd = new NURBSSurface();
+			nsEnd.setUDegree(q);
+			nsEnd.setVDegree(p);
+			nsEnd.setUKnotVector(V.clone());
+			nsEnd.setVKnotVector(U.clone());
+			double[][][] cmEnd = new double[controlMesh[0].length][controlMesh.length][];
+			for (int i = 0; i < cmEnd.length; i++) {
+				for (int j = 0; j < cmEnd[0].length; j++) {
+					cmEnd[i][j] = controlMesh[j][i].clone();
+				}
+			}
+			nsEnd.setControlMesh(cmEnd);
+			nsEnd.setRevolutionDir();
+			return nsEnd;
+		}
 	
 	
 		
@@ -599,6 +764,35 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			for (CornerPoints cp : cornerPoints) {
 				str = str + cp +", ";
 			}
+			return str;
+		}
+		
+		public String toObj(){
+			String str = new String();
+			for (int i = 0; i < controlMesh.length; i++) {
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					str = str + '\n' + "v " + controlMesh[i][j][0] / controlMesh[i][j][3] + " " + controlMesh[i][j][1] / controlMesh[i][j][3] + " " + controlMesh[i][j][2] / controlMesh[i][j][3] + " " + controlMesh[i][j][3];
+				}
+			}
+			str =  str + '\n' + "deg " + q + " " + p;
+			str =  str + '\n' + "surf " + V[0] + " " + V[V.length - 1] + " " + U[0] + " " + U[U.length - 1];
+			int k = 0;
+			for (int i = 0; i < controlMesh.length; i++) {
+				for (int j = 0; j < controlMesh[0].length; j++) {
+					k++;
+					str =  str + " " + k;
+				}
+			}
+			str =  str + '\n' + "parm u";
+			for (int i = 0; i < V.length; i++) {
+				str =  str + " " + V[i];
+			}
+			str =  str + '\n' + "parm v";
+			for (int i = 0; i < U.length; i++) {
+				str =  str + " " + U[i];
+			}
+			
+			str =  str + '\n' + "end";
 			return str;
 		}
 		

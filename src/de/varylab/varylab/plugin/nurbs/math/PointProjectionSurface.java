@@ -18,7 +18,7 @@ import de.varylab.varylab.utilities.MathUtility;
  * @see <a href = "http://page.math.tu-berlin.de/~seidel/"> NURBS </a>
  */
 
-public class PointProjection {
+public class PointProjectionSurface {
 		
 	/**
 	 * necessary condition whether a point is projected to the corner point P00
@@ -422,6 +422,13 @@ public class PointProjection {
 		return possiblePatches ;
 	}
 	
+	/**
+	 * 
+	 * @param nurbs
+	 * @param point
+	 * @return closest point
+	 */
+	
 	public static double[] getClosestPoint(NURBSSurface nurbs, double[] point){
 		if(nurbs.getRevolutionDir() != null){
 			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
@@ -484,6 +491,81 @@ public class PointProjection {
 			if(dist > Rn.euclideanDistance(surfPoint, p)){
 				dist = Rn.euclideanDistance(surfPoint, p);
 				closestPoint = homogSurfPoint;
+			}
+		}
+		return closestPoint;
+	}
+	
+	/**
+	 * 
+	 * @param nurbs
+	 * @param point
+	 * @return closest point
+	 */
+	
+	public static double[] getClosestPointDomain(NURBSSurface nurbs, double[] point){
+		if(nurbs.getRevolutionDir() != null){
+			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
+		}
+		double[] p = MathUtility.get3DPoint(point);
+		double[] closestPoint = new double[2];
+		double distNewton = Double.MAX_VALUE;
+		double dist = Double.MAX_VALUE;
+		double uStart = 0.;
+		double vStart = 0.;
+//		double eps = 0.000001;
+		LinkedList<BoundaryLines> firstBl = new LinkedList<NURBSSurface.BoundaryLines>();
+		firstBl.add(BoundaryLines.u0);
+		firstBl.add(BoundaryLines.um);
+		firstBl.add(BoundaryLines.v0);
+		firstBl.add(BoundaryLines.vn);
+		nurbs.setBoundLines(firstBl);
+		
+		LinkedList<NURBSSurface>  possiblePatches = nurbs.decomposeIntoBezierSurfacesList();
+		for (int i = 0; i < 15; i++) {
+			
+				// start of the newton method
+				if(i > 5 && i < 10){
+					for (NURBSSurface possibleNs : possiblePatches) {
+						double[] U = possibleNs.getUKnotVector();
+						double[] V = possibleNs.getVKnotVector();
+						double u = (U[0] + U[U.length - 1]) / 2;
+						double v = (V[0] + V[V.length - 1]) / 2;
+						double[] homogSurfPoint = possibleNs.getSurfacePoint(u, v);
+						double[] surfPoint = MathUtility.get3DPoint(homogSurfPoint);
+						if(distNewton > Rn.euclideanDistance(surfPoint, point)){
+							distNewton = Rn.euclideanDistance(surfPoint, point);
+							uStart = u;
+							vStart = v;
+						}
+					}
+				double[] result = newtonMethod (nurbs, point, 0.0000000000001,uStart, vStart);
+					if(result != null){ // returns if successful
+						return result;
+					}
+				}
+				// end of the newton method
+				
+				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
+				possiblePatches = getPossiblePatches(possiblePatches, p);
+//				System.out.println("possiblePatches.size(): " + possiblePatches.size());
+				for (NURBSSurface ns : possiblePatches) {
+					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
+				}
+				possiblePatches = subdividedPatches;
+			}
+			
+			for (NURBSSurface ns : possiblePatches) {
+			double[] U = ns.getUKnotVector();
+			double[] V = ns.getVKnotVector();
+			double u = (U[0] + U[U.length - 1]) / 2;
+			double v = (V[0] + V[V.length - 1]) / 2;
+			double[] homogSurfPoint = ns.getSurfacePoint(u, v);
+			double[] surfPoint = MathUtility.get3DPoint(homogSurfPoint);
+			if(dist > Rn.euclideanDistance(surfPoint, p)){
+				dist = Rn.euclideanDistance(surfPoint, p);
+				closestPoint[0] = u;
+				closestPoint[1] = v;
 			}
 		}
 		return closestPoint;
@@ -557,7 +639,7 @@ public class PointProjection {
 			gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 		}
 		if(f > eps || g > eps){
-			System.out.println("f " + f + " g " + g);
+//			System.out.println("f " + f + " g " + g);
 		}
 		return S;
 	}
