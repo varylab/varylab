@@ -115,7 +115,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	}
 
 	private void addTool(HalfedgeLayer layer) {
-		NurbsUVAdapter nurbsAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
+		NurbsUVAdapter nurbsAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
 		layer.addTemporaryGeometry(selectedPointsComponent);
 		if(nurbsAdapter != null) {
 			surface = nurbsAdapter.getSurface();
@@ -132,6 +132,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		tool.setSurface(surface);
 		points.clear();
 		selectedPoints.clear();
+		selectedPointsComponent.removeAllChildren();
 		psm.fireTableDataChanged();
 	}
 

@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -623,22 +622,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				startingPointsUV.add(y0);
 			}
 
-//			LinkedList<double[]> selPoints = new LinkedList<double[]>();
-//			if(selectionButton == e.getSource()){
-//				System.out.println("1. HALLO");
-////				double[] p = new double[2];
-//				if(selectionButton.isEnabled()){
-//					PointSelectionTool pst = new PointSelectionTool(hif.get(new VHDS()), hif.getAdapters(), selPoints, hif, surfaces.get(surfacesTable.getSelectedRow()));
-//					hif.addHalfedgeListener(pst);
-//					hif.update();
-////					double[] point = surfaces.get(surfacesTable.getSelectedRow()).getSurfacePoint(p[0], p[1]);
-//				}
-//			}
-//			System.out.println("selected points");
-//			for (double[] ds : selPoints) {
-//				System.out.println(Arrays.toString(ds));
-//			}
-			
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
 			
@@ -646,15 +629,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			umbilicStop = Math.pow(10, umbilicStop);
 			
 			
-			
-
-//			for (double[] umb : umbilics) {
-//				System.out.println();
-//				System.out.println("umbilic: " + Arrays.toString(umb));
-//				System.out.println();
-//			}
 			NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
-//			double[][] axis = PointProjectionSurfaceOfRevolution.getRotationAxis(ns);
+			
 			double[] U = ns.getUKnotVector();
 			double[] V = ns.getVKnotVector();
 	
@@ -756,7 +732,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
 			List<LineSegment> boundary = nsurface.getBoundarySegments();
-			intObj = IntegralCurves.rungeKuttaCurvatureLine(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
+			intObj = IntegralCurves.rungeKuttaCurvatureLine(nsurface, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
 			if(intObj.getUmbilicIndex() != 0){
 				umbilicIndex.add(intObj.getUmbilicIndex());
 			}
@@ -842,6 +818,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		@Override
 		public void pointSelected(double[] uv) {
 			// TODO Auto-generated method stub
+			// ns.computeCurvature(...,)
 			
 		}
 
@@ -1166,11 +1143,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			VHDS hds = hif.get(new VHDS());
 			umbilics = nurbsSurface.findUmbilics(hds, as);
 			PointSetFactory psfu = new PointSetFactory();
-			int p = nurbsSurface.getUDegree();
-			int q = nurbsSurface.getVDegree();
-			double[] U = nurbsSurface.getUKnotVector();
-			double[] V = nurbsSurface.getVKnotVector();
-			double[][][]Pw = nurbsSurface.getControlMesh();
 			double[][] uu = new double[umbilics.size()][];
 			double[][] upoints = new double[umbilics.size()][];
 			for (int i = 0; i < uu.length; i++) {
@@ -1180,22 +1152,22 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 			for (int i = 0; i < uu.length; i++) {
 				double[] S = new double[4];
-				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, uu[i][0], uu[i][1], S);
+				nurbsSurface.getSurfacePoint(uu[i][0], uu[i][1], S);
 				upoints[i] = S;
 			}
 			if(umbilics.size()>0){
-			psfu.setVertexCoordinates(upoints);
-			psfu.update();
-			SceneGraphComponent sgcu = new SceneGraphComponent("umbilics");
-			SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
-			sgcu.addChild(umbilicComp);
-			sgcu.setGeometry(psfu.getGeometry());
-			Appearance uAp = new Appearance();
-			sgcu.setAppearance(uAp);
-			DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
-			DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
-			upointShader.setDiffuseColor(Color.black);
-			hif.getActiveLayer().addTemporaryGeometry(sgcu);
+				psfu.setVertexCoordinates(upoints);
+				psfu.update();
+				SceneGraphComponent sgcu = new SceneGraphComponent("umbilics");
+				SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
+				sgcu.addChild(umbilicComp);
+				sgcu.setGeometry(psfu.getGeometry());
+				Appearance uAp = new Appearance();
+				sgcu.setAppearance(uAp);
+				DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
+				DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
+				upointShader.setDiffuseColor(Color.black);
+				hif.getActiveLayer().addTemporaryGeometry(sgcu);
 			}
 			if(vectorFieldBox.isSelected()) {
 				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
