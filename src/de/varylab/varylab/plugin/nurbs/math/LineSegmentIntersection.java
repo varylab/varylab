@@ -711,7 +711,7 @@ public class LineSegmentIntersection {
 		return allAjacentNbrs;
 	}
 	
-	private static boolean faceContainsAllBoundaryVerts(LinkedList<IntersectionPoint> allAjacentNbrs, LinkedList<double[]> boundaryVerts){
+	private static boolean faceContainsAllBoundaryVerts(LinkedList<IntersectionPoint> allAjacentNbrs, List<double[]> boundaryVerts){
 		boolean containsAll = false;
 		int numberOfBoundaryVerts = boundaryVerts.size();
 		int counter = 0;
@@ -733,7 +733,7 @@ public class LineSegmentIntersection {
 //		
 //	}
 	
-	public static FaceSet createFaceSet(LinkedList<HalfedgePoint> orientedNbrs, LinkedList<double[]> boundaryVerts){
+	public static FaceSet createFaceSet(LinkedList<HalfedgePoint> orientedNbrs, List<double[]> boundaryVerts){
 		System.out.println("boundary Verts:");
 		for (double[] bV : boundaryVerts) {
 			System.out.println(Arrays.toString(bV));

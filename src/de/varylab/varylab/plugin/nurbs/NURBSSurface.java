@@ -2,13 +2,27 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+
 import de.jreality.math.Rn;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariables;
+import de.jtem.numericalMethods.calculus.minimizing.Info;
+import de.jtem.numericalMethods.calculus.minimizing.NelderMead;
+import de.varylab.varylab.halfedge.VFace;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.plugin.nurbs.adapter.FlatIndexFormAdapter;
+import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurface;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
-import de.varylab.varylab.utilities.MathUtility;
 
 /**
  * 
@@ -35,6 +49,8 @@ import de.varylab.varylab.utilities.MathUtility;
 		private int p, q;
 		private String name = "Nurbs Surface";
 
+//		private List<double[]> umbilics = new LinkedList<double[]>();
+		
 		public NURBSSurface() {
 		
 		}
@@ -827,7 +843,320 @@ import de.varylab.varylab.utilities.MathUtility;
 			}
 			return str;
 		}
+
+		public List<double[]> getBoundaryVerticesUV() {
+			List<double[]> boundaryVerts = new LinkedList<double[]>();
+			double[] boundVert1 = new double[2];
+			boundVert1[0] = U[0];
+			boundVert1[1] = V[0];
+			double[] boundVert2 = new double[2];
+			boundVert2[0] = U[U.length - 1];
+			boundVert2[1] = V[0];
+			double[] boundVert3 = new double[2];
+			boundVert3[0] = U[U.length - 1];
+			boundVert3[1] = V[V.length - 1];
+			double[] boundVert4 = new double[2];
+			boundVert4[0] = U[0];
+			boundVert4[1] = V[V.length - 1];
+			boundaryVerts.add(boundVert1);
+			boundaryVerts.add(boundVert2);
+			boundaryVerts.add(boundVert3);
+			boundaryVerts.add(boundVert4);
+			return boundaryVerts;
+		}
+
+		public List<LineSegment> getBoundarySegments() {
+			List<LineSegment> boundarySegments = new LinkedList<LineSegment>();
+			List<double[]> boundaryVertices = getBoundaryVerticesUV();
+			double[] 
+					boundVert1 = boundaryVertices.get(0),
+					boundVert2 = boundaryVertices.get(1),
+					boundVert3 = boundaryVertices.get(2),
+					boundVert4 = boundaryVertices.get(3);
+					
+			double[][] seg1 = new double[2][2];
+			seg1[0] = boundVert1;
+			seg1[1] = boundVert2;
+			LineSegment b1 = new LineSegment(seg1, 1, 1);
+			double[][] seg2 = new double[2][2];
+			seg2[0] = boundVert2;
+			seg2[1] = boundVert3;
+			LineSegment b2 = new LineSegment(seg2, 1, 2);
+			double[][] seg3 = new double[2][2];
+			seg3[0] = boundVert3;
+			seg3[1] = boundVert4;
+			LineSegment b3 = new LineSegment(seg3, 1, 3);
+			double[][] seg4 = new double[2][2];
+			seg4[0] = boundVert4;
+			seg4[1] = boundVert1;
+			LineSegment b4 = new LineSegment(seg4, 1, 4);
+
+			if(getClosingDir() == ClosingDir.uClosed){
+				boundarySegments.add(b1);
+				boundarySegments.add(b3);
+			}
+			else if(getClosingDir() == ClosingDir.vClosed){
+				boundarySegments.add(b2);
+				boundarySegments.add(b4);
+			}else{
+				boundarySegments.add(b1);
+				boundarySegments.add(b2);
+				boundarySegments.add(b3);
+				boundarySegments.add(b4);
+			}
+			return boundarySegments;
+		}
+
+//		public int curveLine(double[] y0, boolean b, double tol, double umbilicStop, List<Integer> umbilicIndex) {
+//			double u0 = U[0];
+//			double um = U[U.length - 1];
+//			double v0 = V[0];
+//			double vn = V[V.length - 1];
+//			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
+//			IntObjects intObj;
+//			int noSegment;
+//			LinkedList<double[]> all = new LinkedList<double[]>();
+//			
+//			intObj = IntegralCurves.rungeKuttaCurvatureLine(this, y0, tol,false, maxMin, umbilics, umbilicStop, boundary);
+//			if(intObj.getUmbilicIndex() != 0){
+//				umbilicIndex.add(intObj.getUmbilicIndex());
+//			}
+//			Collections.reverse(intObj.getPoints());
+//			all.addAll(intObj.getPoints());
+//			noSegment = all.size();
+//			System.out.println("first size" + noSegment);
+//			boolean cyclic = false;
+//			if(!intObj.isNearby()){
+//				all.pollLast();
+//				intObj = IntegralCurves.rungeKuttaCurvatureLine(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
+//				if(intObj.getUmbilicIndex() != 0){
+//					umbilicIndex.add(intObj.getUmbilicIndex());
+//				}
+//				all.addAll(intObj.getPoints());
+//			}else{
+//				//add the first element of a closed curve
+//				cyclic = true;
+//				System.out.println("add first");
+//				double[] first = new double [2];
+//				first[0] = all.getFirst()[0];
+//				first[1] = all.getFirst()[1];
+//				all.add(first);
+//				noSegment = all.size();
+//			}
+//			int index = 0;
+//			double[] firstcurvePoint = all.getFirst();
+//			for (double[] secondCurvePoint : all) {
+//				index ++;
+//				if(index != 1){
+//					double[][]seg = new double[2][];
+//					seg[0] = firstcurvePoint;
+//					seg[1] = secondCurvePoint;
+//					if(isValidSegment(seg, u0, um, v0, vn)){
+//						LineSegment ls = new  LineSegment();
+//						ls.setIndexOnCurve(index) ;
+//						ls.setSegment(seg);
+//						ls.setCurveIndex(curveIndex);
+//						ls.setCyclic(cyclic);
+//						currentSegments.add(ls);
+//						firstcurvePoint = secondCurvePoint;
+//					}
+//					else{
+//						index--;
+//					}
+//				}
+//			}
+//			PolygonalLine currentLine = new PolygonalLine(currentSegments);
+//			segments.add(currentLine);
+//			curveIndex ++;
+//			double[][] u = new double[all.size()][];
+//			double[][] points = new double[all.size()][];
+//			for (int i = 0; i < u.length; i++) {
+//				u[i] = all.get(i);
+//			}
+//			for (int i = 0; i < u.length; i++) {
+//				double[] S = new double[4];
+//				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
+//				points[i] = S;
+//			}
+//			IndexedLineSetFactory lsf = IndexedLineSetUtility.createCurveFactoryFromPoints(points, false);
+//			lsf.update();
+//			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
+//			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
+//			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
+//			sgc.addChild(maxCurveComp);
+//			sgc.setGeometry(lsf.getGeometry());
+//			Appearance labelAp = new Appearance();
+//			sgc.setAppearance(labelAp);
+//			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+//			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+//			if(maxMin){
+//				pointShader.setDiffuseColor(Color.red);
+//			}else{
+//				pointShader.setDiffuseColor(Color.cyan);
+//			}
+//			hif.getActiveLayer().addTemporaryGeometry(sgc);
+//			return curveIndex;
+//		}
 		
+		//TODO: Why does this method need hds and as?
+	public LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
 		
+		VectorFieldMapAdapter linefield = new VectorFieldMapAdapter();
+		FlatIndexFormAdapter indexAdapter= new FlatIndexFormAdapter(); 
 	
+		double u0 = U[0];
+		double u1 = U[U.length - 1];
+		double v0 = V[0];
+		double v1 = V[V.length - 1];
+		for (VVertex v : hds.getVertices()) {
+			double[] NurbsuvCoordinate = as.get(NurbsUVCoordinate.class, v,	double[].class);
+			double uCoord = NurbsuvCoordinate[0];
+			double vCoord = NurbsuvCoordinate[1];
+			if (uCoord < u0 || uCoord > u1) {
+				System.out.println("uCoord is out of domain " + uCoord);
+			}
+			if (vCoord < v0 || vCoord > v1) {
+				System.out.println("uCoord is out of domain " + vCoord);
+			}
+
+			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this,
+					uCoord, vCoord);
+			double[] vector = ci.getCurvatureDirectionsDomain()[0];
+			linefield.set(v, vector, as);
+		}
+
+		as.add(indexAdapter);
+		as.add(linefield);
+		LinkedList<Double> umbFaces = new LinkedList<Double>();
+		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
+		for (VFace f : hds.getFaces()) {
+			double result = indexAdapter.get(f, as);
+			if (Math.abs(Math.abs(result) - 1) < 0.01
+					|| Math.abs(Math.abs(result) - 2) < 0.01) {
+				umbFaces.add(result);
+				umbilicFaces.add(f);
+			}
+		}
+
+		UmbilicFunction fun = new UmbilicFunction(this);
+		
+		LinkedList<double[]> possibleUmbs = new LinkedList<double[]>();
+		for (VFace f : umbilicFaces) {
+			System.out.println("Faceindex: " + f.getIndex());
+			VVertex v = f.getBoundaryEdge().getStartVertex();
+			double[] start = as.get(NurbsUVCoordinate.class, v, double[].class);
+			double[][] xi = computeXi(start);
+			double value = NelderMead.search(start, xi, 1E-12, fun, 100,
+					new Info());
+			System.out.println();
+			System.out.println("NM Value " + value);
+			System.out.println("NM Pos " + Arrays.toString(start));
+			possibleUmbs.add(start);
+		}
+
+		double epsilon = 0.00001;
+		HashMap<double[], List<double[]>> near = new HashMap<double[], List<double[]>>();
+		for (double[] umb1 : possibleUmbs) {
+			List<double[]> nearUmb1 = new LinkedList<double[]>();
+			for (double[] umb2 : possibleUmbs) {
+				if (umb1 != umb2) {
+					if (Rn.euclideanDistance(umb1, umb2) < epsilon) {
+						nearUmb1.add(umb2);
+					}
+				}
+			}
+			near.put(umb1, nearUmb1);
+		}
+		List<double[]> allNearUmb = new LinkedList<double[]>();
+		List<double[]> allNearFirstUmb = new LinkedList<double[]>();
+		for (double[] umb : possibleUmbs) {
+			if (near.containsKey(umb)) {
+				allNearUmb.add(umb);
+				if (!allNearFirstUmb.contains(umb)) {
+					for (double[] u : near.get(umb)) {
+						allNearFirstUmb.add(u);
+					}
+				}
+			}
+		}
+		possibleUmbs.removeAll(allNearFirstUmb);
+		return possibleUmbs;
+	}
+	
+	private double[][] computeXi(double[] p) {
+		double[][] xi = new double[2][];
+		double[] x1 = new double[2];
+		double[] x2 = new double[2];
+		double pu = p[0];
+		double pv = p[1];
+		double uend = U[U.length - 1];
+		double vend = V[V.length - 1];
+		if(pu + 0.05 < uend){
+			x1[0] = 0.001; 
+		}
+		else{
+			x1[0] = -0.001;
+		}
+		x1[1] = 0;
+		if(pv + 0.05 < vend){
+			x2[1] = 0.001;
+		}
+		else{
+			x2[1] = -0.001;
+		}
+		x2[0] = 0;
+		xi[0] = x1;
+		xi[1] = x2;
+		return xi;
+	}
+	
+	private class UmbilicFunction implements RealFunctionOfSeveralVariables {
+		
+		private NURBSSurface surface = null;
+		
+		public UmbilicFunction(NURBSSurface ns) {
+			surface = ns;
+		}
+		
+		@Override
+		public int getNumberOfVariables() {
+			return 2;
+		}
+
+		@Override
+		public double eval(double[] p) {
+			double u0 = U[0];
+			double u1 = U[U.length - 1];
+			double v0 = V[0];
+			double v1 = V[V.length - 1];
+			if (p[0] < u0 || p[0] > u1) {
+				// System.out.println("Nelder-Mead out of domain");
+				// System.out.println("p[0]: " + p[0]);
+				return 10000;
+			}
+			if (p[1] < v0 || p[1] > v1) {
+				// System.out.println("Nelder-Mead out of domain");
+				// System.out.println("p[1]: " + p[1]);
+				return 10000;
+			}
+			// if(p[0] < u0){
+			// p[0] = u0;
+			// }
+			// else if(p[0] > u1){
+			// p[0] = u1;
+			// }
+			// if(p[1] < v0){
+			// p[1] = v0;
+			// }
+			// else if(p[1] > v1){
+			// p[1] = v1;
+			// }
+			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p[0], p[1]);
+			double H = ci.getMeanCurvature();
+			double K = ci.getGaussCurvature();
+			return Math.abs(H * H - K);
+		}
+	};
+
+
 }

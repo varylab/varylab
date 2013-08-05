@@ -113,7 +113,7 @@ public class IntegralCurves {
 		}
 	}
 	
-	private static boolean segmentIntersectBoundary(LineSegment seg, LinkedList<LineSegment> boundary){
+	private static boolean segmentIntersectBoundary(LineSegment seg, List<LineSegment> boundary){
 		for (LineSegment lS : boundary) {
 			if(LineSegmentIntersection.twoSegmentIntersection(seg, lS)){
 				System.out.println("segment " + seg.toString());
@@ -150,7 +150,7 @@ public class IntegralCurves {
 		return Rn.add(null, second.getSegment()[0],Rn.times(null, lambda, Rn.add(null, second.getSegment()[1], Rn.times(null, -1, second.getSegment()[0]))));
 	}
 	
-	private static double[] boundaryIntersection(LineSegment seg, LinkedList<LineSegment> boundary){
+	private static double[] boundaryIntersection(LineSegment seg, List<LineSegment> boundary){
 		double minDist = Double.MAX_VALUE;
 		double[] intersection = null;
 		for (LineSegment lS : boundary) {
@@ -277,7 +277,7 @@ public class IntegralCurves {
 	distance between the start point and the last point
 	* @return
 	*/
-	public static IntObjects rungeKuttaCurvatureLine(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, List<double[]> umbilics, double umbilicStop, LinkedList<LineSegment> boundary) {
+	public static IntObjects rungeKuttaCurvatureLine(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, List<double[]> umbilics, double umbilicStop, List<LineSegment> boundary) {
 	double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{
 	2 / 9., 1 / 3., 4 / 9., 0 } };
 	double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };

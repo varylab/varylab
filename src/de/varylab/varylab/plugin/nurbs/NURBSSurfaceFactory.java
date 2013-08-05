@@ -28,10 +28,6 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 		minCurvatureVFMap = new HashMap<Integer, double[]>(),
 		maxCurvatureVFMap = new HashMap<Integer, double[]>();
 	
-	public NURBSSurfaceFactory() {
-
-	}
-
 	public void setSurface(NURBSSurface surface) {
 		this.surface = surface;
 	}
@@ -76,7 +72,8 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 	}
 	
 	public NurbsUVAdapter getUVAdapter() {
-		return new NurbsUVAdapter(indexUVMap);
+		NurbsUVAdapter nurbsUVAdapter = new NurbsUVAdapter(surface,indexUVMap);
+		return nurbsUVAdapter;
 	}
 	
 	@Override

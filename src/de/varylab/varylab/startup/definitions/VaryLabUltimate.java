@@ -79,6 +79,7 @@ import de.varylab.varylab.plugin.meshoptimizer.TouchingIncirclesOptimizerCot;
 import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin;
 import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
@@ -177,7 +178,9 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		
 		pSet.add(OBJExportPlugin.class);
 		
+		pSet.add(PointSelectionPlugin.class);
 		pSet.add(NurbsManagerPlugin.class);
+
 //		pSet.add(HalfedgeDebuggerPlugin.class);
 //		pSet.add(WebContentLoader.class);
 		

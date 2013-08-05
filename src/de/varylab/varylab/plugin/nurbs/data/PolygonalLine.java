@@ -5,7 +5,9 @@ import java.util.LinkedList;
 public class PolygonalLine {
 	
 	private LinkedList<LineSegment>pLine;
+	private String description = null;
 	
+
 	public PolygonalLine(){
 		pLine = null;
 	}
@@ -33,6 +35,14 @@ public class PolygonalLine {
 			str = str + ls.toString() +"\n";
 		}
 		return str;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

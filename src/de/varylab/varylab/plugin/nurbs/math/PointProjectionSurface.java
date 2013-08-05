@@ -539,7 +539,7 @@ public class PointProjectionSurface {
 							vStart = v;
 						}
 					}
-				double[] result = newtonMethod (nurbs, point, 0.0000000000001,uStart, vStart);
+				double[] result = newtonMethodDomain(nurbs, point, 0.0000000000001,uStart, vStart);
 					if(result != null){ // returns if successful
 						return result;
 					}
@@ -583,8 +583,17 @@ public class PointProjectionSurface {
 		return str;
 	}
 	
-	
 	private static double[] newtonMethod(NURBSSurface ns, double[] P, double eps, double u, double v){
+		double[] uv = newtonMethodDomain(ns, P, eps, u, v);
+		if(uv == null) {
+			return null;
+		} else {
+			return ns.getSurfacePoint(uv[0], uv[1]);
+		}
+	}
+	
+	
+	private static double[] newtonMethodDomain(NURBSSurface ns, double[] P, double eps, double u, double v){
 		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, u, v);
 		double[] S = ns.getSurfacePoint(u, v);
 		double[] S3D = MathUtility.get3DPoint(S);
@@ -641,7 +650,7 @@ public class PointProjectionSurface {
 		if(f > eps || g > eps){
 //			System.out.println("f " + f + " g " + g);
 		}
-		return S;
+		return new double[]{u,v};
 	}
 	
 	
