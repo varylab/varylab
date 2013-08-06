@@ -250,7 +250,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			}
 			selectedPoints.add(pt);
 			selectedPointsComponent.addChild(createPointComponent(pt));
-			psm.fireTableDataChanged();
 			firePointSelected(tool.getSelectedPoint());
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
@@ -272,6 +271,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				double[] pt = as.getD(NurbsUVCoordinate.class, v);
 				if(!points.contains(pt)) {
 					points.add(pt);
+					selectedPointsComponent.addChild(createPointComponent(pt));
 				}
 			}
 		}
