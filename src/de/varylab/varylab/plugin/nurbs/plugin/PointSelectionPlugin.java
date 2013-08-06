@@ -1,8 +1,12 @@
 package de.varylab.varylab.plugin.nurbs.plugin;
 
+import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
+import static de.jreality.shader.CommonAttributes.POINT_SHADER;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
+import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
+import static java.awt.Color.ORANGE;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -32,11 +36,10 @@ import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
-import de.jreality.shader.DefaultGeometryShader;
-import de.jreality.shader.DefaultPointShader;
-import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.util.SceneGraphUtility;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
@@ -46,6 +49,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ActionListener {
@@ -56,42 +60,78 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	private JPanel panel = new JPanel();
 	
-	private List<double[]> points = new LinkedList<double[]>();
-	private List<double[]> selectedPoints = new LinkedList<double[]>();
+	private LinkedList<double[]> points = new LinkedList<double[]>();
+	private LinkedList<double[]> selectedPoints = new LinkedList<double[]>();
 	
 	private PointSelectionModel psm = new PointSelectionModel();
 	private JTable selectedPointsTable = new JTable(psm);
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
+	
+	private JButton uncheckButton = new JButton("None");
+	private JButton checkButton = new JButton("All");
+	private JButton removeSelectedButton = new JButton("Delete selected");
+	private JButton selectionButton = new JButton("Get selection");
+	
 	private JCheckBox showBox = new JCheckBox("Show");
+	
 	private SceneGraphComponent selectedPointsComponent = new SceneGraphComponent("Selected Nurbs Points");
 	private NURBSSurface surface;
+	private NurbsUVAdapter nurbsUVAdapter;
 	
 	
 	public PointSelectionPlugin() {
 		tool.addActionListener(this);
 		
 		shrinkPanel.setName("Nurbs Selection");
+		shrinkPanel.setLayout(new GridBagLayout());
+		
 		panel.setPreferredSize(new Dimension(250, 200));
 		panel.setMinimumSize(new Dimension(250, 200));
 		panel.setLayout(new GridBagLayout());
 		panel.add(selectedPointsPane);
 		
 		GridBagConstraints rc = LayoutFactory.createRightConstraint();
+		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+		
 		selectedPointsTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		selectedPointsTable.setRowHeight(22);
 		selectedPointsTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PointVisibilityListener());
 		selectedPointsTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
 		selectedPointsTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
+		selectedPointsTable.getColumnModel().getColumn(3).setMaxWidth(22);
+		selectedPointsTable.getColumnModel().getColumn(3).setPreferredWidth(22);
+		selectedPointsTable.getColumnModel().getColumn(0).setMaxWidth(22);
+		selectedPointsTable.getColumnModel().getColumn(0).setPreferredWidth(22);
+		
 		selectedPointsPane.setMinimumSize(new Dimension(200,150));
 		panel.add(selectedPointsPane, rc);
 		
 		showBox.setSelected(true);
 		showBox.addActionListener(this);
+		
+		checkButton.addActionListener(this);
+		uncheckButton.addActionListener(this);
+		removeSelectedButton.addActionListener(this);
+		selectionButton.addActionListener(this);
+		
+		initSelectedPointsComponent();
+		panel.add(checkButton,lc);
+		panel.add(uncheckButton,rc);
+		panel.add(removeSelectedButton,lc);
+		panel.add(selectionButton,rc);
 		panel.add(showBox, rc);
 		
-		shrinkPanel.add(panel);
+		shrinkPanel.add(panel,rc);
 	}
 	
+	private void initSelectedPointsComponent() {
+		Appearance app = new Appearance();
+		app.setAttribute(VERTEX_DRAW, true);
+		app.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		app.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		selectedPointsComponent.setAppearance(app);
+	}
+
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
@@ -111,21 +151,20 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
+		layer.removeTemporaryGeometry(selectedPointsComponent);
+		layer.addTemporaryGeometry(selectedPointsComponent);
 		addTool(layer);
+		updateTool(layer);
 	}
 
-	private void addTool(HalfedgeLayer layer) {
-		NurbsUVAdapter nurbsAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
-		layer.addTemporaryGeometry(selectedPointsComponent);
-		if(nurbsAdapter != null) {
-			surface = nurbsAdapter.getSurface();
-			List<SceneGraphPath> paths = SceneGraphUtility.getPathsToNamedNodes(layer.getLayerRoot(), "Geometry");
-			SceneGraphComponent comp;
-			for (SceneGraphPath path : paths) {
-				comp = path.getLastComponent();
-				if (!comp.getTools().contains(tool))
-					comp.addTool(tool);
-			}
+	private void updateTool(HalfedgeLayer layer) {
+		nurbsUVAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
+		if(nurbsUVAdapter==null) {
+			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
+		}
+		
+		if(nurbsUVAdapter != null) {
+			surface = nurbsUVAdapter.getSurface();
 		} else {
 			surface = null;
 		}
@@ -136,13 +175,37 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		psm.fireTableDataChanged();
 	}
 
+	private void addTool(HalfedgeLayer layer) {
+		List<SceneGraphPath> paths = SceneGraphUtility.getPathsToNamedNodes(layer.getLayerRoot(), "Geometry");
+		SceneGraphComponent comp;
+		for (SceneGraphPath path : paths) {
+			comp = path.getLastComponent();
+			if (!comp.getTools().contains(tool))
+				comp.addTool(tool);
+		}
+	}
+	
+	private void removeTool(HalfedgeLayer layer) {
+		List<SceneGraphPath> paths = SceneGraphUtility.getPathsToNamedNodes(layer.getLayerRoot(), "Geometry");
+		SceneGraphComponent comp;
+		for (SceneGraphPath path : paths) {
+			comp = path.getLastComponent();
+			comp.removeTool(tool);
+		}
+	}
+
 	@Override
 	public void adaptersChanged(HalfedgeLayer layer) {
+		updateTool(layer);
 	}
 
 	@Override
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
+		old.removeTemporaryGeometry(selectedPointsComponent);
+		active.addTemporaryGeometry(selectedPointsComponent);
+		removeTool(old);
 		addTool(active);
+		updateTool(active);
 	}
 
 	@Override
@@ -152,6 +215,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 
 	@Override
 	public void layerRemoved(HalfedgeLayer layer) {
+		removeTool(layer);
 	}
 
 	public void addPointSelectionListener(PointSelectionListener psl) {
@@ -181,15 +245,46 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		Object source = e.getSource();
 		if(source == tool) {
 			double[] pt = tool.getSelectedPoint();
-			points.add(pt);
+			if(!points.contains(pt)) {
+				points.add(pt);
+			}
 			selectedPoints.add(pt);
 			selectedPointsComponent.addChild(createPointComponent(pt));
 			psm.fireTableDataChanged();
 			firePointSelected(tool.getSelectedPoint());
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
+		} else if(source == checkButton) {
+			selectedPoints.clear();
+			selectedPoints.addAll(points);
+		} else if(source == uncheckButton) {
+			selectedPoints.clear();
+		} else if(source == removeSelectedButton) {
+			for(double[] selPt : selectedPoints) {
+				points.remove(selPt);
+			}
+			selectedPoints.clear();
+			resetSelectedPointsComponent();
+		} else if(source == selectionButton) {
+			AdapterSet as = hif.getActiveAdapters();
+			as.addAll(hif.getAdapters());
+			for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
+				double[] pt = as.getD(NurbsUVCoordinate.class, v);
+				if(!points.contains(pt)) {
+					points.add(pt);
+				}
+			}
 		}
-		
+		psm.fireTableDataChanged();
+	}
+
+	private void resetSelectedPointsComponent() {
+		selectedPointsComponent.removeAllChildren();
+		for(double[] pt : points) {
+			SceneGraphComponent ptComponent = createPointComponent(pt);
+			ptComponent.setVisible(selectedPoints.contains(pt));
+			selectedPointsComponent.addChild(ptComponent);
+		}
 	}
 
 	@Override
@@ -275,13 +370,19 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			if (selectedPointsTable.getRowSorter() != null) {
 				row = selectedPointsTable.getRowSorter().convertRowIndexToModel(row);
 			}
-			boolean isVisible = !selectedPointsComponent.getChildComponent(row).isVisible();
-			selectedPointsComponent.getChildComponent(row).setVisible(isVisible);
-			if(!isVisible){
+			boolean isVisible = isSelected(row);
+			if(isVisible){
 				selectedPoints.remove(points.get(row));
+				selectedPointsComponent.getChildComponent(row).setVisible(false);
 			} else {
 				selectedPoints.add(points.get(row));
+				selectedPointsComponent.getChildComponent(row).setVisible(true);
 			}
+			
+		}
+
+		private boolean isSelected(int row) {
+			return selectedPoints.contains(points.get(row));
 		}
 
 		@Override
@@ -297,11 +398,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		psfi.update();
 		SceneGraphComponent sgci = new SceneGraphComponent("uv" + Arrays.toString(uv));
 		sgci.setGeometry(psfi.getGeometry());
-		Appearance iAp = new Appearance();
-		sgci.setAppearance(iAp);
-		DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
-		DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-		ipointShader.setDiffuseColor(Color.orange);
 		return sgci;
 	}
 	
@@ -351,6 +447,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			super(ImageHook.getIcon("remove.png"));
 			setSize(16,16);
 			this.row=row;
+			addActionListener(this);
 		}
 		
 		@Override

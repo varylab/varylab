@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,6 +46,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import org.python.google.common.collect.Lists;
+
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -62,6 +63,7 @@ import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.StorageModel;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
+import de.jreality.shader.DefaultLineShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.DragEventTool;
@@ -73,6 +75,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -80,14 +83,12 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.halfedge.VHDS;
-import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
-import de.varylab.varylab.plugin.nurbs.VertexComparator;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
@@ -552,7 +553,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //		}
 //	}
 	
-	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener {
+	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener {
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -565,21 +566,21 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			nearUmbilicSpinner = new JSpinner(nearUmbilicModel);
 		private JButton
 			goButton = new JButton("Go");
-		private JRadioButton
-			selectionButton = new JRadioButton("select points"),
-			maxButton = new JRadioButton("Max Curvature (red)"),
-			minButton = new JRadioButton("Min Curvature (cyan)"),
-			intersectionButton = new JRadioButton("Bentley Ottmann");
+		private JCheckBox
+			immediateCalculationBox = new JCheckBox("Immediate calculation"),
+			maxCurvatureBox = new JCheckBox("Max (red)"),
+			minCurvatureBox = new JCheckBox("Min (cyan)"),
+			intersectionBox = new JCheckBox("Bentley Ottmann");
 		private CurveTableModel
 			curveTableModel = new CurveTableModel();
 		private JTable 
 			curveTable = new JTable(curveTableModel);
 		private JScrollPane 
 			curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
-//		private PointSelectionTool pst = new PointSelectionTool(hif.get(new VHDS()), hif.getAdapters());
-//		double[] point = pst.getPoint();
-//		System.out.println(Arrays.toString(point));
 
+		private SceneGraphComponent
+			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
+		
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
@@ -592,70 +593,41 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(new JLabel("Near Umbilic Exp"), lc);
 			add(nearUmbilicSpinner, rc);
 //			add(selectionButton, rc);
-			add(maxButton, rc);
-			add(minButton, rc);
-			add(intersectionButton, rc);
+			add(new JLabel("Curvature lines:"), lc);
+			add(minCurvatureBox, lc);
+			add(maxCurvatureBox, rc);
+			
+			add(intersectionBox, rc);
+			add(immediateCalculationBox,lc);
 			add(goButton, rc);
-			selectionButton.addActionListener(this);
 			goButton.addActionListener(this);
 			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 			curveTable.setRowHeight(22);
 			curveTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			add(curveScrollPanel, rc);
-			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());	
+			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
+			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
+			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
+			
+			Appearance app = new Appearance();
+			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
+			integralCurvesRoot.setAppearance(app);
 		}
 		
 		
 		@Override
 		public void actionPerformed(ActionEvent e){
-			VHDS hds = hif.get(new VHDS());
-			Set<VVertex> vSet = new TreeSet<VVertex>(new VertexComparator());
+					
+			List<double[]> startingPointsUV = pstool.getSelectedPoints();
 			
-			List<double[]> startingPointsUV = new LinkedList<double[]>();
-			AdapterSet as = hif.getAdapters();
-			startingPointsUV.addAll(pstool.getSelectedPoints());
+			List<PolygonalLine> currentLines = computeCurvatureLines(startingPointsUV);
 			
-			vSet.addAll(hif.getSelection().getVertices(hds));
-			for(VVertex v : vSet) {
-				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
-				startingPointsUV.add(y0);
-			}
-
-			double tol = tolExpModel.getNumber().doubleValue();
-			tol = Math.pow(10, tol);
-			
-			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
-			umbilicStop = Math.pow(10, umbilicStop);
-			
-			
-			NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
-			
-			double[] U = ns.getUKnotVector();
-			double[] V = ns.getVKnotVector();
-	
-			boolean max = maxButton.isSelected();
-			boolean min = minButton.isSelected();
-			boolean inter = intersectionButton.isSelected();
-			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
-			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
-			
-			List<LineSegment> boundarySegments = ns.getBoundarySegments();
-			
-			for(double[] y0 : startingPointsUV) {
-					if (max){
-						curveIndex = curveLine(ns, tol, umbilics, currentLines,
-								curveIndex, umbilicIndex, y0, true, umbilicStop);
-					}
-					if (min){
-						curveIndex = curveLine(ns, tol, umbilics, currentLines,
-								curveIndex, umbilicIndex, y0, false, umbilicStop);
-					}
-			}
 			lines.addAll(currentLines);
 			hif.clearSelection();
-			
-			if(inter){
+	
+			if(intersectionBox.isSelected()){
+				NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
 				lines.removeAll(removedLines);
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
@@ -663,10 +635,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					allSegments.addAll(pl.getpLine());
 				}
 				int shiftedIndex = allSegments.size();
+				List<LineSegment> boundarySegments = ns.getBoundarySegments();
+				
 				for (LineSegment bs : boundarySegments) {
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);			
+				double[] U = ns.getUKnotVector();
+				double[] V = ns.getVKnotVector();
+		
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
@@ -692,8 +669,34 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.addLayer(hel);
 				hif.update();
 			}
-			curveTableModel.fireTableDataChanged();
 			
+			curveTableModel.fireTableDataChanged();
+		}
+
+
+		private LinkedList<PolygonalLine> computeCurvatureLines(List<double[]> startingPointsUV) {
+			NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
+			
+			double tol = tolExpModel.getNumber().doubleValue();
+			tol = Math.pow(10, tol);
+			
+			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
+			umbilicStop = Math.pow(10, umbilicStop);
+			
+			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
+			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
+			
+			for(double[] y0 : startingPointsUV) {
+					if (maxCurvatureBox.isSelected()){
+						curveIndex = curveLine(ns, tol, umbilics, currentLines,
+								curveIndex, umbilicIndex, y0, true, umbilicStop);
+					}
+					if (minCurvatureBox.isSelected()){
+						curveIndex = curveLine(ns, tol, umbilics, currentLines,
+								curveIndex, umbilicIndex, y0, false, umbilicStop);
+					}
+			}
+			return currentLines;
 		}
 
 		@SuppressWarnings("unused")
@@ -743,7 +746,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean cyclic = false;
 			if(!intObj.isNearby()){
 				all.pollLast();
-				intObj = IntegralCurves.rungeKuttaCurvatureLine(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
+				intObj = IntegralCurves.rungeKuttaCurvatureLine(nsurface, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
 				if(intObj.getUmbilicIndex() != 0){
 					umbilicIndex.add(intObj.getUmbilicIndex());
 				}
@@ -780,8 +783,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					}
 				}
 			}
+			
 			PolygonalLine currentLine = new PolygonalLine(currentSegments);
-			currentLine.setDescription("("+String.format("%.2f", y0[0]) +", "+String.format("%.2f", y0[1])+")");
+			currentLine.setDescription("("+String.format("%.3f", y0[0]) +", "+String.format("%.3f", y0[1])+")");
 			segments.add(currentLine);
 			curveIndex ++;
 			double[][] u = new double[all.size()][];
@@ -796,30 +800,70 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			IndexedLineSetFactory lsf = IndexedLineSetUtility.createCurveFactoryFromPoints(points, false);
 			lsf.update();
-			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
+			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve:" + (maxMin?"maximal":"minimal")+" curvature");
 			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
-			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
-			sgc.addChild(maxCurveComp);
 			sgc.setGeometry(lsf.getGeometry());
 			Appearance labelAp = new Appearance();
-			sgc.setAppearance(labelAp);
 			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
 			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+			DefaultLineShader lineShader = (DefaultLineShader)dgs.getLineShader();
 			if(maxMin){
 				pointShader.setDiffuseColor(Color.red);
+				lineShader.setDiffuseColor(Color.red);
 			}else{
 				pointShader.setDiffuseColor(Color.cyan);
+				lineShader.setDiffuseColor(Color.cyan);
 			}
-			hif.getActiveLayer().addTemporaryGeometry(sgc);
+			sgc.setAppearance(labelAp);
+			integralCurvesRoot.addChild(sgc);
 			return curveIndex;
 		}
 
 
 		@Override
 		public void pointSelected(double[] uv) {
-			// TODO Auto-generated method stub
-			// ns.computeCurvature(...,)
-			
+			if(immediateCalculationBox.isSelected()) {
+				lines.addAll(computeCurvatureLines(Lists.newArrayList(uv)));
+				curveTableModel.fireTableDataChanged();
+			}
+		}
+
+
+		@Override
+		public void dataChanged(HalfedgeLayer layer) {
+			layer.removeTemporaryGeometry(integralCurvesRoot);
+			layer.addTemporaryGeometry(integralCurvesRoot);
+			resetLines();
+		}
+
+		private void resetLines() {
+			integralCurvesRoot.removeAllChildren();
+			lines.clear();
+			curveTableModel.fireTableDataChanged();
+			polygonalLineToSceneGraphComponent.clear();
+		}
+
+
+		@Override
+		public void adaptersChanged(HalfedgeLayer layer) {
+		}
+
+
+		@Override
+		public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
+			old.removeTemporaryGeometry(integralCurvesRoot);
+			resetLines();
+			active.addTemporaryGeometry(integralCurvesRoot);
+		}
+
+
+		@Override
+		public void layerCreated(HalfedgeLayer layer) {
+		}
+
+
+		@Override
+		public void layerRemoved(HalfedgeLayer layer) {
 		}
 
 	}
@@ -1088,6 +1132,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		hif.addHalfedgeListener(curvatureLinesPanel);
 		pstool  = c.getPlugin(PointSelectionPlugin.class);
 		surfacesTable.setModel(new SurfaceTableModel());
 		surfacesTable.setSelectionMode(SINGLE_SELECTION);
