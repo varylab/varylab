@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -45,10 +44,10 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -105,10 +104,13 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.ui.ButtonCellEditor;
+import de.varylab.varylab.ui.ButtonCellRenderer;
+import de.varylab.varylab.ui.ListSelectRemoveTableModel;
+import de.varylab.varylab.ui.PrettyPrinter;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener {
 	
-
 	private HalfedgeInterface 
 		hif = null;
 
@@ -157,12 +159,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private JCheckBox
 		vectorFieldBox = new JCheckBox("vf");
 	
-	private LinkedList<PolygonalLine>
-		lines = new LinkedList<PolygonalLine>();
-	
-	private LinkedList<PolygonalLine>
-	 	removedLines = new LinkedList<PolygonalLine>();
-	
 	private int 
 		curveIndex = 1;
 	
@@ -172,6 +168,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private List<double[]> umbilics = new LinkedList<double[]>();
 
 	private PointSelectionPlugin pstool = null;
+
+	private NURBSSurface activeNurbsSurface;
 
 	
 	public NurbsManagerPlugin() {
@@ -557,7 +555,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //		}
 //	}
 	
-	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener {
+	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener {
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -571,23 +569,22 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private JButton
 			goButton = new JButton("Go");
 		private JCheckBox
-			immediateCalculationBox = new JCheckBox("Immediate calculation"),
+			immediateCalculationBox = new JCheckBox("Immediate"),
 			maxCurvatureBox = new JCheckBox("Max (red)"),
 			minCurvatureBox = new JCheckBox("Min (cyan)"),
 			intersectionBox = new JCheckBox("Bentley Ottmann");
-		private CurveTableModel
-			curveTableModel = new CurveTableModel();
+		
+		private ListSelectRemoveTableModel<PolygonalLine>
+			curvesTableModel = new ListSelectRemoveTableModel<PolygonalLine>(new String[]{"Curves"}, new PolygonalLinePrinter());
+		
 		private JTable 
-			curveTable = new JTable(curveTableModel);
+			curveTable = new JTable(curvesTableModel);
 		private JScrollPane 
 			curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 
 		private SceneGraphComponent
 			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
 		
-		private HashMap<PolygonalLine, SceneGraphComponent>
-			polygonalLineToSceneGraphComponent = new HashMap<PolygonalLine, SceneGraphComponent>();
-	
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
@@ -608,13 +605,23 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			add(immediateCalculationBox,lc);
 			add(goButton, rc);
 			goButton.addActionListener(this);
+			
+	
+			
 			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 			curveTable.setRowHeight(22);
+			curveTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
+			curveTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
 			curveTable.getSelectionModel().addListSelectionListener(this);
 			curveTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+			curveTable.getColumnModel().getColumn(2).setMaxWidth(22);
+			curveTable.getColumnModel().getColumn(2).setPreferredWidth(22);
+			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
+			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
+			curvesTableModel.addTableModelListener(this);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			add(curveScrollPanel, rc);
-			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
+//			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
 			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
 			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
 			
@@ -631,26 +638,24 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 			List<PolygonalLine> currentLines = computeCurvatureLines(startingPointsUV);
 			
-			lines.addAll(currentLines);
+			curvesTableModel.addAll(currentLines);
 			hif.clearSelection();
 	
 			if(intersectionBox.isSelected()){
-				NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
-				lines.removeAll(removedLines);
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
-				for(PolygonalLine pl : lines){
+				for(PolygonalLine pl : curvesTableModel.getSelected()){
 					allSegments.addAll(pl.getpLine());
 				}
 				int shiftedIndex = allSegments.size();
-				List<LineSegment> boundarySegments = ns.getBoundarySegments();
+				List<LineSegment> boundarySegments = activeNurbsSurface.getBoundarySegments();
 				
 				for (LineSegment bs : boundarySegments) {
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);			
-				double[] U = ns.getUKnotVector();
-				double[] V = ns.getVKnotVector();
+				double[] U = activeNurbsSurface.getUKnotVector();
+				double[] V = activeNurbsSurface.getVKnotVector();
 		
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
@@ -664,10 +669,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				allSegments.clear();
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
-				FaceSet fS = LineSegmentIntersection.createFaceSet(H,ns.getBoundaryVerticesUV());
+				FaceSet fS = LineSegmentIntersection.createFaceSet(H,activeNurbsSurface.getBoundaryVerticesUV());
 				for (int i = 0; i < fS.getVerts().length; i++) {
 					double[] S = new double[4];
-					ns.getSurfacePoint(fS.getVerts()[i][0], fS.getVerts()[i][1], S);
+					activeNurbsSurface.getSurfacePoint(fS.getVerts()[i][0], fS.getVerts()[i][1], S);
 					fS.getVerts()[i] = S;
 				}
 				HalfedgeLayer hel = new HalfedgeLayer(hif);
@@ -678,7 +683,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.update();
 			}
 			
-			curveTableModel.fireTableDataChanged();
+			curvesTableModel.fireTableDataChanged();
 		}
 
 
@@ -793,46 +798,61 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			
 			PolygonalLine currentLine = new PolygonalLine(currentSegments);
-			currentLine.setDescription("("+String.format("%.3f", y0[0]) +", "+String.format("%.3f", y0[1])+")");
+			currentLine.setDescription((maxMin?"max:":"min:") + "("+String.format("%.3f", y0[0]) +", "+String.format("%.3f", y0[1])+")");
 			segments.add(currentLine);
 			curveIndex ++;
-			double[][] u = new double[all.size()][];
-			double[][] points = new double[all.size()][];
-			for (int i = 0; i < u.length; i++) {
-				u[i] = all.get(i);
-			}
-			for (int i = 0; i < u.length; i++) {
-				double[] S = new double[4];
-				S = nsurface.getSurfacePoint(u[i][0], u[i][1]);
-				points[i] = S;
+			return curveIndex;
+		}
+
+
+		private SceneGraphComponent createLineComponent(PolygonalLine pl) {
+			List<LineSegment> segments = pl.getpLine();
+			double u,v;
+			double[][] points = new double[segments.size()+1][];
+			int i = 0;
+			for(LineSegment segment : segments) {
+				u = (segment.getSegment())[0][0];
+				v = (segment.getSegment())[0][1];
+				points[i] = activeNurbsSurface.getSurfacePoint(u, v);
+				++i;
+				if(i == segments.size()) {
+					u = (segment.getSegment())[0][0];
+					v = (segment.getSegment())[0][1];
+					points[i] = activeNurbsSurface.getSurfacePoint(u, v);
+				}
 			}
 			IndexedLineSetFactory lsf = IndexedLineSetUtility.createCurveFactoryFromPoints(points, false);
 			lsf.update();
-			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve:" + (maxMin?"maximal":"minimal")+" curvature");
-			polygonalLineToSceneGraphComponent.put(currentLine, sgc);
+			boolean maxMin = pl.getDescription().toLowerCase().contains("max");
+			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve:" + (maxMin?"max":"min")+" curvature");
 			sgc.setGeometry(lsf.getGeometry());
-			Appearance labelAp = new Appearance();
-			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+			Appearance lineApp = new Appearance();
+			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(lineApp, false);
 			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
 			DefaultLineShader lineShader = (DefaultLineShader)dgs.getLineShader();
 			if(maxMin){
 				pointShader.setDiffuseColor(Color.red);
 				lineShader.setDiffuseColor(Color.red);
-			}else{
+			} else {
 				pointShader.setDiffuseColor(Color.cyan);
 				lineShader.setDiffuseColor(Color.cyan);
 			}
-			sgc.setAppearance(labelAp);
-			integralCurvesRoot.addChild(sgc);
-			return curveIndex;
+			sgc.setAppearance(lineApp);
+			return sgc;
 		}
 
 
 		@Override
 		public void pointSelected(double[] uv) {
 			if(immediateCalculationBox.isSelected()) {
-				lines.addAll(computeCurvatureLines(Lists.newArrayList(uv)));
-				curveTableModel.fireTableDataChanged();
+				LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
+				for(PolygonalLine pl : curvatureLines) {
+					if(!curvesTableModel.contains(pl)) {
+						curvesTableModel.add(pl);
+						curvesTableModel.fireTableDataChanged();
+//						integralCurvesRoot.addChild(createLineComponent(pl));
+					}
+				}
 			}
 		}
 
@@ -846,9 +866,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 		private void resetLines() {
 			integralCurvesRoot.removeAllChildren();
-			lines.clear();
-			curveTableModel.fireTableDataChanged();
-			polygonalLineToSceneGraphComponent.clear();
+			curvesTableModel.clear();
+			curvesTableModel.fireTableDataChanged();
 		}
 
 
@@ -886,7 +905,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 			for(int i = 0; i < curveTable.getRowCount(); ++i) {
 				int mi = curveTable.convertRowIndexToModel(i);
-				SceneGraphComponent lineComp = polygonalLineToSceneGraphComponent.get(lines.get(mi));
+				SceneGraphComponent lineComp = integralCurvesRoot.getChildComponent(mi);
 				boolean isVisible = lineComp.isVisible();
 				Appearance app = lineComp.getAppearance();
 				app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls.getRadiiWorldCoordinates());
@@ -898,89 +917,30 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				lineComp.setVisible(isVisible);
 			}
 		}
-		
-		private class CurveTableModel extends DefaultTableModel {
 
-			private static final long serialVersionUID = 1L;
 
-			private String[] columnNames = {"Show", "Curve"};
-			
-			@Override
-			public String getColumnName(int col) {
-				return columnNames[col].toString();
-		    }
-			
-		    @Override
-			public int getRowCount() { 
-		    	return (lines==null)?0:lines.size();
-		    }
-		    
-		    @Override
-			public int getColumnCount() { 
-		    	return columnNames.length;
-		    }
-		    
-		    @Override
-			public Object getValueAt(int row, int col) {
-		        if (col == 1) {
-		        	String desc = lines.get(row).getDescription();
-		        	if(desc == null) {
-		        		return "???";
-		        	}
-		        	return desc;
-		        }
-		    	return polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
-		    }
-		    
-		    @Override
-			public boolean isCellEditable(int row, int col) {
-		    	switch (col) {
-				case 0:
-					return true;
-				default:
-					return false;
-				}
-		    }
-		    
-		    @Override
-			public void setValueAt(Object value, int row, int col) {
-		    }	
-		    
-		    @Override
-		    public Class<?> getColumnClass(int col) {
-		    	if (col == 0)
-		    		return Boolean.class;
-		    	if (col == 1)
-		    		return String.class;
-		        return super.getColumnClass(col);
-		    }
+		@Override
+		public void tableChanged(TableModelEvent e) {
+			resetIntegralCurvesComponent();
+		}
+
+
+		private void resetIntegralCurvesComponent() {
+			integralCurvesRoot.removeAllChildren();
+			for(PolygonalLine pl : curvesTableModel.getList()) {
+				integralCurvesRoot.addChild(createLineComponent(pl));
+			}
 		}
 		
-		public class CurveVisibilityListener implements CellEditorListener {
+		private class PolygonalLinePrinter implements PrettyPrinter<PolygonalLine> {
 
 			@Override
-			public void editingCanceled(ChangeEvent e) {
+			public String toString(PolygonalLine t) {
+				return t.getDescription();
 			}
-
-			@Override
-			public void editingStopped(ChangeEvent e) {
-				JTable table = curvatureLinesPanel.curveTable;
-				int row = table.getSelectedRow();
-				if (table.getRowSorter() != null) {
-					row = table.getRowSorter().convertRowIndexToModel(row);
-				}
-				boolean isVisible = !polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
-				polygonalLineToSceneGraphComponent.get(lines.get(row)).setVisible(isVisible);
-				if(!isVisible){
-					removedLines.add(lines.get(row));
-				}
-				else{
-					removedLines.remove(lines.get(row));
-				}
-			}
+			
 		}
 	}
-	
 	
 	private class PointDistancePanel extends ShrinkPanel implements ActionListener{
 		
@@ -1216,15 +1176,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			qmf.setGenerateEdgesFromFaces(true);
 			qmf.setULineCount(uSpinnerModel.getNumber().intValue());
 			qmf.setVLineCount(vSpinnerModel.getNumber().intValue());
-			NURBSSurface nurbsSurface = surfaces.get(surfacesTable.getSelectedRow());
-			qmf.setSurface(nurbsSurface);
+			activeNurbsSurface = surfaces.get(surfacesTable.getSelectedRow());
+			qmf.setSurface(activeNurbsSurface);
 			qmf.update();
 			hif.set(qmf.getGeometry());
 			hif.update();
 			hif.addLayerAdapter(qmf.getUVAdapter(), false);
 			AdapterSet as = hif.getAdapters();
 			VHDS hds = hif.get(new VHDS());
-			umbilics = nurbsSurface.findUmbilics(hds, as);
+			umbilics = activeNurbsSurface.findUmbilics(hds, as);
 			PointSetFactory psfu = new PointSetFactory();
 			double[][] uu = new double[umbilics.size()][];
 			double[][] upoints = new double[umbilics.size()][];
@@ -1235,7 +1195,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 			for (int i = 0; i < uu.length; i++) {
 				double[] S = new double[4];
-				nurbsSurface.getSurfacePoint(uu[i][0], uu[i][1], S);
+				activeNurbsSurface.getSurfacePoint(uu[i][0], uu[i][1], S);
 				upoints[i] = S;
 			}
 			if(umbilics.size()>0){
@@ -1256,7 +1216,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
 				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
 			}
-			lines.clear();
+//			lines.clear();
 		} 
 	}
 	

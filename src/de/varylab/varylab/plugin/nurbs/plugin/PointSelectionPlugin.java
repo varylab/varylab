@@ -245,8 +245,8 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			double[] pt = tool.getSelectedPoint();
 			if(!psm.contains(pt)) {
 				psm.add(pt);
+				selectedPointsComponent.addChild(createPointComponent(pt));
 			}
-			selectedPointsComponent.addChild(createPointComponent(pt));
 			firePointSelected(tool.getSelectedPoint());
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());

@@ -2,6 +2,7 @@ package de.varylab.varylab.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -178,5 +179,10 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 		} else if (!alreadySelected && b) {
 			selected.add(elem);
 		}
+	}
+
+	public void addAll(Collection<E> col) {
+		list.addAll(col);
+		selected.addAll(col);
 	}
 }
