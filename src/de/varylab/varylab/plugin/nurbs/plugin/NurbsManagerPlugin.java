@@ -1,5 +1,8 @@
 package de.varylab.varylab.plugin.nurbs.plugin;
 
+import static de.jreality.shader.CommonAttributes.LINE_SHADER;
+import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
+import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static java.awt.GridBagConstraints.BOTH;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -39,10 +42,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -65,6 +71,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultLineShader;
 import de.jreality.shader.DefaultPointShader;
+import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.DragEventTool;
 import de.jreality.tools.PointDragEvent;
@@ -154,10 +161,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		lines = new LinkedList<PolygonalLine>();
 	
 	private LinkedList<PolygonalLine>
-	removedLines = new LinkedList<PolygonalLine>();
-	
-	private HashMap<PolygonalLine, SceneGraphComponent>
-		polygonalLineToSceneGraphComponent = new HashMap<PolygonalLine, SceneGraphComponent>();
+	 	removedLines = new LinkedList<PolygonalLine>();
 	
 	private int 
 		curveIndex = 1;
@@ -553,7 +557,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //		}
 //	}
 	
-	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener {
+	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener {
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -581,6 +585,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private SceneGraphComponent
 			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
 		
+		private HashMap<PolygonalLine, SceneGraphComponent>
+			polygonalLineToSceneGraphComponent = new HashMap<PolygonalLine, SceneGraphComponent>();
+	
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
@@ -603,7 +610,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			goButton.addActionListener(this);
 			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 			curveTable.setRowHeight(22);
-			curveTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+			curveTable.getSelectionModel().addListSelectionListener(this);
+			curveTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			add(curveScrollPanel, rc);
 			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
@@ -866,6 +874,111 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		public void layerRemoved(HalfedgeLayer layer) {
 		}
 
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			EffectiveAppearance ea = hif.getEffectiveAppearance(integralCurvesRoot);
+			if(ea == null) {
+				return;
+			}
+			DefaultGeometryShader dgs2 = ShaderUtility.createDefaultGeometryShader(ea);
+			DefaultLineShader dls = (DefaultLineShader) dgs2.getLineShader();
+			
+			for(int i = 0; i < curveTable.getRowCount(); ++i) {
+				int mi = curveTable.convertRowIndexToModel(i);
+				SceneGraphComponent lineComp = polygonalLineToSceneGraphComponent.get(lines.get(mi));
+				boolean isVisible = lineComp.isVisible();
+				Appearance app = lineComp.getAppearance();
+				app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls.getRadiiWorldCoordinates());
+				if(curveTable.isRowSelected(i)) {
+					app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius()*1.5);
+				} else {
+					app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius());					
+				}
+				lineComp.setVisible(isVisible);
+			}
+		}
+		
+		private class CurveTableModel extends DefaultTableModel {
+
+			private static final long serialVersionUID = 1L;
+
+			private String[] columnNames = {"Show", "Curve"};
+			
+			@Override
+			public String getColumnName(int col) {
+				return columnNames[col].toString();
+		    }
+			
+		    @Override
+			public int getRowCount() { 
+		    	return (lines==null)?0:lines.size();
+		    }
+		    
+		    @Override
+			public int getColumnCount() { 
+		    	return columnNames.length;
+		    }
+		    
+		    @Override
+			public Object getValueAt(int row, int col) {
+		        if (col == 1) {
+		        	String desc = lines.get(row).getDescription();
+		        	if(desc == null) {
+		        		return "???";
+		        	}
+		        	return desc;
+		        }
+		    	return polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
+		    }
+		    
+		    @Override
+			public boolean isCellEditable(int row, int col) {
+		    	switch (col) {
+				case 0:
+					return true;
+				default:
+					return false;
+				}
+		    }
+		    
+		    @Override
+			public void setValueAt(Object value, int row, int col) {
+		    }	
+		    
+		    @Override
+		    public Class<?> getColumnClass(int col) {
+		    	if (col == 0)
+		    		return Boolean.class;
+		    	if (col == 1)
+		    		return String.class;
+		        return super.getColumnClass(col);
+		    }
+		}
+		
+		public class CurveVisibilityListener implements CellEditorListener {
+
+			@Override
+			public void editingCanceled(ChangeEvent e) {
+			}
+
+			@Override
+			public void editingStopped(ChangeEvent e) {
+				JTable table = curvatureLinesPanel.curveTable;
+				int row = table.getSelectedRow();
+				if (table.getRowSorter() != null) {
+					row = table.getRowSorter().convertRowIndexToModel(row);
+				}
+				boolean isVisible = !polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
+				polygonalLineToSceneGraphComponent.get(lines.get(row)).setVisible(isVisible);
+				if(!isVisible){
+					removedLines.add(lines.get(row));
+				}
+				else{
+					removedLines.remove(lines.get(row));
+				}
+			}
+		}
 	}
 	
 	
@@ -1007,84 +1120,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			return point;
 		}
 		
-	}
-
-	public class CurveVisibilityListener implements CellEditorListener {
-
-		@Override
-		public void editingCanceled(ChangeEvent e) {
-		}
-
-		@Override
-		public void editingStopped(ChangeEvent e) {
-			JTable table = curvatureLinesPanel.curveTable;
-			int row = table.getSelectedRow();
-			if (table.getRowSorter() != null) {
-				row = table.getRowSorter().convertRowIndexToModel(row);
-			}
-			boolean isVisible = !polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
-			polygonalLineToSceneGraphComponent.get(lines.get(row)).setVisible(isVisible);
-			if(!isVisible){
-				removedLines.add(lines.get(row));
-			}
-			else{
-				removedLines.remove(lines.get(row));
-			}
-		}
 		
-	}
-	
-	private class CurveTableModel extends DefaultTableModel {
-
-		private static final long serialVersionUID = 1L;
-
-		private String[] columnNames = {"Show", "Curve"};
 		
-		@Override
-		public String getColumnName(int col) {
-			return columnNames[col].toString();
-	    }
-		
-	    @Override
-		public int getRowCount() { 
-	    	return (lines==null)?0:lines.size();
-	    }
-	    
-	    @Override
-		public int getColumnCount() { 
-	    	return columnNames.length;
-	    }
-	    
-	    @Override
-		public Object getValueAt(int row, int col) {
-	        if (col == 1) {
-	        	String desc = lines.get(row).getDescription();
-	        	if(desc == null) {
-	        		return "???";
-	        	}
-	        	return desc;
-	        }
-	    	return polygonalLineToSceneGraphComponent.get(lines.get(row)).isVisible();
-	    }
-	    
-	    @Override
-		public boolean isCellEditable(int row, int col) {
-	    	return true; 
-	    }
-	    
-	    @Override
-		public void setValueAt(Object value, int row, int col) {
-	    }	
-	    
-	    @Override
-	    public Class<?> getColumnClass(int col) {
-	    	if (col == 0)
-	    		return Boolean.class;
-	    	if (col == 1)
-	    		return String.class;
-	        return super.getColumnClass(col);
-	    }
-	}
+	}	
 
 	private class SurfaceTableModel extends DefaultTableModel {
 

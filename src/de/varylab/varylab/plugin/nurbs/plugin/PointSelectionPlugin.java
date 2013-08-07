@@ -7,7 +7,6 @@ import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static java.awt.Color.ORANGE;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -18,18 +17,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.plugin.basic.View;
@@ -43,7 +37,6 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
-import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -51,8 +44,12 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.ui.ButtonCellEditor;
+import de.varylab.varylab.ui.ButtonCellRenderer;
+import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
+import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 
-public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ActionListener {
+public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ActionListener, TableModelListener {
 
 	private HalfedgeInterface hif = null;
 	private PointSelectionTool tool = new PointSelectionTool();
@@ -60,10 +57,8 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	private JPanel panel = new JPanel();
 	
-	private LinkedList<double[]> points = new LinkedList<double[]>();
-	private LinkedList<double[]> selectedPoints = new LinkedList<double[]>();
-	
-	private PointSelectionModel psm = new PointSelectionModel();
+	private ListSelectRemoveTableModel<double[]> 
+		psm = new ListSelectRemoveTableModel<double[]>(new String[]{"UV-Coordinate"},new DoubleArrayPrettyPrinter());
 	private JTable selectedPointsTable = new JTable(psm);
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
 	
@@ -78,6 +73,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private NURBSSurface surface;
 	private NurbsUVAdapter nurbsUVAdapter;
 	
+	private boolean startup = true;
 	
 	public PointSelectionPlugin() {
 		tool.addActionListener(this);
@@ -95,13 +91,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		
 		selectedPointsTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		selectedPointsTable.setRowHeight(22);
-		selectedPointsTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PointVisibilityListener());
 		selectedPointsTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
 		selectedPointsTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
-		selectedPointsTable.getColumnModel().getColumn(3).setMaxWidth(22);
-		selectedPointsTable.getColumnModel().getColumn(3).setPreferredWidth(22);
+		selectedPointsTable.getColumnModel().getColumn(2).setMaxWidth(22);
+		selectedPointsTable.getColumnModel().getColumn(2).setPreferredWidth(22);
 		selectedPointsTable.getColumnModel().getColumn(0).setMaxWidth(22);
 		selectedPointsTable.getColumnModel().getColumn(0).setPreferredWidth(22);
+		
+		psm.addTableModelListener(this);
 		
 		selectedPointsPane.setMinimumSize(new Dimension(200,150));
 		panel.add(selectedPointsPane, rc);
@@ -151,8 +148,10 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
-		layer.removeTemporaryGeometry(selectedPointsComponent);
-		layer.addTemporaryGeometry(selectedPointsComponent);
+		if(startup) {
+			layer.addTemporaryGeometry(selectedPointsComponent);
+			startup = false;
+		}
 		addTool(layer);
 		updateTool(layer);
 	}
@@ -169,8 +168,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			surface = null;
 		}
 		tool.setSurface(surface);
-		points.clear();
-		selectedPoints.clear();
+		psm.clear();
 		selectedPointsComponent.removeAllChildren();
 		psm.fireTableDataChanged();
 	}
@@ -245,32 +243,33 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		Object source = e.getSource();
 		if(source == tool) {
 			double[] pt = tool.getSelectedPoint();
-			if(!points.contains(pt)) {
-				points.add(pt);
+			if(!psm.contains(pt)) {
+				psm.add(pt);
 			}
-			selectedPoints.add(pt);
 			selectedPointsComponent.addChild(createPointComponent(pt));
 			firePointSelected(tool.getSelectedPoint());
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
 		} else if(source == checkButton) {
-			selectedPoints.clear();
-			selectedPoints.addAll(points);
-		} else if(source == uncheckButton) {
-			selectedPoints.clear();
-		} else if(source == removeSelectedButton) {
-			for(double[] selPt : selectedPoints) {
-				points.remove(selPt);
+			psm.selectAll();
+			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
+				child.setVisible(true);
 			}
-			selectedPoints.clear();
+		} else if(source == uncheckButton) {
+			psm.clearSelection();
+			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
+				child.setVisible(false);
+			}
+		} else if(source == removeSelectedButton) {
+			psm.removeSelected();
 			resetSelectedPointsComponent();
 		} else if(source == selectionButton) {
 			AdapterSet as = hif.getActiveAdapters();
 			as.addAll(hif.getAdapters());
 			for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
 				double[] pt = as.getD(NurbsUVCoordinate.class, v);
-				if(!points.contains(pt)) {
-					points.add(pt);
+				if(!psm.contains(pt)) {
+					psm.add(pt);
 					selectedPointsComponent.addChild(createPointComponent(pt));
 				}
 			}
@@ -280,9 +279,9 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 
 	private void resetSelectedPointsComponent() {
 		selectedPointsComponent.removeAllChildren();
-		for(double[] pt : points) {
+		for(double[] pt : psm.getList()) {
 			SceneGraphComponent ptComponent = createPointComponent(pt);
-			ptComponent.setVisible(selectedPoints.contains(pt));
+			ptComponent.setVisible(psm.isSelected(pt));
 			selectedPointsComponent.addChild(ptComponent);
 		}
 	}
@@ -292,105 +291,10 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		return View.class;
 	}
 	
-	private class PointSelectionModel extends DefaultTableModel {
-
-		private static final long serialVersionUID = 1L;
-
-		private String[] columnNames = {" ", "U", "V", " "};
-		
-		@Override
-		public String getColumnName(int col) {
-			return columnNames[col].toString();
-	    }
-		
-	    @Override
-		public int getRowCount() { 
-	    	return (points==null)?0:points.size();
-	    }
-	    
-	    @Override
-		public int getColumnCount() { 
-	    	return columnNames.length;
-	    }
-	    
-	    @Override
-		public Object getValueAt(int row, int col) {
-	        if(col == 1) {
-	        	return (points.get(row))[0];
-	        }
-	        if(col == 2) {
-	        	return (points.get(row))[1];
-	        }
-	        if(col == 3) {
-	        	return new RemoveButton(row);
-	        }
-	        return selectedPoints.contains(points.get(row));
-	    }
-	    
-	    @Override
-		public boolean isCellEditable(int row, int col) {
-	    	switch (col) {
-			case 0:
-			case 3:
-				return true;
-			default:
-				return false;
-			}
-	    }
-	    
-	    @Override
-		public void setValueAt(Object value, int row, int col) {
-	    }	
-	    
-	    @Override
-	    public Class<?> getColumnClass(int col) {
-	    	switch (col) {
-			case 0:
-				return Boolean.class;
-			case 1:
-			case 2:
-				return double.class;
-			case 3:
-				return JButton.class;
-			default:
-				return String.class;
-			}
-	    }
-	}
-	
 	public List<double[]> getSelectedPoints() {
-		return selectedPoints ;
+		return psm.getSelected();
 	}
 	
-	private class PointVisibilityListener implements CellEditorListener {
-
-		@Override
-		public void editingStopped(ChangeEvent e) {
-			int row = selectedPointsTable.getSelectedRow();
-			if (selectedPointsTable.getRowSorter() != null) {
-				row = selectedPointsTable.getRowSorter().convertRowIndexToModel(row);
-			}
-			boolean isVisible = isSelected(row);
-			if(isVisible){
-				selectedPoints.remove(points.get(row));
-				selectedPointsComponent.getChildComponent(row).setVisible(false);
-			} else {
-				selectedPoints.add(points.get(row));
-				selectedPointsComponent.getChildComponent(row).setVisible(true);
-			}
-			
-		}
-
-		private boolean isSelected(int row) {
-			return selectedPoints.contains(points.get(row));
-		}
-
-		@Override
-		public void editingCanceled(ChangeEvent e) {
-		}
-
-	}
-
 	private SceneGraphComponent createPointComponent(double[] uv) {
 		PointSetFactory psfi = new PointSetFactory();
 		psfi.setVertexCount(1);
@@ -401,86 +305,9 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		return sgci;
 	}
 	
-	private void removePoint(int index) {
-		double[] pt = points.remove(index);
-		selectedPoints.remove(pt);
-		selectedPointsComponent.removeChild(selectedPointsComponent.getChildComponent(index));
-		psm.fireTableDataChanged();
+	@Override
+	public void tableChanged(TableModelEvent e) {
+		resetSelectedPointsComponent();
 	}
-
-	private class ButtonCellRenderer extends DefaultTableCellRenderer {
-
-		private static final long serialVersionUID = 1L;
-		private JButton renderButton = new JButton();
-		
-		@Override
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row,
-				int column) {
-			if (value instanceof JButton) {
-				JButton buttonValue = (JButton)value;
-				renderButton.setIcon(buttonValue.getIcon());
-				renderButton.setText(buttonValue.getText());
-				return renderButton;
-			} else {
-				return super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
-			}
-		}
-		
-		@Override
-		public void updateUI() {
-			super.updateUI();
-			if (renderButton != null) {
-				renderButton.updateUI();
-			}
-		}
-		
-	}
-	
-	private class RemoveButton extends JButton implements ActionListener {
-
-		private static final long serialVersionUID = 1L;
-
-		private int row = 0;
-		
-		public RemoveButton(int row) {
-			super(ImageHook.getIcon("remove.png"));
-			setSize(16,16);
-			this.row=row;
-			addActionListener(this);
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			removePoint(row);
-		}
-
-	}
-	
-	private class ButtonCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-		private static final long 	
-			serialVersionUID = 1L;
-		private JLabel
-			defaultEditor = new JLabel("-");
-		private Object 
-			activeValue = null;
-		
-		@Override
-		public Component getTableCellEditorComponent(JTable table,
-				Object value, boolean isSelected, int row, int column) {
-			this.activeValue = value;
-			if (value instanceof Component) {
-				return (Component)value;
-			}
-			return defaultEditor;
-		}
-		@Override
-		public Object getCellEditorValue() {
-			return activeValue;
-		}
-		
-	}
-	
 	
 }
