@@ -20,16 +20,16 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	private PrettyPrinter<E> pp = null;
 	
 	private List<E> list = new LinkedList<E>();
-	private List<E> selected = new LinkedList<E>();
+	private List<E> checked = new LinkedList<E>();
 	
-	public ListSelectRemoveTableModel(String[] columnNames) {
-		this(columnNames,null);
+	public ListSelectRemoveTableModel(String columnName) {
+		this(columnName,null);
 	}
 	
-	public ListSelectRemoveTableModel(String[] columnNames, PrettyPrinter<E> printer) {
-		this.columnNames = new String[columnNames.length+2];
-		this.columnNames[0] = this.columnNames[this.columnNames.length-1] = " ";
-		System.arraycopy(columnNames, 0, this.columnNames, 1, columnNames.length);
+	public ListSelectRemoveTableModel(String columnName, PrettyPrinter<E> printer) {
+		this.columnNames = new String[3];
+		this.columnNames[0] = this.columnNames[2] = " ";
+		columnNames[1] = columnName;
 		pp = printer;
 	}
 	
@@ -37,31 +37,31 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 		return Collections.unmodifiableList(list);
 	}
 
-	public boolean isSelected(E pt) {
-		return selected.contains(pt);
+	public boolean isChecked(E pt) {
+		return checked.contains(pt);
 	}
 
-	public void removeSelected() {
-		list.removeAll(selected);
-		selected.clear();
+	public void removeChecked() {
+		list.removeAll(checked);
+		checked.clear();
 	}
 
-	public List<E> getSelected() {
-		return Collections.unmodifiableList(selected);
+	public List<E> getChecked() {
+		return Collections.unmodifiableList(checked);
 	}
 
-	public void clearSelection() {
-		selected.clear();
+	public void clearChecked() {
+		checked.clear();
 	}
 
-	public void selectAll() {
-		selected.clear();
-		selected.addAll(list);
+	public void checkAll() {
+		checked.clear();
+		checked.addAll(list);
 	}
 
 	public void add(E elem) {
 		list.add(elem);
-		selected.add(elem);
+		checked.add(elem);
 	}
 
 	public boolean contains(E elem) {
@@ -70,7 +70,7 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 
 	public void clear() {
 		list.clear();
-		selected.clear();
+		checked.clear();
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
         if(col == 2) {
         	return new RemoveRowButton(row);
         }
-        return selected.contains(list.get(row));
+        return checked.contains(list.get(row));
     }
     
     @Override
@@ -119,9 +119,9 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
     	if(col == 0) {
     		Boolean b = (Boolean)value;
     		if(b) {
-    			selected.add(list.get(row));
+    			checked.add(list.get(row));
     		} else {
-    			selected.remove(list.get(row));
+    			checked.remove(list.get(row));
     		}
     	}
     	fireTableDataChanged();
@@ -157,7 +157,7 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			E elem = list.remove(row);
-			selected.remove(elem);
+			checked.remove(elem);
 			fireTableDataChanged();
 		}
 
@@ -168,21 +168,21 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	}
 
 	public boolean isSelected(int row) {
-		return selected.contains(list.get(row));
+		return checked.contains(list.get(row));
 	}
 
 	public void setSelected(int row, boolean b) {
 		E elem = list.get(row);
-		boolean alreadySelected = selected.contains(elem);
+		boolean alreadySelected = checked.contains(elem);
 		if(alreadySelected && !b) {
-			selected.remove(elem);
+			checked.remove(elem);
 		} else if (!alreadySelected && b) {
-			selected.add(elem);
+			checked.add(elem);
 		}
 	}
 
 	public void addAll(Collection<E> col) {
 		list.addAll(col);
-		selected.addAll(col);
+		checked.addAll(col);
 	}
 }

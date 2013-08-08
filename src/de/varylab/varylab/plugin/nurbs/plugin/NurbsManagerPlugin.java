@@ -575,7 +575,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			intersectionBox = new JCheckBox("Bentley Ottmann");
 		
 		private ListSelectRemoveTableModel<PolygonalLine>
-			curvesTableModel = new ListSelectRemoveTableModel<PolygonalLine>(new String[]{"Curves"}, new PolygonalLinePrinter());
+			curvesTableModel = new ListSelectRemoveTableModel<PolygonalLine>("Curves", new PolygonalLinePrinter());
 		
 		private JTable 
 			curveTable = new JTable(curvesTableModel);
@@ -644,7 +644,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			if(intersectionBox.isSelected()){
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
-				for(PolygonalLine pl : curvesTableModel.getSelected()){
+				for(PolygonalLine pl : curvesTableModel.getChecked()){
 					allSegments.addAll(pl.getpLine());
 				}
 				int shiftedIndex = allSegments.size();
@@ -849,10 +849,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				for(PolygonalLine pl : curvatureLines) {
 					if(!curvesTableModel.contains(pl)) {
 						curvesTableModel.add(pl);
-						curvesTableModel.fireTableDataChanged();
 //						integralCurvesRoot.addChild(createLineComponent(pl));
 					}
 				}
+				curvesTableModel.fireTableDataChanged();
 			}
 		}
 
@@ -928,7 +928,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private void resetIntegralCurvesComponent() {
 			integralCurvesRoot.removeAllChildren();
 			for(PolygonalLine pl : curvesTableModel.getList()) {
-				integralCurvesRoot.addChild(createLineComponent(pl));
+				SceneGraphComponent lineComponent = createLineComponent(pl);
+				integralCurvesRoot.addChild(lineComponent);
+				if(!curvesTableModel.isChecked(pl)) {
+					lineComponent.setVisible(false);
+				}
 			}
 		}
 		
@@ -1152,6 +1156,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		super.storeStates(c);
 		String chooserDir = chooser.getCurrentDirectory().getAbsolutePath();
 		c.storeProperty(getClass(), "importExportLocation", chooserDir);
+		c.storeProperty(getClass(), "calculateMaxCurve", curvatureLinesPanel.maxCurvatureBox.isSelected());
+		c.storeProperty(getClass(), "calculateMinCurve", curvatureLinesPanel.minCurvatureBox.isSelected());
+		c.storeProperty(getClass(), "immediateCurveCalculation", curvatureLinesPanel.immediateCalculationBox.isSelected());
 	}
 	
 	@Override
@@ -1163,6 +1170,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		if (chooserDirFile.exists()) {
 			chooser.setCurrentDirectory(chooserDirFile);
 		}
+		curvatureLinesPanel.maxCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMaxCurve",curvatureLinesPanel.maxCurvatureBox.isSelected()));
+		curvatureLinesPanel.minCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMinCurve",curvatureLinesPanel.minCurvatureBox.isSelected()));
+		curvatureLinesPanel.immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",curvatureLinesPanel.immediateCalculationBox.isSelected()));
 	}
 
 	@Override

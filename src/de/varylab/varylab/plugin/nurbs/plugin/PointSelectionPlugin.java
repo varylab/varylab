@@ -58,7 +58,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private JPanel panel = new JPanel();
 	
 	private ListSelectRemoveTableModel<double[]> 
-		psm = new ListSelectRemoveTableModel<double[]>(new String[]{"UV-Coordinate"},new DoubleArrayPrettyPrinter());
+		psm = new ListSelectRemoveTableModel<double[]>("UV-Coordinate",new DoubleArrayPrettyPrinter());
 	private JTable selectedPointsTable = new JTable(psm);
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
 	
@@ -251,17 +251,17 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
 		} else if(source == checkButton) {
-			psm.selectAll();
+			psm.checkAll();
 			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
 				child.setVisible(true);
 			}
 		} else if(source == uncheckButton) {
-			psm.clearSelection();
+			psm.clearChecked();
 			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
 				child.setVisible(false);
 			}
 		} else if(source == removeSelectedButton) {
-			psm.removeSelected();
+			psm.removeChecked();
 			resetSelectedPointsComponent();
 		} else if(source == selectionButton) {
 			AdapterSet as = hif.getActiveAdapters();
@@ -281,7 +281,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		selectedPointsComponent.removeAllChildren();
 		for(double[] pt : psm.getList()) {
 			SceneGraphComponent ptComponent = createPointComponent(pt);
-			ptComponent.setVisible(psm.isSelected(pt));
+			ptComponent.setVisible(psm.isChecked(pt));
 			selectedPointsComponent.addChild(ptComponent);
 		}
 	}
@@ -292,7 +292,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	}
 	
 	public List<double[]> getSelectedPoints() {
-		return psm.getSelected();
+		return psm.getChecked();
 	}
 	
 	private SceneGraphComponent createPointComponent(double[] uv) {
