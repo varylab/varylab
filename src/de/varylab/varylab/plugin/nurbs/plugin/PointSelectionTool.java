@@ -19,6 +19,7 @@ public class PointSelectionTool extends ActionTool {
 		setDescription("Nurbs Point Selection Tool");
 	}
 
+	@Override
 	public void activate(ToolContext tc) {
 		if (ns != null) {
 			double[] oc = tc.getCurrentPick().getObjectCoordinates();
