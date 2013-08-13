@@ -10,6 +10,7 @@ import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
 import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
@@ -59,6 +60,8 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 		classes.add(JobMonitorPlugin.class);
 		classes.add(JobsTestPlugin.class);
 		classes.add(Inspector.class);
+		
+		instances.addAll(ConformalLab.createConformalPlugins());
 	}
 
 	private static void addOptimizationPlugins(Set<Class<? extends Plugin>> classes) {
