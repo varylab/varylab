@@ -6,7 +6,8 @@ import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static java.awt.GridBagConstraints.BOTH;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
@@ -22,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -38,18 +39,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.DefaultTableModel;
 
 import org.python.google.common.collect.Lists;
 
@@ -109,7 +111,7 @@ import de.varylab.varylab.ui.ButtonCellRenderer;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
 
-public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener {
+public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 	private HalfedgeInterface 
 		hif = null;
@@ -133,37 +135,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		pointDistancePanel = new PointDistancePanel();
 	
 	private JButton
-		importButton = new JButton(importAction),
-		updateButton = new JButton("update");
-
-	private JTable
-		surfacesTable= new JTable(new SurfaceTableModel());
-	
-	private JScrollPane
-		layersScroller = new JScrollPane(surfacesTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+		importButton = new JButton(importAction);
 	
 	private JToolBar
 		surfaceToolbar = new JToolBar();
 	
-	private ArrayList<NURBSSurface>
-		surfaces = new ArrayList<NURBSSurface>();
-
-	private SpinnerNumberModel
-		uSpinnerModel = new SpinnerNumberModel(10,0,100,2),
-		vSpinnerModel = new SpinnerNumberModel(10,0,100,2);
-	
-	private JSpinner
-		uSpinner = new JSpinner(uSpinnerModel),
-		vSpinner = new JSpinner(vSpinnerModel);
-
-	private JCheckBox
-		vectorFieldBox = new JCheckBox("vf");
-	
 	private int 
 		curveIndex = 1;
-	
-	private int 
-		activeSurfaceIndex = 0;
 	
 	private List<double[]> umbilics = new LinkedList<double[]>();
 
@@ -171,7 +149,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 	private NURBSSurface activeNurbsSurface;
 
-	
 	public NurbsManagerPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = BOTH;
@@ -180,26 +157,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		
 		configureFileChooser();
-		importButton.addActionListener(this);
 		importButton.setToolTipText("Load Nurbs surface");
-		updateButton.addActionListener(this);
 		
 		JPanel tablePanel = new JPanel();
 		tablePanel.setLayout(new GridLayout());
-		tablePanel.add(layersScroller);
-		layersScroller.setMinimumSize(new Dimension(30, 150));
-		surfacesTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
-		surfacesTable.setRowHeight(22);
-		surfacesTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		
+		surfaceToolbar.add(new JLabel("Import Nurbs Surface "));
 		surfaceToolbar.add(importAction);
-		surfaceToolbar.add(new JToolBar.Separator());
-		surfaceToolbar.add(vectorFieldBox);
-		surfaceToolbar.add(new JToolBar.Separator());
-		surfaceToolbar.add(uSpinner);
-		surfaceToolbar.add(vSpinner);
-		surfaceToolbar.add(new JToolBar.Separator());
-		surfaceToolbar.add(updateButton);
 		surfaceToolbar.setFloatable(false);
 		
 		c.weighty = 0.0;
@@ -207,8 +171,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		c.weighty = 1.0;
 		shrinkPanel.add(tablePanel, c);
 		c.weighty = 0.0;
-//		shrinkPanel.add(conjugateLinesPanel, c);
-//		c.weighty = 0.0;
 		shrinkPanel.add(curvatureLinesPanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(geodesicPanel, c);
@@ -261,11 +223,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			serialVersionUID = 1L;
 
 		public ImportAction() {
-			
 			putValue(SMALL_ICON, ImageHook.getIcon("folder.png"));
 			putValue(NAME, "Import");
 			putValue(SHORT_DESCRIPTION, "Import");
-			
 		}
 		
 		@Override
@@ -289,14 +249,78 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 						System.out.println("surface.isClosedVDir()");
 					}
 					surface.setName(file.getName());
-					surfaces.add(surface);
-					activeSurfaceIndex = surfaces.size()-1;
+					activeNurbsSurface = surface;
+					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
+					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
+					int dialogOk = JOptionPane.showConfirmDialog(
+						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
+					if(dialogOk == JOptionPane.OK_OPTION) {
+						addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
+						pstool.addPointSelectionListener(curvatureLinesPanel);
+						double[][] umbilicalPoints = computeUmbilicalPoints();
+						
+						if(umbilicalPoints.length>0){
+							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
+						}
+					}
 				} 
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
 			}
-			updateStates();
+//			updateStates();
+		}
+		
+		private class NurbsParameterPanel extends JPanel {
+			
+			private static final long serialVersionUID = 1L;
+
+			private SpinnerNumberModel
+				uModel = new SpinnerNumberModel(10,0,100,2),
+				vModel = new SpinnerNumberModel(10,0,100,2);
+			
+			private JSpinner
+				uSpinner = new JSpinner(uModel),
+				vSpinner = new JSpinner(vModel);
+			
+			private JPanel
+				infoPanel = new JPanel(),
+				paramPanel = new JPanel();
+	
+			public NurbsParameterPanel(NURBSSurface surf) {
+				super(new GridBagLayout());
+				GridBagConstraints rc = LayoutFactory.createRightConstraint();
+				
+				add(new JLabel("Surface info"),rc);
+				
+				infoPanel.setLayout(new GridLayout(4, 1));
+				infoPanel.add(new JLabel("u-Degree: " + surf.getUDegree())); 
+				infoPanel.add(new JLabel("u-Knots:  " + surf.getUKnotVector().length));
+				infoPanel.add(new JLabel("v-Degree: " + surf.getVDegree())); 
+				infoPanel.add(new JLabel("v-Knots:  " + surf.getVKnotVector().length));
+				
+				add(infoPanel,rc);
+				
+				add(new JSeparator(SwingConstants.HORIZONTAL),rc);
+				
+				add(new JLabel("Parameters:"),rc);
+				
+				paramPanel.setLayout(new GridLayout(2,2));
+				paramPanel.add(new JLabel("u-Lines")); 
+				paramPanel.add(uSpinner);
+				paramPanel.add(new JLabel("v-Lines")); 
+				paramPanel.add(vSpinner);
+				
+				add(paramPanel,rc);
+			}
+			
+			public int getU() {
+				return uModel.getNumber().intValue();
+			}
+			
+			public int getV() {
+				return vModel.getNumber().intValue();
+			}
 		}
 	}
 	
@@ -364,13 +388,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					}
 				}
 			if(segmentButton.isSelected()){
-				LinkedList<double[]> points = IntegralCurves.geodesicSegmentBetweenTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), a, b, eps, tol,nearby);
+				LinkedList<double[]> points = IntegralCurves.geodesicSegmentBetweenTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
 				PointSetFactory psf = new PointSetFactory();
-				int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
-				int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
-				double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
-				double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
-				double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+				int p = activeNurbsSurface.getUDegree();
+				int q = activeNurbsSurface.getVDegree();
+				double[] U = activeNurbsSurface.getUKnotVector();
+				double[] V = activeNurbsSurface.getVKnotVector();
+				double[][][]Pw = activeNurbsSurface.getControlMesh();
 				double[][] u = new double[points.size()][];
 				double[][] surfacePoints = new double[points.size()][];
 				for (int i = 0; i < u.length; i++) {
@@ -408,14 +432,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				}
 				System.out.println("Geodesic segment length: " + length);
 			}else{
-				LinkedList<double[]> points = IntegralCurves.geodesicExponentialGivenByTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), a, b, eps, tol,nearby);
-				points.addAll(IntegralCurves.geodesicExponentialGivenByTwoPoints(surfaces.get(surfacesTable.getSelectedRow()), b, a, eps, tol, nearby));
+				LinkedList<double[]> points = IntegralCurves.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
+				points.addAll(IntegralCurves.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, b, a, eps, tol, nearby));
 				PointSetFactory psf = new PointSetFactory();
-				int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
-				int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
-				double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
-				double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
-				double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+				int p = activeNurbsSurface.getUDegree();
+				int q = activeNurbsSurface.getVDegree();
+				double[] U = activeNurbsSurface.getUKnotVector();
+				double[] V = activeNurbsSurface.getVKnotVector();
+				double[][][]Pw = activeNurbsSurface.getControlMesh();
 				double[][] u = new double[points.size()][];
 				double[][] surfacePoints = new double[points.size()][];
 				for (int i = 0; i < u.length; i++) {
@@ -688,8 +712,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 
 		private LinkedList<PolygonalLine> computeCurvatureLines(List<double[]> startingPointsUV) {
-			NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
-			
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
 			
@@ -701,11 +723,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 			for(double[] y0 : startingPointsUV) {
 					if (maxCurvatureBox.isSelected()){
-						curveIndex = curveLine(ns, tol, umbilics, currentLines,
+						curveIndex = curveLine(activeNurbsSurface, tol, umbilics, currentLines,
 								curveIndex, umbilicIndex, y0, true, umbilicStop);
 					}
 					if (minCurvatureBox.isSelected()){
-						curveIndex = curveLine(ns, tol, umbilics, currentLines,
+						curveIndex = curveLine(activeNurbsSurface, tol, umbilics, currentLines,
 								curveIndex, umbilicIndex, y0, false, umbilicStop);
 					}
 			}
@@ -816,8 +838,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				points[i] = activeNurbsSurface.getSurfacePoint(u, v);
 				++i;
 				if(i == segments.size()) {
-					u = (segment.getSegment())[0][0];
-					v = (segment.getSegment())[0][1];
+					u = (segment.getSegment())[1][0];
+					v = (segment.getSegment())[1][1];
 					points[i] = activeNurbsSurface.getSurfacePoint(u, v);
 				}
 			}
@@ -1058,8 +1080,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 
 		private double[] calculateClosestPoint(double[] point) {
-			NURBSSurface ns =  surfaces.get(surfacesTable.getSelectedRow());
-			double[] surfacePoint = ns.getClosestPoint(point);
+			double[] surfacePoint = activeNurbsSurface.getClosestPoint(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");
 //			
@@ -1087,48 +1108,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		
 		
 	}	
-
-	private class SurfaceTableModel extends DefaultTableModel {
-
-		private static final long serialVersionUID = 1L;
-
-		private String[] columnNames = new String[]{"Name"};
-		
-		@Override
-		public String getColumnName(int col) {
-	        return columnNames[col].toString();
-	    }
-		
-	    @Override
-		public int getRowCount() { 
-	    	return (surfaces==null)?0:surfaces.size();
-	    }
-	    
-	    @Override
-		public int getColumnCount() { 
-	    	return 1; 
-	    }
-	    
-	    @Override
-		public Object getValueAt(int row, int col) {
-	        return surfaces.get(row).getName();
-	    }
-	    
-	    @Override
-		public boolean isCellEditable(int row, int col) {
-	    	return true; 
-	    }
-	    
-	    @Override
-		public void setValueAt(Object value, int row, int col) {
-	        surfaces.get(row).setName((String)value);
-	    }
-	}
-	
-	private void updateStates() {
-		surfacesTable.revalidate();
-		surfacesTable.getSelectionModel().setSelectionInterval(activeSurfaceIndex,activeSurfaceIndex);
-	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -1136,9 +1115,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(curvatureLinesPanel);
 		pstool  = c.getPlugin(PointSelectionPlugin.class);
-		surfacesTable.setModel(new SurfaceTableModel());
-		surfacesTable.setSelectionMode(SINGLE_SELECTION);
-		surfacesTable.getSelectionModel().setSelectionInterval(activeSurfaceIndex,activeSurfaceIndex);
 	}
 	
 	@Override
@@ -1175,73 +1151,68 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		curvatureLinesPanel.immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",curvatureLinesPanel.immediateCalculationBox.isSelected()));
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent ae) {
-		Object src = ae.getSource();
-		pstool.addPointSelectionListener(this.curvatureLinesPanel);
-		if(src == updateButton) {
-			NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
-			qmf.setGenerateVertexNormals(true);
-			qmf.setGenerateFaceNormals(true);
-			qmf.setGenerateEdgesFromFaces(true);
-			qmf.setULineCount(uSpinnerModel.getNumber().intValue());
-			qmf.setVLineCount(vSpinnerModel.getNumber().intValue());
-			activeNurbsSurface = surfaces.get(surfacesTable.getSelectedRow());
-			qmf.setSurface(activeNurbsSurface);
-			qmf.update();
-			hif.set(qmf.getGeometry());
-			hif.update();
-			hif.addLayerAdapter(qmf.getUVAdapter(), false);
-			AdapterSet as = hif.getAdapters();
-			VHDS hds = hif.get(new VHDS());
-			umbilics = activeNurbsSurface.findUmbilics(hds, as);
-			PointSetFactory psfu = new PointSetFactory();
-			double[][] uu = new double[umbilics.size()][];
-			double[][] upoints = new double[umbilics.size()][];
-			for (int i = 0; i < uu.length; i++) {
-				uu[i] = umbilics.get(i);
-			}
-			psfu.setVertexCount(uu.length);
+	private void addUmbilicalPoints(double[][] umbillicPoints, HalfedgeLayer layer) {
+		PointSetFactory psfu = new PointSetFactory();
+	
+		psfu.setVertexCount(umbillicPoints.length);
+	
+		psfu.setVertexCoordinates(umbillicPoints);
+		psfu.update();
+		SceneGraphComponent sgcu = new SceneGraphComponent("Umbilics");
+		SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
+		sgcu.addChild(umbilicComp);
+		sgcu.setGeometry(psfu.getGeometry());
+		Appearance uAp = new Appearance();
+		sgcu.setAppearance(uAp);
+		DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
+		DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
+		upointShader.setDiffuseColor(Color.GREEN);
+		layer.addTemporaryGeometry(sgcu);
+		
+	}
 
-			for (int i = 0; i < uu.length; i++) {
-				double[] S = new double[4];
-				activeNurbsSurface.getSurfacePoint(uu[i][0], uu[i][1], S);
-				upoints[i] = S;
-			}
-			if(umbilics.size()>0){
-				psfu.setVertexCoordinates(upoints);
-				psfu.update();
-				SceneGraphComponent sgcu = new SceneGraphComponent("umbilics");
-				SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
-				sgcu.addChild(umbilicComp);
-				sgcu.setGeometry(psfu.getGeometry());
-				Appearance uAp = new Appearance();
-				sgcu.setAppearance(uAp);
-				DefaultGeometryShader udgs = ShaderUtility.createDefaultGeometryShader(uAp, false);
-				DefaultPointShader upointShader = (DefaultPointShader)udgs.getPointShader();
-				upointShader.setDiffuseColor(Color.black);
-				hif.getActiveLayer().addTemporaryGeometry(sgcu);
-			}
-			if(vectorFieldBox.isSelected()) {
-				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
-				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
-			}
-//			lines.clear();
-		} 
+	private double[][] computeUmbilicalPoints() {
+		AdapterSet as = hif.getAdapters();
+		VHDS hds = hif.get(new VHDS());
+		umbilics = activeNurbsSurface.findUmbilics(hds, as);
+		double[][] uu = new double[umbilics.size()][];
+		double[][] upoints = new double[umbilics.size()][];
+		for (int i = 0; i < uu.length; i++) {
+			uu[i] = umbilics.get(i);
+		}
+		
+		for (int i = 0; i < uu.length; i++) {
+			double[] S = new double[4];
+			activeNurbsSurface.getSurfacePoint(uu[i][0], uu[i][1], S);
+			upoints[i] = S;
+		}
+		
+		return upoints;
+		
+	}
+
+	private void addNurbsMesh(NURBSSurface surf, HalfedgeLayer layer, int u, int v) {
+		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
+		qmf.setGenerateVertexNormals(true);
+		qmf.setGenerateFaceNormals(true);
+		qmf.setGenerateEdgesFromFaces(true);
+		qmf.setULineCount(u);
+		qmf.setVLineCount(v);
+		qmf.setSurface(surf);
+		qmf.update();
+		layer.set(qmf.getGeometry());
+		layer.update();
+		layer.addAdapter(qmf.getUVAdapter(), false);
 	}
 	
-	
-	
-//	
 	public NURBSSurface getSelectedSurface() {
-		NURBSSurface ns = surfaces.get(surfacesTable.getSelectedRow());
 		LinkedList<BoundaryLines> boundList = new LinkedList<NURBSSurface.BoundaryLines>();
 		boundList.add(BoundaryLines.u0);
 		boundList.add(BoundaryLines.um);
 		boundList.add(BoundaryLines.v0);
 		boundList.add(BoundaryLines.vn);
-		ns.setBoundLines(boundList);
-		return ns;
+		activeNurbsSurface.setBoundLines(boundList);
+		return activeNurbsSurface;
 	}
 	
 	@Override
@@ -1254,7 +1225,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		JRViewer v = new JRViewer();
 		v.addContentUI();
 		v.addBasicUI();
-		v.registerPlugin(PointSelectionPlugin.class);
 		v.registerPlugin(new NurbsManagerPlugin());
 		v.startup();
 	}

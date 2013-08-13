@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.jreality.math.Rn;
+import de.jreality.scene.Geometry;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.numericalMethods.calculus.function.RealFunctionOfSeveralVariables;
 import de.jtem.numericalMethods.calculus.minimizing.Info;
@@ -1158,5 +1159,17 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 		}
 	};
 
-
+	
+	
+	public Geometry createNurbsMesh(int u, int v) {
+		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
+		qmf.setGenerateVertexNormals(true);
+		qmf.setGenerateFaceNormals(true);
+		qmf.setGenerateEdgesFromFaces(true);
+		qmf.setULineCount(u);
+		qmf.setVLineCount(v);
+		qmf.setSurface(this);
+		qmf.update();
+		return qmf.getGeometry();
+	}
 }
