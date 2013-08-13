@@ -58,12 +58,10 @@ import org.python.google.common.collect.Lists;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
-import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
-import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
@@ -97,6 +95,7 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
+import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
@@ -590,13 +589,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private JSpinner
 			tolSpinner = new JSpinner(tolExpModel),
 			nearUmbilicSpinner = new JSpinner(nearUmbilicModel);
-		private JButton
+		
+		private JButton 
+		    intersectionsButton = new JButton("Discretize!"),
 			goButton = new JButton("Go");
+		
 		private JCheckBox
 			immediateCalculationBox = new JCheckBox("Immediate"),
 			maxCurvatureBox = new JCheckBox("Max (red)"),
-			minCurvatureBox = new JCheckBox("Min (cyan)"),
-			intersectionBox = new JCheckBox("Bentley Ottmann");
+			minCurvatureBox = new JCheckBox("Min (cyan)");
 		
 		private ListSelectRemoveTableModel<PolygonalLine>
 			curvesTableModel = new ListSelectRemoveTableModel<PolygonalLine>("Curves", new PolygonalLinePrinter());
@@ -625,12 +626,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(minCurvatureBox, lc);
 			add(maxCurvatureBox, rc);
 			
-			add(intersectionBox, rc);
 			add(immediateCalculationBox,lc);
 			add(goButton, rc);
 			goButton.addActionListener(this);
-			
-	
 			
 			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 			curveTable.setRowHeight(22);
@@ -644,28 +642,36 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
 			curvesTableModel.addTableModelListener(this);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
+			
 			add(curveScrollPanel, rc);
-//			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());
+
 			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
 			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
 			
 			Appearance app = new Appearance();
+			app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 			integralCurvesRoot.setAppearance(app);
+			
+			intersectionsButton.addActionListener(this);
+			add(intersectionsButton,rc);
 		}
 		
 		
 		@Override
 		public void actionPerformed(ActionEvent e){
 					
-			List<double[]> startingPointsUV = pstool.getSelectedPoints();
+			Object source = e.getSource();
 			
-			List<PolygonalLine> currentLines = computeCurvatureLines(startingPointsUV);
+			if(source == goButton) {
+				List<double[]> startingPointsUV = pstool.getSelectedPoints();
 			
-			curvesTableModel.addAll(currentLines);
-			hif.clearSelection();
-	
-			if(intersectionBox.isSelected()){
+				List<PolygonalLine> currentLines = computeCurvatureLines(startingPointsUV);
+			
+				curvesTableModel.addAll(currentLines);
+				hif.clearSelection();
+				curvesTableModel.fireTableDataChanged();
+			} else if(source == intersectionsButton) {
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
 				for(PolygonalLine pl : curvesTableModel.getChecked()){
@@ -706,8 +712,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				hif.addLayer(hel);
 				hif.update();
 			}
-			
-			curvesTableModel.fireTableDataChanged();
 		}
 
 
@@ -973,7 +977,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private static final long 
 			serialVersionUID = 1L;
 		private JButton
-			showControlMeshButton = new JButton("Show Control Mesh"),
 			goButton = new JButton("Go"),
 			pointButton = new JButton("create point");
 		
@@ -988,9 +991,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 			add(pointButton, rc);
 			add(goButton, rc);
-			add(showControlMeshButton, rc);
 			goButton.addActionListener(this);
-			showControlMeshButton.addActionListener(this);
 			pointButton.addActionListener(this);
 			
 		}
@@ -1050,27 +1051,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				psfi.setVertexCoordinates(point);
 				
 			}
-			if (showControlMeshButton == e.getSource()) {
-				NURBSSurface ns = getSelectedSurface();
-				System.out.println("original surface " + ns.toString());
-				NURBSSurface decomposed = ns.decomposeSurface();				
-				double[][][] cm = decomposed.getControlMesh();
-				QuadMeshFactory qmf = new QuadMeshFactory();
-				qmf.setULineCount(cm[0].length);
-				qmf.setVLineCount(cm.length);
-				qmf.setVertexCoordinates(cm);
-				qmf.setGenerateEdgesFromFaces(true);
-				qmf.update();
-				IndexedFaceSet ifs = qmf.getIndexedFaceSet();
-				SceneGraphComponent cmc = new SceneGraphComponent("Control Mesh");
-				cmc.setGeometry(ifs);
-				Appearance app = new Appearance();
-				cmc.setAppearance(app);
-				app.setAttribute(CommonAttributes.FACE_DRAW, false);
-				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
-				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
-				hif.getActiveLayer().addTemporaryGeometry(cmc);
-			}
 			
 			if (pointCreated && goButton == e.getSource()) {
 				point = calculateClosestPoint(point);
@@ -1115,6 +1095,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(curvatureLinesPanel);
 		pstool  = c.getPlugin(PointSelectionPlugin.class);
+		c.getPlugin(ExtractControlMesh.class);
 	}
 	
 	@Override
