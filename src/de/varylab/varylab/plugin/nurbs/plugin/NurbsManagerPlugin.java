@@ -41,7 +41,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
@@ -105,8 +104,7 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-import de.varylab.varylab.ui.ButtonCellEditor;
-import de.varylab.varylab.ui.ButtonCellRenderer;
+import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
 
@@ -602,10 +600,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private ListSelectRemoveTableModel<PolygonalLine>
 			curvesTableModel = new ListSelectRemoveTableModel<PolygonalLine>("Curves", new PolygonalLinePrinter());
 		
-		private JTable 
-			curveTable = new JTable(curvesTableModel);
+		private ListSelectRemoveTable<PolygonalLine> 
+			curvesTable = new ListSelectRemoveTable<PolygonalLine>(curvesTableModel);
+		
 		private JScrollPane 
-			curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+			curveScrollPanel = new JScrollPane(curvesTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 
 		private SceneGraphComponent
 			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
@@ -630,24 +629,16 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(goButton, rc);
 			goButton.addActionListener(this);
 			
-			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
-			curveTable.setRowHeight(22);
-			curveTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
-			curveTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
-			curveTable.getSelectionModel().addListSelectionListener(this);
-			curveTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-			curveTable.getColumnModel().getColumn(2).setMaxWidth(22);
-			curveTable.getColumnModel().getColumn(2).setPreferredWidth(22);
-			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
-			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
+			curvesTable.getSelectionModel().addListSelectionListener(this);
+			curvesTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+			
+			curvesTableModel = curvesTable.getListModel();
+			
 			curvesTableModel.addTableModelListener(this);
 			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
 			
 			add(curveScrollPanel, rc);
 
-			curveTable.getColumnModel().getColumn(0).setPreferredWidth(22);
-			curveTable.getColumnModel().getColumn(0).setMaxWidth(22);
-			
 			Appearance app = new Appearance();
 			app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
@@ -929,13 +920,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			DefaultGeometryShader dgs2 = ShaderUtility.createDefaultGeometryShader(ea);
 			DefaultLineShader dls = (DefaultLineShader) dgs2.getLineShader();
 			
-			for(int i = 0; i < curveTable.getRowCount(); ++i) {
-				int mi = curveTable.convertRowIndexToModel(i);
+			for(int i = 0; i < curvesTable.getRowCount(); ++i) {
+				int mi = curvesTable.convertRowIndexToModel(i);
 				SceneGraphComponent lineComp = integralCurvesRoot.getChildComponent(mi);
 				boolean isVisible = lineComp.isVisible();
 				Appearance app = lineComp.getAppearance();
 				app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls.getRadiiWorldCoordinates());
-				if(curveTable.isRowSelected(i)) {
+				if(curvesTable.isRowSelected(i)) {
 					app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius()*1.5);
 				} else {
 					app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius());					

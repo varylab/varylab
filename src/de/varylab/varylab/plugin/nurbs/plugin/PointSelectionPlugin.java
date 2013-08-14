@@ -21,7 +21,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -44,9 +43,8 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
-import de.varylab.varylab.ui.ButtonCellEditor;
-import de.varylab.varylab.ui.ButtonCellRenderer;
 import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
+import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 
 public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ActionListener, TableModelListener {
@@ -57,9 +55,13 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	private JPanel panel = new JPanel();
 	
+
 	private ListSelectRemoveTableModel<double[]> 
 		psm = new ListSelectRemoveTableModel<double[]>("UV-Coordinate",new DoubleArrayPrettyPrinter());
-	private JTable selectedPointsTable = new JTable(psm);
+	private ListSelectRemoveTable<double[]> 
+		selectedPointsTable = new ListSelectRemoveTable<double[]>(psm);
+
+	
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
 	
 	private JButton uncheckButton = new JButton("None");
@@ -90,13 +92,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 		
 		selectedPointsTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
-		selectedPointsTable.setRowHeight(22);
-		selectedPointsTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
-		selectedPointsTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
-		selectedPointsTable.getColumnModel().getColumn(2).setMaxWidth(22);
-		selectedPointsTable.getColumnModel().getColumn(2).setPreferredWidth(22);
-		selectedPointsTable.getColumnModel().getColumn(0).setMaxWidth(22);
-		selectedPointsTable.getColumnModel().getColumn(0).setPreferredWidth(22);
 		
 		psm.addTableModelListener(this);
 		
