@@ -580,6 +580,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		private static final long 
 			serialVersionUID = 1L;
+		
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
 			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1);
@@ -707,11 +708,17 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 
 		private LinkedList<PolygonalLine> computeCurvatureLines(List<double[]> startingPointsUV) {
+			
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
 			
 			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
 			umbilicStop = Math.pow(10, umbilicStop);
+			
+			List<double[]> boundaryVertices = activeNurbsSurface.getBoundaryVerticesUV();
+			double scale = Rn.euclideanDistance(boundaryVertices.get(0), boundaryVertices.get(2));
+			tol *= scale;
+			umbilicStop *= scale;
 			
 			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
@@ -1125,14 +1132,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 	private void addUmbilicalPoints(double[][] umbillicPoints, HalfedgeLayer layer) {
 		PointSetFactory psfu = new PointSetFactory();
-	
 		psfu.setVertexCount(umbillicPoints.length);
-	
 		psfu.setVertexCoordinates(umbillicPoints);
 		psfu.update();
 		SceneGraphComponent sgcu = new SceneGraphComponent("Umbilics");
-		SceneGraphComponent umbilicComp = new SceneGraphComponent("Max Curve");
-		sgcu.addChild(umbilicComp);
 		sgcu.setGeometry(psfu.getGeometry());
 		Appearance uAp = new Appearance();
 		sgcu.setAppearance(uAp);

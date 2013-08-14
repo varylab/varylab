@@ -6,7 +6,7 @@ import de.jreality.tools.ActionTool;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
 public class PointSelectionTool extends ActionTool {
-	private NURBSSurface ns = null;
+	private NURBSSurface nurbsSurface = null;
 	
 	private double[] selectedPoint = new double[2];
 	
@@ -21,9 +21,9 @@ public class PointSelectionTool extends ActionTool {
 
 	@Override
 	public void activate(ToolContext tc) {
-		if (ns != null) {
+		if (nurbsSurface != null) {
 			double[] oc = tc.getCurrentPick().getObjectCoordinates();
-			selectedPoint = ns.getClosestPointDomain(oc);
+			selectedPoint = nurbsSurface.getClosestPointDomain(oc);
 			fire(this);
 		}
 	}
@@ -38,6 +38,10 @@ public class PointSelectionTool extends ActionTool {
 	}
 
 	public void setSurface(NURBSSurface surface) {
-		ns = surface;
+		nurbsSurface = surface;
+	}
+
+	public NURBSSurface getSurface() {
+		return nurbsSurface;
 	}
 }

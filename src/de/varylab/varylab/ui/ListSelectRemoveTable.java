@@ -16,6 +16,10 @@ public class ListSelectRemoveTable<E> extends JTable {
 		setRowHeight(22);
 		setDefaultEditor(JButton.class, new ButtonCellEditor());
 		setDefaultRenderer(JButton.class, new ButtonCellRenderer());
+		adjustColumnSizes();
+	}
+
+	public void adjustColumnSizes() {
 		getColumnModel().getColumn(2).setMaxWidth(22);
 		getColumnModel().getColumn(2).setPreferredWidth(22);
 		getColumnModel().getColumn(0).setMaxWidth(22);

@@ -14,8 +14,10 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,10 +59,12 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 
 	private ListSelectRemoveTableModel<double[]> 
-		psm = new ListSelectRemoveTableModel<double[]>("UV-Coordinate",new DoubleArrayPrettyPrinter());
+		activeModel = new ListSelectRemoveTableModel<double[]>("UV-Coordinates",new DoubleArrayPrettyPrinter());
 	private ListSelectRemoveTable<double[]> 
-		selectedPointsTable = new ListSelectRemoveTable<double[]>(psm);
+		selectedPointsTable = new ListSelectRemoveTable<double[]>(activeModel);
 
+	private Map<HalfedgeLayer, ListSelectRemoveTableModel<double[]>>
+		layers2models = new HashMap<HalfedgeLayer, ListSelectRemoveTableModel<double[]>>();
 	
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
 	
@@ -92,9 +96,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 		
 		selectedPointsTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
-		
-		psm.addTableModelListener(this);
-		
+		activeModel.addTableModelListener(this);
 		selectedPointsPane.setMinimumSize(new Dimension(200,150));
 		panel.add(selectedPointsPane, rc);
 		
@@ -138,34 +140,70 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 
 	@Override
 	public PluginInfo getPluginInfo() {
-		return super.getPluginInfo();
+		return new PluginInfo("Nurbs surface point selection", "Nurbs team");
 	}
 
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
+		layer.addTemporaryGeometry(selectedPointsComponent);
 		if(startup) {
-			layer.addTemporaryGeometry(selectedPointsComponent);
+			addTool(layer);
 			startup = false;
 		}
-		addTool(layer);
+		if(activeModel == null) {
+			if(layers2models.containsKey(layer)) {
+				activeModel = layers2models.get(layer);
+				activeModel.clear();
+			} else {
+				activeModel = new ListSelectRemoveTableModel<double[]>("UV-coordinates", new DoubleArrayPrettyPrinter());
+				activeModel.addTableModelListener(this);
+				layers2models.put(layer,activeModel);
+			}
+		}
 		updateTool(layer);
+		activeModel.fireTableDataChanged();
 	}
 
-	private void updateTool(HalfedgeLayer layer) {
-		nurbsUVAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
-		if(nurbsUVAdapter==null) {
-			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
+	@Override
+	public void adaptersChanged(HalfedgeLayer layer) {
+		updateTool(layer);
+		if(tool.getSurface() == null) {
+			activeModel.clear();
+			activeModel.fireTableDataChanged();
 		}
-		
-		if(nurbsUVAdapter != null) {
-			surface = nurbsUVAdapter.getSurface();
+	}
+
+	@Override
+	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
+		if(old == active) {
+			return;
+		}
+		old.removeTemporaryGeometry(selectedPointsComponent);
+		active.addTemporaryGeometry(selectedPointsComponent);
+		layers2models.put(old,activeModel);
+		if(layers2models.containsKey(active)) {
+			activeModel = layers2models.get(active);
 		} else {
-			surface = null;
+			System.err.println("this should not happen!");
 		}
-		tool.setSurface(surface);
-		psm.clear();
-		selectedPointsComponent.removeAllChildren();
-		psm.fireTableDataChanged();
+		selectedPointsTable.setModel(activeModel);
+		removeTool(old);
+		addTool(active);
+		updateTool(active);
+		activeModel.fireTableDataChanged();
+	}
+
+	@Override
+	public void layerCreated(HalfedgeLayer layer) {
+		ListSelectRemoveTableModel<double[]> newModel = new ListSelectRemoveTableModel<double[]>("UV-coordinates", new DoubleArrayPrettyPrinter());
+		newModel.addTableModelListener(this);
+		layers2models.put(layer,newModel);
+	}
+
+	@Override
+	public void layerRemoved(HalfedgeLayer layer) {
+		layers2models.remove(layer);
+		removeTool(layer);
 	}
 
 	private void addTool(HalfedgeLayer layer) {
@@ -187,28 +225,18 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		}
 	}
 
-	@Override
-	public void adaptersChanged(HalfedgeLayer layer) {
-		updateTool(layer);
-	}
-
-	@Override
-	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
-		old.removeTemporaryGeometry(selectedPointsComponent);
-		active.addTemporaryGeometry(selectedPointsComponent);
-		removeTool(old);
-		addTool(active);
-		updateTool(active);
-	}
-
-	@Override
-	public void layerCreated(HalfedgeLayer layer) {
-		addTool(layer);
-	}
-
-	@Override
-	public void layerRemoved(HalfedgeLayer layer) {
-		removeTool(layer);
+	private void updateTool(HalfedgeLayer layer) {
+		nurbsUVAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
+		if(nurbsUVAdapter==null) {
+			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
+		}
+		
+		if(nurbsUVAdapter != null) {
+			surface = nurbsUVAdapter.getSurface();
+		} else {
+			surface = null;
+		}
+		tool.setSurface(surface);
 	}
 
 	public void addPointSelectionListener(PointSelectionListener psl) {
@@ -238,45 +266,45 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		Object source = e.getSource();
 		if(source == tool) {
 			double[] pt = tool.getSelectedPoint();
-			if(!psm.contains(pt)) {
-				psm.add(pt);
+			if(!activeModel.contains(pt)) {
+				activeModel.add(pt);
 				selectedPointsComponent.addChild(createPointComponent(pt));
 			}
 			firePointSelected(tool.getSelectedPoint());
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
 		} else if(source == checkButton) {
-			psm.checkAll();
+			activeModel.checkAll();
 			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
 				child.setVisible(true);
 			}
 		} else if(source == uncheckButton) {
-			psm.clearChecked();
+			activeModel.clearChecked();
 			for(SceneGraphComponent child : selectedPointsComponent.getChildComponents()) {
 				child.setVisible(false);
 			}
 		} else if(source == removeSelectedButton) {
-			psm.removeChecked();
+			activeModel.removeChecked();
 			resetSelectedPointsComponent();
 		} else if(source == selectionButton) {
 			AdapterSet as = hif.getActiveAdapters();
 			as.addAll(hif.getAdapters());
 			for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
 				double[] pt = as.getD(NurbsUVCoordinate.class, v);
-				if(!psm.contains(pt)) {
-					psm.add(pt);
+				if(!activeModel.contains(pt)) {
+					activeModel.add(pt);
 					selectedPointsComponent.addChild(createPointComponent(pt));
 				}
 			}
 		}
-		psm.fireTableDataChanged();
+		activeModel.fireTableDataChanged();
 	}
 
 	private void resetSelectedPointsComponent() {
 		selectedPointsComponent.removeAllChildren();
-		for(double[] pt : psm.getList()) {
+		for(double[] pt : activeModel.getList()) {
 			SceneGraphComponent ptComponent = createPointComponent(pt);
-			ptComponent.setVisible(psm.isChecked(pt));
+			ptComponent.setVisible(activeModel.isChecked(pt));
 			selectedPointsComponent.addChild(ptComponent);
 		}
 	}
@@ -287,7 +315,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	}
 	
 	public List<double[]> getSelectedPoints() {
-		return psm.getChecked();
+		return activeModel.getChecked();
 	}
 	
 	private SceneGraphComponent createPointComponent(double[] uv) {
@@ -303,6 +331,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		resetSelectedPointsComponent();
+		selectedPointsTable.adjustColumnSizes();
 	}
 	
 }
