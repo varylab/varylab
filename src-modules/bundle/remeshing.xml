@@ -13,7 +13,7 @@
 		hex meshes.
 	</description>
 	<blogURL href="http://www.varylab.com/p/remeshing.html"/>
-	<logoImage href="bundle_remeshing.png"/>
+	<logoImage href="remeshing.png"/>
 	
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
 	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>

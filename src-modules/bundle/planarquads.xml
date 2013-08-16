@@ -13,7 +13,7 @@
 		and optimization modules.
 	</description>
 	<blogURL href="http://www.varylab.com/p/planar-quads.html"/>
-	<logoImage href="bundle_planar_quads.png"/>
+	<logoImage href="planarquads.png"/>
 	
 	<moduleRef id="g56d45bnmr7xvnyd" alias="optimization essentials"/>
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
