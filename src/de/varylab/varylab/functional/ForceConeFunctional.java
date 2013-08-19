@@ -36,6 +36,7 @@ public class ForceConeFunctional <
 		Gradient G, 
 		Hessian H
 	) {
+		double fac;
 		for (E e : hds.getPositiveEdges()) {
 			V v = e.getStartVertex();
 			V vi = e.getTargetVertex();
@@ -43,16 +44,17 @@ public class ForceConeFunctional <
 			getPosition(vi, x, pvi);
 			Rn.subtract(veci, pv, pvi);
 			if (E != null) {
-				E.add(veci[0]*veci[0] + veci[1]*veci[1] - veci[2]*veci[2]);
+				E.add(Math.pow(veci[0]*veci[0] + veci[1]*veci[1] - veci[2]*veci[2],2));
 			}
 			if (G != null) {
-				G.add(3*v.getIndex(), 2*veci[0]);
-				G.add(3*v.getIndex()+1, 2*veci[1]);
-				G.add(3*v.getIndex()+2, -2*veci[2]);
+				fac = 2*(veci[0]*veci[0] + veci[1]*veci[1] - veci[2]*veci[2]);
+				G.add(3*v.getIndex(), 2*veci[0]*fac);
+				G.add(3*v.getIndex()+1, 2*veci[1]*fac);
+				G.add(3*v.getIndex()+2, -2*veci[2]*fac);
 				
-				G.add(3*vi.getIndex(), -2*veci[0]);
-				G.add(3*vi.getIndex()+1, -2*veci[1]);
-				G.add(3*vi.getIndex()+2, 2*veci[2]);
+				G.add(3*vi.getIndex(), -2*veci[0]*fac);
+				G.add(3*vi.getIndex()+1, -2*veci[1]*fac);
+				G.add(3*vi.getIndex()+2, 2*veci[2]*fac);
 			}
 		}
 	}
