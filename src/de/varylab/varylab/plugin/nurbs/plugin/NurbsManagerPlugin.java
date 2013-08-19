@@ -936,7 +936,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 
 		private void updateActiveNurbsSurface(HalfedgeLayer layer) {
-			NurbsUVAdapter nurbsUVAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
+			NurbsUVAdapter nurbsUVAdapter = layer.getAdapters().query(NurbsUVAdapter.class);
 			if(nurbsUVAdapter == null) {
 				nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
 			}

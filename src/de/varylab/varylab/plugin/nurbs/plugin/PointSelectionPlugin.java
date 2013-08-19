@@ -226,7 +226,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	}
 
 	private void updateTool(HalfedgeLayer layer) {
-		nurbsUVAdapter = layer.getCurrentAdapters().query(NurbsUVAdapter.class);
+		nurbsUVAdapter = layer.getAdapters().query(NurbsUVAdapter.class);
 		if(nurbsUVAdapter==null) {
 			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
 		}
