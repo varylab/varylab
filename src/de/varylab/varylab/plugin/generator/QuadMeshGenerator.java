@@ -101,9 +101,10 @@ public class QuadMeshGenerator extends AlgorithmDialogPlugin {
 		double[][][] verts = new double[numV][numU][];
 		for (int u = 0; u < verts.length; u++) {
 			for (int v = 0; v  < verts[0].length; v++) {
+				double step = 1.0/(Math.max(numV,numU)-1.0);
 				verts[u][v] = new double[]{
-					v / (double)(numV - 1) - 0.5, 
-					u / (double)(numU - 1) - 0.5, 
+					v * step - 0.5, 
+					u * step - 0.5, 
 					0
 				};
 			}

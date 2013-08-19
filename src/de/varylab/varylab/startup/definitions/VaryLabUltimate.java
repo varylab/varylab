@@ -63,6 +63,7 @@ import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.EqualDiagonalsOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.ForceConeOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.GeodesicCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.IncircleOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
@@ -278,6 +279,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(CircumcircleCurvatureOptimizer.class);
 		pSet.add(NURBSSurfaceOptimizer.class);
 		pSet.add(MinimalPathsOptimizer.class);
+		pSet.add(ForceConeOptimizer.class);
 		
 	}
 	

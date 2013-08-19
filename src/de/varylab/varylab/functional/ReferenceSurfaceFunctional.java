@@ -228,7 +228,7 @@ implements Functional<V, E, F> {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void setReferenceSurface(HDS refSurface, AdapterSet as) {
 		this.refSurface = refSurface;
-		Triangulator.triangulate(refSurface);
+		Triangulator.triangulateByCuttingCorners(refSurface,as);
 		kdtree = new KdTree<V, E, F>(refSurface, as, 10, false);
 		refas = as;
 	}
