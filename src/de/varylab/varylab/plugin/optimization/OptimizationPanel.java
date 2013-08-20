@@ -160,7 +160,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		progressBar.setStringPainted(true);
 	}
 	
-	private void optimize() {
+	public OptimizationJob optimize() {
 		VHDS hds = hif.get(new VHDS());
 		VaryLabFunctional fun = createFunctional(hds);
 		
@@ -176,9 +176,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		job.setSmoothingEnabled(smoothSurfaceChecker.isSelected());
 		job.addOptimizationListener(this);
 		jobQueue.queueJob(job);
+		return job;
 	}
 	
-	private void optimizeAnimated() {
+	public void optimizeAnimated() {
 		if (animateToggle.isSelected()) {
 			VHDS hds = hif.get(new VHDS());
 			VaryLabFunctional fun = createFunctional(hds);

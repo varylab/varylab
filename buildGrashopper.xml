@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     27.03.2013 18:43:35                                                        
+
+     VaryLab service    
+     The manual build steps
+                   
+     sechel                                                                
+     ====================================================================== -->
+<project name="Grashopper Data Model" default="compile jaxb classes">
+    <description>
+    	Grashopper XML Data Model Generator
+    </description>
+	
+	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+		<classpath>
+			<fileset dir="etc/ant">
+				<include name="jaxb-xjc.jar"/>
+			</fileset>
+		</classpath>	
+	</taskdef>
+
+	<target name="compile jaxb classes">
+		<property name="src" value="src/de/varylab/varylab/plugin/grashopper/data"/>
+		<xjc 
+			schema="${src}/rvlmesh.xsd" 
+			binding="${src}/rvlmesh.xjb"
+			destdir="src"
+			package="de.varylab.varylab.plugin.grashopper.data.binding"
+			extension="false"
+		>
+			<produces dir="${src}/binding" includes="*"/>
+		</xjc>
+	</target>
+	
+
+</project>

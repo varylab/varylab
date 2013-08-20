@@ -12,6 +12,7 @@ import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.varylab.plugin.VarylabMain;
+import de.varylab.varylab.plugin.grashopper.GrashopperPlugin;
 import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
@@ -50,6 +51,7 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 	
 	@Override
 	public void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances) {
+		classes.add(GrashopperPlugin.class);
 		classes.add(VarylabMain.class);
 		classes.add(IterationProtocolPanel.class);
 		addOptimizationPlugins(classes);
