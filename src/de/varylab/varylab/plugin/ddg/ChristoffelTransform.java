@@ -7,10 +7,6 @@ import static java.lang.Math.sin;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeSet;
 
 import javax.swing.JCheckBox;
@@ -34,10 +29,8 @@ import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
@@ -57,7 +50,8 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 	public static enum NormalMethod {
 		LS_Sphere,
 		Face_Average,
-		Face_Sphere
+		Face_Sphere,
+		V_Spheres
 	}
 
 	private CentralExtensionSubdivision
@@ -88,100 +82,6 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 	public JPanel getDialogPanel() {
 		return panel;
 	}
-	
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	public @interface EdgeSign {}
-	
-	@EdgeSign
-	private class EdgeSignAdapter extends AbstractAdapter<Boolean> {
-		
-		private Map<Object, Boolean>
-			signMap = new HashMap<Object, Boolean>();
-		
-		public EdgeSignAdapter() {
-			super(Boolean.class, true, true);
-		}
-
-		@Override
-		public <
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>
-		> Boolean getE(E e, AdapterSet a) {
-			Boolean s = signMap.get(e);
-			return s == null ? false : s;
-		}
-		
-		@Override
-		public <
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>
-		> void setE(E e, Boolean value, AdapterSet a) {
-			signMap.put(e, value);
-		}
-		
-		@Override
-		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-			return Edge.class.isAssignableFrom(nodeClass);
-		}
-
-	}
-	
-	private <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	>  void labelFaceOf(E edge, AdapterSet a) {
-		E actEdge = edge.getNextEdge();
-		while (actEdge != edge){
-			E prev = actEdge.getPreviousEdge();
-			boolean prevLabel = a.get(EdgeSign.class, prev, Boolean.class);
-			a.set(EdgeSign.class, actEdge, !prevLabel);
-			a.set(EdgeSign.class, actEdge.getOppositeEdge(), !prevLabel);
-			actEdge = actEdge.getNextEdge();
-		}
-		boolean edgeLabel = a.get(EdgeSign.class, edge, Boolean.class);
-		boolean prevLabel = a.get(EdgeSign.class, edge.getPreviousEdge(), Boolean.class);
-		if (prevLabel == edgeLabel){
-			System.err.println("could not label face " + edge.getLeftFace() + " correctly, continuing...");
-		}
-	}
-	
-	
-	private <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void createEdgeLabels(HDS hds, AdapterSet a) {
-		HashSet<E> pendingEdges = new HashSet<E>();
-		Stack<E> edgeStack = new Stack<E>();
-		for (E e : hds.getEdges()) {
-			pendingEdges.add(e);
-		}
-		E edge0 = hds.getEdge(0);
-		if (edge0.getLeftFace() != null) {
-			edgeStack.push(edge0);
-		}
-		if (edge0.getRightFace() != null) {
-			edgeStack.push(edge0.getOppositeEdge());
-		}
-		while (!edgeStack.isEmpty()){
-			E edge = edgeStack.pop();
-			labelFaceOf(edge, a);
-			for (E e : HalfEdgeUtils.boundaryEdges(edge.getLeftFace())){
-				if (pendingEdges.contains(e)){
-					if (e.getRightFace() != null) {
-						edgeStack.push(e.getOppositeEdge());
-					}
-					pendingEdges.remove(e);
-				}
-			}
-		}
-	}
-	
 	
 	public  <
 		V extends Vertex<V, E, F>,
@@ -305,8 +205,9 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 					double[] vec = getAssociatedEdgeVector(e, phi, a, method);
 					//double factor = Rn.euclideanDistanceSquared(pv, pv2);
 					E de = e.getLeftFace() != null ? e : e.getOppositeEdge();
+					double factor = 0;
 					double[] r12 = decomposeEdgeLength(de, a);
-					double factor = r12[0] * r12[1];
+					factor = r12[0] * r12[1];
 					boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
 					double scale = (edgeSign ? -1 : 1) / factor;
 					vec[0] *= scale;
@@ -389,19 +290,18 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 			Map<E, V> oldEnewVMap = new HashMap<E, V>();
 			Map<V, V> oldVnewVMap = new HashMap<V, V>();
 			HDS ce = ceSubdivider.subdivide(hds, a, oldFnewVMap, oldEnewVMap, oldVnewVMap);
-			createEdgeLabels(ce, a);
+//			createEdgeLabels(ce, a);
 			dualize(ce, phi, a, method);
 			for (V v : hds.getVertices()) {
 				V newV = oldVnewVMap.get(v);
 				a.set(Position.class, v, a.getD(Position3d.class, newV));
 			}
 		} else {
-			createEdgeLabels(hds, a);
+//			createEdgeLabels(hds, a);
 			dualize(hds, phi, a, method);
 			hif.addLayerAdapter(esa, false);
 		}
 	}
-	
 	
 	@Override
 	public <

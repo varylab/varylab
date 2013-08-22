@@ -24,6 +24,7 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.ui.LayoutFactory;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -121,10 +122,18 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		angleLabel.setEnabled(true);
 		phiSpinner.setEnabled(true);
 		
-		int numVerts = surface.numVertices();
-		fixingIndices[0] = rnd.nextInt(numVerts);
-		fixingIndices[1] = rnd.nextInt(numVerts);
-		fixingIndices[2] = rnd.nextInt(numVerts);
+		if(hif.getSelection().getVertices().size() == 3) {
+			int i = 0;
+			for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
+				fixingIndices[i] = v.getIndex();
+				++i;
+			}
+		} else {
+			int numVerts = surface.numVertices();
+			fixingIndices[0] = rnd.nextInt(numVerts);
+			fixingIndices[1] = rnd.nextInt(numVerts);
+			fixingIndices[2] = rnd.nextInt(numVerts);
+		}
 		fixingPoints[0] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[0]));
 		fixingPoints[1] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[1]));
 		fixingPoints[2] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[2]));
