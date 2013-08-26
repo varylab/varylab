@@ -16,6 +16,9 @@ public class AdaptedEdgeWeightFunction implements WeightFunction<VEdge> {
 	
 	@Override
 	public Double getWeight(VEdge e) {
+		if (!aSet.isAvailable(Weight.class, e.getClass(), Double.class)) {
+			return 1.0;
+		}
 		Double w = aSet.get(Weight.class, e, Double.class);
 		return w == null ? 1.0 : w;
 	}
