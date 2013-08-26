@@ -18,7 +18,9 @@ import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.job.Job;
 import de.jreality.plugin.job.JobListener;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.util.NativePathUtility;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -28,7 +30,7 @@ import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.optimization.OptimizationJob;
+import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.grashopper.data.RVLMeshFactory;
 import de.varylab.varylab.plugin.grashopper.data.binding.Face;
 import de.varylab.varylab.plugin.grashopper.data.binding.FaceList;
@@ -42,6 +44,8 @@ public class GrashopperPlugin extends Plugin {
 
 	private static Logger	
 		log = Logger.getLogger(GrashopperPlugin.class.getName());
+	private HalfedgeLayer 
+		layer = null;
 		
 	private class ComponentClient extends Thread {
 			
@@ -51,8 +55,7 @@ public class GrashopperPlugin extends Plugin {
 			optimizationPanel = null;
 		private HalfedgeInterface
 			hif = null;
-		private HalfedgeLayer 
-			layer = null;
+		
 		
 		
 		public ComponentClient(Socket socket, HalfedgeInterface hif, OptimizationPanel optPanel) {
@@ -64,7 +67,6 @@ public class GrashopperPlugin extends Plugin {
 		
 		@Override
 		public void run() {
-			layer = hif.createLayer("Grashopper Geometry@" + socket.getRemoteSocketAddress());
 			InputStream in = null;
 			try {
 				in = socket.getInputStream();
@@ -75,20 +77,19 @@ public class GrashopperPlugin extends Plugin {
 			}
 			InputStreamReader inReader = new InputStreamReader(in);
 			LineNumberReader lineReader = new LineNumberReader(inReader);
-			StringBuffer buffer = new StringBuffer();
+//			StringBuffer buffer = new StringBuffer();
 			try {
 				String line = lineReader.readLine();
-				while (line != null) {
-					buffer.append(line);
-					buffer.append("\n");
-					line = lineReader.readLine();
-				}
-				processData(buffer.toString(), socket.getOutputStream());
-				log.info("got data: " + buffer.toString());
+//				while (line != null) {
+//					buffer.append(line);
+//					buffer.append("\n");
+//					line = lineReader.readLine();
+//				}
+				processData(line, socket.getOutputStream());
+				log.info("got data: " + line);
 			} catch (IOException e) {
 				log.warning("error transferring data: " + e);
 			}
-//			hif.removeLayer(layer);
 		}
 		
 		
@@ -158,15 +159,12 @@ public class GrashopperPlugin extends Plugin {
 			try {
 				StringReader xmlReader = new StringReader(xml);
 				RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
-				hif.activateLayer(layer);
-				hif.set(toIndexedFaceSet(mesh));
+				layer.set(toIndexedFaceSet(mesh));
 				log.info("mesh: " + mesh);
 			} catch (Exception e) {
 				log.warning("could not parse grashopper mesh: " + e);
 			}
-			OptimizationJob job = optimizationPanel.optimize();
-			job.addJobListener(new JobListener() {
-				
+			JobListener jobListener = new JobListener() {
 				@Override
 				public void jobStarted(Job arg0) {
 				}
@@ -179,8 +177,10 @@ public class GrashopperPlugin extends Plugin {
 				public void jobFinished(Job arg0) {
 					try {
 						VHDS hds = new VHDS();
-						hds = hif.get(hds);
-						RVLMesh mesh = toRVLMesh(hds, hif.getAdapters());
+						hds = layer.get(hds);
+						AdapterSet aSet = AdapterSet.createGenericAdapters();
+						aSet.addAll(layer.getAdapters());
+						RVLMesh mesh = toRVLMesh(hds, aSet);
 						String xml = RVLMeshFactory.meshToXML(mesh);
 						OutputStreamWriter outWriter = new OutputStreamWriter(out);
 						outWriter.write(xml);
@@ -211,7 +211,9 @@ public class GrashopperPlugin extends Plugin {
 						log.warning("error writing response: " + e2);
 					}
 				}
-			});
+			};
+			VHDS hds = layer.get(new VHDS());
+			optimizationPanel.optimize(hds, jobListener);
 		}
 		
 	}
@@ -257,6 +259,8 @@ public class GrashopperPlugin extends Plugin {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		HalfedgeInterface hif = c.getPlugin(HalfedgeInterface.class);
+		layer = hif.createLayer("Grashopper Geometry");
+		layer.addAdapter(new VPositionAdapter(), true);
 		OptimizationPanel optPanel = c.getPlugin(OptimizationPanel.class);
 		Server server = new Server(hif, optPanel);
 		server.start();
@@ -264,6 +268,8 @@ public class GrashopperPlugin extends Plugin {
 	
 	
 	public static void main(String[] args) {
+		NativePathUtility.set("native");
+		JRHalfedgeViewer.initHalfedgeFronted();
 		JRViewer v = new JRViewer();
 		v.addBasicUI();
 		v.addContentUI();

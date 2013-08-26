@@ -20,7 +20,6 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
-import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -122,20 +121,20 @@ public class RandomPointsBall extends AlgorithmPlugin {
 	}
 	
 
-	private <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void toPoincareDisc(HDS hds, AdapterSet as) {
-		for(V v : hds.getVertices()) {
-			double[] coords = as.getD(Position3d.class, v);
-			coords[0] /= coords[2]+1;
-			coords[1] /= coords[2]+1;
-			coords[2] = 0;
-			as.set(Position.class, v, coords);
-		}
-	}
+//	private <
+//		V extends Vertex<V, E, F>,
+//		E extends Edge<V, E, F>,
+//		F extends Face<V, E, F>,
+//		HDS extends HalfEdgeDataStructure<V, E, F>
+//	> void toPoincareDisc(HDS hds, AdapterSet as) {
+//		for(V v : hds.getVertices()) {
+//			double[] coords = as.getD(Position3d.class, v);
+//			coords[0] /= coords[2]+1;
+//			coords[1] /= coords[2]+1;
+//			coords[2] = 0;
+//			as.set(Position.class, v, coords);
+//		}
+//	}
 		
 	private <
 		V extends Vertex<V, E, F>,

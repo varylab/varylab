@@ -25,6 +25,7 @@ import javax.swing.SpinnerNumberModel;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.functional.DomainValue;
@@ -160,10 +161,13 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		progressBar.setStringPainted(true);
 	}
 	
-	public OptimizationJob optimize() {
+	public void optimize() {
 		VHDS hds = hif.get(new VHDS());
+		optimize(hds, null);
+	}
+	
+	public OptimizationJob optimize(VHDS hds, JobListener jobListener) {
 		VaryLabFunctional fun = createFunctional(hds);
-		
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
 		
@@ -175,6 +179,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		job.setMaximumIterates(maxIter);
 		job.setSmoothingEnabled(smoothSurfaceChecker.isSelected());
 		job.addOptimizationListener(this);
+		if (jobListener != null) {
+			job.addJobListener(jobListener);
+		}
 		jobQueue.queueJob(job);
 		return job;
 	}
