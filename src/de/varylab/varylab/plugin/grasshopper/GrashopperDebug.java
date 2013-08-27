@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.grashopper;
+package de.varylab.varylab.plugin.grasshopper;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -46,7 +46,7 @@ public class GrashopperDebug extends ShrinkPanelPlugin implements ActionListener
 		hostField = new JTextField("127.0.0.1");
 	
 	private SpinnerNumberModel
-		portModel = new SpinnerNumberModel(8000, 0, 65535, 1);
+		portModel = new SpinnerNumberModel(GrasshopperPlugin.SERVER_PORT, 0, 65535, 1);
 	
 	private JSpinner
 		portSpinner = new JSpinner(portModel);

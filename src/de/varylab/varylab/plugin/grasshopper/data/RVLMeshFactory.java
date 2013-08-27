@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.grashopper.data;
+package de.varylab.varylab.plugin.grasshopper.data;
 
 import java.io.Reader;
 import java.io.StringWriter;
@@ -9,8 +9,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import de.varylab.varylab.plugin.grashopper.data.binding.ObjectFactory;
-import de.varylab.varylab.plugin.grashopper.data.binding.RVLMesh;
+import de.varylab.varylab.plugin.grasshopper.data.binding.ObjectFactory;
+import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
 
 
 public class RVLMeshFactory {
@@ -23,7 +23,7 @@ public class RVLMeshFactory {
 	static {
 		try {
 			ClassLoader parentLoader = RVLMeshFactory.class.getClassLoader();
-			jaxbContex = JAXBContext.newInstance("de.varylab.varylab.plugin.grashopper.data.binding", parentLoader);
+			jaxbContex = JAXBContext.newInstance("de.varylab.varylab.plugin.grasshopper.data.binding", parentLoader);
 		} catch (Exception e) {
 			log.severe(e.getMessage());
 		}

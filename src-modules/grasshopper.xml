@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>gd56hgvr344yuhjy</id>
+		<name>Grashopper Component Connection</name>
+		<revision>1</revision>
+		<category>Poweruser</category>
+	</manifest>
+	<description>
+		This plug-in lets you connect VaryLab the its Grasshopper component.
+		Exchange geometry data and do surface optimization in Grasshopper using
+		all of VaryLabs features. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.grasshopper.GrasshopperPlugin"/>
+
+</module>

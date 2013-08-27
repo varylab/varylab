@@ -16,6 +16,9 @@ public class AdaptedFaceWeightFunction implements VolumeWeight<VFace> {
 	
 	@Override
 	public Double getWeight(VFace f) {
+		if (!aSet.isAvailable(Weight.class, f.getClass(), Double.class)) {
+			return 1.0;
+		}
 		Double w = aSet.get(Weight.class, f, Double.class);
 		return w == null ? 1.0 : w;
 	}

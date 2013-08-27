@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<RVLMesh 
+	xmlns="http://schemas.datacontract.org/2004/07/GHVaryLab" 
+	xmlns:i="http://www.w3.org/2001/XMLSchema-instance"> 
+	<Faces/> 
+	<Vertices> 
+		<Vertex> 
+			<X>0.1234</X> 
+			<Y>0.5789</Y> 
+			<Z>0.2345</Z> 
+		</Vertex> 
+	</Vertices> 
+</RVLMesh>

@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package de.varylab.varylab.plugin.grashopper.data.binding;
+package de.varylab.varylab.plugin.grasshopper.data.binding;

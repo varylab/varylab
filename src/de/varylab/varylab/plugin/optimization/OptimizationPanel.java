@@ -31,6 +31,7 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -44,10 +45,11 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.CoordinateArrayAdapter;
 import de.varylab.varylab.icon.ImageHook;
+import de.varylab.varylab.optimization.AbstractOptimizationJob;
 import de.varylab.varylab.optimization.AnimatedOptimizationJob;
 import de.varylab.varylab.optimization.IterationProtocol;
-import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.OptimizationJob;
+import de.varylab.varylab.optimization.OptimizationListener;
 import de.varylab.varylab.optimization.VaryLabFunctional;
 import de.varylab.varylab.optimization.array.ArrayDomainValue;
 import de.varylab.varylab.optimization.array.ArrayGradient;
@@ -162,16 +164,17 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	public void optimize() {
-		VHDS hds = hif.get(new VHDS());
-		optimize(hds, null);
+		HalfedgeLayer layer = hif.getActiveLayer();
+		optimize(layer, null);
 	}
 	
-	public OptimizationJob optimize(VHDS hds, JobListener jobListener) {
+	public OptimizationJob optimize(HalfedgeLayer layer, JobListener jobListener) {
+		VHDS hds = layer.get(new VHDS());
 		VaryLabFunctional fun = createFunctional(hds);
 		double acc = Math.pow(10, accuracyModel.getNumber().intValue());
 		int maxIter = maxIterationsModel.getNumber().intValue();
 		
-		OptimizationJob job = new OptimizationJob(hds, fun);
+		OptimizationJob job = new OptimizationJob(hds, layer, fun);
 		job.setCostraints(createConstraints(hds));
 		job.setMethod(getTaoMethod());
 		job.setTolerances(0.0);
@@ -202,7 +205,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	@Override
-	public void optimizationStarted(int maxIterations) {
+	public void optimizationStarted(AbstractOptimizationJob job, int maxIterations) {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(maxIterations);
 		progressBar.setValue(0);
@@ -211,15 +214,15 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationProgress(double[] solution, int iteration) {
+	public void optimizationProgress(AbstractOptimizationJob abstractJob, double[] solution, int iteration) {
+		OptimizationJob job = (OptimizationJob)abstractJob;
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
 		if (protocolPanel.isProtocolActive()) {
-			VHDS hds = hif.get(new VHDS());
 			List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
 			for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-				protocol.add(op.getIterationProtocol(solution, hds));
+				protocol.add(op.getIterationProtocol(solution, job.getHds()));
 			}
 			protocolPanel.appendIterationProtocol(protocol);
 		}
@@ -227,7 +230,9 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	@Override
-	public void optimizationFinished(GetSolutionStatusResult stat, double[] x) {
+	public void optimizationFinished(AbstractOptimizationJob abstractJob, GetSolutionStatusResult stat, double[] x) {
+		OptimizationJob job = (OptimizationJob)abstractJob;
+		final HalfedgeLayer layer = job.getSourceLayer();
 		String status = stat.toString().replace("getSolutionStatus : ", "");
 		System.out.println("optimization status ------------------------------------");
 		System.out.println(status);
@@ -236,7 +241,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		Runnable updater = new Runnable() {
 			@Override
 			public void run() {
-				hif.updateGeometry(posAdapter);
+				layer.updateGeometry(posAdapter);
 			}
 		};
 		EventQueue.invokeLater(updater);

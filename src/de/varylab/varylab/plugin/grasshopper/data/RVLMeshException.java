@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.grashopper.data;
+package de.varylab.varylab.plugin.grasshopper.data;
 
 public class RVLMeshException extends Exception {
 

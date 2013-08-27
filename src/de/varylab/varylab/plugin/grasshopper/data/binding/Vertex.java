@@ -6,7 +6,7 @@
 //
 
 
-package de.varylab.varylab.plugin.grashopper.data.binding;
+package de.varylab.varylab.plugin.grasshopper.data.binding;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

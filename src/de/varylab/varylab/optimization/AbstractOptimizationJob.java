@@ -41,7 +41,7 @@ public abstract class AbstractOptimizationJob extends AbstractCancelableJob {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationStarted(maxIterations);						
+						l.optimizationStarted(AbstractOptimizationJob.this, maxIterations);						
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -57,7 +57,7 @@ public abstract class AbstractOptimizationJob extends AbstractCancelableJob {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationProgress(solutionCopy, iteration);
+						l.optimizationProgress(AbstractOptimizationJob.this, solutionCopy, iteration);
 					}
 				};
 				EventQueue.invokeLater(delegate);
@@ -73,7 +73,7 @@ public abstract class AbstractOptimizationJob extends AbstractCancelableJob {
 				Runnable delegate = new Runnable() {
 					@Override
 					public void run() {
-						l.optimizationFinished(status, solutionCopy);
+						l.optimizationFinished(AbstractOptimizationJob.this, status, solutionCopy);
 					}
 				};
 				EventQueue.invokeLater(delegate);

@@ -21,12 +21,12 @@
 	</taskdef>
 
 	<target name="compile jaxb classes">
-		<property name="src" value="src/de/varylab/varylab/plugin/grashopper/data"/>
+		<property name="src" value="src/de/varylab/varylab/plugin/grasshopper/data"/>
 		<xjc 
 			schema="${src}/rvlmesh.xsd" 
 			binding="${src}/rvlmesh.xjb"
 			destdir="src"
-			package="de.varylab.varylab.plugin.grashopper.data.binding"
+			package="de.varylab.varylab.plugin.grasshopper.data.binding"
 			extension="false"
 		>
 			<produces dir="${src}/binding" includes="*"/>

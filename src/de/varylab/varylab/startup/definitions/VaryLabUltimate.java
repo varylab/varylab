@@ -52,6 +52,7 @@ import de.varylab.varylab.plugin.generator.HexMeshGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
+import de.varylab.varylab.plugin.grasshopper.GrasshopperPlugin;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
@@ -179,11 +180,6 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(OBJExportPlugin.class);
 		
 		pSet.add(NurbsManagerPlugin.class);
-
-//		pSet.add(HalfedgeDebuggerPlugin.class);
-//		pSet.add(WebContentLoader.class);
-		
-//		pSet.add(Sky.class);
 		pSet.add(NodePropertyEditor.class);
 		pSet.add(RemoveGeodesicPlugin.class);
 		pSet.add(GeodesicSelection.class);
@@ -207,6 +203,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(NumberSpinnerGUI.class);
 		pSet.add(PythonConsole.class);
 		pSet.add(Inspector.class);
+		pSet.add(GrasshopperPlugin.class);
 	}
 
 

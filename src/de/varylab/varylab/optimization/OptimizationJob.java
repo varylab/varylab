@@ -6,6 +6,7 @@ import static de.jtem.jpetsc.PETSc.PETSC_DEFAULT;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jpetsc.Mat;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
@@ -21,6 +22,8 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 
 	private VHDS
 		hds = null;
+	private HalfedgeLayer
+		sourceLayer = null;
 	private VaryLabFunctional
 		functional = null;
 	private List<Constraint>
@@ -38,9 +41,10 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 	private VaryLabTaoApplication
 		activeApplication = null;
 	
-	public OptimizationJob(VHDS hds, VaryLabFunctional fun) {
+	public OptimizationJob(VHDS hds, HalfedgeLayer sourceLayer, VaryLabFunctional fun) {
 		super("Optimization");
 		this.hds = hds;
+		this.sourceLayer = sourceLayer;
 		this.functional = fun;
 	}
 	
@@ -119,6 +123,12 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 	}
 	public void setSmoothingEnabled(boolean smoothingEnabled) {
 		this.smoothingEnabled = smoothingEnabled;
+	}
+	public VHDS getHds() {
+		return hds;
+	}
+	public HalfedgeLayer getSourceLayer() {
+		return sourceLayer;
 	}
 	
 }
