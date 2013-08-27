@@ -139,6 +139,7 @@ public class GrashopperPlugin extends Plugin {
 					rf.setA(bv.get(0).getIndex());
 					rf.setB(bv.get(1).getIndex());
 					rf.setC(bv.get(2).getIndex());
+					rf.setD(-1);
 					rf.setIsTriangle(true);
 				} else 
 				if (bv.size() == 4) {
@@ -184,6 +185,7 @@ public class GrashopperPlugin extends Plugin {
 						String xml = RVLMeshFactory.meshToXML(mesh);
 						OutputStreamWriter outWriter = new OutputStreamWriter(out);
 						outWriter.write(xml);
+						outWriter.flush();
 						out.close();
 					} catch (Exception e) {
 						log.warning("error writing response: " + e);
@@ -276,6 +278,7 @@ public class GrashopperPlugin extends Plugin {
 		v.addContentSupport(ContentType.Raw);
 		v.setPropertiesFile("GrashopperTest.xml");
 		v.registerPlugin(GrashopperPlugin.class);
+		v.registerPlugin(GrashopperDebug.class);
 		v.registerPlugin(SpringOptimizer.class);
 		v.startup();
 	}
