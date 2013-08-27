@@ -32,9 +32,10 @@ public class ExtractControlMesh extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		NurbsUVAdapter nurbsAdapter = hi.getActiveVolatileAdapters().query(NurbsUVAdapter.class);
+		AdapterSet as = hi.getAdapters();
+		as.addAll(hi.getActiveVolatileAdapters());
+		NurbsUVAdapter nurbsAdapter = as.query(NurbsUVAdapter.class);
 		if(nurbsAdapter != null) {
-			HalfedgeLayer newLayer = hi.createLayer("Control Mesh");
 			double[][][] cm = nurbsAdapter.getSurface().getControlMesh();
 			QuadMeshFactory qmf = new QuadMeshFactory();
 			qmf.setULineCount(cm[0].length);
@@ -43,6 +44,7 @@ public class ExtractControlMesh extends AlgorithmPlugin {
 			qmf.setGenerateEdgesFromFaces(true);
 			qmf.update();
 			IndexedFaceSet ifs = qmf.getIndexedFaceSet();
+			HalfedgeLayer newLayer = hi.createLayer("Control Mesh");
 			newLayer.set(ifs);
 			newLayer.setActive(true);
 		} else {

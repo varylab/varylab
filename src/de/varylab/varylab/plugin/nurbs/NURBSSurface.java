@@ -22,6 +22,7 @@ import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
+import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurface;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 
@@ -86,6 +87,16 @@ import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
 			closDir = getClosingDir();
 		}
 		
+		public NURBSSurface(double[][][] cm, int pDeg, int qDeg) {
+			controlMesh = cm;
+			p = pDeg;
+			q = qDeg;
+			int m = cm.length;
+			int n = cm[0].length;
+			U = NurbsSurfaceUtility.uniformKnotVector(m, pDeg);
+			V = NurbsSurfaceUtility.uniformKnotVector(n, qDeg);
+		}
+
 		/**
 		 * if this surface is no surface of revolution, then revDir = null
 		 */

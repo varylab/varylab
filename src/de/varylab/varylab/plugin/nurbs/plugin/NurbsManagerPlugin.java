@@ -84,20 +84,22 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
-import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
+import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
@@ -107,6 +109,7 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
@@ -252,8 +255,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					int dialogOk = JOptionPane.showConfirmDialog(
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
-						addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
-						pstool.addPointSelectionListener(curvatureLinesPanel);
+						NurbsSurfaceUtility.addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
 						double[][] umbilicalPoints = computeUmbilicalPoints();
 						
 						if(umbilicalPoints.length>0){
@@ -884,6 +886,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 		@Override
 		public void dataChanged(HalfedgeLayer layer) {
+			updateActiveNurbsSurface(layer);
 			layer.addTemporaryGeometry(integralCurvesRoot);
 			if(activeModel == null) {
 				if(layers2models.containsKey(layer)) {
@@ -936,7 +939,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 
 		private void updateActiveNurbsSurface(HalfedgeLayer layer) {
-			NurbsUVAdapter nurbsUVAdapter = layer.getAdapters().query(NurbsUVAdapter.class);
+			AdapterSet as = layer.getAdapters();
+			as.addAll(layer.getActiveVolatileAdapters());
+			NurbsUVAdapter nurbsUVAdapter = as.query(NurbsUVAdapter.class);
 			if(nurbsUVAdapter == null) {
 				nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
 			}
@@ -1139,7 +1144,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(curvatureLinesPanel);
 		pstool  = c.getPlugin(PointSelectionPlugin.class);
+		pstool.addPointSelectionListener(curvatureLinesPanel);
 		c.getPlugin(ExtractControlMesh.class);
+		c.getPlugin(NurbsSurfaceFromMesh.class);
+		c.getPlugin(VertexEditorPlugin.class);
+		c.getPlugin(QuadMeshGenerator.class);
 	}
 	
 	@Override
@@ -1195,6 +1204,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 	private double[][] computeUmbilicalPoints() {
 		AdapterSet as = hif.getAdapters();
+		as.addAll(hif.getActiveVolatileAdapters());
 		VHDS hds = hif.get(new VHDS());
 		umbilics = activeNurbsSurface.findUmbilics(hds, as);
 		double[][] uu = new double[umbilics.size()][];
@@ -1211,20 +1221,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		return upoints;
 		
-	}
-
-	private void addNurbsMesh(NURBSSurface surf, HalfedgeLayer layer, int u, int v) {
-		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
-		qmf.setGenerateVertexNormals(true);
-		qmf.setGenerateFaceNormals(true);
-		qmf.setGenerateEdgesFromFaces(true);
-		qmf.setULineCount(u);
-		qmf.setVLineCount(v);
-		qmf.setSurface(surf);
-		qmf.update();
-		layer.set(qmf.getGeometry());
-		layer.update();
-		layer.addAdapter(qmf.getUVAdapter(), false);
 	}
 	
 	public NURBSSurface getSelectedSurface() {
