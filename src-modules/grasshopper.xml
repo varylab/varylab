@@ -10,9 +10,9 @@
 		<category>Poweruser</category>
 	</manifest>
 	<description>
-		This plug-in lets you connect VaryLab the its Grasshopper component.
+		This plug-in lets you connect VaryLab with its Grasshopper components.
 		Exchange geometry data and do surface optimization in Grasshopper using
-		all of VaryLabs features. 
+		all of VaryLab's features. 
 	</description>
 	<plugin class="de.varylab.varylab.plugin.grasshopper.GrasshopperPlugin"/>
 
