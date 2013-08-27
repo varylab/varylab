@@ -52,6 +52,8 @@ public class GrasshopperPlugin extends Plugin {
 			socket = null;
 		private OptimizationPanel
 			optimizationPanel = null;
+		public static final String 
+			UTF8_BOM = "\uFEFF";
 		
 		public ComponentClient(Socket socket, OptimizationPanel optPanel) {
 			super("Grashopper Component@" + socket);
@@ -73,7 +75,7 @@ public class GrasshopperPlugin extends Plugin {
 			try {
 				String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 				String data = lineReader.readLine();
-				if (data.charAt(0) != '<') {
+				if (data.startsWith(UTF8_BOM)) {
 					data = data.substring(1);
 				}
 				if (data.startsWith("COMMAND GEOMETRY")) {
@@ -115,7 +117,7 @@ public class GrasshopperPlugin extends Plugin {
 				getLayer().set(RVLMeshUtility.toIndexedFaceSet(mesh));
 				log.info("mesh: " + mesh);
 			} catch (Exception e) {
-				log.warning("could not parse grashopper mesh: " + e);
+				log.warning("could not parse grashopper mesh: " + e + "\n" + xml.substring(0, 200) + "...");
 			}
 			JobListener jobListener = new JobListener() {
 				@Override
