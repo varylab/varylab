@@ -117,7 +117,7 @@ public class GrasshopperPlugin extends Plugin {
 				getLayer().set(RVLMeshUtility.toIndexedFaceSet(mesh));
 				log.info("mesh: " + mesh);
 			} catch (Exception e) {
-				log.warning("could not parse grashopper mesh: " + e + "\n" + xml.substring(0, 200) + "...");
+				log.warning("could not parse grasshopper mesh: " + e + "\n" + xml.substring(0, 200) + "...");
 			}
 			JobListener jobListener = new JobListener() {
 				@Override
