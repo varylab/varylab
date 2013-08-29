@@ -24,8 +24,8 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Length;
-import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -38,7 +38,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		panel = new JPanel();
 	
 	private SpinnerNumberModel
-		distanceModel = new SpinnerNumberModel(0.0,0.0,1.0,0.1);
+		distanceModel = new SpinnerNumberModel(0.0,0.0,Double.POSITIVE_INFINITY,0.1);
 	
 	private JSpinner
 		distanceSpinner = new JSpinner(distanceModel);
@@ -47,7 +47,9 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		identificationMap = new HashMap<Vertex<?,?,?>, Vertex<?,?,?>>();
 	
 	private JLabel
-		infoLabel = new JLabel("Vertex pairs found:");
+		infoLabel = new JLabel("Vertex pairs found:"),
+		minLengthLabel = new JLabel(),
+		minDistanceLabel = new JLabel();
 
 	private JCheckBox
 		noEdgeCollapseChecker = new JCheckBox("no edge collapse"),
@@ -56,6 +58,12 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 	private HalfedgeSelection 
 		oldSelection = null;
 	
+	private double[][] distances = null;
+
+	private double minEdgeLength;
+
+	private double minDistance;
+
 	public IdentifyVerticesPlugin() {
 		panel.setLayout(new GridBagLayout());
 
@@ -76,6 +84,10 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		panel.add(boundaryOnlyChecker,gbc2);
 		noEdgeCollapseChecker.setSelected(true);
 		boundaryOnlyChecker.setSelected(true);
+		panel.add(new JLabel("minimum edge length"),gbc1);
+		panel.add(minLengthLabel, gbc2);
+		panel.add(new JLabel("minimum vertex distance"),gbc1);
+		panel.add(minDistanceLabel, gbc2);
 		panel.add(new JLabel("Distance"), gbc1);
 		panel.add(distanceSpinner, gbc2);
 		
@@ -99,8 +111,12 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 				}
 
 				Vertex<?,?,?> w = identificationMap.get(v);
-
-				StitchingUtility.stitch(hds, (V)v, (V)w, da);
+				E edge = HalfEdgeUtils.findEdgeBetweenVertices((V)v,(V)w);
+				if(edge != null) {
+					TopologyAlgorithms.collapseEdge(edge);
+				} else {
+					StitchingUtility.stitch(hds, (V)v, (V)w, da);
+				}
 				alreadyMerged.add(v);
 				alreadyMerged.add(w);
 			}
@@ -108,6 +124,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 			hif.set(hds);
 		}
 		hif.setSelection(oldSelection);
+		distances = null;
 	}
 
 	@Override
@@ -184,9 +201,8 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 						continue;
 					}
 					if(v.getIndex() < w.getIndex()) {
-						double dist = Rn.euclideanDistance(a.get(Position3d.class, v), a.get(Position.class, w));
-						System.out.println(v +" - "+w+": "+dist);
-						if(dist <= distance) {
+//						System.out.println(v +" - "+w+": "+dist);
+						if(distances[w.getIndex()][v.getIndex()] <= distance) {
 							if(noEdgeCollapseChecker.isSelected()) {
 								if(HalfEdgeUtils.findEdgeBetweenVertices(v, w) != null) {
 									continue;
@@ -220,17 +236,31 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
+		distances = new double[hds.numVertices()][];
 		oldSelection = hcp.getSelection();
-		double minEdgeLength = Double.POSITIVE_INFINITY;
+		minEdgeLength = Double.POSITIVE_INFINITY;
+		minDistance = Double.POSITIVE_INFINITY;
 		for(E e : hds.getPositiveEdges()) {
 			double length = a.get(Length.class, e, Double.class);
 			if(length < minEdgeLength) {
 				minEdgeLength = length;
 			}
 		}
-//		distanceModel.setMaximum(5*minEdgeLength);
-//		distanceModel.setStepSize(minEdgeLength/5.0);
-//		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-//		calculateAndShowIdentification(hds,hcp, da);
+		for(int i = 0; i < hds.numVertices(); ++i) {
+			for(int j = 0; j < i; ++j) {
+				if(j == 0) {
+					distances[i] = new double[i];			
+				}
+				double[] 
+						pi = a.getD(Position3d.class, hds.getVertex(i)),
+						pj = a.getD(Position3d.class, hds.getVertex(j));
+				distances[i][j] = Rn.euclideanDistance(pi, pj);
+				if(distances[i][j] < minDistance) {
+					minDistance = distances[i][j];
+				}
+			}
+		}
+		minLengthLabel.setText(Double.toString(minEdgeLength));
+		minDistanceLabel.setText(Double.toString(minDistance));
 	}
 }
