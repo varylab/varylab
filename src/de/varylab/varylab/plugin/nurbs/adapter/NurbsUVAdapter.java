@@ -10,7 +10,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
+import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 @NurbsUVCoordinate
 public class NurbsUVAdapter extends AbstractAdapter<double[]> {

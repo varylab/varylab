@@ -43,8 +43,8 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
@@ -159,6 +159,8 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				activeModel.addTableModelListener(this);
 				layers2models.put(layer,activeModel);
 			}
+		} else {
+			activeModel.clear();
 		}
 		updateTool(layer);
 		activeModel.fireTableDataChanged();

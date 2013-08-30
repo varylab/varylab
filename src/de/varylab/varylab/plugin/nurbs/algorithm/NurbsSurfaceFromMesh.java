@@ -10,6 +10,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import de.jreality.math.Rn;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -21,6 +22,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.SelectionUtility;
 
@@ -32,8 +34,8 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 	private SpinnerNumberModel 
 		uDegree = new SpinnerNumberModel(3, 1, Integer.MAX_VALUE, 1),
 		vDegree = new SpinnerNumberModel(3, 1, Integer.MAX_VALUE, 1),
-		uSteps = new SpinnerNumberModel(3, 1, Integer.MAX_VALUE, 1),
-		vSteps = new SpinnerNumberModel(3, 1, Integer.MAX_VALUE, 1);
+		uSteps = new SpinnerNumberModel(21, 1, Integer.MAX_VALUE, 1),
+		vSteps = new SpinnerNumberModel(21, 1, Integer.MAX_VALUE, 1);
 	
 	private JSpinner
 		uStepSpinner = new JSpinner(uSteps),
@@ -85,6 +87,8 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 			controlMesh = createControlMesh(hds,a);
 			uDegree.setMaximum(m-1);
 			vDegree.setMaximum(n-1);
+			uDegree.setValue(Math.min(uDegree.getNumber().intValue(), m-1));
+			vDegree.setValue(Math.min(vDegree.getNumber().intValue(), n-1));
 		} else {
 			throw new RuntimeException("The mesh on the active layer does not have the correct combinatorics.");
 		}
@@ -108,20 +112,25 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 		}
 		double[][][] cm = new double[m][n][4];
 		e = startEdge.getNextEdge();
+		NurbsWeightAdapter nwa = as.query(NurbsWeightAdapter.class);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m - 1; j++) {
 				v = e.getStartVertex();
 				System.arraycopy(as.getD(Position3d.class, v), 0, cm[j][i], 0, 3);
-				// TODO: add weights
-				cm[j][i][3] = 1;
+				cm[j][i][3] = 1.0;
+				if((nwa != null)) {
+					Rn.times(cm[j][i], nwa.getV(v, null), cm[j][i]);
+				} 
 				if(j < m-2) {
 					e = getNextInRowTraversal(e);
 				}
 			}
 			v = e.getTargetVertex();
 			System.arraycopy(as.getD(Position3d.class, v), 0, cm[m-1][i], 0, 3);
-			//TODO: add weights
-			cm[m-1][i][3] = 1;
+			cm[m-1][i][3] = 1.0;
+			if((nwa != null)) {
+				Rn.times(cm[m-1][i], nwa.getV(v, null), cm[m-1][i]);
+			} 
 			startEdge = startEdge.getPreviousEdge();
 			if(i < n-2) {
 				e = startEdge.getOppositeEdge().getPreviousEdge().getOppositeEdge();

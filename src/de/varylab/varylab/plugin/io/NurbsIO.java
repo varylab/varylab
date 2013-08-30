@@ -1,6 +1,8 @@
 package de.varylab.varylab.plugin.io;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
@@ -369,5 +371,18 @@ public class NurbsIO {
 			}
 		}
 		return ns;
+	}
+
+
+	public static void writeOBJ(NURBSSurface activeNurbsSurface, File file) {
+		try {
+			FileWriter out = new FileWriter(file);
+			out.write(activeNurbsSurface.toObj());
+			out.close();
+		} catch (Exception e1) {
+			System.err.println("Could not write to file " + file);
+			e1.printStackTrace();
+		}
+		
 	}
 }

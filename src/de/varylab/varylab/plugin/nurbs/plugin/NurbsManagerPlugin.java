@@ -8,11 +8,13 @@ import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -31,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -96,8 +97,8 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
-import de.varylab.varylab.plugin.nurbs.NurbsUVCoordinate;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
@@ -110,6 +111,7 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
+import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
@@ -122,8 +124,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private JFileChooser 
 		chooser = new JFileChooser();
 	
-	private Action
-		importAction = new ImportAction();
 	
 	private GeodesicPanel
 		geodesicPanel = new GeodesicPanel();
@@ -135,7 +135,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		pointDistancePanel = new PointDistancePanel();
 	
 	private JButton
-		importButton = new JButton(importAction);
+		exportButton = new JButton(new ExportAction()),
+		importButton = new JButton(new ImportAction());
 	
 	private JToolBar
 		surfaceToolbar = new JToolBar();
@@ -157,13 +158,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		
 		configureFileChooser();
-		importButton.setToolTipText("Load Nurbs surface");
-		
 		JPanel tablePanel = new JPanel();
 		tablePanel.setLayout(new GridLayout());
 		
-		surfaceToolbar.add(new JLabel("Import Nurbs Surface "));
-		surfaceToolbar.add(importAction);
+		surfaceToolbar.add(new JLabel("NURBS surface"));
+		surfaceToolbar.add(importButton);
+		surfaceToolbar.add(exportButton);
+		exportButton.setEnabled(false);
 		surfaceToolbar.setFloatable(false);
 		
 		c.weighty = 0.0;
@@ -191,23 +192,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			@Override
 			public String getDescription() {
 				return "Wavefront OBJ (*.obj)";
-			}
-			
-			@Override
-			public String toString() {
-				return getDescription();
-			}
-		});
-
-		chooser.addChoosableFileFilter(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(".obj");
-			}
-
-			@Override
-			public String getDescription() {
-				return "Halfedge Geomtry (*.obj)";
 			}
 			
 			@Override
@@ -318,6 +302,53 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			public int getV() {
 				return vModel.getNumber().intValue();
+			}
+		}
+	}
+	
+	
+	private class ExportAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ExportAction() {
+			putValue(NAME, "Export");
+			putValue(SMALL_ICON, ImageHook.getIcon("disk.png"));
+			putValue(SHORT_DESCRIPTION, "Export NURBS Surface");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+			chooser.setDialogTitle("Export Layer Geometry");
+			chooser.setPreferredSize(new Dimension(800, 700));
+			int result = chooser.showSaveDialog(w);
+			if (result != JFileChooser.APPROVE_OPTION)
+				return;
+			File file = chooser.getSelectedFile();
+
+			String name = file.getName().toLowerCase();
+			if (!name.endsWith(".obj")) {
+				file = new File(file.getAbsoluteFile() + ".obj");
+			}
+			if (file.exists()) {
+				int result2 = JOptionPane.showConfirmDialog(w,
+						"File " + file.getName() + " exists. Overwrite?",
+						"Overwrite?", YES_NO_OPTION);
+				if (result2 != JOptionPane.YES_OPTION)
+					return;
+			}
+			try {
+				NurbsIO.writeOBJ(activeNurbsSurface,file);
+			} catch (final Exception ex) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(w, ex.getMessage(), ex
+								.getClass().getSimpleName(), ERROR_MESSAGE);
+					}
+				};
+				EventQueue.invokeLater(r);
 			}
 		}
 	}
@@ -718,8 +749,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
 			umbilicStop = Math.pow(10, umbilicStop);
 			
-			List<double[]> boundaryVertices = activeNurbsSurface.getBoundaryVerticesUV();
-			double scale = Rn.euclideanDistance(boundaryVertices.get(0), boundaryVertices.get(2));
+			//List<double[]> boundaryVertices = activeNurbsSurface.getBoundaryVerticesUV();
+			double scale = 1.0; //Rn.euclideanDistance(boundaryVertices.get(0), boundaryVertices.get(2));
 			tol *= scale;
 			umbilicStop *= scale;
 			
@@ -897,16 +928,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					activeModel.addTableModelListener(this);
 					layers2models.put(layer,activeModel);
 				}
+			} else {
+				activeModel.clear();
 			}
 			activeModel.fireTableDataChanged();
 		}
-
-//		private void resetLines() {
-//			integralCurvesRoot.removeAllChildren();
-//			activeModel.clear();
-//			activeModel.fireTableDataChanged();
-//		}
-
 
 		@Override
 		public void adaptersChanged(HalfedgeLayer layer) {
@@ -936,23 +962,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			updateActiveNurbsSurface(active);
 			activeModel.fireTableDataChanged();
 		}
-
-
-		private void updateActiveNurbsSurface(HalfedgeLayer layer) {
-			AdapterSet as = layer.getAdapters();
-			as.addAll(layer.getActiveVolatileAdapters());
-			NurbsUVAdapter nurbsUVAdapter = as.query(NurbsUVAdapter.class);
-			if(nurbsUVAdapter == null) {
-				nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
-			}
-			
-			if(nurbsUVAdapter != null) {
-				activeNurbsSurface = nurbsUVAdapter.getSurface(); 
-			} else {
-				activeNurbsSurface = null;
-			}
-		}
-
 
 		@Override
 		public void layerCreated(HalfedgeLayer layer) {
@@ -1143,6 +1152,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(curvatureLinesPanel);
+		hif.addAdapter(new NurbsWeightAdapter(), true);
 		pstool  = c.getPlugin(PointSelectionPlugin.class);
 		pstool.addPointSelectionListener(curvatureLinesPanel);
 		c.getPlugin(ExtractControlMesh.class);
@@ -1202,6 +1212,30 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 	}
 
+	private void updateActiveNurbsSurface(HalfedgeLayer layer) {
+		AdapterSet as = layer.getAdapters();
+		as.addAll(layer.getActiveVolatileAdapters());
+		NurbsUVAdapter nurbsUVAdapter = as.query(NurbsUVAdapter.class);
+		if(nurbsUVAdapter == null) {
+			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
+		}
+		
+		if(nurbsUVAdapter != null) {
+			activeNurbsSurface = nurbsUVAdapter.getSurface();
+			// TODO: this should not be needed.
+			double[][] umbilicalPoints = computeUmbilicalPoints();
+			
+			if(umbilicalPoints.length>0){
+				addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
+			}
+		} else {
+			activeNurbsSurface = null;
+		}
+		exportButton.setEnabled(nurbsUVAdapter != null);
+		
+
+	}
+	
 	private double[][] computeUmbilicalPoints() {
 		AdapterSet as = hif.getAdapters();
 		as.addAll(hif.getActiveVolatileAdapters());

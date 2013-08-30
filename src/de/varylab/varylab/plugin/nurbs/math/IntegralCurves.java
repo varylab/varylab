@@ -290,11 +290,9 @@ public class IntegralCurves {
 	// double[] b = { 0,1/5., 3/10.,4/5.,8/9.,1,1 };
 	LinkedList<double[]> u = new LinkedList<double[]>();
 	int dim = y0.length;
-	double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] -
-	ns.getUKnotVector()[ns.getUKnotVector().length - 1]),
-	Math.abs(ns.getVKnotVector()[0] -
-	ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
-	double h = maxDist / 50;
+	double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] -	ns.getUKnotVector()[ns.getUKnotVector().length - 1]),
+	Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
+	double h = tol*maxDist;
 	double tau;
 	double vau;
 	double [] vec1 = new double[2];
@@ -411,10 +409,9 @@ public class IntegralCurves {
 			}
 		}
 		if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
-			double hOld = h;
 			h = h * Math.sqrt(tol * vau / tau);
-			if(h > maxDist / 2){
-				h = hOld;
+			if(h > tol*maxDist){
+				h = tol*maxDist;
 			}
 		}
 		if(u.size() == 2){
