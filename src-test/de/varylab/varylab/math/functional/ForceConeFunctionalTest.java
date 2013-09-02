@@ -35,8 +35,8 @@ public class ForceConeFunctionalTest extends FunctionalTest<VVertex, VEdge, VFac
 		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v4);
 		HalfEdgeUtils.constructFaceByVertices(hds, v2,v3,v4);
 		HalfEdgeUtils.constructFaceByVertices(hds, v3,v1,v4);
-		v1.P = new double[] {0.0,0.0,0.0};
-		v2.P = new double[] {1.0,0.0,0.0};
+		v1.P = new double[] {0,0.,0.2};
+		v2.P = new double[] {1.0,0.,0.1};
 		v3.P = new double[] {0.0, 1.0, 0.0};
 		v4.P = new double[] {rnd.nextDouble(),rnd.nextDouble(),rnd.nextDouble()};
 				

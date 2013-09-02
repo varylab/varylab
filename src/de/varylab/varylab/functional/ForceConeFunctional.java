@@ -39,6 +39,12 @@ public class ForceConeFunctional <
 		distanceTerm = 0,
 		vertexTerm = 0;
 
+	public final Double 
+		coneAngle = Math.PI/6,
+		cAF = Math.tan(coneAngle) * Math.tan(coneAngle);
+		
+	public Double[]
+			coneAngles;
 	
 	@Override
 	public <
@@ -52,7 +58,11 @@ public class ForceConeFunctional <
 		double fac;
 		double check = 0.;
 		int numc = 0;
-		
+		coneAngles = new Double[hds.getVertices().size()];
+		for (int i = 0; i < coneAngles.length; i++) {
+			//coneAngles[i] = Math.pow(Math.tan(Math.random()*Math.PI/4),2);
+			coneAngles[i] = cAF;
+		}
 		/*
 		 * 
 		 * Cone energy
@@ -64,21 +74,21 @@ public class ForceConeFunctional <
 			getPosition(vi, x, pvi);
 			Rn.subtract(veci, pv, pvi);
 			if (E != null) {
-				E.add(Math.pow(veci[0]*veci[0] + veci[1]*veci[1] - veci[2]*veci[2],2));
+				E.add(Math.pow(veci[0]*veci[0] + veci[1]*veci[1] -  coneAngles[v.getIndex()]* veci[2]*veci[2],2));
 				if(Math.abs(Math.atan(veci[2]*veci[2]/ (veci[0]*veci[0] + veci[1]*veci[1]))-Math.atan(1)) > 0.1){
 					check += Math.abs(Math.atan(veci[2]*veci[2]/ (veci[0]*veci[0] + veci[1]*veci[1]))-Math.atan(1));
 					numc++;
 				}
 			}
 			if (G != null) {
-				fac =2*(veci[0]*veci[0] + veci[1]*veci[1] - veci[2]*veci[2]);
+				fac =2*(veci[0]*veci[0] + veci[1]*veci[1] - coneAngles[v.getIndex()]* veci[2]*veci[2]);
 				G.add(3*v.getIndex(), 2*veci[0]*fac);
 				G.add(3*v.getIndex()+1, 2*veci[1]*fac);
-				G.add(3*v.getIndex()+2, -2*veci[2]*fac);
+				G.add(3*v.getIndex()+2, -2*cAF* veci[2]*fac);
 				
 				G.add(3*vi.getIndex(), -2*veci[0]*fac);
 				G.add(3*vi.getIndex()+1, -2*veci[1]*fac);
-				G.add(3*vi.getIndex()+2, 2*veci[2]*fac);
+				G.add(3*vi.getIndex()+2, 2*coneAngles[v.getIndex()]* veci[2]*fac);
 			}
 		}
 		
@@ -306,13 +316,13 @@ public class ForceConeFunctional <
 	
 						getPosition(v1, x, pv);
 						getPosition(v2, x, pvi);
-						double f = 0.01;
+						double f = 1.;
 						if (E != null) {			
-							E.add(f/Math.pow(0.1 + Rn.euclideanDistanceSquared(pv, pvi),1));
+							E.add(f/Math.pow(0.00001 + Rn.euclideanDistanceSquared(pv, pvi),1));
 						}
 						
 						if (G != null) {
-							fac = -f/ Math.pow(0.1 + Rn.euclideanDistanceSquared(pv, pvi),2) ;
+							fac = -f/ Math.pow(0.00001 + Rn.euclideanDistanceSquared(pv, pvi),2) ;
 							G.add(3*v1.getIndex(),	f* fac * 2*(pv[0]-pvi[0]));
 							G.add(3*v1.getIndex()+1,f* fac * 2*(pv[1]-pvi[1]));
 							G.add(3*v1.getIndex()+2,f* fac * 2*(pv[2]-pvi[2]));
@@ -366,16 +376,16 @@ public class ForceConeFunctional <
 					V v2 = e.getTargetVertex();
 					getPosition(v1, x, pv);
 					getPosition(v2, x, pvi);
-					
+					System.out.println("z small");
 					if (E != null) {			
-						E.add( -  Math.pow(pv[2] - pvi[2],2) ) ;
+						E.add( -  Math.pow(pv[2] - pvi[2],4) ) ;
 					}
 					
 					if (G != null) {
 						
-						G.add(3*v1.getIndex()+2, - 2*(pv[2]-pvi[2]));
+						G.add(3*v1.getIndex()+2, - 4* Math.pow(pv[2] - pvi[2],3));
 	
-						G.add(3*v2.getIndex()+2,  2*(pv[2]-pvi[2]));
+						G.add(3*v2.getIndex()+2,  4* Math.pow(pv[2] - pvi[2],3));
 					}
 				}
 				break;

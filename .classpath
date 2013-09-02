@@ -6,13 +6,18 @@
 	<classpathentry kind="src" path="src-website"/>
 	<classpathentry kind="src" path="src-resource"/>
 	<classpathentry kind="src" path="src-modules"/>
+	<classpathentry kind="src" path="exp"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar" sourcepath="/Substance"/>
 	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/jpetsctao.jar" sourcepath="/jTao"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedge.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedgetools.jar" sourcepath="/halfedgetools"/>
-	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
+	<classpathentry kind="lib" path="lib/jreality/jReality.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www3.math.tu-berlin.de/jreality/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/ellipticFunctions.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/mfc.jar"/>
