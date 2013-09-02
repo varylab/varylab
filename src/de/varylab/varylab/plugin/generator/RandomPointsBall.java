@@ -144,6 +144,7 @@ public class RandomPointsBall extends AlgorithmPlugin {
 	> void extractHyperbolicFaces(HDS hds, AdapterSet as) {
 		HashSet<F> hyperbolicFaces = new HashSet<F>();
 		TreeSet<E> hyperbolicEdges = new TreeSet<E>(new Comparator<E>(){
+			@Override
 			public int compare(E a, E b){
 				int v1 = a.getStartVertex().getIndex();
 				int v2 = a.getTargetVertex().getIndex();
