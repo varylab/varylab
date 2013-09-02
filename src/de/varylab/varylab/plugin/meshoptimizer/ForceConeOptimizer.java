@@ -62,10 +62,10 @@ public class ForceConeOptimizer extends VarylabOptimizerPlugin {
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
 		functional.setUseAngleTerm(angleChecker.isSelected());
 		functional.setAngleTerm(angleTermCombo.getSelectedIndex());
-		functional.setUseAngleTerm(distanceChecker.isSelected());
-		functional.setAngleTerm(distanceTermCombo.getSelectedIndex());
-		functional.setUseAngleTerm(vertexChecker.isSelected());
-		functional.setAngleTerm(vertexTermCombo.getSelectedIndex());
+		functional.setUseDistanceTerm(distanceChecker.isSelected());
+		functional.setDistanceTerm(distanceTermCombo.getSelectedIndex());
+		functional.setUseVertexTerm(vertexChecker.isSelected());
+		functional.setVertexTerm(vertexTermCombo.getSelectedIndex());
 		return functional;
 	}
 	
