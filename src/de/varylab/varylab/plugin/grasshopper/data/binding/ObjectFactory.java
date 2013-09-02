@@ -1,8 +1,8 @@
 //
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Ã„nderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2013.09.02 um 12:03:23 PM CEST 
+// Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+// Generiert: 2013.09.02 um 03:28:08 PM CEST 
 //
 
 
@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _RVLLineSet_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLLineSet");
+    private final static QName _RVLMesh_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLMesh");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: de.varylab.varylab.plugin.grasshopper.data.binding
@@ -49,11 +50,35 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RVLMesh }
+     * 
+     */
+    public RVLMesh createRVLMesh() {
+        return new RVLMesh();
+    }
+
+    /**
+     * Create an instance of {@link Face }
+     * 
+     */
+    public Face createFace() {
+        return new Face();
+    }
+
+    /**
      * Create an instance of {@link Vertex }
      * 
      */
     public Vertex createVertex() {
         return new Vertex();
+    }
+
+    /**
+     * Create an instance of {@link FaceList }
+     * 
+     */
+    public FaceList createFaceList() {
+        return new FaceList();
     }
 
     /**
@@ -87,6 +112,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLLineSet")
     public JAXBElement<RVLLineSet> createRVLLineSet(RVLLineSet value) {
         return new JAXBElement<RVLLineSet>(_RVLLineSet_QNAME, RVLLineSet.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RVLMesh }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLMesh")
+    public JAXBElement<RVLMesh> createRVLMesh(RVLMesh value) {
+        return new JAXBElement<RVLMesh>(_RVLMesh_QNAME, RVLMesh.class, null, value);
     }
 
 }

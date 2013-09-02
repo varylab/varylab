@@ -6,7 +6,15 @@
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 >
+	<element name="RVLMesh" type="rvl:RVLMesh"/>
 	<element name="RVLLineSet" type="rvl:RVLLineSet"/>
+
+	<complexType name="RVLMesh">
+		<sequence>
+			<element name="Faces" type="rvl:face_list"/>
+			<element name="Vertices" type="rvl:vertex_list"/>
+		</sequence>
+	</complexType>
 
 	<complexType name="RVLLineSet">
 		<sequence>
@@ -25,6 +33,23 @@
 		<sequence>
 			<element name="A" type="int"/>
 			<element name="B" type="int"/>
+		</sequence>
+	</complexType>
+
+
+	<complexType name="face_list">
+		<sequence>
+			<element name="Face" type="rvl:face" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="face">
+		<sequence>
+			<element name="A" type="int"/>
+			<element name="B" type="int"/>
+			<element name="C" type="int"/>
+			<element name="D" type="int"/>
+			<element name="isTriangle" type="boolean"/>
 		</sequence>
 	</complexType>
 

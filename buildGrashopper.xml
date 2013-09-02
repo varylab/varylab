@@ -23,17 +23,8 @@
 	<target name="compile jaxb classes">
 		<property name="src" value="src/de/varylab/varylab/plugin/grasshopper/data"/>
 		<xjc 
-			schema="${src}/rvlmesh.xsd" 
-			binding="${src}/rvlmesh.xjb"
-			destdir="src"
-			package="de.varylab.varylab.plugin.grasshopper.data.binding"
-			extension="false"
-		>
-			<produces dir="${src}/binding" includes="*"/>
-		</xjc>
-		<xjc 
-			schema="${src}/rvllineset.xsd" 
-			binding="${src}/rvllineset.xjb"
+			schema="${src}/rvldata.xsd" 
+			binding="${src}/rvldata.xjb"
 			destdir="src"
 			package="de.varylab.varylab.plugin.grasshopper.data.binding"
 			extension="false"

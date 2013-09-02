@@ -19,10 +19,15 @@ import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.job.Job;
 import de.jreality.plugin.job.JobListener;
 import de.jreality.util.NativePathUtility;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.halfedge.VHDS;
@@ -47,7 +52,8 @@ public class GrasshopperPlugin extends Plugin {
 		layer = null;
 	protected static final int 
 		SERVER_PORT = 6789;
-	
+	private HalfedgeSelection
+		selection = new HalfedgeSelection();
 		
 	private class ComponentClient extends Thread {
 			
@@ -125,7 +131,33 @@ public class GrasshopperPlugin extends Plugin {
 			out.close();
 		}
 		
+		private void storeSelection() {
+			selection = new HalfedgeSelection(getLayer().getSelection());
+		}
+		
+		private void restoreSelection() {
+			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
+			HalfedgeSelection result = new HalfedgeSelection();
+			for (Face<?,?,?> f : selection.getFaces()) {
+				if (f.getIndex() < hds.numFaces()) {
+					result.add(hds.getFace(f.getIndex()));
+				}
+			}
+			for (Edge<?,?,?> e : selection.getEdges()) {
+				if (e.getIndex() < hds.numEdges()) {
+					result.add(hds.getEdge(e.getIndex()));
+				}
+			}
+			for (Vertex<?,?,?> v : selection.getVertices()) {
+				if (v.getIndex() < hds.numVertices()) {
+					result.add(hds.getVertex(v.getIndex()));
+				}
+			}
+			getLayer().setSelection(result);
+		}
+		
 		public void doOptimization(String xml, final OutputStream out) throws IOException {
+			storeSelection();
 			StringReader xmlReader = new StringReader(xml);
 			String startXML = xml.substring(0, 100);
 			final AtomicBoolean isMesh = new AtomicBoolean(true);
@@ -154,6 +186,7 @@ public class GrasshopperPlugin extends Plugin {
 				out.close();
 				return;
 			}
+			restoreSelection();
 			JobListener jobListener = new JobListener() {
 				@Override
 				public void jobStarted(Job arg0) {

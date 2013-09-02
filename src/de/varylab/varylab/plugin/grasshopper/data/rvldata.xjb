@@ -2,7 +2,7 @@
 <bindings version="2.1"
 	 xmlns="http://java.sun.com/xml/ns/jaxb"
 	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	 schemaLocation = "rvllineset.xsd"
+	 schemaLocation = "rvldata.xsd"
  >
 
  	

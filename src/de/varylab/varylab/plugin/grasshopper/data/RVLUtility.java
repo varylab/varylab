@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.math.Rn;
@@ -29,6 +30,7 @@ import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Vertex;
 import de.varylab.varylab.plugin.grasshopper.data.binding.VertexList;
+import de.varylab.varylab.utilities.NodeIndexComparator;
 
 public class RVLUtility {
 
@@ -147,7 +149,7 @@ public class RVLUtility {
 			if (grouped.contains(v)) continue;
 			double[] pos = a.getD(Position3d.class, v);
 			int counter = 1;
-			Set<VVertex> group = new HashSet<VVertex>();
+			Set<VVertex> group = new TreeSet<VVertex>(new NodeIndexComparator<VVertex>());
 			vertexGroups.add(group);
 			grouped.add(v);
 			group.add(v);
