@@ -31,6 +31,15 @@
 		>
 			<produces dir="${src}/binding" includes="*"/>
 		</xjc>
+		<xjc 
+			schema="${src}/rvllineset.xsd" 
+			binding="${src}/rvllineset.xjb"
+			destdir="src"
+			package="de.varylab.varylab.plugin.grasshopper.data.binding"
+			extension="false"
+		>
+			<produces dir="${src}/binding" includes="*"/>
+		</xjc>
 	</target>
 	
 

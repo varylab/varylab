@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema 
+	xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://schemas.datacontract.org/2004/07/GHVaryLab"
+	xmlns:rvl="http://schemas.datacontract.org/2004/07/GHVaryLab" 
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+>
+	<element name="RVLLineSet" type="rvl:RVLLineSet"/>
+
+	<complexType name="RVLLineSet">
+		<sequence>
+			<element name="Lines" type="rvl:line_list"/>
+			<element name="Vertices" type="rvl:vertex_list"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="line_list">
+		<sequence>
+			<element name="Line" type="rvl:line" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="line">
+		<sequence>
+			<element name="A" type="int"/>
+			<element name="B" type="int"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="vertex_list">
+		<sequence>
+			<element name="Vertex" type="rvl:vertex" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="vertex">
+		<sequence>
+			<element name="X" type="double"/>
+			<element name="Y" type="double"/>
+			<element name="Z" type="double"/>
+			<element name="ID" type="int"/>
+		</sequence>
+	</complexType>
+
+</schema>

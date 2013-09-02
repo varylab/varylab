@@ -17,16 +17,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für vertex_list complex type.
+ * <p>Java-Klasse für line_list complex type.
  * 
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="vertex_list">
+ * &lt;complexType name="line_list">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Vertex" type="{http://schemas.datacontract.org/2004/07/GHVaryLab}vertex" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Line" type="{http://schemas.datacontract.org/2004/07/GHVaryLab}line" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -36,41 +36,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "vertex_list", propOrder = {
-    "vertex"
+@XmlType(name = "line_list", propOrder = {
+    "line"
 })
-public class VertexList {
+public class LineList {
 
-    @XmlElement(name = "Vertex")
-    protected List<Vertex> vertex;
+    @XmlElement(name = "Line")
+    protected List<Line> line;
 
     /**
-     * Gets the value of the vertex property.
+     * Gets the value of the line property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the vertex property.
+     * This is why there is not a <CODE>set</CODE> method for the line property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getVertex().add(newItem);
+     *    getLine().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Vertex }
+     * {@link Line }
      * 
      * 
      */
-    public List<Vertex> getVertex() {
-        if (vertex == null) {
-            vertex = new ArrayList<Vertex>();
+    public List<Line> getLine() {
+        if (line == null) {
+            line = new ArrayList<Line>();
         }
-        return this.vertex;
+        return this.line;
     }
 
 }

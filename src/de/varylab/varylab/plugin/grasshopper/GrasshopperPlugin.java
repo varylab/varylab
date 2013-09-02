@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import de.jreality.plugin.JRViewer;
@@ -27,8 +28,10 @@ import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.VarylabMain;
+import de.varylab.varylab.plugin.grasshopper.data.RVLLineSetFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLMeshFactory;
-import de.varylab.varylab.plugin.grasshopper.data.RVLMeshUtility;
+import de.varylab.varylab.plugin.grasshopper.data.RVLUtility;
+import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
@@ -87,7 +90,7 @@ public class GrasshopperPlugin extends Plugin {
 						log.warning("layer selection not yet implemented");
 					}
 					OutputStream out = socket.getOutputStream();
-					writeHDS(hds, out);
+					writeHDSAsMesh(hds, out);
 				} else {
 					String xml = xmlHeader + data;
 					OutputStream out = socket.getOutputStream();
@@ -98,10 +101,22 @@ public class GrasshopperPlugin extends Plugin {
 			}
 		}
 		
-		public void writeHDS(VHDS hds, OutputStream out) throws Exception {
+		public void writeHDSAsLineSet(VHDS hds, OutputStream out) throws Exception {
 			AdapterSet aSet = AdapterSet.createGenericAdapters();
 			aSet.addAll(getLayer().getAdapters());
-			RVLMesh mesh = RVLMeshUtility.toRVLMesh(hds, aSet);
+			RVLLineSet lineSet = RVLUtility.toRVLLineSet(hds, aSet);
+			String xml = RVLLineSetFactory.lineSetToXML(lineSet);
+			OutputStreamWriter outWriter = new OutputStreamWriter(out);
+			outWriter.write(xml + "\r\n");
+			outWriter.flush();
+			outWriter.close();
+			out.close();
+		}
+		
+		public void writeHDSAsMesh(VHDS hds, OutputStream out) throws Exception {
+			AdapterSet aSet = AdapterSet.createGenericAdapters();
+			aSet.addAll(getLayer().getAdapters());
+			RVLMesh mesh = RVLUtility.toRVLMesh(hds, aSet);
 			String xml = RVLMeshFactory.meshToXML(mesh);
 			OutputStreamWriter outWriter = new OutputStreamWriter(out);
 			outWriter.write(xml + "\r\n");
@@ -111,13 +126,33 @@ public class GrasshopperPlugin extends Plugin {
 		}
 		
 		public void doOptimization(String xml, final OutputStream out) throws IOException {
-			try {
-				StringReader xmlReader = new StringReader(xml);
-				RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
-				getLayer().set(RVLMeshUtility.toIndexedFaceSet(mesh));
-				log.info("mesh: " + mesh);
-			} catch (Exception e) {
-				log.warning("could not parse grasshopper mesh: " + e + "\n" + xml.substring(0, 200) + "...");
+			StringReader xmlReader = new StringReader(xml);
+			String startXML = xml.substring(0, 100);
+			final AtomicBoolean isMesh = new AtomicBoolean(true);
+			if (startXML.contains("RVLMesh")) {
+				try {
+					RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
+					getLayer().set(RVLUtility.toIndexedFaceSet(mesh));
+					log.info("mesh: " + mesh);
+					isMesh.set(true);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper mesh: " + e + "\n" + startXML + "...");
+				}
+			} else 
+			if (startXML.contains("RVLLineSet")){
+				try {
+					RVLLineSet lineSet = RVLLineSetFactory.loadRVLLineSet(xmlReader);
+					VHDS hds = RVLUtility.toHDS(lineSet);
+					getLayer().set(hds);
+					log.info("line set: " + lineSet);
+					isMesh.set(false);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper line set: " + e + "\n" + startXML + "...");
+				}
+			} else {
+				log.warning("data type not recognized: " + startXML +"...");
+				out.close();
+				return;
 			}
 			JobListener jobListener = new JobListener() {
 				@Override
@@ -135,7 +170,11 @@ public class GrasshopperPlugin extends Plugin {
 						public void run() {
 							try {
 								VHDS hds = getLayer().get(new VHDS());
-								writeHDS(hds, out);
+								if (isMesh.get()) {
+									writeHDSAsMesh(hds, out);
+								} else {
+									writeHDSAsLineSet(hds, out);
+								}
 							} catch (Exception e) {
 								log.warning("error writing response: " + e);
 							}							

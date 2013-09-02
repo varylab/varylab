@@ -1,8 +1,8 @@
 //
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Ã„nderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2013.08.20 um 05:58:43 PM CEST 
+// Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+// Generiert: 2013.09.01 um 11:23:47 AM CEST 
 //
 
 
@@ -17,7 +17,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the de.varylab.varylab.plugin.grashopper.data.binding package. 
+ * generated in the de.varylab.varylab.plugin.grasshopper.data.binding package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -31,29 +31,21 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _RVLMesh_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLMesh");
+    private final static QName _RVLLineSet_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLLineSet");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: de.varylab.varylab.plugin.grashopper.data.binding
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: de.varylab.varylab.plugin.grasshopper.data.binding
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link RVLMesh }
+     * Create an instance of {@link RVLLineSet }
      * 
      */
-    public RVLMesh createRVLMesh() {
-        return new RVLMesh();
-    }
-
-    /**
-     * Create an instance of {@link Face }
-     * 
-     */
-    public Face createFace() {
-        return new Face();
+    public RVLLineSet createRVLLineSet() {
+        return new RVLLineSet();
     }
 
     /**
@@ -65,11 +57,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link FaceList }
+     * Create an instance of {@link Line }
      * 
      */
-    public FaceList createFaceList() {
-        return new FaceList();
+    public Line createLine() {
+        return new Line();
     }
 
     /**
@@ -81,12 +73,20 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RVLMesh }{@code >}}
+     * Create an instance of {@link LineList }
      * 
      */
-    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLMesh")
-    public JAXBElement<RVLMesh> createRVLMesh(RVLMesh value) {
-        return new JAXBElement<RVLMesh>(_RVLMesh_QNAME, RVLMesh.class, null, value);
+    public LineList createLineList() {
+        return new LineList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RVLLineSet }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLLineSet")
+    public JAXBElement<RVLLineSet> createRVLLineSet(RVLLineSet value) {
+        return new JAXBElement<RVLLineSet>(_RVLLineSet_QNAME, RVLLineSet.class, null, value);
     }
 
 }

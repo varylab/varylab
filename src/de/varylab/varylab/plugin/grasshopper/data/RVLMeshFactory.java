@@ -8,8 +8,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.namespace.QName;
 
-import de.varylab.varylab.plugin.grasshopper.data.binding.ObjectFactory;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
 
 
@@ -19,6 +20,8 @@ public class RVLMeshFactory {
 		log = Logger.getLogger(RVLMeshFactory.class.getName());
 	private static JAXBContext
 		jaxbContex = null;
+    private final static QName 
+    	_RVLMesh_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLMesh");
 	
 	static {
 		try {
@@ -28,6 +31,11 @@ public class RVLMeshFactory {
 			log.severe(e.getMessage());
 		}
 	}
+	
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLMesh")
+    public static JAXBElement<RVLMesh> createRVLMesh(RVLMesh value) {
+        return new JAXBElement<RVLMesh>(_RVLMesh_QNAME, RVLMesh.class, null, value);
+    }
 	
 	public static RVLMesh loadRVLMesh(Reader in) throws RVLMeshException {
 		try {
@@ -45,8 +53,7 @@ public class RVLMeshFactory {
 		try {
 			Marshaller m = jaxbContex.createMarshaller();
 			StringWriter sw = new StringWriter();
-			ObjectFactory of = new ObjectFactory();
-			JAXBElement<RVLMesh> meshElement = of.createRVLMesh(mesh);
+			JAXBElement<RVLMesh> meshElement = createRVLMesh(mesh);
 			m.marshal(meshElement, sw);
 			return sw.getBuffer().toString();
 		} catch (Throwable t) {

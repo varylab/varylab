@@ -30,6 +30,9 @@ public class ForceConeFunctional <
 		vecip = new double[3],
 		tmp = new double[3];
 	
+	private boolean	
+		useAngleTerm = false;
+	
 	/*
 	 * Additional terms
 	 */
@@ -97,12 +100,7 @@ public class ForceConeFunctional <
 		/*
 		 * Angle terms: Additional energy term for spreading edges equally on cones 
 		 */
-		if(addTerm == 0){
-			
-		}
-		
-		else{
-		
+		if(useAngleTerm) {
 		for (V v : hds.getVertices()) {
 			for (E e1:HalfEdgeUtils.incomingEdges(v)){
 				for (E e2:HalfEdgeUtils.incomingEdges(v)){
@@ -435,5 +433,12 @@ public class ForceConeFunctional <
     public boolean hasHessian() {
     	return false;
     }
+	
+	public boolean isUseAngleTerm() {
+		return useAngleTerm;
+	}
+	public void setUseAngleTerm(boolean useAngleTerm) {
+		this.useAngleTerm = useAngleTerm;
+	}
 	
 }

@@ -1,5 +1,11 @@
 package de.varylab.varylab.plugin.meshoptimizer;
 
+import java.awt.GridLayout;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.ForceConeFunctional;
@@ -13,11 +19,30 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 public class ForceConeOptimizer extends VarylabOptimizerPlugin { 
 	
 	private ForceConeFunctional<VVertex, VEdge, VFace>
-	functional = new ForceConeFunctional<VVertex, VEdge, VFace>();
+		functional = new ForceConeFunctional<VVertex, VEdge, VFace>();
 
+	private JPanel
+		optionsPanel = new JPanel();
+	private JComboBox
+		methodCombo = new JComboBox(new String[]{"Method 1", "Method 2", "Method 3"});
+	private JCheckBox
+		angleChecker = new JCheckBox("Angle");
+	
+	public ForceConeOptimizer() {
+		optionsPanel.setLayout(new GridLayout(2, 2));
+		optionsPanel.add(angleChecker);
+		optionsPanel.add(methodCombo);
+	}
+	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
+		functional.setUseAngleTerm(angleChecker.isSelected());
 		return functional;
+	}
+	
+	@Override
+	public JPanel getOptionPanel() {
+		return optionsPanel;
 	}
 	
 	@Override
