@@ -1,9 +1,6 @@
 import java.io.IOException;
 
-import org.sunflow.core.Geometry;
-
 import de.jreality.geometry.Primitives;
-import de.jreality.geometry.SphereUtility;
 import de.jreality.plugin.JRViewer;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
