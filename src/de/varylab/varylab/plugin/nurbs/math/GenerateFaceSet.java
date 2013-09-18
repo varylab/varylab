@@ -456,7 +456,9 @@ public class GenerateFaceSet {
 				if(!isFaceVertex(nextLocal)){
 					System.out.println("1.2.1. next local != face vertex");
 					IntersectionPoint newP = getOppositePoint(nextLocal);
+					System.out.println("(getNextNbrLocal(p.getIntersectionPoint(), nextLocal.getParentHP()" + Arrays.toString(getNextNbrLocal(p.getIntersectionPoint(), nextLocal.getParentHP()).getPoint()));
 					IntersectionPoint newPrevious = getOppositePoint(getNextNbrLocal(p.getIntersectionPoint(), nextLocal.getParentHP()));
+					System.out.println("newPrevious " + Arrays.toString(newPrevious.getPoint()));
 					next = getNextNbrLocal(newPrevious, newP.getParentHP());
 					next.getParentHP().setPrevious(newP);
 				}
@@ -546,17 +548,22 @@ public class GenerateFaceSet {
 	
 	private IntersectionPoint getOppositePoint(IntersectionPoint ip){
 		if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.interior){
+			System.out.println("INTERRIOR");
 			return null;
 		}
 		else if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.left){
+			System.out.println("left and rightBound");
 			for (IntersectionPoint right : rightBound) {
+				System.out.println(Arrays.toString(right.getPoint()));
 				if(ip.getPoint()[1] == right.getPoint()[1]){
 					return right;
 				}
 			}
 		}
 		else if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.right){
+			System.out.println("right and leftBound");
 			for (IntersectionPoint left : leftBound) {
+				System.out.println(Arrays.toString(left.getPoint()));
 				if(ip.getPoint()[1] == left.getPoint()[1]){
 					return left;
 				}
@@ -576,6 +583,7 @@ public class GenerateFaceSet {
 				}
 			}
 		}
+		System.out.println("ELSE");
 		return null;
 	}
 	

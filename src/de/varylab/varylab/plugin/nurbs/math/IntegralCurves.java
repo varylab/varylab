@@ -1319,73 +1319,7 @@ public class IntegralCurves {
 		}
 		return intersectionPoints;
 	}
-	
-//	public static LinkedList<double[]> setIntoDomain(double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
-//		LinkedList<double[]> domainList = new LinkedList<double[]>();
-//		boolean first = true;
-//		double[][] seg = new double[2][2];
-//		domainList.add(pointList.getFirst());
-//		seg[0] = pointList.getFirst();
-//		for (double[] p : pointList) {
-//			if(!first){
-//				seg[1] = p.clone();
-//				if(pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
-//					double[][] intersections = getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, seg[0], seg[1]);
-//					domainList.add(intersections[0]);
-//					domainList.add(intersections[1]);
-//				}
-//				seg[0] = p.clone();
-//				double[] domainPoint = getPointInDomain(u0, um, v0, vn, p);
-//				double[] check = domainList.getLast();
-//				if(!Arrays.equals(check, domainPoint)){
-//					domainList.add(domainPoint);
-//				}
-//				else{
-//					System.out.println("DOPPEL PUNKT");
-//				}
-//				
-//			}
-//			first = false;
-//		}
-//		return domainList;
-//		
-//	}
-	
-	private static void genarateValidPointList(NURBSSurface ns, double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
-		if(ns.getClosingDir() != ClosingDir.nonClosed){
-			if(ns.getClosingDir() == ClosingDir.uClosed){
-				double[] first = pointList.getFirst();
-				if(first[0] == u0){
-					double[] second = pointList.get(1);
-					if(pointsAreInDifferentDomains(u0, um, v0, vn, first, second)){
-						first[0] = um;
-					}
-				}
-				else if(first[0] == um){
-					double[] second = pointList.get(1);
-					if(pointsAreInDifferentDomains(u0, um, v0, vn, first, second)){
-						first[0] = u0;
-					}
-				}
-			}
-			else if(ns.getClosingDir() == ClosingDir.vClosed){
-				double[] first = pointList.getFirst();
-				if(first[1] == v0){
-					double[] second = pointList.get(1);
-					if(pointsAreInDifferentDomains(u0, um, v0, vn, first, second)){
-						first[1] = vn;
-					}
-				}
-				else if(first[1] == vn){
-					double[] second = pointList.get(1);
-					if(pointsAreInDifferentDomains(u0, um, v0, vn, first, second)){
-						first[1] = v0;
-					}
-				}
-			}
-		}
-	}
-	
+
 	private static void flipClosedBoundaryPoint(NURBSSurface ns, double u0, double um, double v0, double vn, double[] point){
 		if(ns.getClosingDir() == ClosingDir.uClosed){
 			if(point[0] == u0){
@@ -1405,33 +1339,26 @@ public class IntegralCurves {
 		}
 	}
 	
-	
-	
-	
-	
 	private static LinkedList<double[]> setIntoDomain(NURBSSurface ns, double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
-//		genarateValidPointList(ns, u0, um, v0, vn, pointList);
-
 		LinkedList<double[]> domainList = new LinkedList<double[]>();
 		int counter = 0;
 		double[][] seg = new double[2][2];
 		domainList.add(pointList.getFirst());
-		seg[0] = pointList.getFirst();
+		seg[0] = pointList.getFirst().clone();
+		domainList.add(pointList.getFirst());
 		for (double[] p : pointList) {
 			if(counter != 0){
 				seg[1] = p.clone();
-				if(counter == 1 && ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
+				if(ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
 					flipClosedBoundaryPoint(ns, u0, um, v0, vn, seg[0]);
-					domainList.add(seg[0]);
+//					domainList.add(seg[0]);
 					domainList.add(getPointInDomain(u0, um, v0, vn, seg[1]));
-				}
-				else{
+				} else {
 					if(pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
 						double[][] intersections = getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, seg[0], seg[1]);
 						domainList.add(intersections[0]);
 						domainList.add(intersections[1]);
 					}
-					seg[0] = p.clone();
 					double[] domainPoint = getPointInDomain(u0, um, v0, vn, p);
 					double[] check = domainList.getLast();
 					if(!Arrays.equals(check, domainPoint)){
@@ -1441,11 +1368,11 @@ public class IntegralCurves {
 						System.out.println("DOPPEL PUNKT");
 					}
 				}
+				seg[0] = p.clone();
 			}
 			counter++;
 		}
 		return domainList;
-		
 	}
 	
 	public static boolean pointIsInU(double u0, double um, double[] point){
@@ -1468,10 +1395,6 @@ public class IntegralCurves {
 		}
 		return true;
 	}
-	
-
-	
-	
 	public static double[] getPointInDomain(double u0, double um , double v0, double vn, double[] point){
 		double[] domainPoint = {point[0], point[1]};
 		if(pointIsInDomain(u0, um, v0, vn, point)){

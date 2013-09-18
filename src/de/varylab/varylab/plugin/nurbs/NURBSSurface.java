@@ -284,18 +284,16 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return true;
 		}
 		
+		
 		public boolean isClosedBoundaryPoint(double[] point){
 			if(getClosingDir() != ClosingDir.nonClosed){
 				List<Double> closingValues = getClosedBoundValues();
-				if(getClosingDir() == ClosingDir.uClosed){
-					for (Double value : closingValues) {
+				for (Double value : closingValues) {
+					if(getClosingDir() == ClosingDir.uClosed){
 						if(point[0] == value){
 							return true;
 						}
-					}
-				}
-				if(getClosingDir() == ClosingDir.vClosed){
-					for (Double value : closingValues) {
+					} else {
 						if(point[1] == value){
 							return true;
 						}
@@ -313,6 +311,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		public void setControlMesh(double[][][] cm) {
 			this.controlMesh = cm;
 		}
+		
 
 		public void setSurfaceData(double[][][] cm, double[] U, double[] V, int p,
 				int q) {
@@ -322,6 +321,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			this.p = p;
 			this.q = q;
 		}
+		
 
 		public void setDefaultKnots() {
 			int n = controlMesh.length;

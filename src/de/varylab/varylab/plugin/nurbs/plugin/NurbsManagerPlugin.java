@@ -683,7 +683,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(curveScrollPanel, rc);
 
 			Appearance app = new Appearance();
-			app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+			app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 			integralCurvesRoot.setAppearance(app);
 			
@@ -1211,7 +1211,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				cmc.setGeometry(ifs);
 				Appearance app = new Appearance();
 				cmc.setAppearance(app);
-				app.setAttribute(CommonAttributes.FACE_DRAW, false);
+				app.setAttribute(CommonAttributes.FACE_DRAW, true);
 				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 				app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				hif.getActiveLayer().addTemporaryGeometry(cmc);
