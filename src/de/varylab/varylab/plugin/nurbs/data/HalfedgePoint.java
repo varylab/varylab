@@ -8,9 +8,10 @@ public class HalfedgePoint {
 	
 	
 
-	protected IntersectionPoint point;
-	protected LinkedList<IntersectionPoint> nbrs;
-	protected LinkedList<IntersectionPoint> unusedNbrs;
+	private IntersectionPoint point;
+	private LinkedList<IntersectionPoint> nbrs;
+	private LinkedList<IntersectionPoint> unusedNbrs;
+	private IntersectionPoint before;
 	
 	
 
@@ -32,6 +33,16 @@ public class HalfedgePoint {
 		this.point = point;
 		this.unusedNbrs = maxNbrs;
 	}
+	
+	
+
+	public IntersectionPoint getPrevious() {
+		return before;
+	}
+
+	public void setPrevious(IntersectionPoint before) {
+		this.before = before;
+	}
 
 	public LinkedList<IntersectionPoint> getNbrs() {
 		return nbrs;
@@ -44,11 +55,11 @@ public class HalfedgePoint {
 
 
 
-	public IntersectionPoint getPoint() {
+	public IntersectionPoint getIntersectionPoint() {
 		return point;
 	}
 
-	public void setPoint(IntersectionPoint point) {
+	public void setIntersectionPoint(IntersectionPoint point) {
 		this.point = point;
 	}
 

@@ -10,15 +10,6 @@ public class IntObjects {
 	protected boolean nearby;
 	protected boolean maxMin;
 	protected boolean cyclic = false;
-	protected int umbilicIndex;
-	
-	public int getUmbilicIndex() {
-		return umbilicIndex;
-	}
-
-	public void setUmbilicIndex(int umbilicIndex) {
-		this.umbilicIndex = umbilicIndex;
-	}
 
 	public IntObjects(){
 		points = null;
@@ -36,6 +27,8 @@ public class IntObjects {
 		orientation = o;
 		nearby = n;
 	}
+
+
 
 	public LinkedList<double[]> getPoints() {
 		return points;

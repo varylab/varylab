@@ -504,9 +504,10 @@ public class PointProjectionSurface {
 	 */
 	
 	public static double[] getClosestPointDomain(NURBSSurface nurbs, double[] point){
-		if(nurbs.getRevolutionDir() != null){
-			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
-		}
+//		if(nurbs.getRevolutionDir() != null){
+//			//TODO: Domain version of closest point for surfaces of revolution
+//			return PointProjectionSurfaceOfRevolution.getClosestPoint(nurbs, point);
+//		}
 		double[] p = MathUtility.get3DPoint(point);
 		double[] closestPoint = new double[2];
 		double distNewton = Double.MAX_VALUE;

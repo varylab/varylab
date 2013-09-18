@@ -6,8 +6,8 @@ import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.scene.IndexedFaceSet;
 
 public class FaceSet {
-	protected double[][] verts;
-	protected int[][] faces;
+	private double[][] verts;
+	private int[][] faces;
 	
 	public FaceSet(){
 		
