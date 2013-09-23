@@ -14,7 +14,7 @@
 		console, a Python script manager, and a GUI designer for interactive change of
 		variables and script invocation.
 	</description>
-	<plugin class="de.jreality.plugin.scripting.PythonConsole"/>
+	<!--plugin class="de.jreality.plugin.scripting.PythonConsole"/-->
 	<plugin class="de.jreality.plugin.scripting.PythonToolsManager"/>
 	<plugin class="de.jreality.plugin.scripting.gui.NumberSpinnerGUI"/>
 	
