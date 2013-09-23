@@ -1,7 +1,6 @@
 package de.varylab.varylab.plugin.nurbs.math;
 //import java.awt.Color;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,26 +10,16 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
-import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
-import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.TreeSegmentComparator;
 import de.varylab.varylab.plugin.nurbs.data.EventPoint;
 import de.varylab.varylab.plugin.nurbs.data.EventPointYComparator;
-import de.varylab.varylab.plugin.nurbs.data.FaceSet;
-import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
-import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
-import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.ClosedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.Partition;
 import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
