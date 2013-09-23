@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema 
+	xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.varylab.com/2013/09/BlenderMesh"
+	xmlns:bm="http://www.varylab.com/2013/09/BlenderMesh" 
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+>
+	<element name="BlenderMesh" type="bm:BlenderMesh"/>
+
+	<complexType name="BlenderMesh">
+		<sequence>
+			<element name="Faces" type="bm:face_list"/>
+			<element name="Vertices" type="bm:vertex_list"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="face_list">
+		<sequence>
+			<element name="Face" type="bm:face" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="face">
+		<sequence>
+			<element name="V" type="int" minOccurs="2" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="vertex_list">
+		<sequence>
+			<element name="Vertex" type="bm:vertex" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="vertex">
+		<sequence>
+			<element name="X" type="double"/>
+			<element name="Y" type="double"/>
+			<element name="Z" type="double"/>
+			<element name="ID" type="int"/>
+		</sequence>
+	</complexType>
+
+</schema>

@@ -1,0 +1,33 @@
+<BlenderMesh
+	xmlns="http://www.varylab.com/2013/09/BlenderMesh"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<Faces>
+		<Face>
+			<V>0</V>
+			<V>1</V>
+			<V>2</V>
+		</Face>
+	</Faces>
+	<Vertices>
+		<Vertex>
+			<X>0.12345</X>
+			<Y>0.34444</Y>
+			<Z>0.23434</Z>
+			<ID>0</ID>
+		</Vertex>
+		<Vertex>
+			<X>0.53232</X>
+			<Y>0.65432</Y>
+			<Z>0.12345</Z>
+			<ID>1</ID>
+		</Vertex>
+		<Vertex>
+			<X>1.53232</X>
+			<Y>1.65432</Y>
+			<Z>1.12345</Z>
+			<ID>2</ID>
+		</Vertex>
+	</Vertices>
+	<ID>0</ID>
+</BlenderMesh>
