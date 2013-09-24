@@ -18,16 +18,23 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jreality.math.Matrix;
+import de.jreality.plugin.JRViewer;
+import de.jreality.plugin.JRViewer.ContentType;
+import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.content.ContentAppearance;
 import de.jreality.plugin.job.AbstractJob;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.ui.AppearanceInspector;
 import de.jreality.util.LoggingSystem;
+import de.jreality.util.NativePathUtility;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
@@ -37,15 +44,20 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
+import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.plugin.VarylabMain;
+import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 
 public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionListener {
 
@@ -143,6 +155,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				try {
 					remeshSurface();
 				} catch(RemeshingException re) {
+					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), re.getMessage(), "Remeshing error", JOptionPane.ERROR_MESSAGE);
 					fireJobFailed(re);
 					return;
 				}
@@ -293,7 +306,9 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		for (VVertex v : remesh.getVertices()) {
 			double[] patternPoint = a.getD(Position3d.class, v);
 			VFace f = RemeshingUtility.getContainingFace(v, surface, a, surfaceKD);
-			if (f == null) continue;
+			if (f == null) {
+				continue;
+			} 
 			double[] bary = RemeshingUtility.getBarycentricTexturePoint(patternPoint, f, a);
 			double[] newPos = RemeshingUtility.getPointFromBarycentric(bary, f, a);
 			a.set(Position.class, v, newPos);
@@ -403,4 +418,21 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		return info;
 	}
 
+	public static void main(String[] args) {
+		NativePathUtility.set("native");
+		JRHalfedgeViewer.initHalfedgeFronted();
+		JRViewer v = new JRViewer();
+		v.addBasicUI();
+		v.addContentUI();
+		v.addContentSupport(ContentType.Raw);
+		v.registerPlugin(VarylabMain.class);
+		v.registerPlugin(ConsolePlugin.class);
+		v.registerPlugin(SurfaceRemeshingPlugin.class);
+		v.registerPlugin(QuadMeshGenerator.class);
+		v.registerPlugin(VertexEditorPlugin.class);
+		v.registerPlugin(TriangulatePlugin.class);
+		v.registerPlugin(DiscreteConformalPlugin.class);
+		v.startup();
+	}
+	
 }

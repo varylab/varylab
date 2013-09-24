@@ -45,7 +45,7 @@ public class LatticeRemesher <
 	
 	public HDS remesh(HDS chds, AdapterSet a) throws RemeshingException {
 		HDS hds = lattice.getHDS();
-//		SceneGraphComponent child1 = new SceneGraphComponent();
+//		SceneGraphComponent child1 = new SceneGraphComponent("Initial Lattice");
 //		child1.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child1);
 		LinkedList<V> corners = TextureUtility.findCorners(chds, a); 
@@ -58,35 +58,24 @@ public class LatticeRemesher <
 //		root.addChild(child2);
 		
 		polygon.snapTextureCorners(corners, a);
-//		SceneGraphComponent child3 = new SceneGraphComponent();
+//		SceneGraphComponent child3 = new SceneGraphComponent("Snap Texture Coordinates");
 //		child3.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child3);
 		
 		removeOutside(edges, hds);
-//		SceneGraphComponent child4 = new SceneGraphComponent();
+//		SceneGraphComponent child4 = new SceneGraphComponent("Outside removed");
 //		child4.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child4);
 		
 		
-		SpringRemeshingUtility.straightenBoundary(
-			lattice,
-			edges,
-			polygon.getCorners() ,
-			a
-		);
-//		SceneGraphComponent child5 = new SceneGraphComponent();
+		SpringRemeshingUtility.straightenBoundary(lattice, edges, polygon.getCorners(), a);
+//		SceneGraphComponent child5 = new SceneGraphComponent("Straighten Boundary");
 //		child5.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child5);
 		
 		
-		SpringRemeshingUtility.relaxInterior(
-			lattice, 
-			polygon.getCorners(), 
-			true, 
-			false,
-			a
-		);
-//		SceneGraphComponent child6 = new SceneGraphComponent();
+		SpringRemeshingUtility.relaxInterior(lattice, polygon.getCorners(), true, false, a);
+//		SceneGraphComponent child6 = new SceneGraphComponent("Relax Interior");
 //		child6.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child6);
 		
@@ -148,10 +137,11 @@ public class LatticeRemesher <
 			double[] pt = l1.intersect(l2);
 			V v = lattice.getLatticeVertex(pt);
 			if(!verts.isEmpty()) {
-				List<V> segment = l1.getOpenSegment(verts.getLast(),v,newVertices, a);
-				if(segment.size() == 0) {
+				if(verts.getLast() == v) {
 					throw new RemeshingException("Two boundary vertices have been identified. Please refine texture.");
 				}
+				List<V> segment = l1.getOpenSegment(verts.getLast(),v,newVertices, a);
+				
 				verts.addAll(segment);
 			}
 			verts.add(v);
@@ -187,6 +177,7 @@ public class LatticeRemesher <
 		LinkedList<F> queue = new LinkedList<F>();
 		HashSet<F> visited = new HashSet<F>();
 		queue.add(intFace);
+		visited.add(intFace);
 		while (!queue.isEmpty()){
 			F actFace = queue.poll();
 			List<F> star = new LinkedList<F>();

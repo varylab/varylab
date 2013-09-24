@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.remeshing;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 import de.jreality.math.Rn;
@@ -9,6 +10,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 
 public class TextureUtility {
@@ -22,11 +24,17 @@ public class TextureUtility {
 		LinkedList<V> corners = new LinkedList<V>();
 		E be = HalfEdgeUtils.boundaryEdges(hds).iterator().next();
 		be = findNextTextureCorner(be, a);
+		double[] ev = a.getD(EdgeVector.class, be);
+		double[] ev2 = a.getD(EdgeVector.class, be.getOppositeEdge().getNextEdge());
+		double orientation = Rn.determinant(new double[][]{{ev[0],ev[1]}, {ev2[0],ev2[1]}});
 		E e = be;
 		do {
 			e = findNextTextureCorner(e, a);
 			corners.add(e.getStartVertex());
 		} while(e != be);
+		if(orientation>0) {
+			Collections.reverse(corners);
+		}
 		return corners;
 	}
 
