@@ -70,9 +70,10 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 		int dim = hds.numVertices() * 3;
 		Vec x = new Vec(dim);
 		for (VVertex v : hds.getVertices()) {
-			x.setValue(v.getIndex() * 3 + 0, v.P[0] / v.P[3], INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 1, v.P[1] / v.P[3], INSERT_VALUES);
-			x.setValue(v.getIndex() * 3 + 2, v.P[2] / v.P[3], INSERT_VALUES);
+			double[] P = v.getP();
+			x.setValue(v.getIndex() * 3 + 0, P[0] / P[3], INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 1, P[1] / P[3], INSERT_VALUES);
+			x.setValue(v.getIndex() * 3 + 2, P[2] / P[3], INSERT_VALUES);
 		}
 		app.setInitialSolutionVec(x);
 		if (functional.hasHessian()) {

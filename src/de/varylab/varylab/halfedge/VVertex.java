@@ -5,7 +5,7 @@ import de.jtem.halfedge.Vertex;
 
 public class VVertex extends Vertex<VVertex, VEdge, VFace> {
 
-	public double[]
+	private double[]
 	    P = {0, 0, 0, 1},
 	    T = {0, 0, 0, 1};
 	private boolean
@@ -44,6 +44,19 @@ public class VVertex extends Vertex<VVertex, VEdge, VFace> {
 		if (v.T != null) T = v.T.clone();
 		variable = v.variable;
 		weight = v.weight;
+	}
+	
+	public double[] getP() {
+		return P;
+	}
+	public void setP(double[] p) {
+		System.arraycopy(p, 0, P, 0, 4);
+	}
+	public double[] getT() {
+		return T;
+	}
+	public void setT(double[] t) {
+		System.arraycopy(t, 0, T, 0, 4);
 	}
 	
 }

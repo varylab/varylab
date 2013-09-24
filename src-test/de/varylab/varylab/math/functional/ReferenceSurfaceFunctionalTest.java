@@ -30,19 +30,20 @@ public class ReferenceSurfaceFunctionalTest extends FunctionalTest<VVertex, VEdg
 			v3 = refSurface.addNewVertex();
 		
 		HalfEdgeUtils.constructFaceByVertices(refSurface, v1,v2,v3);
-		v1.P = new double[] {0.0,0.0,0.0};
-		v2.P = new double[] {1.0,0.0,0.0};
-		v3.P = new double[] {0.0,1.0,0.0};
+		v1.setP(new double[] {0.0,0.0,0.0});
+		v2.setP(new double[] {1.0,0.0,0.0});
+		v3.setP(new double[] {0.0,1.0,0.0});
 		
 		VHDS hds = new VHDS();
 		VVertex vh = hds.addNewVertex();
-		vh.P = new double[] {Math.random(), Math.random(), 1.0};
+		vh.setP(new double[] {Math.random(), Math.random(), 1.0});
 
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {
-			result.set(v.getIndex() * 3 + 0, v.P[0]);
-			result.set(v.getIndex() * 3 + 1, v.P[1]);
-			result.set(v.getIndex() * 3 + 2, v.P[2]);
+			double[] P = v.getP();
+			result.set(v.getIndex() * 3 + 0, P[0]);
+			result.set(v.getIndex() * 3 + 1, P[1]);
+			result.set(v.getIndex() * 3 + 2, P[2]);
 		}
 		
 		MyDomainValue pos = new MyDomainValue(result);

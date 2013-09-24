@@ -96,7 +96,9 @@ public class PlanarQuadsOptimizer extends VarylabOptimizerPlugin {
 	public static double getShortestEdgeLength(VHDS hds) {
 		double r = Double.MAX_VALUE;
 		for (VEdge e : hds.getEdges()) {
-			double tmp = Pn.distanceBetween(e.getStartVertex().P, e.getTargetVertex().P, Pn.EUCLIDEAN);
+			double[] s = e.getStartVertex().getP();
+			double[] t = e.getTargetVertex().getP();
+			double tmp = Pn.distanceBetween(s, t, Pn.EUCLIDEAN);
 			if (tmp < r) {
 				r = tmp;
 			}

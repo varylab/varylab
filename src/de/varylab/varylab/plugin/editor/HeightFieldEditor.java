@@ -71,9 +71,10 @@ public class HeightFieldEditor extends AlgorithmDialogPlugin {
 		double a = aModel.getNumber().doubleValue();
 		VHDS r = hcp.get(new VHDS());
 		for (VVertex v : r.getVertices()) {
-			if (v.P == null) continue;
-			double x = v.P[0];
-			double y = v.P[1];
+			double[] P = v.getP();
+			if (P == null) continue;
+			double x = P[0];
+			double y = P[1];
 			double z = 0.0;
 			if(coshButton.isSelected()) {
 				z = f(2*(x - 0.5), a) * f(2*(y - 0.5), a);
@@ -82,7 +83,7 @@ public class HeightFieldEditor extends AlgorithmDialogPlugin {
 			if(knickButton.isSelected()) {
 				z = (x+y>=0)?x+y:-x-y;
 			}
-			v.P[2] = z;
+			P[2] = z;
 		}
 		hcp.set(r);
 	}

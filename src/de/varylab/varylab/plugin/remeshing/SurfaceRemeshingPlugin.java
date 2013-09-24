@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.remeshing;
 
 import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -63,10 +66,23 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private enum Pattern {
 		Triangles,
-		TrianglesQuantized,
 		Quads,
+		TrianglesQuantized,
 		QuadsQuantized,
 		QuadsSingularities;
+		
+		public String toString() {
+			switch (this) {
+			case QuadsQuantized:
+				return "Boundary Aligned Quads";
+			case TrianglesQuantized:
+				return "Boundary Aligned Triangles";
+			case QuadsSingularities:
+				return "Quads With Singularities";
+			default:
+				return super.toString();
+			}
+		};
 	}
 	
 	private ContentAppearance
@@ -79,19 +95,20 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	
 	// ui components
 	private JComboBox
-		patternCombo = new JComboBox(Pattern.values());	
+		patternCombo = new JComboBox();	
 	private GridBagConstraints
-		gbc1 = new GridBagConstraints(),
-		gbc2 = new GridBagConstraints();
+		c1 = new GridBagConstraints(),
+		c2 = new GridBagConstraints();
 	private JButton
 		meshingButton = new JButton("Remesh"),
 		liftingButton = new JButton("Lift/Flat");
 	private JPanel
 		quantOptsPanel = new JPanel();
 	private JCheckBox
-		newVerticesBox = new JCheckBox("Insert new Vertices"),
-		forceOnLatticeBox = new JCheckBox("Force corners on Lattice"),
-		projectiveCoordsBox = new JCheckBox("Use projective texture");
+		expertModeChecker = new JCheckBox("Expert Mode"),
+		newVerticesBox = new JCheckBox("Insert new Vertices", true),
+		forceOnLatticeBox = new JCheckBox("Force corners on Lattice", true),
+		projectiveCoordsBox = new JCheckBox("Use projective texture", true);
 	
 	private VHDS 
 		surface = new VHDS(),
@@ -106,31 +123,61 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	private Map<VFace,VFace> 
 		newOldFaceMap = new HashMap<VFace, VFace>();
 	
+	
 	public SurfaceRemeshingPlugin() {
-		gbc1.insets = new Insets(2, 2, 2, 2);
-		gbc1.gridwidth = GridBagConstraints.RELATIVE;
-		gbc1.weightx = 0.0;
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc2.insets = new Insets(2, 2, 2, 2);
-		gbc2.gridwidth = GridBagConstraints.REMAINDER;
-		gbc2.weightx = 1.0;
-		gbc2.fill = GridBagConstraints.BOTH;
+	}
+	
+	
+	private void createLayout() {
+		boolean expert = isExpertMode();
+		shrinkPanel.removeAll();
+		c1.insets = new Insets(2, 2, 2, 2);
+		c1.gridwidth = GridBagConstraints.RELATIVE;
+		c1.weightx = 0.0;
+		c1.fill = GridBagConstraints.BOTH;
+		c2.insets = new Insets(2, 2, 2, 2);
+		c2.gridwidth = GridBagConstraints.REMAINDER;
+		c2.weightx = 1.0;
+		c2.fill = GridBagConstraints.BOTH;
 
-		shrinkPanel.add(new JLabel("Pattern"), gbc1);
-		shrinkPanel.add(patternCombo, gbc2);
-		shrinkPanel.add(meshingButton, gbc2);
+		shrinkPanel.add(expertModeChecker, c2);
+		shrinkPanel.add(new JLabel("Pattern"), c1);
+		ComboBoxModel model = null;
+		if (expert) {
+			model = new DefaultComboBoxModel(Pattern.values());
+		} else {
+			Pattern[] patterns = {Pattern.Triangles, Pattern.Quads, Pattern.TrianglesQuantized, Pattern.QuadsQuantized};
+			model = new DefaultComboBoxModel(patterns);
+		}
+		patternCombo.setModel(model);
+		
+		shrinkPanel.add(patternCombo, c2);
+		shrinkPanel.add(meshingButton, c2);
+		
+		if (expert) {
+			shrinkPanel.add(liftingButton, c2);
+			quantOptsPanel.removeAll();
+			quantOptsPanel.setLayout(new GridBagLayout());
+			quantOptsPanel.setBorder(BorderFactory.createTitledBorder("Method Options"));
+			quantOptsPanel.add(projectiveCoordsBox, c2);
+			quantOptsPanel.add(newVerticesBox, c2);
+			quantOptsPanel.add(forceOnLatticeBox, c2);
+			shrinkPanel.add(quantOptsPanel, c2);
+		}
+		
+		shrinkPanel.revalidate();
+	}
 
-		quantOptsPanel.setLayout(new GridLayout(4, 1));
-		quantOptsPanel.add(projectiveCoordsBox);
-		projectiveCoordsBox.setSelected(true);
-		quantOptsPanel.add(newVerticesBox);
-		quantOptsPanel.add(forceOnLatticeBox);
-		quantOptsPanel.add(liftingButton);
-		
-		shrinkPanel.add(quantOptsPanel, gbc2);
-		
+
+	private boolean isExpertMode() {
+		boolean expert = expertModeChecker.isSelected();
+		return expert;
+	}
+	
+	private void connectGUIListeners() {
 		meshingButton.addActionListener(this);
 		liftingButton.addActionListener(this);
+		expertModeChecker.addActionListener(this);
 	}
 	
 	
@@ -154,8 +201,16 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			if (s == meshingButton) {
 				try {
 					remeshSurface();
-				} catch(RemeshingException re) {
-					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), re.getMessage(), "Remeshing error", JOptionPane.ERROR_MESSAGE);
+					if (!isExpertMode() && 
+						(getPattern() == Pattern.QuadsQuantized ||
+						getPattern() == Pattern.TrianglesQuantized ||
+						getPattern() == Pattern.QuadsSingularities)
+					) {
+						liftMesh();
+					}
+				} catch(Exception re) {
+					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), re, "Remeshing error", JOptionPane.ERROR_MESSAGE);
+					re.printStackTrace();
 					fireJobFailed(re);
 					return;
 				}
@@ -175,8 +230,13 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		RemeshingJob job = new RemeshingJob(e.getSource());
-		jobQueuePlugin.queueJob(job);
+		if (e.getSource() == meshingButton || e.getSource() == liftingButton) {
+			RemeshingJob job = new RemeshingJob(e.getSource());
+			jobQueuePlugin.queueJob(job);
+		}
+		if (e.getSource() == expertModeChecker) {
+			createLayout();
+		}
 	}
 	
 	
@@ -187,7 +247,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			return;
 		}
 		for(VVertex v : remesh.getVertices()) {
-			v.P = remeshPosMap.get(v.getIndex());
+			double[] flattened = remeshPosMap.get(v.getIndex());
+			System.arraycopy(flattened, 0, v.getP(), 0, 4);
 		}
 		hcp.set(remesh);
 	}
@@ -213,7 +274,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		newOldFaceMap.clear();
 		surface = hcp.get(surface);
 		AdapterSet a = hcp.getAdapters();
-		if (surface.getVertex(0).T == null) {
+		if (surface.getVertex(0).getT() == null) {
 			throw new RemeshingException("Surface has no texture coordinates.");
 		}
 		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, a, 10, false);
@@ -225,7 +286,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Matrix texMatrix = ai.getTextureMatrix();
 
 		for (VVertex v : surface.getVertices()) {
-			texMatrix.transformVector(v.T);
+			texMatrix.transformVector(v.getT());
 		}
 		
 		Matrix texInvMatrix = texMatrix.getInverse();
@@ -246,12 +307,12 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesh = remesher.remesh(surface, a); 
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
-				texInvMatrix.transformVector(v.P);
-				texInvMatrix.transformVector(v.T);
-				remeshPosMap.put(v.getIndex(), v.P);
+				texInvMatrix.transformVector(v.getP());
+				texInvMatrix.transformVector(v.getT());
+				remeshPosMap.put(v.getIndex(), v.getP());
 			}
 			for (VVertex v : surface.getVertices()) {
-				texInvMatrix.transformVector(v.T);
+				texInvMatrix.transformVector(v.getT());
 			}
 			hcp.set(remesh);
 			return;
@@ -263,12 +324,12 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesher.setLattice(new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
 			remesh = remesher.remesh(surface, a); 
 			for (VVertex v : remesh.getVertices()) {
-				texInvMatrix.transformVector(v.P);
-				texInvMatrix.transformVector(v.T);
-				remeshPosMap.put(v.getIndex(), v.P);
+				texInvMatrix.transformVector(v.getP());
+				texInvMatrix.transformVector(v.getT());
+				remeshPosMap.put(v.getIndex(), v.getP());
 			}
 			for (VVertex v : surface.getVertices()) {
-				texInvMatrix.transformVector(v.T);
+				texInvMatrix.transformVector(v.getT());
 			}
 			hcp.set(remesh);
 			return;
@@ -285,7 +346,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				remeshPosMap.put(v.getIndex(), coord);
 			}
 			for (VVertex v : surface.getVertices()) {
-				texInvMatrix.transformVector(v.T);
+				texInvMatrix.transformVector(v.getT());
 			}
 
 			hcp.set(remesh);
@@ -363,10 +424,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		
 		// transform tex coordinates
 		for (VVertex v : remesh.getVertices()) {
-			texInvMatrix.transformVector(v.T);
+			texInvMatrix.transformVector(v.getT());
 		}
 		for (VVertex v : surface.getVertices()) {
-			texInvMatrix.transformVector(v.T);
+			texInvMatrix.transformVector(v.getT());
 		}
 		
 		RemeshingUtility.cutTargetBoundary(faceOverlap, overlap, surface, featureSet, a);
@@ -386,12 +447,15 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		contentAppearance = c.getPlugin(ContentAppearance.class);
 		jobQueuePlugin = c.getPlugin(JobQueuePlugin.class);
+		createLayout();
+		connectGUIListeners();
 	}
 	
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
 		super.storeStates(c);
+		c.storeProperty(getClass(), "expoertMode", expertModeChecker.isSelected());
 		c.storeProperty(getClass(), "pattern", patternCombo.getSelectedIndex());
 		c.storeProperty(getClass(), "newVertices", newVerticesBox.isSelected());
 		c.storeProperty(getClass(), "forceLattice", forceOnLatticeBox.isSelected());
@@ -401,7 +465,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	@Override
 	public void restoreStates(Controller c) throws Exception {
 		super.restoreStates(c);
-		patternCombo.setSelectedIndex(c.getProperty(getClass(), "pattern", 0));
+		expertModeChecker.setSelected(c.getProperty(getClass(), "expertMode", expertModeChecker.isSelected()));
+		try {
+			patternCombo.setSelectedIndex(c.getProperty(getClass(), "pattern", 0));
+		} catch (Exception e) {}
 		newVerticesBox.setSelected(c.getProperty(getClass(), "newVertices", true));
 		forceOnLatticeBox.setSelected(c.getProperty(getClass(), "forceLattice", true));
 		projectiveCoordsBox.setSelected(c.getProperty(getClass(), "useProjectiveCoords", true));

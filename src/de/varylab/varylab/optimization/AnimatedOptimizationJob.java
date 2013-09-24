@@ -84,7 +84,7 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 				xVec.assemblyBegin();
 				for (VVertex v : hds.getVertices()) {
 					int[] pos = {v.getIndex()};
-					xVec.setValuesBlocked(1, pos, v.P, INSERT_VALUES);
+					xVec.setValuesBlocked(1, pos, v.getP(), INSERT_VALUES);
 				}
 				xVec.assemblyEnd();
 			}

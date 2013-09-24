@@ -23,6 +23,7 @@ import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.job.JobListener;
@@ -306,9 +307,11 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		int dim = hds.numVertices() * 3;
 		double[] x = new double[dim];
 		for (VVertex v : hds.getVertices()) {
-			x[v.getIndex() * 3 + 0] = v.P[0];
-			x[v.getIndex() * 3 + 1] = v.P[1];
-			x[v.getIndex() * 3 + 2] = v.P[2];
+			double[] P = v.getP();
+			Pn.dehomogenize(P, P);
+			x[v.getIndex() * 3 + 0] = P[0];
+			x[v.getIndex() * 3 + 1] = P[1];
+			x[v.getIndex() * 3 + 2] = P[2];
 		}
 		return new ArrayDomainValue(x);
 	}

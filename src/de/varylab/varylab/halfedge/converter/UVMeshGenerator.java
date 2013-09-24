@@ -62,14 +62,14 @@ public class UVMeshGenerator {
 		do {
 			VEdge e = se;
 			v = 0;
-			xyzcoord[u][v][0] = Arrays.copyOf(e.getStartVertex().P,4);
+			xyzcoord[u][v][0] = Arrays.copyOf(e.getStartVertex().getP(),4);
 			xyzcoord[u][v++][0][3] = 1;
 			while(e.getTargetVertex() != vend) {
-				xyzcoord[u][v][0] = Arrays.copyOf(e.getTargetVertex().P,4);
+				xyzcoord[u][v][0] = Arrays.copyOf(e.getTargetVertex().getP(),4);
 				xyzcoord[u][v++][0][3] = 1;
 				e = getOpposingEdge(e);
 			} 
-			xyzcoord[u][v][0] = Arrays.copyOf(e.getTargetVertex().P,4);
+			xyzcoord[u][v][0] = Arrays.copyOf(e.getTargetVertex().getP(), 4);
 			xyzcoord[u++][v][0][3] = 1;
 			vend = e.getOppositeEdge().getPreviousEdge().getStartVertex();
 			se = se.getOppositeEdge().getNextEdge().getNextEdge();

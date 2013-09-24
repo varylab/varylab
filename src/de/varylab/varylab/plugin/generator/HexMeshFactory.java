@@ -85,8 +85,8 @@ public class HexMeshFactory {
 	}
 	
 	public Rectangle2D getInsideRectangle() {
-		double[] ll = hds.getVertex(0).P;
-		double[] ur = hds.getVertex(hds.numVertices()-1).P;
+		double[] ll = hds.getVertex(0).getP();
+		double[] ur = hds.getVertex(hds.numVertices()-1).getP();
 		return new Rectangle2D(
 			new double[]{ll[0] + w[0], ll[1] + w[1]},
 			new double[]{ur[0] - w[0], ur[1] - w[1]}
@@ -94,7 +94,7 @@ public class HexMeshFactory {
 	}
 	
 	public Rectangle2D getOutsideRectangle() {
-		double[] ur = hds.getVertex(hds.numVertices()-1).P;
+		double[] ur = hds.getVertex(hds.numVertices()-1).getP();
 		return new Rectangle2D(
 			new double[]{0.0,0.0},
 			new double[]{ur[0]+w[0],ur[1]+((uHex%2==1)?w[1]:0)}
@@ -135,8 +135,11 @@ public class HexMeshFactory {
 				move *= (i % 2 == 0) ? 1 : -1;
 				xPos += move*wv[0]/2;
 				yPos += move*wv[1]/2;
-				double[] pos = {xPos, yPos, 0, 1};
-				vv.P = pos;
+				double[] vvp = vv.getP();
+				vvp[0] = xPos;
+				vvp[1] = yPos;
+				vvp[2] = 0.0;
+				vvp[3] = 1.0;
 			}
 		}
 	}

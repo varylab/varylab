@@ -18,15 +18,15 @@ public class ANetOptimizer extends VarylabOptimizerPlugin {
 	
 	@Override
 	public Functional<VVertex, VEdge, VFace> getFunctional(VHDS hds) {
-//		double scale = getShortestEdgeLength(hds);
-//		functional.setScale(scale);
 		return functional;
 	}
 	
 	public static double getShortestEdgeLength(VHDS hds) {
 		double r = Double.MAX_VALUE;
 		for (VEdge e : hds.getEdges()) {
-			double tmp = Pn.distanceBetween(e.getStartVertex().P, e.getTargetVertex().P, Pn.EUCLIDEAN);
+			double[] sp = e.getStartVertex().getP();
+			double[] tp = e.getTargetVertex().getP();
+			double tmp = Pn.distanceBetween(sp, tp, Pn.EUCLIDEAN);
 			if (tmp < r) {
 				r = tmp;
 			}

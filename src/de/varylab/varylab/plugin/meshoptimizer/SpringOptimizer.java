@@ -155,8 +155,8 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		if(st == AVERAGE) {
 			double l = 0.0;
 			for (VEdge e : hds.getPositiveEdges()) {
-				double[] s = e.getStartVertex().P;
-				double[] t = e.getTargetVertex().P;
+				double[] s = e.getStartVertex().getP();
+				double[] t = e.getTargetVertex().getP();
 				l += Rn.euclideanDistance(s, t);
 			}
 			l /= hds.numEdges() / 2.0;
