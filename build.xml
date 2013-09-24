@@ -194,6 +194,9 @@
 			<fileset dir="${src}">
 				<include name="**/*.xml"/>
 			</fileset>
+			<fileset dir="${src}">
+				<include name="**/logging.properties"/>
+			</fileset>
 		</copy>
 	</target>
 
