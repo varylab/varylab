@@ -20,6 +20,9 @@ public class IntersectionPoint {
 	private LinkedList<Integer> indexList = null;
 	
 
+	public IntersectionPoint() {
+	}
+	
 	
 	public ClosedBoundary getClosedBoundary(NURBSSurface ns, double dilation){
 		if(closedBoundary == null){
@@ -58,13 +61,19 @@ public class IntersectionPoint {
 		closedBoundary = cb;
 	}
 
-	public IntersectionPoint() {
-	}
-	
-	
 
 	public LinkedList<Integer> getIndexList() {
-		return indexList;
+		if(indexList != null){
+			return indexList;
+		} else {
+			indexList = new LinkedList<Integer>();
+			for (LineSegment ls : intersectingSegments) {
+				if(!indexList.contains(ls.getCurveIndex())){
+					indexList.add(ls.getCurveIndex());
+				}
+			}
+			return indexList;
+		}
 	}
 
 	public void setIndexList(LinkedList<Integer> indexList) {

@@ -36,6 +36,10 @@ public class LineSegmentIntersection {
 			int curves = 120;
 			double uFactor = curves / (u1 - u0);
 			double vFactor = curves / (v1 - v0);
+			System.out.println("all original segemtns");
+			for (LineSegment ls : segList) {
+				System.out.println(ls.toString());
+			}
 			
 			Partition[][] partition = new Partition[curves + 1][curves + 1];
 			System.out.println("Start ini");
@@ -91,8 +95,10 @@ public class LineSegmentIntersection {
 		System.out.println("anfanglaenge: " + segList.size());
 		System.out.println("endlaenge: " + finalSegmentTree.size());
 		LinkedList<LineSegment> finalSegmentList = new LinkedList<LineSegment>();
+		System.out.println("all selected segemnts");
 		for (LineSegment ls : finalSegmentTree) {
 			finalSegmentList.add(ls);
+			System.out.println(ls.toString());
 		}
 		return finalSegmentList;
 	}

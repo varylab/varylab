@@ -60,16 +60,7 @@ public class GenerateFaceSet {
 		return indexList;
 	}
 	
-	public static int getShiftedIndexFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
-		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
-		int shiftedIndex = 0;
-		for (LineSegment ls : intersectingSegments) {
-			if(ls.getCurveIndex() == curveIndex){
-				shiftedIndex = ls.getShiftedIndex();
-			}
-		}
-		return shiftedIndex;
-	}
+	
 	
 	private static boolean getCyclicFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
 		boolean cyclic = false;
@@ -110,6 +101,76 @@ public class GenerateFaceSet {
 		return sameIndexList;
 	}
 	
+	private boolean areOppositePoints(IntersectionPoint ip1, IntersectionPoint ip2){
+		IntersectionPoint opposite = getOppositePoint(ip1);
+		if(opposite == null){
+			return false;
+		} else {
+			if(!Arrays.equals(opposite.getPoint(), ip2.getPoint())){
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+	}
+	
+	private static int getShiftedIndexFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
+		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
+		int shiftedIndex = 0;
+		for (LineSegment ls : intersectingSegments) {
+			if(ls.getCurveIndex() == curveIndex){
+				shiftedIndex = ls.getShiftedIndex();
+			}
+		}
+		return shiftedIndex;
+	}
+	
+	private static int getRightShiftFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
+		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
+		int rightShift = 0;
+		for (LineSegment ls : intersectingSegments) {
+			if(ls.getCurveIndex() == curveIndex){
+				rightShift = ls.getRightShift();
+			}
+		}
+		return rightShift;
+	}
+	private static int getUpShiftFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
+		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
+		int upShift = 0;
+		for (LineSegment ls : intersectingSegments) {
+			if(ls.getCurveIndex() == curveIndex){
+				upShift = ls.getUpShift();
+			}
+		}
+		return upShift;
+	}
+	
+	private boolean pointsHaveGivenCurveIndexAndInSameDomain(IntersectionPoint ip1, IntersectionPoint ip2, int curveIndex){
+		if(ip1.getIndexList().contains(curveIndex) && ip2.getIndexList().contains(curveIndex)){
+			int rightShift1 = getRightShiftFromIntersectionPointAndCurveIndex(ip1, curveIndex);
+			int rightshift2 = getRightShiftFromIntersectionPointAndCurveIndex(ip2, curveIndex);
+			int upShift1 = getUpShiftFromIntersectionPointAndCurveIndex(ip1, curveIndex);
+			int upShift2 = getUpShiftFromIntersectionPointAndCurveIndex(ip2, curveIndex);
+			if((rightShift1 == rightshift2) && (upShift1 == upShift2)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean pointsHaveCurveIndexAndInSameDomain(IntersectionPoint ip1, IntersectionPoint ip2, int curveIndex){
+		if(ip1.getIndexList().contains(curveIndex) && ip2.getIndexList().contains(curveIndex)){
+			int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip1, curveIndex);
+			int shiftedIndex2 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip2, curveIndex);
+			if(shiftedIndex1 == shiftedIndex2){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	public LinkedList<HalfedgePoint> findAllNbrs(NURBSSurface ns, double dilation, LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
@@ -117,7 +178,7 @@ public class GenerateFaceSet {
 		for (Double value : ns.getBoundaryValuesPastIntersection(dilation)) {
 			System.out.println(value);
 		}
-		System.out.println("CLOSEDBoundary " + Arrays.toString(ns.getClosedBoundaryValuesPastIntersection(dilation)));
+		System.out.println("CLOSEDBoundary past intersection algorithm" + Arrays.toString(ns.getClosedBoundaryValuesPastIntersection(dilation)));
 		System.out.println("CLOSED BOUNDARY PIONTS");
 		for (IntersectionPoint iP1 : intersectionPoints) {
 			ClosedBoundary cb = iP1.getClosedBoundary(ns, dilation);
@@ -136,19 +197,43 @@ public class GenerateFaceSet {
 			}
 	
 			// add for each curve intersecting this intersectionPoint all IntersectionPoints contained in this curve
-
-			for (Integer i : iP1.getIndexList()){
-				IndexedCurveList icl = new IndexedCurveList(i, new LinkedList<IntersectionPoint>());
-				int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(iP1, i);
+			double[] check = {6.283185307, -0.867038755};
+			for (Integer index1 : iP1.getIndexList()){
+				IndexedCurveList icl = new IndexedCurveList(index1, new LinkedList<IntersectionPoint>());
+//				int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(iP1, index1);
 				iP1CurveList.add(icl);
+				if(Arrays.equals(check, iP1.getPoint())){
+					System.out.println("all points on lines intersecting at " + Arrays.toString(check));
+					System.out.println(" iP1.getIndexList()");
+					for (Integer index : iP1.getIndexList()) {
+						System.out.println(index);
+					}
+					System.out.println("getIndexListFromIntersectionPoint(iP1)");
+					for (Integer index : getIndexListFromIntersectionPoint(iP1)) {
+						System.out.println(index);
+					}
+					
+				}
+				System.out.println("IP1 IS THE PIONT " + Arrays.toString(iP1.getPoint()) + " and the index = " + index1);
 				for (IntersectionPoint iP2 : intersectionPoints) {
-					LinkedList<Integer> curveIndex = getIndexListFromIntersectionPoint(iP2);
-					int shiftedIndex2 = getShiftedIndexFromIntersectionPointAndCurveIndex(iP2, i);
-					if(curveIndex.contains(i) && shiftedIndex1 == shiftedIndex2){
+//					LinkedList<Integer> curveIndices = iP2.getIndexList();
+//					int shiftedIndex2 = getShiftedIndexFromIntersectionPointAndCurveIndex(iP2, index1);
+//					if(curveIndices.contains(index1) && !areOppositePoints(iP1, iP2)){
+					if(pointsHaveGivenCurveIndexAndInSameDomain(iP1, iP2, index1)){
+//					if(pointsHaveCurveIndexAndInSameDomain(iP1, iP2, index1)){
+						System.out.println("pointsAreOnSameLineAndInSameDomain(iP1, iP2) iP2 is : " + Arrays.toString(iP2.getPoint()));
 						icl.getCurveList().add(iP2);
+						if(Arrays.equals(check, iP1.getPoint())){
+							System.out.println(Arrays.toString(iP2.getPoint()));
+						}
 					}
 				}
+				
 			}
+			
+			
+			
+			
 			
 			LinkedList<IntersectionPoint> nbrs = new LinkedList<IntersectionPoint>();
 			
@@ -242,6 +327,17 @@ public class GenerateFaceSet {
 //		for (IntersectionPoint ip : intersectionPoints) {
 //			System.out.println(ip.getParentHP().toString());
 //		}
+		for (HalfedgePoint hp : points) {
+			
+			double[] check = {6.283185307, -0.867038755};
+			if(Arrays.equals(check, hp.getIntersectionPoint().getPoint())){
+				System.out.println("nbr check");
+				System.out.println("all nbrs of " + Arrays.toString(check));
+				for (IntersectionPoint ip : hp.getNbrs()) {
+					System.out.println(Arrays.toString(ip.getPoint()));
+				}
+			}
+		}
 		return points;
 	}
 	
@@ -433,6 +529,11 @@ public class GenerateFaceSet {
 //	}
 	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, HalfedgePoint p){
+		System.out.println("point p  = " + Arrays.toString(p.getIntersectionPoint().getPoint()));
+//		System.out.println("unusedNbrs");
+//		for (IntersectionPoint ip : p.getUnusedNbrs()) {
+//			System.out.println(Arrays.toString(ip.getPoint()));
+//		}
 		System.out.println();
 		if(previous != null){
 			System.out.println("PRIVIOUS = " + Arrays.toString(previous.getPoint()));
@@ -440,7 +541,7 @@ public class GenerateFaceSet {
 		else{
 			System.out.println("PRIVIOUS = null");
 		}
-		System.out.println("point p  = " + Arrays.toString(p.getIntersectionPoint().getPoint()));
+	
 		IntersectionPoint next = null;
 		if(previous == null){
 			System.out.println("1. previous == null");
@@ -473,8 +574,9 @@ public class GenerateFaceSet {
 			System.out.println("1. previous != null");
 			IntersectionPoint nextLocal = getNextNbrLocal(previous, p);
 			System.out.println("next local " + Arrays.toString(nextLocal.getPoint()));
-			p.getUnusedNbrs().remove(nextLocal);
+		
 			if(!isClosedBoundaryPoint(p.getIntersectionPoint())){
+				p.getUnusedNbrs().remove(nextLocal);
 				System.out.println("1. p != closed boundary");
 				if(!isClosedBoundaryPoint(nextLocal)){
 					System.out.println("1.1. next local != closed boundary");
@@ -486,8 +588,16 @@ public class GenerateFaceSet {
 					if(!isFaceVertex(nextLocal)){
 						System.out.println("1.2.1. next local != face vertex");
 						IntersectionPoint newP = getOppositePoint(nextLocal);
+						System.out.println("newP " + Arrays.toString(newP.getPoint()));
 						IntersectionPoint newPrevious = getOppositePoint(getNextNbrLocal(p.getIntersectionPoint(), nextLocal.getParentHP()));
+						System.out.println("newPrevious " + Arrays.toString(newPrevious.getPoint()));
+						System.out.println("all orinted nbrs of newP");
+						for (IntersectionPoint ip : newP.getParentHP().getNbrs()) {
+							System.out.println(Arrays.toString(ip.getPoint()));
+						}
 						next = getNextNbrLocal(newPrevious, newP.getParentHP());
+		
+						System.out.println("getNextNbrLocal(newPrevious, newP.getParentHP()); " + Arrays.toString(next.getPoint()));
 						next.getParentHP().setPrevious(newP);
 					}
 					else{
@@ -498,7 +608,7 @@ public class GenerateFaceSet {
 				}
 			}
 			else{
-				System.out.println("2. previous != null");
+				System.out.println("2. p == closed boundary");
 				if(!isClosedBoundaryPoint(nextLocal)){
 					System.out.println("1.2. next local != closed boundary");
 					next = nextLocal;
@@ -507,9 +617,11 @@ public class GenerateFaceSet {
 				else{
 					System.out.println("2.2. next local == closed boundary");
 					IntersectionPoint newP = getOppositePoint(p.getIntersectionPoint());
+					System.out.println("newP " + Arrays.toString(newP.getPoint()));
 					IntersectionPoint newPrevious = getOppositePoint(nextLocal);
+					System.out.println("newPrevious " + Arrays.toString(newPrevious.getPoint()));
 					next = getNextNbrLocal(newPrevious, newP.getParentHP());
-					next.getParentHP().setPrevious(newPrevious);
+					next.getParentHP().setPrevious(newP);
 				}
 			}
 		}
@@ -727,7 +839,7 @@ public class GenerateFaceSet {
 		}
 		System.out.println();
 		double[][] verts = new double[points.size()][2];
-		LinkedList<int[]> faceNbrs = new LinkedList<int[]>();
+		LinkedList<int[]> faceVerts = new LinkedList<int[]>();
 		int c = 0;
 		for (HalfedgePoint hP: points) {
 			LinkedList<IntersectionPoint> unusedNbrs = new LinkedList<IntersectionPoint>();
@@ -740,23 +852,23 @@ public class GenerateFaceSet {
 			c++;
 		}
 		fS.setVerts(verts);
-//		int faceIndexTest = 0;
+		int faceIndexTest = 0;
 		System.out.println("All faces");
 		Set<Double> boundaryValues = new HashSet<Double>();
 		boundaryValues = ns.getBoundaryValuesPastIntersection(dilation);
 		List<Double> boundValues = new LinkedList<Double>();
 		for (Double d : boundaryValues) {
-			boundaryValues.add(d);
+			boundValues.add(d);
 		}
 		for (HalfedgePoint hP : points) {
 			while(!hP.getUnusedNbrs().isEmpty()){
 				if(!isClosedBoundaryPoint(hP.getIntersectionPoint())){
-//					faceIndexTest ++;
+					faceIndexTest ++;
 					LinkedList<IntersectionPoint> facePoints = getAllFaceVertices(hP);
-//					System.out.println("Face index = " + faceIndexTest);
-//					for (IntersectionPoint iP : facePoints) {
-//						System.out.println(Arrays.toString(iP.getPoint()));
-//					}
+					System.out.println("Face index = " + faceIndexTest);
+					for (IntersectionPoint iP : facePoints) {
+						System.out.println(Arrays.toString(iP.getPoint()));
+					}
 					if(!faceConsistsOnlyOfBoundaryVertices(facePoints, boundValues)){
 						LinkedList<Integer> ind = new LinkedList<Integer>();
 						for (IntersectionPoint fP : facePoints) {
@@ -772,19 +884,19 @@ public class GenerateFaceSet {
 							index[count] = i;
 							count++;
 						}
-						faceNbrs.add(index);
+						faceVerts.add(index);
 					}
 					else{
 						System.out.println();
-						System.out.println("        FACE");
+						System.out.println("    null    FACE");
 						System.out.println();
 					}
 				}
 			}
 		}
-		int[][] faceIndex = new int[faceNbrs.size()][];
+		int[][] faceIndex = new int[faceVerts.size()][];
 		int counter = 0;
-		for (int[] fs : faceNbrs) {
+		for (int[] fs : faceVerts) {
 				faceIndex[counter] = fs;
 				counter++;
 		}

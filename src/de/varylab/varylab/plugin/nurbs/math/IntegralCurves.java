@@ -576,6 +576,7 @@ public class IntegralCurves {
 	double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 	double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
 	double[] b = { 0, 0.5, 0.75, 1 };
+	double[] initialValue = y0.clone();
 	// double[][] A =	{{0,0,0,0,0,0,0},{1/5.,0,0,0,0,0,0},{3/40.,9/40.,0,0,0,0,0},{44/45.,-56/15.,32/9.,0,0,0,0},{19372/6561.,-25360/2187.,64448/6561.,-212/729.,0,0,0},{9017/3168.,-355/33.,46732/5247.,49/176.,-5103/18656.,0,0},{35/384.,	0, 500/1113., 125/192., -2187/6784., 11/84.,0}};
 	// double[] c1 = {35/384., 0, 500/1113., 125/192., -2187/6784., 11/84.,	0 };
 	// double[] c2 = {5179/57600., 0, 7571/16695., 393/640.,	-92097/339200., 187/2100., 1/40.};
@@ -593,12 +594,12 @@ public class IntegralCurves {
 	double [] vec1 = new double[2];
 	double [] vec2 = new double[2];
 	boolean closed = false;
-	pointList.add(y0);
+	pointList.add(initialValue);
 	double[] orientation = new double[2];
 	if (!secondOrientation) {
-		orientation = IntegralCurves.getVecField(ns, y0, conj);
+		orientation = IntegralCurves.getVecField(ns, initialValue, conj);
 	} else {
-		orientation = Rn.times(null, -1, IntegralCurves.getVecField(ns, y0, conj));
+		orientation = Rn.times(null, -1, IntegralCurves.getVecField(ns, initialValue, conj));
 	}
 	boolean nearBy = false;
 	double dist;
@@ -606,7 +607,6 @@ public class IntegralCurves {
 	LineSegment seg = new LineSegment();
 
 	while (!nearBy) {
-//		System.out.println("pointList.size() "+pointList.size());
 		double[] v = new double[dim];
 		double[] sumA = new double[dim];
 		for (int i = 0; i < dim; i++) {
@@ -1339,39 +1339,86 @@ public class IntegralCurves {
 		}
 	}
 	
+//	private static LinkedList<double[]> setIntoDomain(NURBSSurface ns, double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
+//		LinkedList<double[]> domainList = new LinkedList<double[]>();
+//		int counter = 0;
+//		double[][] seg = new double[2][2];
+//		domainList.add(pointList.getFirst());
+//		seg[0] = pointList.getFirst().clone();
+//		domainList.add(pointList.getFirst());
+//		for (double[] p : pointList) {
+//			if(counter != 0){
+//				seg[1] = p.clone();
+//				if(ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
+//					flipClosedBoundaryPoint(ns, u0, um, v0, vn, seg[0]);
+////					domainList.add(seg[0]);
+//					domainList.add(getPointInDomain(u0, um, v0, vn, seg[1]));
+//				} else {
+//					if(pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
+//						double[][] intersections = getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, seg[0], seg[1]);
+//						domainList.add(intersections[0]);
+//						domainList.add(intersections[1]);
+//					}
+//					double[] domainPoint = getPointInDomain(u0, um, v0, vn, p);
+//					double[] check = domainList.getLast();
+//					if(!Arrays.equals(check, domainPoint)){
+//						domainList.add(domainPoint);
+//					}
+//					else{
+//						System.out.println("DOPPEL PUNKT");
+//					}
+//				}
+//				seg[0] = p.clone();
+//			}
+//			counter++;
+//		}
+//		return domainList;
+//	}
+	
 	private static LinkedList<double[]> setIntoDomain(NURBSSurface ns, double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
 		LinkedList<double[]> domainList = new LinkedList<double[]>();
 		int counter = 0;
+//		System.out.println("check runge kutta list");
+//		for (double[] point : pointList) {
+//			System.out.println(Arrays.toString(point));
+//		}
 		double[][] seg = new double[2][2];
 		domainList.add(pointList.getFirst());
 		seg[0] = pointList.getFirst().clone();
-		domainList.add(pointList.getFirst());
+//		domainList.add(pointList.getFirst());
 		for (double[] p : pointList) {
 			if(counter != 0){
 				seg[1] = p.clone();
-				if(ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
-					flipClosedBoundaryPoint(ns, u0, um, v0, vn, seg[0]);
+				if(counter == 1 && ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
+//					flipClosedBoundaryPoint(ns, u0, um, v0, vn, seg[0]);
+					flipClosedBoundaryPoint(ns, u0, um, v0, vn, pointList.getFirst());
+//					domainList
 //					domainList.add(seg[0]);
-					domainList.add(getPointInDomain(u0, um, v0, vn, seg[1]));
+					domainList.add(getPointInDomain(u0, um, v0, vn, p));
 				} else {
 					if(pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
 						double[][] intersections = getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, seg[0], seg[1]);
 						domainList.add(intersections[0]);
 						domainList.add(intersections[1]);
 					}
-					double[] domainPoint = getPointInDomain(u0, um, v0, vn, p);
-					double[] check = domainList.getLast();
-					if(!Arrays.equals(check, domainPoint)){
-						domainList.add(domainPoint);
-					}
-					else{
-						System.out.println("DOPPEL PUNKT");
-					}
+					
+				}
+				double[] domainPoint = getPointInDomain(u0, um, v0, vn, p);
+				double[] check = domainList.getLast();
+				if(!Arrays.equals(check, domainPoint)){
+					domainList.add(domainPoint);
+				}
+				else{
+					System.out.println("DOPPEL PUNKT");
 				}
 				seg[0] = p.clone();
 			}
 			counter++;
 		}
+//		System.out.println("setIntoDomain");
+//		for (double[] point : domainList) {
+//			System.out.println(Arrays.toString(point));
+//		}
 		return domainList;
 	}
 	

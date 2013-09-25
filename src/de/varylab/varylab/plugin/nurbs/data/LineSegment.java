@@ -7,23 +7,23 @@ import de.jreality.math.Rn;
 
 public class LineSegment {
 	
-	protected double[][] segment;
-	protected int indexOnCurve = Integer.MIN_VALUE;
-	protected int curveIndex = Integer.MIN_VALUE;
+	private double[][] segment;
+	private int indexOnCurve = Integer.MIN_VALUE;
+	private int curveIndex = Integer.MIN_VALUE;
 	private int shiftedIndex = Integer.MAX_VALUE;
-	protected LinkedList<double[]> ePoints;
-	protected boolean cyclic;
-//	protected boolean max;
+	private boolean cyclic;
+	private int rightShift;
+	private int upShift;
 	
 	public LineSegment(){
 		
 	}
 	
-	public LineSegment(double[][] s , int iOC,int cI){
+	public LineSegment(double[][] s , int iOC, int cI){
 		segment = s;
 		indexOnCurve = iOC;
 		curveIndex = cI;
-		shiftedIndex = cI;
+//		shiftedIndex = cI;
 	}
 	
 	public static enum PointStatus {
@@ -32,23 +32,28 @@ public class LineSegment {
 		lower
 	}
 	
-	
-	
-	
+	public int getRightShift() {
+		return rightShift;
+	}
+
+	public void setRightShift(int rightShift) {
+		this.rightShift = rightShift;
+	}
+
+	public int getUpShift() {
+		return upShift;
+	}
+
+	public void setUpShift(int upShift) {
+		this.upShift = upShift;
+	}
+
 	public int getShiftedIndex() {
 		return shiftedIndex;
 	}
 
 	public void setShiftedIndex(int shiftedIndex) {
 		this.shiftedIndex = shiftedIndex;
-	}
-
-	public LinkedList<double[]> getePoints() {
-		return ePoints;
-	}
-
-	public void setePoints(LinkedList<double[]> ePoints) {
-		this.ePoints = ePoints;
 	}
 
 	public double[][] getSegment() {
@@ -118,14 +123,13 @@ public class LineSegment {
 		closedBoundary.add(seg0);
 		closedBoundary.add(seg1);
 		return closedBoundary;
-		
 	}
 
 	@Override
 	public String toString() {
 		return //"LineSegmentIntersection [segment=" + Arrays.toString(segment[0]) + " " + Arrays.toString(segment[1])
 				//+ ", index=" + indexOnCurve +
-				curveIndex+ "|" + indexOnCurve + " endpoints " + Arrays.toString(segment[0]) + Arrays.toString(segment[1]);
+				curveIndex+ "|" + indexOnCurve + " endpoints " + Arrays.toString(segment[0]) + Arrays.toString(segment[1]) + " rightShift = " + rightShift + " upShift = " + upShift;
 	}
 
 
