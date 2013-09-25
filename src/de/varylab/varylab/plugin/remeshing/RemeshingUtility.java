@@ -20,6 +20,7 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
+import de.jtem.halfedgetools.adapter.type.generic.Position2d;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
@@ -139,7 +140,7 @@ public class RemeshingUtility {
 		// map inner vertices
 		Map<V, double[]> flatCoordMap = new HashMap<V, double[]>();
 		for (V v : remesh.getVertices()) {
-			double[] patternPoint = a.getD(Position3d.class, v);
+			double[] patternPoint = a.getD(Position2d.class, v);
 			F f = RemeshingUtility.getContainingFace(v, mesh, a, meshKD);
 			if (f == null) { 
 				System.err.println("no face containing " + v + " found!");
@@ -436,21 +437,20 @@ public class RemeshingUtility {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> F getContainingFace(V v, HDS mesh, AdapterSet a, KdTree<V, E, F> meshKD) {
-		double[] p = a.getD(Position3d.class, v);
-		Collection<V> nearbyVertices = meshKD.collectKNearest(p, 5);
+		Collection<V> nearbyVertices = meshKD.collectKNearest(a.getD(Position3d.class, v), 5);
 		Set<F> checkFaces = new HashSet<F>();
 		for (V nv : nearbyVertices) {
 			checkFaces.addAll(HalfEdgeUtils.facesIncidentWithVertex(nv));
 		}
 		// check faces incident with nearest points
 		for (F f : checkFaces) {
-			if (isInConvexTextureFace(p, f, a)) {
+			if (isInConvexTextureFace(a.getD(Position2d.class, v), f, a)) {
 				return f;
 			}
 		}
 		// brute force check
 		for (F f : mesh.getFaces()) {
-			if (isInConvexTextureFace(p, f, a)) {
+			if (isInConvexTextureFace(a.getD(Position2d.class, v), f, a)) {
 				return f;
 			}
 		}
@@ -480,8 +480,8 @@ public class RemeshingUtility {
 		boolean sideFlag = false;
 		boolean firstEdge = true;
 		for (E e : bList) {
-			double[] sp = a.getD(TexturePosition3d.class, e.getStartVertex());
-			double[] tp = a.getD(TexturePosition3d.class, e.getTargetVertex());
+			double[] sp = a.getD(TexturePosition2d.class, e.getStartVertex());
+			double[] tp = a.getD(TexturePosition2d.class, e.getTargetVertex());
 			double[] v1 = Rn.subtract(null, tp, sp);
 			double[] v2 = Rn.subtract(null, p, sp);
 			double[] v2r = {-v2[1], v2[0], 0};

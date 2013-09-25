@@ -92,4 +92,9 @@ public class QuadLattice <
 		}
 		return Collections.singletonList(e);
 	}
+	
+	@Override
+	protected boolean isValidAngle(double angle) {
+		return (Math.abs(angle*4 - Math.round(4*angle/Math.PI)*Math.PI) < 1E-2);
+	}
 }

@@ -95,7 +95,7 @@ public class LatticeLine2D <
 		double[] startIJ = lattice.getIJ(sp);
 		Slope dirSlope = lattice.compass.getClosestSlope(dir[0],dir[1]);
 		Slope ijSlope = lattice.compass.getIJSlope(dirSlope);
-		startIJ = nextIJPointInDirection(startIJ, ijSlope);
+		startIJ = LatticeUtility.nextLatticePointInDirection(startIJ, ijSlope);
 		double[] IJ = new double[]{Math.round(startIJ[0]),Math.round(startIJ[1])};
 		V v = lattice.getVertex((int)IJ[0], (int)IJ[1]);
 		double[] vpos = a.getD(Position3d.class, v);
@@ -118,16 +118,5 @@ public class LatticeLine2D <
 		return segment;
 	}
 
-	double[] nextIJPointInDirection(double[] startIJ, Slope ijSlope) {
-		double[] nextIJ = new double[]{startIJ[0], startIJ[1]};  
-		if((nextIJ[0] % 1 != 0) || (nextIJ[1] % 1 != 0)) {
-			double 
-				lx = (ijSlope.dx==0)?0:(((ijSlope.dx>0)?1-((nextIJ[0])%1):-((nextIJ[0])%1))/ijSlope.dx),
-				ly = (ijSlope.dy==0)?0:(((ijSlope.dy>0)?1-((nextIJ[1])%1):-((nextIJ[1])%1))/ijSlope.dy);
-			Rn.add(nextIJ,nextIJ,Rn.times(null,Math.max(lx, ly),ijSlope.toArray()));
-		} else {
-			Rn.add(nextIJ,nextIJ,ijSlope.toArray());
-		}
-		return nextIJ;
-	}
+
 }

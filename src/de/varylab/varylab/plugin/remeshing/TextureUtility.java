@@ -57,4 +57,16 @@ public class TextureUtility {
 		} while(Math.abs(Math.PI - theta) < 1E-3);
 		return be;
 	}
+	
+
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double[] getDirection(V v1, V v2, AdapterSet a) {
+		double[] p1 = a.getD(TexturePosition2d.class,v1);
+		double[] p2 = a.getD(TexturePosition2d.class,v2);
+		return Rn.subtract(null, p2, p1);
+	}
 }

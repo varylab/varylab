@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.math.Matrix;
+import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
@@ -38,6 +39,7 @@ import de.jreality.util.LoggingSystem;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
+import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
@@ -277,7 +279,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		if (surface.getVertex(0).getT() == null) {
 			throw new RemeshingException("Surface has no texture coordinates.");
 		}
-		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, a, 10, false);
+		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, new AdapterSet(new VTexturePositionPosition3dAdapter()), 10, false);
 		HalfedgeSelection sel = hcp.getSelection();
 		Set<VVertex> featureSet = sel.getVertices(surface);
 		featureSet.retainAll(HalfEdgeUtils.boundaryVertices(surface));
@@ -302,8 +304,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		case Triangles:
 			TriangleRemeshingUtility.createRectangularTriangleMesh(remesh, bbox);
 			break;
-		case TrianglesQuantized:
-			remesher.setLattice(new TriangleLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
+		case TrianglesQuantized: {
+			TriangleLattice<VVertex, VEdge, VFace, VHDS> lattice = new TriangleLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox);
+			lattice.setTexInvTransform(Rn.times(null,texInvMatrix.getEntry(3,3),new double[]{texInvMatrix.getEntry(0, 0), texInvMatrix.getEntry(0, 1), texInvMatrix.getEntry(1, 0), texInvMatrix.getEntry(1, 1)}));
+			remesher.setLattice(lattice);
 			remesh = remesher.remesh(surface, a); 
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
@@ -314,14 +318,22 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.getT());
 			}
-			hcp.set(remesh);
+			if(!isExpertMode()) {
+				hcp.setNoUndo(remesh);
+			} else {
+				hcp.set(remesh);
+			}
 			return;
-		case Quads:
+		}
+		case Quads: {
 			QuadLattice<VVertex, VEdge, VFace, VHDS> qLattice = new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox);
 			remesh = qLattice.getHDS();
 			break;
-		case QuadsQuantized:
-			remesher.setLattice(new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox));
+		}
+		case QuadsQuantized: {
+			QuadLattice<VVertex, VEdge, VFace, VHDS> lattice = new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox);
+			lattice.setTexInvTransform(Rn.times(null,texInvMatrix.getEntry(3,3),new double[]{texInvMatrix.getEntry(0, 0), texInvMatrix.getEntry(0, 1), texInvMatrix.getEntry(1, 0), texInvMatrix.getEntry(1, 1)}));			
+			remesher.setLattice(lattice);
 			remesh = remesher.remesh(surface, a); 
 			for (VVertex v : remesh.getVertices()) {
 				texInvMatrix.transformVector(v.getP());
@@ -331,9 +343,14 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.getT());
 			}
-			hcp.set(remesh);
+			if(!isExpertMode()) {
+				hcp.setNoUndo(remesh);
+			} else {
+				hcp.set(remesh);
+			}
 			return;
-		case QuadsSingularities:
+		}
+		case QuadsSingularities: {
 			LocalQuadRemesher<VVertex, VEdge, VFace, VHDS> localQuadRemesher =
 				new LocalQuadRemesher<VVertex, VEdge, VFace, VHDS>();
 			newOldFaceMap = localQuadRemesher.remesh(surface,remesh,a, projectiveCoordsBox.isSelected());
@@ -349,7 +366,11 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				texInvMatrix.transformVector(v.getT());
 			}
 
-			hcp.set(remesh);
+			if(!isExpertMode()) {
+				hcp.setNoUndo(remesh);
+			} else {
+				hcp.set(remesh);
+			}
 			HalfedgeSelection selection = hcp.getSelection();
 			for(VVertex v : remesh.getVertices()) {
 				if(localQuadRemesher.isTextureVertex(v) || HalfEdgeUtils.isBoundaryVertex(v)) {
@@ -360,19 +381,21 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			
 			return;
 		}
+		}
 		
 		// map inner vertices
 		Map<VVertex, VFace> texFaceMap = new HashMap<VVertex, VFace>();
 		Set<VVertex> cutSet = new HashSet<VVertex>(remesh.getVertices());
 		for (VVertex v : remesh.getVertices()) {
 			double[] patternPoint = a.getD(Position3d.class, v);
+			// TODO: seems to be broken 
 			VFace f = RemeshingUtility.getContainingFace(v, surface, a, surfaceKD);
 			if (f == null) {
 				continue;
 			} 
 			double[] bary = RemeshingUtility.getBarycentricTexturePoint(patternPoint, f, a);
 			double[] newPos = RemeshingUtility.getPointFromBarycentric(bary, f, a);
-			a.set(Position.class, v, newPos);
+			a.set(Position3d.class, v, newPos);
 			texFaceMap.put(v, f);
 			cutSet.remove(v);
 		}
@@ -502,4 +525,22 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		v.startup();
 	}
 	
+	@Position3d
+	private class VTexturePositionPosition3dAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
+
+		public VTexturePositionPosition3dAdapter() {
+			super(VVertex.class, null, null, double[].class, true, false);
+		}
+		
+		@Override
+		public double getPriority() {
+			return 1;
+		}
+		
+		@Override
+		public double[] getVertexValue(VVertex v, AdapterSet a) {
+			return new double[]{v.getT()[0]/v.getT()[3], v.getT()[1]/v.getT()[3], v.getT()[2]/v.getT()[3]};
+		}
+		
+	}
 }

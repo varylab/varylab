@@ -33,6 +33,7 @@ public class TriangleLattice <
 	
 	public TriangleLattice(HDS template, AdapterSet a, Rectangle2D bbox) {
 		super(template, new double[]{1.0/3.0,0.0}, new double[]{1.0/6.0,0.5},bbox);
+		texInvTransform = new double[] {Math.sqrt(3), 0.0, 0.0, 1.0};
 		this.a = a;
 		double xSpan = bbox.getWidth();
 		double ySpan = bbox.getHeight();
@@ -132,4 +133,9 @@ public class TriangleLattice <
 		}
 		return edges;
 	}
+
+	protected boolean isValidAngle(double angle) {
+		return (Math.abs(angle*6 - Math.round(6*angle/Math.PI)*Math.PI) < 1E-2);
+	}
+
 }
