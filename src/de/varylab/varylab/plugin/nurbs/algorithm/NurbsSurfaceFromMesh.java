@@ -19,7 +19,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
@@ -67,8 +67,8 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 	}
 	
 	@Override
-	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Custom;
+	public String getCategory() {
+		return "NURBS";
 	}
 
 	@Override
@@ -113,29 +113,31 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 		double[][][] cm = new double[m][n][4];
 		e = startEdge.getNextEdge();
 		NurbsWeightAdapter nwa = as.query(NurbsWeightAdapter.class);
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m - 1; j++) {
-				v = e.getStartVertex();
-				System.arraycopy(as.getD(Position3d.class, v), 0, cm[j][i], 0, 3);
-				cm[j][i][3] = 1.0;
-				if((nwa != null)) {
-					Rn.times(cm[j][i], nwa.getV(v, null), cm[j][i]);
-				} 
-				if(j < m-2) {
-					e = getNextInRowTraversal(e);
+		synchronized(nwa) {
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m - 1; j++) {
+					v = e.getStartVertex();
+					System.arraycopy(as.getD(Position3d.class, v), 0, cm[j][i], 0, 3);
+					cm[j][i][3] = 1.0;
+					if((nwa != null)) {
+						Rn.times(cm[j][i], nwa.getV(v, null), cm[j][i]);
+					} 
+					if(j < m-2) {
+						e = getNextInRowTraversal(e);
+					}
 				}
-			}
-			v = e.getTargetVertex();
-			System.arraycopy(as.getD(Position3d.class, v), 0, cm[m-1][i], 0, 3);
-			cm[m-1][i][3] = 1.0;
-			if((nwa != null)) {
-				Rn.times(cm[m-1][i], nwa.getV(v, null), cm[m-1][i]);
-			} 
-			startEdge = startEdge.getPreviousEdge();
-			if(i < n-2) {
-				e = startEdge.getOppositeEdge().getPreviousEdge().getOppositeEdge();
-			} else { // i == n-1
-				e = startEdge.getOppositeEdge();
+				v = e.getTargetVertex();
+				System.arraycopy(as.getD(Position3d.class, v), 0, cm[m-1][i], 0, 3);
+				cm[m-1][i][3] = 1.0;
+				if((nwa != null)) {
+					Rn.times(cm[m-1][i], nwa.getV(v, null), cm[m-1][i]);
+				} 
+				startEdge = startEdge.getPreviousEdge();
+				if(i < n-2) {
+					e = startEdge.getOppositeEdge().getPreviousEdge().getOppositeEdge();
+				} else { // i == n-1
+					e = startEdge.getOppositeEdge();
+				}
 			}
 		}
 		return cm;
@@ -166,13 +168,17 @@ public class NurbsSurfaceFromMesh extends AlgorithmDialogPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		NURBSSurface surface = new NURBSSurface(controlMesh, uDegree.getNumber().intValue(), vDegree.getNumber().intValue());
-		//TODO: put on extra layer
-		NurbsSurfaceUtility.addNurbsMesh(surface, hif.getActiveLayer(), uSteps.getNumber().intValue(), vSteps.getNumber().intValue());
+		HalfedgeLayer newLayer = new HalfedgeLayer(hif);
+		newLayer.setName("NURBS Surface from " + hif.getActiveLayer().getName());
+		NurbsSurfaceUtility.addNurbsMesh(surface, newLayer, uSteps.getNumber().intValue(), vSteps.getNumber().intValue());
+		hif.addLayer(newLayer);
+		hif.activateLayer(newLayer);
 	}
 
 	@Override
 	protected JPanel getDialogPanel() {
 		return dPanel;
 	}
+
 	
 }

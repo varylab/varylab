@@ -9,17 +9,16 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class ExtractControlMesh extends AlgorithmPlugin {
 
 	@Override
-	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Custom;
+	public String getCategory() {
+		return "NURBS";
 	}
-
+	
 	@Override
 	public String getAlgorithmName() {
 		return "Extract Control Mesh";
