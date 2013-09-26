@@ -870,6 +870,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		}
 		
 		
+		@SuppressWarnings("unused")
 		private ValidSegment isValidSegemnt(double[][] seg, double u0, double um, double v0, double vn, int shiftedIndex){
 			ValidSegment vs = new ValidSegment();
 			if((seg[0][0] == u0 && seg[1][0] == um) || (seg[0][0] == um && seg[1][0] == u0)){

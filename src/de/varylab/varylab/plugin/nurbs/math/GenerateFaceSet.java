@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sunflow.system.UI;
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
@@ -19,8 +17,8 @@ import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
-import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.ClosedBoundary;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
 public class GenerateFaceSet {
 	
@@ -103,6 +101,7 @@ public class GenerateFaceSet {
 		return sameIndexList;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean areOppositePoints(IntersectionPoint ip1, IntersectionPoint ip2){
 		IntersectionPoint opposite = getOppositePoint(ip1);
 		if(opposite == null){
@@ -162,6 +161,7 @@ public class GenerateFaceSet {
 		return false;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean pointsHaveCurveIndexAndInSameDomain(IntersectionPoint ip1, IntersectionPoint ip2, int curveIndex){
 		if(ip1.getIndexList().contains(curveIndex) && ip2.getIndexList().contains(curveIndex)){
 			int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip1, curveIndex);
