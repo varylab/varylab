@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sunflow.system.UI;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
@@ -172,7 +174,7 @@ public class GenerateFaceSet {
 	}
 	
 	
-	public LinkedList<HalfedgePoint> findAllNbrs(NURBSSurface ns, double dilation, LinkedList<IntersectionPoint> intersectionPoints){
+	public LinkedList<HalfedgePoint> findAllLocalNbrs(NURBSSurface ns, double dilation, LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
 		System.out.println("Boundary ");
 		for (Double value : ns.getBoundaryValuesPastIntersection(dilation)) {
@@ -430,10 +432,8 @@ public class GenerateFaceSet {
 	
 	private boolean isClosedBoundaryPoint(IntersectionPoint ip){
 		if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.interior){
-//			System.out.println("BOUNDARY " + ip.getClosedBoundary(ns, dilation));
 			return false;
 		}
-//		System.out.println("HHHHHAAAAALLLLLOOOOO!!!!!");
 		return true;
 	}
 	
@@ -528,6 +528,8 @@ public class GenerateFaceSet {
 //		return next;
 //	}
 	
+	
+	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, HalfedgePoint p){
 		System.out.println("point p  = " + Arrays.toString(p.getIntersectionPoint().getPoint()));
 //		System.out.println("unusedNbrs");
@@ -596,7 +598,6 @@ public class GenerateFaceSet {
 							System.out.println(Arrays.toString(ip.getPoint()));
 						}
 						next = getNextNbrLocal(newPrevious, newP.getParentHP());
-		
 						System.out.println("getNextNbrLocal(newPrevious, newP.getParentHP()); " + Arrays.toString(next.getPoint()));
 						next.getParentHP().setPrevious(newP);
 					}
@@ -629,10 +630,6 @@ public class GenerateFaceSet {
 		return next;
 	}
 	
-
-	
-
-	
 	private LinkedList<IntersectionPoint>  getAllFaceVertices(HalfedgePoint p){
 		LinkedList<IntersectionPoint> allFaceVerts = new LinkedList<IntersectionPoint>();
 		IntersectionPoint previous = null;
@@ -648,20 +645,30 @@ public class GenerateFaceSet {
 			first = false;
 			IntersectionPoint current = getNextNbr(previous, allFaceVerts.getLast().getParentHP());
 			previous = current.getParentHP().getPrevious();
+//			if(current.getClosedBoundary(ns, dilation) != ClosedBoundary.interior){
+//				current = getUniqueClosedBoundryPoint(current);
+//			}
 			allFaceVerts.add(current);
 		}
 		allFaceVerts.pollLast();
 		System.out.println("all face verts");
+		LinkedList<IntersectionPoint> uniqueFaceVerts = new LinkedList<IntersectionPoint>();
 		for (IntersectionPoint ip : allFaceVerts) {
-			System.out.println(Arrays.toString(ip.getPoint()));
+			ClosedBoundary cb = ip.getClosedBoundary(ns, dilation);
+			if(cb == ClosedBoundary.right || cb == ClosedBoundary.upper){
+				uniqueFaceVerts.add(getOppositePoint(ip));
+			}
+			else{
+				uniqueFaceVerts.add(ip);
+			}
+			System.out.println(Arrays.toString(uniqueFaceVerts.getLast().getPoint()));
 		}
-		return allFaceVerts;
+		return uniqueFaceVerts;
 	}
 	
 	private IntersectionPoint getOppositePoint(IntersectionPoint ip){
 		if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.interior){
-			System.out.println("INTERRIOR");
-			return null;
+			throw new IllegalArgumentException("IntersectionPoint " + Arrays.toString(ip.getPoint()) + " does not lie on the closed boundary");
 		}
 		else if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.left){
 			System.out.println("left and rightBound");
@@ -699,28 +706,53 @@ public class GenerateFaceSet {
 		return null;
 	}
 	
-//	private static boolean faceContainsAllBoundaryVerts(LinkedList<IntersectionPoint> allAjacentNbrs, List<double[]> boundaryVerts){
-//		boolean containsAll = false;
-//		int numberOfBoundaryVerts = boundaryVerts.size();
-//		int counter = 0;
-//		for(double[] bV : boundaryVerts){
-//			for (IntersectionPoint iP : allAjacentNbrs) {
-//				if(Arrays.equals(bV,iP.getPoint())){
-//					counter++;
+	private IntersectionPoint getUniqueClosedBoundryPoint(IntersectionPoint ip){
+		IntersectionPoint unique = ip;
+		ClosedBoundary cb = ip.getClosedBoundary(ns, dilation);
+		if(cb == ClosedBoundary.upper || cb == ClosedBoundary.right){
+			unique = getOppositePoint(ip);
+		}
+		return unique;
+	}
+	
+	
+//	private IntersectionPoint getUniqueClosedBoundryPoint(IntersectionPoint nextLocal, IntersectionPoint p){
+//		IntersectionPoint unique = nextLocal;
+//		System.out.println("getUniqueClosedBoundryPoint");
+//		if(nextLocal.getClosedBoundary(ns, dilation) == ClosedBoundary.interior){
+//			throw new IllegalArgumentException("IntersectionPoint " + Arrays.toString(nextLocal.getPoint())+ " does not lie on the closed boundary");
+//		}
+//		else{
+//			ClosedBoundary cb = nextLocal.getClosedBoundary(ns, dilation);
+//			System.out.println("switch");
+//			
+//			if(cb == ClosedBoundary.upper || cb == ClosedBoundary.right){
+//				if(getNextNbrLocal(p, nextLocal.getParentHP()).getClosedBoundary(ns, dilation) != ClosedBoundary.interior){
+//					unique = getOppositePoint(nextLocal);
+//					System.out.println("unique " + Arrays.toString(unique.getPoint()));
+//					System.out.println("p " + Arrays.toString(p.getPoint()));
+//					System.out.println("nextLocal " + Arrays.toString(nextLocal.getPoint()));
+//					System.out.println("getNextNbrLocal(p, nextLocal.getParentHP()) " + Arrays.toString(getNextNbrLocal(p, nextLocal.getParentHP()).getPoint()));
+//					IntersectionPoint newPrevious = getOppositePoint(getNextNbrLocal(p, nextLocal.getParentHP()));
+//					System.out.println("newPrevious " + Arrays.toString(newPrevious.getPoint()));
+//					unique.getParentHP().setPrevious(newPrevious);
+//					System.out.println("unique.getPatrentHP() " + Arrays.toString(unique.getParentHP().getIntersectionPoint().getPoint()));
 //				}
-//				if(counter == numberOfBoundaryVerts){
-//					containsAll = true;
-//					break;
+//				else{
+//					unique = getOppositePoint(nextLocal);
 //				}
 //			}
+//			else{
+//				unique.getParentHP().setPrevious(p);
+//			}
 //		}
-//		return containsAll;
+//		System.out.println("unique end " + Arrays.toString(unique.getPoint()));
+//		return unique;
 //	}
 	
 	
 	private static boolean faceConsistsOnlyOfBoundaryVertices(LinkedList<IntersectionPoint> facePoints, List<Double> boundaryValues){
 		 for (IntersectionPoint ip : facePoints) {
-			 
 			if(!ip.isBoundaryPoint(boundaryValues)){
 				if(Math.abs(ip.getPoint()[0] - 20.0) < 1){
 					System.out.println("boundary values:");
@@ -821,10 +853,32 @@ public class GenerateFaceSet {
 		return halfPoints;
 	}
 	
+	private boolean isValidBoundaryFaceVertex(HalfedgePoint hp){
+//		if(!isClosedBoundaryPoint(hp.getIntersectionPoint())){
+//			System.err.println("no closed boundary point");
+//		}
+//		else if(!isFaceVertex(hp.getIntersectionPoint())){
+//			System.err.println("no closed boundary point");
+//		}
+		ClosedBoundary cb = hp.getIntersectionPoint().getClosedBoundary(ns, dilation);
+		if(isFaceVertex(hp.getIntersectionPoint()) && (cb == ClosedBoundary.left || cb == ClosedBoundary.lower)){
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isValidHalfEdgePoint(HalfedgePoint hp){
+		if(isClosedBoundaryPoint(hp.getIntersectionPoint()) && !isValidBoundaryFaceVertex(hp)){
+			return false;
+		}
+		return true;
+	}
+	
 	
 	public FaceSet createFaceSet(NURBSSurface ns, LinkedList<HalfedgePoint> orientedNbrs, List<double[]> boundaryVerts, double dilation){
 		FaceSet fS = new FaceSet();
 		List<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
+		List<HalfedgePoint> validVerts = new LinkedList<HalfedgePoint>();
 		System.out.println("ALL USE#D POINTS");
 		System.out.println("boundary values " + ns.getBoundaryValuesPastIntersection(dilation));
 		System.out.println("closind direction " + ns.getClosingDir());
@@ -832,15 +886,34 @@ public class GenerateFaceSet {
 		System.out.println();
 		for (HalfedgePoint hp : orientedNbrs) {
 //			System.out.println("ip " + Arrays.toString(hp.getIntersectionPoint().getPoint()) + " getClosedBoundary " + hp.getIntersectionPoint().getClosedBoundary(ns, dilation));
+//			if(!isClosedBoundaryPoint(hp.getIntersectionPoint())){
+			if(isValidHalfEdgePoint(hp)){
+				validVerts.add(hp);
+				System.out.println("all starting points " + Arrays.toString(hp.getIntersectionPoint().getPoint()));
+			}
 			if(!isClosedBoundaryPoint(hp.getIntersectionPoint())){
 				points.add(hp);
-				System.out.println("all starting points " + Arrays.toString(hp.getIntersectionPoint().getPoint()));
 			}
 		}
 		System.out.println();
-		double[][] verts = new double[points.size()][2];
+		double[][] verts = new double[validVerts.size()][2];
 		LinkedList<int[]> faceVerts = new LinkedList<int[]>();
+//		int c = 0;
+//		for (HalfedgePoint hP: points) {
+//			LinkedList<IntersectionPoint> unusedNbrs = new LinkedList<IntersectionPoint>();
+//			for (IntersectionPoint iP : hP.getNbrs()) {
+//				unusedNbrs.add(iP);
+//			}
+//			unusedNbrs.pollLast();
+//			hP.setUnusedNbrs(unusedNbrs);
+//			verts[c] = hP.getIntersectionPoint().getPoint();
+//			c++;
+//		}
 		int c = 0;
+		for (HalfedgePoint hP: validVerts) {
+			verts[c] = hP.getIntersectionPoint().getPoint();
+			c++;
+		}
 		for (HalfedgePoint hP: points) {
 			LinkedList<IntersectionPoint> unusedNbrs = new LinkedList<IntersectionPoint>();
 			for (IntersectionPoint iP : hP.getNbrs()) {
@@ -848,8 +921,6 @@ public class GenerateFaceSet {
 			}
 			unusedNbrs.pollLast();
 			hP.setUnusedNbrs(unusedNbrs);
-			verts[c] = hP.getIntersectionPoint().getPoint();
-			c++;
 		}
 		fS.setVerts(verts);
 		int faceIndexTest = 0;
@@ -872,6 +943,14 @@ public class GenerateFaceSet {
 					if(!faceConsistsOnlyOfBoundaryVertices(facePoints, boundValues)){
 						LinkedList<Integer> ind = new LinkedList<Integer>();
 						for (IntersectionPoint fP : facePoints) {
+							if(fP.getClosedBoundary(ns, dilation) != ClosedBoundary.interior){
+								System.out.println();
+								System.out.println("CREATE FACE SET: check unique boundary");
+								System.out.println();
+								System.out.println("point before " + Arrays.toString(fP.getPoint()));
+								fP = getUniqueClosedBoundryPoint(fP);
+								System.out.println("point past " + Arrays.toString(fP.getPoint()));
+							}
 							for (int i = 0; i < verts.length; i++) {
 								if(fP.getPoint() == verts[i]){
 									ind.add(i);

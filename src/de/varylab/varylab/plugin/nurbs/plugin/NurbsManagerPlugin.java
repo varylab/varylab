@@ -779,7 +779,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
-				LinkedList<HalfedgePoint> hp = gfs.findAllNbrs(activeNurbsSurface, dilation, intersections);
+				LinkedList<HalfedgePoint> hp = gfs.findAllLocalNbrs(activeNurbsSurface, dilation, intersections);
 //				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(activeNurbsSurface, dilation, intersections);
 				LinkedList<HalfedgePoint> H = GenerateFaceSet.orientedNbrs(hp);
 				System.out.println("boundary values after algorithm");

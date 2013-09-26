@@ -21,7 +21,19 @@ public class IntersectionPoint {
 	
 
 	public IntersectionPoint() {
+		
 	}
+	
+//	public IntersectionPoint clone(){
+//		IntersectionPoint clone = new IntersectionPoint();
+//		clone.setClosedBoundary(closedBoundary);
+//		clone.setIndexList(indexList);
+//		clone.setIntersectingSegments(intersectingSegments);
+//		clone.setParentHP(parentHP);
+//		clone.setPoint(point);
+//		clone.setSameIndexDist(sameIndexDist);
+//		return clone;
+//	}
 	
 	
 	public ClosedBoundary getClosedBoundary(NURBSSurface ns, double dilation){
