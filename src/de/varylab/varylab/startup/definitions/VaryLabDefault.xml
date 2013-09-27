@@ -159,7 +159,7 @@
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixBoundaryY</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:texture</string>
@@ -175,11 +175,11 @@
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixBoundaryZ</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixBoundaryX</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.varylab.discreteconformal.plugin.ConformalVisualizationPlugin:showPanel</string>
@@ -1070,15 +1070,15 @@
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixSelectionX</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixSelectionY</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.varylab.varylab.plugin.optimization.OptimizationPanel:fixSelectionZ</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:initPosition</string>

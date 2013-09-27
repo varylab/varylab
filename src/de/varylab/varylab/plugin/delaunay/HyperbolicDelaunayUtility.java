@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -153,11 +151,7 @@ public class HyperbolicDelaunayUtility {
 		return e1e1*(e1e1*e2e2-e1e2*e1e2) > 0;
 	}
 	
-	protected static <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> boolean isHyperbolicLowerFace(double[] hypNormal) {
+	protected static boolean isHyperbolicLowerFace(double[] hypNormal) {
 		return Pn.innerProduct(new double[]{0.0,0.0,1.0}, hypNormal, Pn.HYPERBOLIC) > 0;
 	}
 	
@@ -202,7 +196,6 @@ public class HyperbolicDelaunayUtility {
 		if(n2[2] < 0) {
 			return ((Rn.innerProduct(n2, n2)*n1[2] - Rn.innerProduct(n1, n2)*n2[2]) < 0);
 		} else { //n1[2] < 0!
-			Assert.assertTrue(n1[2] < 0);
 			return ((Rn.innerProduct(n1, n1)*n2[2] - Rn.innerProduct(n1, n2)*n1[2]) < 0);
 		}
 	}
