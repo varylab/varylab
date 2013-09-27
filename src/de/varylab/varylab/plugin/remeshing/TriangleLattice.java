@@ -134,6 +134,7 @@ public class TriangleLattice <
 		return edges;
 	}
 
+	@Override
 	protected boolean isValidAngle(double angle) {
 		return (Math.abs(angle*6 - Math.round(6*angle/Math.PI)*Math.PI) < 1E-2);
 	}

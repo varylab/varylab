@@ -25,6 +25,7 @@ public class RandomPointsUnitDisc extends AlgorithmPlugin {
 	private int
 		extraPoints = 20;
 
+	@Override
 	public String getCategory() {
 		return "Hyperbolic Delaunay";
 	}

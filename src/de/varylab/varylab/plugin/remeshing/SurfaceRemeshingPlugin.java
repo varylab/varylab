@@ -73,6 +73,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		QuadsQuantized,
 		QuadsSingularities;
 		
+		@Override
 		public String toString() {
 			switch (this) {
 			case QuadsQuantized:

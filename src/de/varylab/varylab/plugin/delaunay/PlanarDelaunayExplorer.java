@@ -296,12 +296,15 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 	}
 
 	private static class Hyperboloid implements Immersion {
+		@Override
 		public void evaluate(double u, double v, double[] xyz, int index) {
 			xyz[3*index]= Math.sinh(u)*Math.cos(v);
 			xyz[3*index+1]= Math.sinh(u)*Math.sin(v);
 			xyz[3*index+2]= Math.cosh(u);
 		}
+		@Override
 		public int getDimensionOfAmbientSpace() { return 3;	}
+		@Override
 		public boolean isImmutable() { return true; }
 	};
 	
@@ -341,12 +344,15 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 	}
 	
 	private static class Paraboloid implements Immersion {
+		@Override
 		public void evaluate(double u, double v, double[] xyz, int index) {
 			xyz[3*index]= u*Math.cos(v);
 			xyz[3*index+1]= u*Math.sin(v);
 			xyz[3*index+2]= u*u;
 		}
+		@Override
 		public int getDimensionOfAmbientSpace() { return 3;	}
+		@Override
 		public boolean isImmutable() { return true; }
 	};
 
