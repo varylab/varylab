@@ -43,6 +43,7 @@ import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
+import de.jtem.halfedgetools.adapter.type.generic.Position2d;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
@@ -388,7 +389,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Map<VVertex, VFace> texFaceMap = new HashMap<VVertex, VFace>();
 		Set<VVertex> cutSet = new HashSet<VVertex>(remesh.getVertices());
 		for (VVertex v : remesh.getVertices()) {
-			double[] patternPoint = a.getD(Position3d.class, v);
+			double[] patternPoint = a.getD(Position2d.class, v);
 			// TODO: seems to be broken 
 			VFace f = RemeshingUtility.getContainingFace(v, surface, a, surfaceKD);
 			if (f == null) {
@@ -396,7 +397,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			} 
 			double[] bary = RemeshingUtility.getBarycentricTexturePoint(patternPoint, f, a);
 			double[] newPos = RemeshingUtility.getPointFromBarycentric(bary, f, a);
-			a.set(Position3d.class, v, newPos);
+			a.set(Position.class, v, newPos);
 			texFaceMap.put(v, f);
 			cutSet.remove(v);
 		}
