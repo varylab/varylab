@@ -28,6 +28,7 @@ import de.varylab.discreteconformal.plugin.visualizer.IndexMedialGraph;
 import de.varylab.varylab.VaryLab;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
+import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
 import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
@@ -245,6 +246,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(IncircleCrossRatio2.class);
 		pSet.add(IndexMedialGraph.class);
 		pSet.add(EdgeNormalTorsion.class);
+		pSet.add(Conicality.class);
 	}
 
 
