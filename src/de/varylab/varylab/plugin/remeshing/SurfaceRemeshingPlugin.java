@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.remeshing;
 
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -213,8 +214,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 						liftMesh();
 					}
 				} catch(Exception re) {
-					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), re, "Remeshing error", JOptionPane.ERROR_MESSAGE);
-					re.printStackTrace();
+					showExceptionDialog(re);
 					fireJobFailed(re);
 					return;
 				}
@@ -229,6 +229,16 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			}
 		}
 		
+	}
+	
+	private void showExceptionDialog(final Exception e) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), e, "Remeshing error", JOptionPane.ERROR_MESSAGE);JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), e, "Remeshing error", JOptionPane.ERROR_MESSAGE);
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	
@@ -390,7 +400,6 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Set<VVertex> cutSet = new HashSet<VVertex>(remesh.getVertices());
 		for (VVertex v : remesh.getVertices()) {
 			double[] patternPoint = a.getD(Position2d.class, v);
-			// TODO: seems to be broken 
 			VFace f = RemeshingUtility.getContainingFace(v, surface, a, surfaceKD);
 			if (f == null) {
 				continue;
