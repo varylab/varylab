@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,8 +53,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
-
-import org.python.google.common.collect.Lists;
 
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -105,11 +102,9 @@ import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
-import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
-import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
@@ -150,7 +145,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private int 
 		curveIndex = 1;
 	
-	private List<double[]> umbilics = new LinkedList<double[]>();
+	private List<double[]> singularities = new LinkedList<double[]>();
 
 	private PointSelectionPlugin pstool = null;
 
@@ -244,6 +239,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					activeNurbsSurface = surface;
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
+					System.out.println("The NURBS surface:");
+					System.out.println(surface.toReadableInputString());
 					int dialogOk = JOptionPane.showConfirmDialog(
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
@@ -700,8 +697,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			if(source == goButton) {
 				List<double[]> startingPointsUV = pstool.getSelectedPoints();
+				System.out.println("ALL STARTING POINTS");
+				for (double[] sp : startingPointsUV) {
+					System.out.println(Arrays.toString(sp));
+				}
+				double tol = tolExpModel.getNumber().doubleValue();
+				tol = Math.pow(10, tol);
+				double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
+				umbilicStop = Math.pow(10, umbilicStop);
+				boolean firstVectorField = maxCurvatureBox.isSelected();
+				boolean secondVectorField = minCurvatureBox.isSelected();
 			
-				List<PolygonalLine> currentLines = computeCurvatureLines(startingPointsUV);
+				List<PolygonalLine> currentLines = IntegralCurves.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
 			System.out.println();
 			System.out.println("check lines");
 			int count = 0;
@@ -739,6 +746,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				
 				// with domain boundary
 				
+				System.out.println("FIRST CHECK");
+				for (LineSegment bs : boundarySegments) {
+					System.out.println(bs.toString());
+				}
+				System.out.println("FIRST CHECK END");
+				
+				
 				if(activeNurbsSurface.getClosingDir() == ClosingDir.uClosed){
 					double[][] seg2 = {{um,v0},{um,vn}};
 					double[][] seg4 = {{u0,v0},{u0,vn}};
@@ -747,7 +761,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					boundarySegments.add(ls2);
 					boundarySegments.add(ls4);
 				}
-				if(activeNurbsSurface.getClosingDir() == ClosingDir.vClosed){
+				else if(activeNurbsSurface.getClosingDir() == ClosingDir.vClosed){
 					double[][] seg1 = {{u0,v0},{um,v0}};
 					double[][] seg3 = {{u0,vn},{um,vn}};
 					LineSegment ls1 = new LineSegment(seg1, 1, 1);
@@ -755,6 +769,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					boundarySegments.add(ls1);
 					boundarySegments.add(ls3);
 				}
+				
+				System.out.println("SECOND CHECK");
+				for (LineSegment bs : boundarySegments) {
+					System.out.println(bs.toString());
+				}
+				System.out.println("SECOND CHECK END");
 				
 				//end
 				
@@ -807,28 +827,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		}
 
 
-		private LinkedList<PolygonalLine> computeCurvatureLines(List<double[]> startingPointsUV) {
-			double tol = tolExpModel.getNumber().doubleValue();
-			tol = Math.pow(10, tol);
-			
-			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
-			umbilicStop = Math.pow(10, umbilicStop);
-			
-			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
-			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
-			
-			for(double[] y0 : startingPointsUV) {
-					if (maxCurvatureBox.isSelected()){
-						curveIndex = curveLine(activeNurbsSurface, tol, umbilics, currentLines,
-								curveIndex, umbilicIndex, y0, true, umbilicStop);
-					}
-					if (minCurvatureBox.isSelected()){
-						curveIndex = curveLine(activeNurbsSurface, tol, umbilics, currentLines,
-								curveIndex, umbilicIndex, y0, false, umbilicStop);
-					}
-			}
-			return currentLines;
-		}
 
 		@SuppressWarnings("unused")
 		private void writeToFile(FaceSet fS) {
@@ -839,182 +837,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			} catch (Exception e2) {}
 		}
 		
-		private ValidSegment isValidSegemnt(double[][] seg, double u0, double um, double v0, double vn, int rightShift, int upShift){
-			ValidSegment vs = new ValidSegment();
-			vs.setValid(false);
-			if (seg[0][0] == u0 && seg[1][0] == um){
-				System.out.println("leftShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				rightShift--;
-			} else if (seg[0][0] == um && seg[1][0] == u0){
-				System.out.println("rightShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				rightShift++;
-			} else if (seg[0][1] == v0 && seg[1][1] == vn){
-				System.out.println("downShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				upShift--;
-			} else if (seg[0][1] == vn && seg[1][1] == v0){
-				System.out.println("upShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				upShift++;
-			} else if (seg[0][0] == seg[1][0] && seg[0][1] == seg[1][1]){
-				System.out.println("not valid segment w.r.t. equal endpoints");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-			} else {
-				vs.setValid(true);
-			}
-			vs.setRightShift(rightShift);
-			vs.setUpShift(upShift);
-			return vs;
-		}
-		
-		
-		@SuppressWarnings("unused")
-		private ValidSegment isValidSegemnt(double[][] seg, double u0, double um, double v0, double vn, int shiftedIndex){
-			ValidSegment vs = new ValidSegment();
-			if((seg[0][0] == u0 && seg[1][0] == um) || (seg[0][0] == um && seg[1][0] == u0)){
-				System.out.println("not valid segment w.r.t. u0, um");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				shiftedIndex++;
-				System.out.println("shiftedIndex in isValidSegment = " + shiftedIndex);
-				vs.setValid(false);
-				
-			}
-			else if((seg[0][1] == v0 && seg[1][1] == vn) || (seg[0][1] == vn && seg[1][1] == v0)){
-				System.out.println("not valid segment w.r.t. v0, vn");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				shiftedIndex++;
-				System.out.println("shiftedIndex in isValidSegment = " + shiftedIndex);
-				vs.setValid(false);
-			}
-			else if(seg[0][0] == seg[1][0] && seg[0][1] == seg[1][1]){
-				System.out.println("not valid segment w.r.t. equal endpoints");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
-				vs.setValid(false);
-			}
-			else{
-				vs.setValid(true);
-			}
-			vs.setShiftedIndex(shiftedIndex);
-			return vs;
-		}
-		
-
-		private int curveLine(NURBSSurface ns, double tol, List<double[]> umbilics, List<PolygonalLine> segments, int curveIndex, List<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop) {
-			double[] U = ns.getUKnotVector();
-			double[] V = ns.getVKnotVector();
-			double u0 = U[0];
-			double um = U[U.length - 1];
-			double v0 = V[0];
-			double vn = V[V.length - 1];
-			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
-//			IntObjects intObj;
-//			int noSegment;
-			LinkedList<double[]> all = new LinkedList<double[]>();
-			List<LineSegment> boundary = ns.getBoundarySegments();
-//			intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
-			IntObjects intObj = IntegralCurves.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
-			
-			Collections.reverse(intObj.getPoints());
-//			System.out.println("intObj.getPoints() false and reversed");
-//			for (double[] point : intObj.getPoints()) {
-//				System.out.println(Arrays.toString(point));
-//			}
-			all.addAll(intObj.getPoints());
-//			System.out.println("all.addAll(intObj.getPoints()); ");
-//			for (double[] point : all) {
-//				System.out.println(Arrays.toString(point));
-//			}
-			//only debugging
-//			double[] last = all.pollLast().clone();
-//			System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
-			//end debugging
-			System.out.println("first size" + all.size());
-			boolean cyclic = false;
-			if(!intObj.isNearby()){
-//				all.pollLast();
-//				intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
-				intObj = IntegralCurves.rungeKuttaConjugateLine(ns, y0, tol, true , maxMin, umbilics, umbilicStop, boundary );
-//				System.out.println("intObj.getPoints() true ");
-//				for (double[] point : intObjSecond.getPoints()) {
-//					System.out.println(Arrays.toString(point));
-//				}
-//				System.out.println("THE FIRST POINTS");
-//				System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
-//				all.add(last);
-//				for (double[] point : all) {
-//					System.out.println(Arrays.toString(point));
-//				}
-				all.addAll(intObj.getPoints());
-//				System.out.println("all points concatinated from runge kutta derectly past adding");
-//				for (double[] point : all) {
-//					System.out.println(Arrays.toString(point));
-//				}
-			}else{
-				//add the first element of a closed curve
-				cyclic = true;
-				System.out.println("add first");
-				double[] first = new double [2];
-				first[0] = all.getFirst()[0];
-				first[1] = all.getFirst()[1];
-				all.add(first);
-			}
-			int index = 0;
-//			Integer shiftedIndex = 0;
-			int rightShift = 0;
-			int upShift = 0;
-			double[] firstcurvePoint = all.getFirst();
-//			System.out.println("all points concatinated from runge kutta");
-//			for (double[] point : all) {
-//				System.out.println(Arrays.toString(point));
-//			}
-			for (double[] secondCurvePoint : all) {
-				index ++;
-				if(index != 1){
-					double[][]seg = new double[2][];
-					seg[0] = firstcurvePoint.clone();
-					seg[1] = secondCurvePoint.clone();
-//					ValidSegment vs = isValidSegemnt(seg, u0, um, v0, vn, shiftedIndex);
-					ValidSegment vs = isValidSegemnt(seg, u0, um, v0, vn, rightShift, upShift);
-					rightShift = vs.getRightShift();
-					upShift = vs.getUpShift();
-//					shiftedIndex = vs.getShiftedIndex();
-					boolean segmentIsValid = vs.isValid();
-					if(segmentIsValid){
-//						System.out.println("shiftedIndex danach = " + shiftedIndex);
-						System.out.println("rightShifted danach = " + rightShift);
-						System.out.println("upShifted danach = " + upShift);
-						LineSegment ls = new  LineSegment();
-						ls.setIndexOnCurve(index) ;
-						ls.setSegment(seg);
-						ls.setCurveIndex(curveIndex);
-						ls.setCyclic(cyclic);
-						ls.setRightShift(rightShift);
-						ls.setUpShift(upShift);
-//						ls.setShiftedIndex(shiftedIndex);
-						currentSegments.add(ls);
-						firstcurvePoint = secondCurvePoint;
-					}
-					else{
-						index--;
-						firstcurvePoint = secondCurvePoint;
-					}
-				}
-			}
-			//begin check
-			System.out.println("check concatinated line");
-			for (LineSegment ls : currentSegments) {
-				System.out.println(ls.toString());
-			}
-			//end check
-			PolygonalLine currentLine = new PolygonalLine(currentSegments);
-			currentLine.setDescription((maxMin?"max:":"min:") + "("+String.format("%.3f", y0[0]) +", "+String.format("%.3f", y0[1])+")");
-			segments.add(currentLine);
-			curveIndex ++;
-			return curveIndex;
-		}
-
 
 		private SceneGraphComponent createLineComponent(PolygonalLine pl) {
 			List<LineSegment> segments = pl.getpLine();
@@ -1055,8 +877,16 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 		@Override
 		public void pointSelected(double[] uv) {
+			List<double[]> startingPointsUV = pstool.getSelectedPoints();
+			double tol = tolExpModel.getNumber().doubleValue();
+			tol = Math.pow(10, tol);
+			double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
+			umbilicStop = Math.pow(10, umbilicStop);
+			boolean firstVectorField = maxCurvatureBox.isSelected();
+			boolean secondVectorField = minCurvatureBox.isSelected();
 			if(immediateCalculationBox.isSelected()) {
-				LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
+				LinkedList<PolygonalLine> curvatureLines = IntegralCurves.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
+//				LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
 				for(PolygonalLine pl : curvatureLines) {
 					if(!activeModel.contains(pl)) {
 						activeModel.add(pl);
@@ -1419,11 +1249,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private double[][] computeUmbilicalPoints() {
 		AdapterSet as = hif.getAdapters();
 		VHDS hds = hif.get(new VHDS());
-		umbilics = activeNurbsSurface.findUmbilics(hds, as);
-		double[][] uu = new double[umbilics.size()][];
-		double[][] upoints = new double[umbilics.size()][];
+		singularities = activeNurbsSurface.findUmbilics(hds, as);
+		double[][] uu = new double[singularities.size()][];
+		double[][] upoints = new double[singularities.size()][];
 		for (int i = 0; i < uu.length; i++) {
-			uu[i] = umbilics.get(i);
+			uu[i] = singularities.get(i);
 		}
 		
 		for (int i = 0; i < uu.length; i++) {

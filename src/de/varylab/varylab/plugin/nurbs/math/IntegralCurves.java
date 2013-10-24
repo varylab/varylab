@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import de.varylab.varylab.plugin.nurbs.data.ChristoffelInfo;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 public class IntegralCurves {
 	
@@ -30,33 +33,12 @@ public class IntegralCurves {
 		return dir;
 	}
 	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
-//	double K = ci.getGaussCurvature();
-//	if(K > 0){
 		double[][] sF = ci.getSecondFundamental();
 		double l = sF[0][0];
 		double n  = sF[1][1];
-//		if(n * l <= 0){
-//			System.out.println("n * l <= 0");
-//		}
 		dir[0] = Math.sqrt(n / l);
 		return dir;
-//	}
-//	else{
-//		return getAssymptotic(ns, p);
-//	}
 	}
-	
-	
-//	private static double[] getAssymptotic(NURBSSurface ns, double[] p){
-//		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
-//		double[][] sF = ci.getSecondFundamental();
-//		double l = sF[0][0];
-//		double m = sF[0][1];
-//		double n = sF[1][1];
-//		double dir0 = -(m / l) - Math.sqrt(m * m - l * n) / l;
-//		double[] dir = {dir0, 1};
-//		return dir;
-//	}
 	
 	
 	private static double[] getConj(NURBSSurface ns, double[] v, double[] p){
@@ -87,16 +69,50 @@ public class IntegralCurves {
 		}
 	}
 	
-	private static boolean segmentIntersectBoundary(LineSegment seg, List<LineSegment> boundary){
-		for (LineSegment lS : boundary) {
-			if(LineSegmentIntersection.segmentIntersectsLine(seg, lS)){
-				System.out.println("segment " + seg.toString());
-				System.out.println("boundary " + lS.toString());
+	private static boolean segmentIntersectBoundary(NURBSSurface ns  , LineSegment ls){
+		double[][] seg = ls.getSegment();
+		if(ns.getClosingDir() == ClosingDir.uClosed){
+			double[] V = ns.getVKnotVector();
+			double v0 = V[0];
+			double vn = V[V.length - 1];
+			if(seg[1][1] <= v0 || seg[1][1] >= vn){
 				return true;
 			}
 		}
+		else if(ns.getClosingDir() == ClosingDir.vClosed){
+			double[] U = ns.getUKnotVector();
+			double u0 = U[0];
+			double um = U[U.length - 1];
+			if(seg[1][0] <= u0 || seg[1][0] >= um){
+				return true;
+			}
+		}
+		else{
+			double[] U = ns.getUKnotVector();
+			double[] V = ns.getVKnotVector();
+			double v0 = V[0];
+			double vn = V[V.length - 1];
+			double u0 = U[0];
+			double um = U[U.length - 1];
+			if(seg[1][1] <= v0 || seg[1][1] >= vn || seg[1][0] <= u0 || seg[1][0] >= um){
+				return true;
+			}
+			
+		}
+		
 		return false;
 	}
+	
+//	private static boolean segmentIntersectBoundary(LineSegment seg, List<LineSegment> boundary){
+//		for (LineSegment lS : boundary) {
+//			if(LineSegmentIntersection.segmentIntersectsLine(seg, lS)){
+//				System.out.println("segment " + seg.toString());
+//				System.out.println("boundary " + lS.toString());
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 	
 	public static double[] intersectionPoint(double[][] line1, double[][] line2){
 		double s1 = line1[0][0];
@@ -139,32 +155,6 @@ public class IntegralCurves {
 		return true;
 	}
 	
-//	private static double[] projectIntoShiftedDomain(NURBSSurface ns, double[] point){
-//		double[] projectedPoint = point.clone();
-//		if(ns.getClosingDir() == ClosingDir.uClosed){
-//			double[] V = ns.getVKnotVector();
-//			double v0 = V[0];
-//			double vn = V[V.length - 1];
-//			if(projectedPoint[1] < v0){
-//				projectedPoint[1] = v0;
-//			}
-//			if(projectedPoint[1] > vn){
-//				projectedPoint[1] = vn;
-//			}
-//		}
-//		else{
-//			double[] U = ns.getUKnotVector();
-//			double u0 = U[0];
-//			double um = U[U.length - 1];
-//			if(projectedPoint[0] < u0){
-//				projectedPoint[0] = u0;
-//			}
-//			if(projectedPoint[0] > um){
-//				projectedPoint[0] = um;
-//			}
-//		}
-//		return projectedPoint;
-//	}
 	
 	private static boolean isNotAtBoundary(NURBSSurface ns, double[] point){
 		LinkedList<Double> boundaryValues = ns.getBoundaryValues();
@@ -230,59 +220,6 @@ public class IntegralCurves {
 		return intersection;
 	}
 	
-//	private static double[] boundaryIntersection(NURBSSurface ns, LineSegment seg, List<LineSegment> boundary){
-//		double minDist = Double.MAX_VALUE;
-//		double[] intersection = null;
-//		for (LineSegment lS : boundary) {
-//			if(Rn.euclideanDistance(seg.getSegment()[0], intersectionPoint(seg, lS)) < minDist){
-//				intersection = intersectionPoint(seg, lS);
-//				minDist = Rn.euclideanDistance(seg.getSegment()[0], intersectionPoint(seg, lS));
-//			}
-//		}
-//		if(ns.getClosingDir() == null){
-//			if(isOutsideOfDomain(ns, intersection)){
-//				intersection = projectPointIntoDomain(ns, intersection);
-//			}
-//		}else{
-//			if(isOutsideOfShiftedDomain(ns, intersection)){
-//				intersection = projectIntoShiftedDomain(ns, intersection);
-//			}
-//		}
-//		
-//		return intersection;
-//	}
-	
-//	private static boolean isOutsideOfDomain(NURBSSurface ns, double[] point){
-//		double u0 = ns.getUKnotVector()[0];
-//		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
-//		double v0 = ns.getVKnotVector()[0];
-//		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
-//		if(point[0] < u0 || point[0] > u1 ||point[1] < v0 || point[1] > v1){
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//	private static double[] projectPointIntoDomain(NURBSSurface ns, double[] point){
-//		double u0 = ns.getUKnotVector()[0];
-//		double u1 = ns.getUKnotVector()[ns.getUKnotVector().length - 1];
-//		double v0 = ns.getVKnotVector()[0];
-//		double v1 = ns.getVKnotVector()[ns.getVKnotVector().length - 1];
-//		double[] domainPoint = point;
-//		if(point[0] < u0){
-//			domainPoint[0] = u0;
-//		}
-//		else if(point[0] > u1){
-//			domainPoint[0] = u1;
-//		}
-//		else if(point[1] < v0){
-//			domainPoint[1] = v0;
-//		}
-//		else if(point[1] > v1){
-//			domainPoint[1] = v1;
-//		}
-//		return domainPoint;
-//	}
 	
 	private static boolean lineContainsProjectedPoint(double[] src,  double[] fixed){
 		double[] start = {0, 0};
@@ -306,56 +243,11 @@ public class IntegralCurves {
 		}
 	}
 	
-//	public static double[] goOverUBoundary(double u0, double um, double[] point, boolean left, boolean right){
-//		if(point[0] < u0){
-//			System.out.println("point = " + Arrays.toString(point));
-//			point[0] = um - (u0 - point[0]);
-//			System.out.println("go left");
-//			left = true;
-//		}
-//		else if(point[0] > um){
-//			System.out.println("point = " + Arrays.toString(point));
-//			point[0] = u0 + point[0] - um;
-//			System.out.println("go right");
-//			right = true;
-//		}
-//		else{
-//			left = false;
-//			right = false;
-//		}
-//		return point;
-//	}
-//	public static double[] goOverVBoundary(double v0, double vn, double[] point, boolean down, boolean up){
-//		if(point[1] < v0){
-//			System.out.println("point = " + Arrays.toString(point));
-//			point[1] = vn - (v0 - point[1]);
-//			System.out.println("NEW point = " + Arrays.toString(point));
-//			System.out.println("go down");
-//			down = true;
-//		}
-//		else if(point[1] > vn){
-//			System.out.println("point = " + Arrays.toString(point));
-//			point[1] = v0 + point[1] - vn;
-//			System.out.println("NEW point = " + Arrays.toString(point));
-//			System.out.println("go up");
-//			up = true;
-//		}
-//		else{
-//			down = false;
-//			up = false;
-//		}
-//		return point;
-//	}
-	
-//	private static boolean terminationCondition(NURBSSurface ns, LineSegment seg, LinkedList<double[]> u, LinkedList<LineSegment> boundary){
-//		if(segmentIntersectBoundary(seg, boundary)) {
-//			return true;
-//		}
-//		return false;
-//	}
+
 	
 	private static boolean terminationCondition(NURBSSurface ns, LineSegment seg, LinkedList<double[]> u, List<LineSegment> boundary){
-		if(segmentIntersectBoundary(seg, boundary)) {
+//		if(segmentIntersectBoundary(seg, boundary)) {
+		if(segmentIntersectBoundary(ns, seg)) {
 			double[] intersection = boundaryIntersection(ns, seg, boundary);
 			u.add(intersection);
 			return true;
@@ -571,6 +463,10 @@ public class IntegralCurves {
 	
 	
 	public static IntObjects rungeKuttaConjugateLine(NURBSSurface ns, double[] y0, double tol, boolean secondOrientation, boolean conj, List<double[]> umbilics, double umbilicStop, List<LineSegment> boundary) {
+		System.out.println("INPUT BOUNDARY");
+		for (LineSegment bs : boundary) {
+			System.out.println(bs.toString());
+		}
 	double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{
 	2 / 9., 1 / 3., 4 / 9., 0 } };
 	double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
@@ -607,6 +503,7 @@ public class IntegralCurves {
 	LineSegment seg = new LineSegment();
 
 	while (!nearBy) {
+		System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
 		double[] v = new double[dim];
 		double[] sumA = new double[dim];
 		for (int i = 0; i < dim; i++) {
@@ -627,15 +524,6 @@ public class IntegralCurves {
 			segment[0] = v;
 			Rn.add(segment[1], v, Rn.times(null, h, sumA));
 			seg.setSegment(segment);
-//			if (segmentIntersectBoundary(seg, boundary)) {
-//			System.out.println("out of domain 1");
-//			double[] intersection = boundaryIntersection(ns, seg, boundary);
-//			pointList.add(intersection);
-//			IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-//			System.out.println("letztes element: " +
-//					Arrays.toString(intObj.getPoints().getLast()));
-//			return intObj;
-//			}
 			if(terminationCondition(ns, seg, pointList, boundary)){
 				System.out.println("out of domain 1");
 				pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
@@ -1972,6 +1860,184 @@ public class IntegralCurves {
 		double[] point = {0,6};
 		double dist = distLineSegmentPoint(point, seg);
 		System.out.println("dist " + dist);
+	}
+	
+//	public LinkedList<PolygonalLine> computeCurvatureLines(NURBSSurface ns, boolean max, boolean min, double tol, double umbilicStop, List<double[]> startingPointsUV) {
+//
+//		
+//		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
+//		LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
+//		
+//		for(double[] y0 : startingPointsUV) {
+//				if (max){
+//					curveIndex = curveLine(ns, tol, umbilics, currentLines,
+//							curveIndex, umbilicIndex, y0, true, umbilicStop);
+//				}
+//				if (min){
+//					curveIndex = curveLine(ns, tol, umbilics, currentLines,
+//							curveIndex, umbilicIndex, y0, false, umbilicStop);
+//				}
+//		}
+//		return currentLines;
+//	}
+	
+	private static ValidSegment isValidSegemnt(double[][] seg, double u0, double um, double v0, double vn, int rightShift, int upShift){
+		ValidSegment vs = new ValidSegment();
+		vs.setValid(false);
+		if (seg[0][0] == u0 && seg[1][0] == um){
+			System.out.println("leftShift");
+			System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+			rightShift--;
+		} else if (seg[0][0] == um && seg[1][0] == u0){
+			System.out.println("rightShift");
+			System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+			rightShift++;
+		} else if (seg[0][1] == v0 && seg[1][1] == vn){
+			System.out.println("downShift");
+			System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+			upShift--;
+		} else if (seg[0][1] == vn && seg[1][1] == v0){
+			System.out.println("upShift");
+			System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+			upShift++;
+		} else if (seg[0][0] == seg[1][0] && seg[0][1] == seg[1][1]){
+			System.out.println("not valid segment w.r.t. equal endpoints");
+			System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+		} else {
+			vs.setValid(true);
+		}
+		vs.setRightShift(rightShift);
+		vs.setUpShift(upShift);
+		return vs;
+	}
+	
+	public static int curveLine(NURBSSurface ns, double tol, List<double[]> umbilics, List<PolygonalLine> segments, int curveIndex, List<Integer> umbilicIndex, double[] y0, boolean maxMin, double umbilicStop) {
+		double[] U = ns.getUKnotVector();
+		double[] V = ns.getVKnotVector();
+		double u0 = U[0];
+		double um = U[U.length - 1];
+		double v0 = V[0];
+		double vn = V[V.length - 1];
+		LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
+//		IntObjects intObj;
+//		int noSegment;
+		LinkedList<double[]> all = new LinkedList<double[]>();
+		List<LineSegment> boundary = ns.getBoundarySegments();
+//		intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
+		IntObjects intObj = IntegralCurves.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
+		
+		Collections.reverse(intObj.getPoints());
+//		System.out.println("intObj.getPoints() false and reversed");
+//		for (double[] point : intObj.getPoints()) {
+//			System.out.println(Arrays.toString(point));
+//		}
+		all.addAll(intObj.getPoints());
+//		System.out.println("all.addAll(intObj.getPoints()); ");
+//		for (double[] point : all) {
+//			System.out.println(Arrays.toString(point));
+//		}
+		//only debugging
+//		double[] last = all.pollLast().clone();
+//		System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
+		//end debugging
+		System.out.println("first size" + all.size());
+		boolean cyclic = false;
+		if(!intObj.isNearby()){
+//			all.pollLast();
+//			intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
+			intObj = IntegralCurves.rungeKuttaConjugateLine(ns, y0, tol, true , maxMin, umbilics, umbilicStop, boundary );
+//			System.out.println("intObj.getPoints() true ");
+//			for (double[] point : intObjSecond.getPoints()) {
+//				System.out.println(Arrays.toString(point));
+//			}
+//			System.out.println("THE FIRST POINTS");
+//			System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
+//			all.add(last);
+//			for (double[] point : all) {
+//				System.out.println(Arrays.toString(point));
+//			}
+			all.addAll(intObj.getPoints());
+//			System.out.println("all points concatinated from runge kutta derectly past adding");
+//			for (double[] point : all) {
+//				System.out.println(Arrays.toString(point));
+//			}
+		}else{
+			//add the first element of a closed curve
+			cyclic = true;
+			System.out.println("add first");
+			double[] first = new double [2];
+			first[0] = all.getFirst()[0];
+			first[1] = all.getFirst()[1];
+			all.add(first);
+		}
+		int index = 0;
+//		Integer shiftedIndex = 0;
+		int rightShift = 0;
+		int upShift = 0;
+		double[] firstcurvePoint = all.getFirst();
+//		System.out.println("all points concatinated from runge kutta");
+//		for (double[] point : all) {
+//			System.out.println(Arrays.toString(point));
+//		}
+		for (double[] secondCurvePoint : all) {
+			index ++;
+			if(index != 1){
+				double[][]seg = new double[2][];
+				seg[0] = firstcurvePoint.clone();
+				seg[1] = secondCurvePoint.clone();
+//				ValidSegment vs = isValidSegemnt(seg, u0, um, v0, vn, shiftedIndex);
+				ValidSegment vs = isValidSegemnt(seg, u0, um, v0, vn, rightShift, upShift);
+				rightShift = vs.getRightShift();
+				upShift = vs.getUpShift();
+//				shiftedIndex = vs.getShiftedIndex();
+				boolean segmentIsValid = vs.isValid();
+				if(segmentIsValid){
+//					System.out.println("shiftedIndex danach = " + shiftedIndex);
+					System.out.println("rightShifted danach = " + rightShift);
+					System.out.println("upShifted danach = " + upShift);
+					LineSegment ls = new  LineSegment();
+					ls.setIndexOnCurve(index) ;
+					ls.setSegment(seg);
+					ls.setCurveIndex(curveIndex);
+					ls.setCyclic(cyclic);
+					ls.setRightShift(rightShift);
+					ls.setUpShift(upShift);
+//					ls.setShiftedIndex(shiftedIndex);
+					currentSegments.add(ls);
+					firstcurvePoint = secondCurvePoint;
+				}
+				else{
+					index--;
+					firstcurvePoint = secondCurvePoint;
+				}
+			}
+		}
+		//begin check
+		System.out.println("check concatinated line");
+		for (LineSegment ls : currentSegments) {
+			System.out.println(ls.toString());
+		}
+		//end check
+		PolygonalLine currentLine = new PolygonalLine(currentSegments);
+		currentLine.setDescription((maxMin?"max:":"min:") + "("+String.format("%.3f", y0[0]) +", "+String.format("%.3f", y0[1])+")");
+		segments.add(currentLine);
+		curveIndex ++;
+		return curveIndex;
+	}
+	
+	public static LinkedList<PolygonalLine> computeIntegralLines(NURBSSurface ns, boolean firstVectorField, boolean secondVectorField, int curveIndex, double tol, double umbilicStop, List<double[]> singularities, List<double[]> startingPointsUV) {
+		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
+		LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
+		
+		for(double[] y0 : startingPointsUV) {
+				if (firstVectorField){
+					curveIndex = curveLine(ns, tol, singularities, currentLines, curveIndex, umbilicIndex, y0, true, umbilicStop);
+				}
+				if (secondVectorField){
+					curveIndex = curveLine(ns, tol, singularities, currentLines, curveIndex, umbilicIndex, y0, false, umbilicStop);
+				}
+		}
+		return currentLines;
 	}
 	
 	
