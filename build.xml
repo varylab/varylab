@@ -399,11 +399,11 @@
             <description>Varylab - Discrete Surface Optimization</description>
             <description kind="short">Varylab - Discrete Surface Optimization</description>
             <j2se minVersion="1.6" args="-Xmx512M"/>
-        	<manifest>
+        	<!--manifest>
         		<attribute name="Permissions" value="all-permissions"/>
         		<attribute name="Codebase" value="http://my.varylab.com"/>
         		<attribute name="Application-Name" value="VaryLab"/>
-        	</manifest>
+        	</manifest-->
             <lib dir="." includes="${manifest.classpath}"/>
 			<lib dir="${lib}/jogamp">
 				<include name="*.jar"/>
