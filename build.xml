@@ -394,11 +394,16 @@
             signAlias="${signAlias}"
 			keystore="${keystore}"
 			attemptjavadetection="true"
-			offlineallowed="false"
+			offlineallowed="true"
 		>
             <description>Varylab - Discrete Surface Optimization</description>
             <description kind="short">Varylab - Discrete Surface Optimization</description>
             <j2se minVersion="1.6" args="-Xmx512M"/>
+        	<manifest>
+        		<attribute name="Permissions" value="all-permissions"/>
+        		<attribute name="Codebase" value="http://my.varylab.com"/>
+        		<attribute name="Application-Name" value="VaryLab"/>
+        	</manifest>
             <lib dir="." includes="${manifest.classpath}"/>
 			<lib dir="${lib}/jogamp">
 				<include name="*.jar"/>
