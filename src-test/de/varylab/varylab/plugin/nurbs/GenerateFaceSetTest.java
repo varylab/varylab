@@ -1,19 +1,13 @@
 package de.varylab.varylab.plugin.nurbs;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 
-import com.itextpdf.text.log.SysoLogger;
-
-import de.varylab.varylab.plugin.nurbs.data.IntObjects;
-import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
-import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 public class GenerateFaceSetTest {
 	
@@ -40,6 +34,7 @@ public class GenerateFaceSetTest {
 		return openGherkin;
 	}
 	
+	@SuppressWarnings("unused")
 	private NURBSSurface createRhino_1Sphere(){
 		double[] U = {-1.570796326794897, -1.570796326794897, -1.570796326794897, 0.0, 0.0, 1.570796326794897, 1.570796326794897, 1.570796326794897};
 		double[] V = {0.0, 0.0, 0.0, 1.570796326794897, 1.570796326794897, 3.141592653589793, 3.141592653589793, 4.71238898038469, 4.71238898038469, 6.283185307179586, 6.283185307179586, 6.283185307179586};
@@ -59,7 +54,7 @@ public class GenerateFaceSetTest {
 	
 	@Test
 	public void getNextNbrTest(){
-		NURBSSurface openGherkin = createOpenGherkin();
+		createOpenGherkin();
 	}
 	
 	@Test

@@ -138,17 +138,17 @@ public class GenerateFaceSet {
 //		}
 //		
 //	}
-	
-	private static int getShiftedIndexFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
-		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
-		int shiftedIndex = 0;
-		for (LineSegment ls : intersectingSegments) {
-			if(ls.getCurveIndex() == curveIndex){
-				shiftedIndex = ls.getShiftedIndex();
-			}
-		}
-		return shiftedIndex;
-	}
+//	
+//	private static int getShiftedIndexFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
+//		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
+//		int shiftedIndex = 0;
+//		for (LineSegment ls : intersectingSegments) {
+//			if(ls.getCurveIndex() == curveIndex){
+//				shiftedIndex = ls.getShiftedIndex();
+//			}
+//		}
+//		return shiftedIndex;
+//	}
 
 	
 	private static int getRightShiftFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){

@@ -2,7 +2,6 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.Arrays;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,6 +9,7 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
 
 public class InegralCurvesTest {
 	
+	@SuppressWarnings("unused")
 	private NURBSSurface createRhino_1Sphere(){
 		double[] U = {-1.570796326794897, -1.570796326794897, -1.570796326794897, 0.0, 0.0, 1.570796326794897, 1.570796326794897, 1.570796326794897};
 		double[] V = {0.0, 0.0, 0.0, 1.570796326794897, 1.570796326794897, 3.141592653589793, 3.141592653589793, 4.71238898038469, 4.71238898038469, 6.283185307179586, 6.283185307179586, 6.283185307179586};
