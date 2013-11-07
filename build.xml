@@ -86,6 +86,7 @@
 	<path id="jtem.libraryclasspath">
 		<pathelement location="${lib}/jtem/beans.jar"/>
 		<pathelement location="${lib}/jtem/blas.jar"/>
+		<pathelement location="${lib}/jtem/discretegroup.jar"/>
 		<pathelement location="${lib}/jtem/ellipticFunctions.jar"/>
 		<pathelement location="${lib}/jtem/halfedge.jar"/>
 		<pathelement location="${lib}/jtem/halfedgetools.jar"/>
