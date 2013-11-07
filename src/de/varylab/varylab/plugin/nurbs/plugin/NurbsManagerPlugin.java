@@ -106,7 +106,8 @@ import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
@@ -423,7 +424,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					}
 				}
 			if(segmentButton.isSelected()){
-				LinkedList<double[]> points = IntegralCurves.geodesicSegmentBetweenTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
+				LinkedList<double[]> points = IntegralCurvesOriginal.geodesicSegmentBetweenTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
 				PointSetFactory psf = new PointSetFactory();
 				int p = activeNurbsSurface.getUDegree();
 				int q = activeNurbsSurface.getVDegree();
@@ -467,8 +468,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				}
 				System.out.println("Geodesic segment length: " + length);
 			}else{
-				LinkedList<double[]> points = IntegralCurves.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
-				points.addAll(IntegralCurves.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, b, a, eps, tol, nearby));
+				LinkedList<double[]> points = IntegralCurvesOriginal.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
+				points.addAll(IntegralCurvesOriginal.geodesicExponentialGivenByTwoPoints(activeNurbsSurface, b, a, eps, tol, nearby));
 				PointSetFactory psf = new PointSetFactory();
 				int p = activeNurbsSurface.getUDegree();
 				int q = activeNurbsSurface.getVDegree();
@@ -707,17 +708,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				umbilicStop = Math.pow(10, umbilicStop);
 				boolean firstVectorField = maxCurvatureBox.isSelected();
 				boolean secondVectorField = minCurvatureBox.isSelected();
-			
-				List<PolygonalLine> currentLines = IntegralCurves.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
-			System.out.println();
-			System.out.println("check lines");
+				IntegralCurve ic = new IntegralCurve(activeNurbsSurface);
+				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
 			int count = 0;
 			for (PolygonalLine pl : currentLines) {
 				count++;
 				System.out.println(count + ". line");
 				for (LineSegment ls : pl.getpLine()) {
 //					if(Arrays.equals(ls.getSegment()[0], ls.getSegment()[1])){
-						System.out.println(Arrays.toString(ls.getSegment()[0]) + " " + Arrays.toString(ls.getSegment()[1]));
+//						System.out.println(Arrays.toString(ls.getSegment()[0]) + " " + Arrays.toString(ls.getSegment()[1]));
 //					}
 				}
 				
@@ -885,7 +884,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			boolean firstVectorField = maxCurvatureBox.isSelected();
 			boolean secondVectorField = minCurvatureBox.isSelected();
 			if(immediateCalculationBox.isSelected()) {
-				LinkedList<PolygonalLine> curvatureLines = IntegralCurves.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
+				LinkedList<PolygonalLine> curvatureLines = IntegralCurvesOriginal.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
 //				LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
 				for(PolygonalLine pl : curvatureLines) {
 					if(!activeModel.contains(pl)) {

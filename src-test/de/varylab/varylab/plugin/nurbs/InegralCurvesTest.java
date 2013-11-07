@@ -5,7 +5,8 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 
 public class InegralCurvesTest {
 	
@@ -32,8 +33,8 @@ public class InegralCurvesTest {
 		double right = 3.;
 		double x = 3.5;
 		double y = -0.7;
-		double resultX = IntegralCurves.modInterval(left, right, x);
-		double resultY = IntegralCurves.modInterval(left, right, y);
+		double resultX = IntegralCurvesOriginal.modInterval(left, right, x);
+		double resultY = IntegralCurvesOriginal.modInterval(left, right, y);
 		System.out.println(resultX);
 		System.out.println(resultY);
 		Assert.assertEquals(1.6, resultX, 0.0000001);
@@ -51,10 +52,10 @@ public class InegralCurvesTest {
 		int[] resultXExpected = {0};
 		int[] resultY = new int[1];
 		int[] resultYExpected = {0};
-		resultX[0] = IntegralCurves.getModInterval(left, right, x);
-		System.out.println("resx " + IntegralCurves.getModInterval(left, right, x));
-		resultY[0] = IntegralCurves.getModInterval(left, right, y);
-		System.out.println("resy " + IntegralCurves.getModInterval(left, right, y));
+		resultX[0] = IntegralCurvesOriginal.getModInterval(left, right, x);
+		System.out.println("resx " + IntegralCurvesOriginal.getModInterval(left, right, x));
+		resultY[0] = IntegralCurvesOriginal.getModInterval(left, right, y);
+		System.out.println("resy " + IntegralCurvesOriginal.getModInterval(left, right, y));
 		Assert.assertArrayEquals(resultXExpected, resultX);
 		Assert.assertArrayEquals(resultYExpected, resultY);
 	}
@@ -68,8 +69,8 @@ public class InegralCurvesTest {
 		double[] point1 = {2.0, 2.2};
 		double[] point2 = {0.5, 2.0};
 		double[] point3 = {2.0, 2.0};
-		Assert.assertTrue(IntegralCurves.pointsAreInDifferentDomains(u0, um, v0, vn, point1, point2));
-		Assert.assertTrue(IntegralCurves.pointsAreInDifferentDomains(u0, um, v0, vn, point1, point3));
+		Assert.assertTrue(IntegralCurvesOriginal.pointsAreInDifferentDomains(u0, um, v0, vn, point1, point2));
+		Assert.assertTrue(IntegralCurvesOriginal.pointsAreInDifferentDomains(u0, um, v0, vn, point1, point3));
 		
 	}
 	
@@ -87,14 +88,14 @@ public class InegralCurvesTest {
 //		System.out.println("jetzt richtig");
 		double[] p1 = {1.5, 1};
 		double[] p2 = {0.5, 3};
-		double[][] intersections = IntegralCurves.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
+		double[][] intersections = IntegralCurvesOriginal.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
 		double[][] upper = {{1,2}, {1,0}};
 		Assert.assertArrayEquals(upper, intersections);
 		System.out.println("int 1 " + Arrays.toString(intersections[0]));
 		System.out.println("int 2 " + Arrays.toString(intersections[1]));
 		p2[0] = 0.5;
 		p2[1] = -1.;
-		intersections = IntegralCurves.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
+		intersections = IntegralCurvesOriginal.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
 		double[][] lower = {{1,0}, {1,2}};
 		Assert.assertArrayEquals(lower, intersections);
 		System.out.println("int 1 " + Arrays.toString(intersections[0]));
@@ -103,13 +104,13 @@ public class InegralCurvesTest {
 		p1[1] = 0.5;
 		p2[0] = -1;
 		p2[1] = 1.5;
-		intersections = IntegralCurves.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
+		intersections = IntegralCurvesOriginal.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
 		System.out.println("int 1 " + Arrays.toString(intersections[0]));
 		System.out.println("int 2 " + Arrays.toString(intersections[1]));
 		double[][] left = {{0,1}, {2,1}};
 		Assert.assertArrayEquals(left, intersections);
 		p2[0] = 3;
-		intersections = IntegralCurves.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
+		intersections = IntegralCurvesOriginal.getShiftedBoundaryIntersectionPoints(u0, um, v0, vn, p1, p2);
 		System.out.println("int 1 " + Arrays.toString(intersections[0]));
 		System.out.println("int 2 " + Arrays.toString(intersections[1]));
 		double[][] right = {{2,1}, {0,1}};
@@ -125,13 +126,29 @@ public class InegralCurvesTest {
 		double[][] lineLeft = {{u0, v0},{u0, vn}};
 		double[][] lineRight = {{um, v0},{um, vn}};
 		double[][] seg = {{0,0.5},{2,1.5}};
-		System.out.println("left intersection " + Arrays.toString(IntegralCurves.intersectionPoint(lineLeft, seg)));
-		System.out.println("right intersection " + Arrays.toString(IntegralCurves.intersectionPoint(lineRight, seg)));
+		System.out.println("left intersection " + Arrays.toString(IntegralCurvesOriginal.intersectionPoint(lineLeft, seg)));
+		System.out.println("right intersection " + Arrays.toString(IntegralCurvesOriginal.intersectionPoint(lineRight, seg)));
 		Assert.assertTrue(true);
 	}
 	
 	@Test
-	public void rhinoSphereTest(){
+	public void isNotAtBoundaryTest(){
+		NURBSSurface ns = createRhino_1Sphere();
+		IntegralCurve ic = new IntegralCurve(ns);
+		double u0 = -1.570796326794897, um = 1.570796326794897, v0 = 0.0, vn = 6.283185307179586;
+		double [] testPoint1 = {1,1};
+		double [] testPoint2 = {u0,1};
+		double [] testPoint3 = {um,1};
+		double [] testPoint4 = {1,v0};
+		double [] testPoint5 = {1,vn};
+		double [] testPoint6 = {u0,vn};
+		Assert.assertTrue(ic.isNotAtBoundary(testPoint1));
+		Assert.assertTrue(!ic.isNotAtBoundary(testPoint2));
+		Assert.assertTrue(!ic.isNotAtBoundary(testPoint3));
+		Assert.assertTrue(!ic.isNotAtBoundary(testPoint4));
+		Assert.assertTrue(!ic.isNotAtBoundary(testPoint5));
+		Assert.assertTrue(!ic.isNotAtBoundary(testPoint6));
+		
 		
 	}
 

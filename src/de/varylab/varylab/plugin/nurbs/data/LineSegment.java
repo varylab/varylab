@@ -7,7 +7,7 @@ import de.jreality.math.Rn;
 
 public class LineSegment {
 	
-	private double[][] segment;
+	private double[][] segment = new double[2][];
 	private int indexOnCurve = Integer.MIN_VALUE;
 	private int curveIndex = Integer.MIN_VALUE;
 	private int shiftedIndex = Integer.MAX_VALUE;
@@ -17,6 +17,11 @@ public class LineSegment {
 	
 	public LineSegment(){
 		
+	}
+	
+	public LineSegment(double[] start, double[] target){
+		segment[0] = start;
+		segment[1] = target;
 	}
 	
 	public LineSegment(double[][] s , int iOC, int cI){

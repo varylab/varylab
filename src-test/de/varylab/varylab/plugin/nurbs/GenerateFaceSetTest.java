@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurves;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 
 public class GenerateFaceSetTest {
 	
@@ -88,7 +88,7 @@ public class GenerateFaceSetTest {
 //			System.out.println(Arrays.toString(point));
 //		}
 		
-		List<PolygonalLine> currentLines = IntegralCurves.computeIntegralLines(ns, true, true, curveIndex, tol, umbilicStop, null, startingPointsUV);
+		List<PolygonalLine> currentLines = IntegralCurvesOriginal.computeIntegralLines(ns, true, true, curveIndex, tol, umbilicStop, null, startingPointsUV);
 		int counter = 0;
 		for (PolygonalLine pl : currentLines) {
 			counter ++;

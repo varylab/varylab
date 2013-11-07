@@ -42,7 +42,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		public enum BoundaryLines{u0, um, v0, vn};
 		public enum CornerPoints{P00, Pm0, P0n, Pmn};
 		public enum RevolutionDir{uDir, vDir};
-		public enum ClosingDir{uClosed, vClosed, nonClosed};
+		public enum ClosingDir{uClosed, vClosed, uvClosed, nonClosed};
 		private LinkedList<BoundaryLines> boundLines = new LinkedList<NURBSSurface.BoundaryLines>();
 		private LinkedList<CornerPoints> cornerPoints = new LinkedList<CornerPoints>();
 		private RevolutionDir revDir = null;
@@ -238,6 +238,9 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		}
 		
 		private ClosingDir determineClosingCondition(){
+			if(isClosedUDir() && isClosedVDir()){
+				return ClosingDir.uvClosed;
+			}
 			if(isClosedUDir()){
 				return ClosingDir.uClosed;
 			}
