@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>hdbtresg6dj743hy</id>
+		<name>Random Geometry Generators</name>
+		<revision>1</revision>
+		<category>Generator</category>
+	</manifest>
+	<description>
+		Essentials set of random geomtry generators. Contains Convex Hull, 
+		Random Ellipsoid, and Random Sphere generators. 
+	</description>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.generator.ConvexHullGenerator"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.generator.RandomEllipsoidGenerator"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator"/>
+	
+</module>

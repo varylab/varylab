@@ -17,5 +17,10 @@
 	<moduleRef id="94zdhs5ejfz432sh" alias="conformal lab"/>
 	<moduleRef id="shdztrsg35463jst" alias="mesh editing"/>
 	<moduleRef id="8kgfd3ncuy5fvbsw" alias="python"/>
+	<moduleRef id="hf65frs4356rfh54" alias="visualization"/>
+	<moduleRef id="js5dhr65st865gwr" alias="subdivision"/>
+	<moduleRef id="hdbtresg6dj743hy" alias="random geometries generator"/>
+	<moduleRef id="sbdtznfe36dhe64f" alias="planar mesh generators"/>
+	<moduleRef id="hdbtresg6dj743fs" alias="primitives generator"/>
 	
 </bundle>

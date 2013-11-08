@@ -27,5 +27,8 @@
 	<moduleRef id="0174554738654297" alias="remeshing"/>
 	<moduleRef id="js5dhr65st865gwr" alias="subdivision"/>
 	<moduleRef id="8kgfd3ncuy5fvbsw" alias="python"/>
+	<moduleRef id="hdbtresg6dj743hy" alias="random geometries generator"/>
+	<moduleRef id="sbdtznfe36dhe64f" alias="planar mesh generators"/>
+	<moduleRef id="hdbtresg6dj743fs" alias="primitives generator"/>
 
 </bundle>

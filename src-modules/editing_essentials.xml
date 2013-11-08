@@ -22,5 +22,13 @@
 	<plugin class="de.jtem.halfedgetools.plugin.widget.MarqueeWidget"/>
 	<plugin class="de.jtem.halfedgetools.plugin.widget.ContextMenuWidget"/>
 	<plugin class="de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin"/>
-	
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.EdgeCollapsePlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.FaceCollapserPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.EdgeFlipperPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverFillPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.FaceScalerPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.EdgeSplitterPlugin"/>
+	<plugin class="de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin"/>
 </module>
