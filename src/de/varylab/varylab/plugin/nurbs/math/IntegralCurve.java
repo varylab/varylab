@@ -236,6 +236,7 @@ public class IntegralCurve {
 		return intersection;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean terminationCondition(NURBSSurface ns, LineSegment seg, LinkedList<double[]> u, List<LineSegment> boundary){
 //		if(segmentIntersectBoundary(seg, boundary)) {
 		if(segmentIntersectBoundary(seg)) {

@@ -710,18 +710,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				boolean secondVectorField = minCurvatureBox.isSelected();
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface);
 				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
-			int count = 0;
-			for (PolygonalLine pl : currentLines) {
-				count++;
-				System.out.println(count + ". line");
-				for (LineSegment ls : pl.getpLine()) {
+//			int count = 0;
+//			for (PolygonalLine pl : currentLines) {
+//				count++;
+//				System.out.println(count + ". line");
+				//for (LineSegment ls : pl.getpLine()) {
 //					if(Arrays.equals(ls.getSegment()[0], ls.getSegment()[1])){
 //						System.out.println(Arrays.toString(ls.getSegment()[0]) + " " + Arrays.toString(ls.getSegment()[1]));
 //					}
-				}
-				
-				
-			}
+//				}
+//				
+//				
+//			}
 		
 			
 				activeModel.addAll(currentLines);
