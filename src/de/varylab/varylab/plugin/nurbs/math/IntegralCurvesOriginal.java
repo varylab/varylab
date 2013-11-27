@@ -19,20 +19,21 @@ public class IntegralCurvesOriginal {
 	
 	public enum VectorField{curvature, conjugate};
 
-	public static double[] getMaxMinCurv(NURBSSurface ns, double u, double v,boolean max) {
+	public static double[] getMaxMinCurv(NURBSSurface ns, double[] p,boolean max) {
 		if (max) {
-			return NURBSCurvatureUtility.curvatureAndDirections(ns, u, v).getCurvatureDirectionsDomain()[1];
+			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getCurvatureDirectionsDomain()[1];
 		} else {	
-			return NURBSCurvatureUtility.curvatureAndDirections(ns, u, v).getCurvatureDirectionsDomain()[0];
+			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getCurvatureDirectionsDomain()[0];
 		}
 	}
+	
 	
 	public static double[] getSymmetricDirection(NURBSSurface ns, double[] p) {
 	double[] dir = {1,1};
 	if(!ns.isSurfaceOfRevolution()){
 		return dir;
 	}
-	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
+	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
 		double[][] sF = ci.getSecondFundamental();
 		double l = sF[0][0];
 		double n  = sF[1][1];
@@ -41,8 +42,19 @@ public class IntegralCurvesOriginal {
 	}
 	
 	
+	
+	
+	
+	
+	/**
+	 * 
+	 * @param ns
+	 * @param v
+	 * @param p
+	 * @return w , with w * 2 * v = 0 ,where  2 denotes the second fundamental form
+	 */
 	private static double[] getConj(NURBSSurface ns, double[] v, double[] p){
-		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p[0], p[1]);
+		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p);
 		double[][] sF = ci.getSecondFundamental();
 		double[] b = new double[2];
 		b[0] = v[0] * sF[0][0] + v[1] * sF[1][0];
@@ -50,13 +62,13 @@ public class IntegralCurvesOriginal {
 		double[] w = new double[2];
 		w[0] = -b[1];
 		w[1] = b[0];
-		double[] fu = ci.getSu();
-		double[] fv = ci.getSv();
-		double[] W = Rn.add(null, Rn.times(null, w[0], fu), Rn.times(null, w[1], fv));
-		Rn.normalize(W, W);
-		if(Math.abs(1 - Rn.euclideanNorm(W)) > 0.001){
-			System.out.println("length: " + Rn.euclideanNorm(w));
-		}
+//		double[] fu = ci.getSu();
+//		double[] fv = ci.getSv();
+//		double[] W = Rn.add(null, Rn.times(null, w[0], fu), Rn.times(null, w[1], fv));
+//		Rn.normalize(W, W);
+//		if(Math.abs(1 - Rn.euclideanNorm(W)) > 0.001){
+//			System.out.println("length: " + Rn.euclideanNorm(w));
+//		}
 		return w;
 	}
 	
@@ -275,11 +287,10 @@ public class IntegralCurvesOriginal {
 	* @return
 	*/
 	public static IntObjects rungeKuttaCurvatureLine(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, List<double[]> umbilics, double umbilicStop, List<LineSegment> boundary) {
-		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{
-			2 / 9., 1 / 3., 4 / 9., 0 } };
+		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
-	double[] b = { 0, 0.5, 0.75, 1 };
+		double[] b = { 0, 0.5, 0.75, 1 };
 	// double[][] A =	{{0,0,0,0,0,0,0},{1/5.,0,0,0,0,0,0},{3/40.,9/40.,0,0,0,0,0},{44/45.,-56/15.,32/9.,0,0,0,0},{19372/6561.,-25360/2187.,64448/6561.,-212/729.,0,0,0},{9017/3168.,-355/33.,46732/5247.,49/176.,-5103/18656.,0,0},{35/384.,	0, 500/1113., 125/192., -2187/6784., 11/84.,0}};
 	// double[] c1 = {35/384., 0, 500/1113., 125/192., -2187/6784., 11/84.,	0 };
 	// double[] c2 = {5179/57600., 0, 7571/16695., 393/640.,	-92097/339200., 187/2100., 1/40.};
@@ -300,9 +311,9 @@ public class IntegralCurvesOriginal {
 	u.add(y0);
 	double[] orientation = new double[2];
 	if (!secondOrientation) {
-		orientation = IntegralCurvesOriginal.getMaxMinCurv(ns, y0[0], y0[1], max);
+		orientation = IntegralCurvesOriginal.getMaxMinCurv(ns, y0, max);
 	} else {
-		orientation = Rn.times(null, -1, IntegralCurvesOriginal.getMaxMinCurv(ns, y0[0], y0[1], max));
+		orientation = Rn.times(null, -1, IntegralCurvesOriginal.getMaxMinCurv(ns, y0, max));
 	}
 	boolean nearBy = false;
 	double dist;
@@ -318,12 +329,11 @@ public class IntegralCurvesOriginal {
 		}
 		double[][] k = new double[b.length][2];
 
-		if (Rn.innerProduct(orientation,IntegralCurvesOriginal.getMaxMinCurv(ns, v[0], v[1], max)) > 0) {
-			k[0] = Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, v[0],
-					v[1], max));
+		if (Rn.innerProduct(orientation,IntegralCurvesOriginal.getMaxMinCurv(ns, v, max)) > 0) {
+			k[0] = Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, v, max));
 		} else {
 			k[0] = Rn.times(null, -1,
-					Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, v[0], v[1], max)));
+					Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, v, max)));
 		}
 		double[][] segment = new double[2][2];
 		for (int l = 1; l < b.length; l++) {
@@ -352,10 +362,11 @@ public class IntegralCurvesOriginal {
 				System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 				return intObj;
 			}
-			if(Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h * sumA[1], max))) > 0) {
-				k[l] = Rn.normalize(null, IntegralCurvesOriginal.getMaxMinCurv(ns,v[0] + h * sumA[0], v[1] + h * sumA[1], max));
+			
+			if(Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurvesOriginal.getMaxMinCurv(ns, Rn.add(null, v, Rn.times(null, h, sumA)), max))) > 0) {
+				k[l] = Rn.normalize(null, IntegralCurvesOriginal.getMaxMinCurv(ns,Rn.add(null, v, Rn.times(null, h, sumA)), max));
 			} else {
-				k[l] = Rn.times(null, -1, Rn.normalize(null, IntegralCurvesOriginal.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h* sumA[1], max)));
+				k[l] = Rn.times(null, -1, Rn.normalize(null, IntegralCurvesOriginal.getMaxMinCurv(ns, Rn.add(null, v, Rn.times(null, h, sumA)), max)));
 			}
 		}
 		double[] Phi1 = new double[dim];
@@ -416,10 +427,10 @@ public class IntegralCurvesOriginal {
 				System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 				return intObj;
 			}
-			if (Rn.innerProduct(orientation,IntegralCurvesOriginal.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
-				orientation = IntegralCurvesOriginal.getMaxMinCurv(ns,u.getLast()[0], u.getLast()[1], max);
+			if (Rn.innerProduct(orientation,IntegralCurvesOriginal.getMaxMinCurv(ns, u.getLast(), max)) > 0) {
+				orientation = IntegralCurvesOriginal.getMaxMinCurv(ns,u.getLast(), max);
 			} else {
-				orientation = Rn.times(null, -1, IntegralCurvesOriginal.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max));
+				orientation = Rn.times(null, -1, IntegralCurvesOriginal.getMaxMinCurv(ns, u.getLast(), max));
 			}
 		}
 		if ((tau <= tol * vau / 2 || tau >= tol * vau)) {
@@ -1943,8 +1954,8 @@ public class IntegralCurvesOriginal {
 //		int noSegment;
 		LinkedList<double[]> all = new LinkedList<double[]>();
 		List<LineSegment> boundary = ns.getBoundarySegments();
-//		intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
-		IntObjects intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
+		IntObjects intObj = IntegralCurvesOriginal.rungeKuttaCurvatureLine(ns, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
+//		IntObjects intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
 		
 		Collections.reverse(intObj.getPoints());
 //		System.out.println("intObj.getPoints() false and reversed");
@@ -1964,8 +1975,8 @@ public class IntegralCurvesOriginal {
 		boolean cyclic = false;
 		if(!intObj.isNearby()){
 //			all.pollLast();
-//			intObj = IntegralCurves.rungeKuttaCurvatureLine(ns, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
-			intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol, true , maxMin, umbilics, umbilicStop, boundary );
+			intObj = IntegralCurvesOriginal.rungeKuttaCurvatureLine(ns, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
+//			intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol, true , maxMin, umbilics, umbilicStop, boundary );
 //			System.out.println("intObj.getPoints() true ");
 //			for (double[] point : intObjSecond.getPoints()) {
 //				System.out.println(Arrays.toString(point));

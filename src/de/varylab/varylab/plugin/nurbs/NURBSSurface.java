@@ -1223,9 +1223,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			if (vCoord < v0 || vCoord > v1) {
 				System.out.println("uCoord is out of domain " + vCoord);
 			}
-
-			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this,
-					uCoord, vCoord);
+			double[] p = {uCoord, vCoord};
+			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, p);
 			double[] vector = ci.getCurvatureDirectionsDomain()[0];
 			linefield.set(v, vector, as);
 		}
@@ -1356,7 +1355,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			// else if(p[1] > v1){
 			// p[1] = v1;
 			// }
-			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p[0], p[1]);
+			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p);
 			double H = ci.getMeanCurvature();
 			double K = ci.getGaussCurvature();
 			return Math.abs(H * H - K);

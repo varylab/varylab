@@ -14,7 +14,9 @@ public class NURBSCurvatureUtility {
 	 * @param v
 	 * @return lambda my K H
 	 */
-	public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double u, double v){
+	public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] point){
+		double u = point[0];
+		double v = point[1];
 		CurvatureInfo dG = new CurvatureInfo();
 //		System.out.println("CurvatureInfo");
 //		System.out.println(ns.toString());

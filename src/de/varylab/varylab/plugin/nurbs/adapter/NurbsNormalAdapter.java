@@ -30,7 +30,7 @@ public class NurbsNormalAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFa
 	@Override
 	public double[] getVertexValue(VVertex v, AdapterSet a) {
 		double[] uv = a.getD(NurbsUVCoordinate.class, v);
-		CurvatureInfo info = curvatureAndDirections(surface, uv[0], uv[1]);
+		CurvatureInfo info = curvatureAndDirections(surface, uv);
 		return info.getCurvatureDirectionsManifold()[0];
 	}
 	

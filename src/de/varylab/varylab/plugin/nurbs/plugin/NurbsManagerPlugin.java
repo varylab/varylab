@@ -107,6 +107,7 @@ import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
@@ -708,20 +709,36 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				umbilicStop = Math.pow(10, umbilicStop);
 				boolean firstVectorField = maxCurvatureBox.isSelected();
 				boolean secondVectorField = minCurvatureBox.isSelected();
-				IntegralCurve ic = new IntegralCurve(activeNurbsSurface);
-				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
+
+				VecFieldCondition vfc = VecFieldCondition.curvature;
+				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol);
+				
+				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
+//				List<PolygonalLine> currentLines = IntegralCurvesOriginal.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, startingPointsUV, startingPointsUV);
+//			int count = 0;
+//			for (PolygonalLine pl : currentLines) {
+//				count++;
+//				System.out.println(count + ". line");
+//				for (LineSegment ls : pl.getpLine()) {
+
+//				IntegralCurve ic = new IntegralCurve(activeNurbsSurface);
+//				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
 //			int count = 0;
 //			for (PolygonalLine pl : currentLines) {
 //				count++;
 //				System.out.println(count + ". line");
 				//for (LineSegment ls : pl.getpLine()) {
+
 //					if(Arrays.equals(ls.getSegment()[0], ls.getSegment()[1])){
 //						System.out.println(Arrays.toString(ls.getSegment()[0]) + " " + Arrays.toString(ls.getSegment()[1]));
 //					}
 //				}
+//			}
+//				}
 //				
 //				
 //			}
+
 		
 			
 				activeModel.addAll(currentLines);
@@ -798,20 +815,20 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
-				LinkedList<HalfedgePoint> hp = gfs.findAllLocalNbrs(activeNurbsSurface, dilation, intersections);
+
 //				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(activeNurbsSurface, dilation, intersections);
-				LinkedList<HalfedgePoint> H = GenerateFaceSet.orientedNbrs(hp);
+
 				System.out.println("boundary values after algorithm");
 				Set<Double> checkList = activeNurbsSurface.getBoundaryValuesPastIntersection(dilation);
 				for (Double value : checkList) {
 					System.out.println(value);
 				}
 				System.out.println();
-				FaceSet fS = gfs.createFaceSet(activeNurbsSurface,H,activeNurbsSurface.getBoundaryVerticesUV(), dilation);
-				for (int i = 0; i < fS.getVerts().length; i++) {
+				FaceSet fs = gfs.createFaceSet(activeNurbsSurface.getBoundaryVerticesUV());
+				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];
-					activeNurbsSurface.getSurfacePoint(fS.getVerts()[i][0], fS.getVerts()[i][1], S);
-					fS.getVerts()[i] = S;
+					activeNurbsSurface.getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);
+					fs.getVerts()[i] = S;
 				}
 
 				HalfedgeLayer hel = new HalfedgeLayer(hif);
@@ -819,7 +836,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //				writeToFile(fS);
 			
 //				hel.addTemporaryGeometry(fS.getIndexedFaceSet());
-				hel.set(fS.getIndexedFaceSet());
+				hel.set(fs.getIndexedFaceSet());
 				hif.addLayer(hel);
 				hif.update();
 			}

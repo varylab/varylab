@@ -52,9 +52,8 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
-//				System.out.println("u " + u);
-//				System.out.println("v " + v);
-				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, u, v);
+				double[] p = {u, v};
+				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p);
 				
 				if(ci.getMinCurvature() == ci.getMaxCurvature()) { //umbillic point
 					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});

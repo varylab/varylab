@@ -595,7 +595,8 @@ public class PointProjectionSurface {
 	
 	
 	private static double[] newtonMethodDomain(NURBSSurface ns, double[] P, double eps, double u, double v){
-		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, u, v);
+		double[] p = {u,v};
+		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p);
 		double[] S = ns.getSurfacePoint(u, v);
 		double[] S3D = MathUtility.get3DPoint(S);
 		double[] P3D = MathUtility.get3DPoint(P);
@@ -633,7 +634,9 @@ public class PointProjectionSurface {
 				return null;
 				
 			}
-			ci = NURBSCurvatureUtility.curvatureAndDirections(ns, u, v);
+			p[0] = u;
+			p[1] = v;
+			ci = NURBSCurvatureUtility.curvatureAndDirections(ns, p);
 			S = ns.getSurfacePoint(u, v);
 			S3D = MathUtility.get3DPoint(S);
 			r = Rn.subtract(null, S3D, P);
