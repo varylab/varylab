@@ -101,7 +101,6 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
-import de.varylab.varylab.plugin.nurbs.data.HalfedgePoint;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
@@ -710,10 +709,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				boolean firstVectorField = maxCurvatureBox.isSelected();
 				boolean secondVectorField = minCurvatureBox.isSelected();
 
-				VecFieldCondition vfc = VecFieldCondition.curvature;
+				VecFieldCondition vfc = VecFieldCondition.conjugate;
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol);
 				
-				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
+				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
 //				List<PolygonalLine> currentLines = IntegralCurvesOriginal.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, startingPointsUV, startingPointsUV);
 //			int count = 0;
 //			for (PolygonalLine pl : currentLines) {

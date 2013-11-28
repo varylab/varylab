@@ -7,7 +7,9 @@ import org.junit.Test;
 
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 
 public class GenerateFaceSetTest {
 	
@@ -51,10 +53,53 @@ public class GenerateFaceSetTest {
 		return rhino_1Sphere;
 	}
 	
+	@Test
+	public void getNextNbrTest1(){
+		NURBSSurface openGerkin = createOpenGherkin();
+		double[] start1 = {5.585053606381854, 0.17453292519943298};
+		double[] start2 = {0.0, 0.17453292519943298};
+		List<double[]> startingPointsUV = new LinkedList<double[]>();
+		startingPointsUV.add(start1);
+		startingPointsUV.add(start2);
+		double tol = 0.0001;
+		VecFieldCondition vfc = VecFieldCondition.conjugate;
+		IntegralCurve ic = new IntegralCurve(openGerkin, vfc, tol);
+		boolean firstVectorField = true;
+		boolean secondVectorField = true;
+		LinkedList<double[]> singularities = new LinkedList<double[]>();
+		List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, 1, umbilicStop, singularities, startingPointsUV);
+		
+	}
+	
 	
 	@Test
 	public void getNextNbrTest(){
-		createOpenGherkin();
+		double[] U = {-3,3};
+		double[] V = {-2,2};
+		int p = 2;
+		int q = 2;
+		double[][][] controlMesh = {{{0.0, 0.0, -1.0, 1.0}, {0.0, 0.0, -0.7071067811865476, 0.7071067811865476}}};
+		NURBSSurface ns = new NURBSSurface(U, V, controlMesh, p, q);
+		double[] p1 = {-3,2}, p2 = {-2,2}, p3 = {-1,2}, p4 = {0,2}, p5 = {1,2}, p6 = {3,2}, p7 = {-3,1}, p8 = {3,1}, p9 = {2.5,0.5}, p10 = {0,0}, p11 = {2,0},
+		p12 = {3,0}, p13 = {2.5,-0.5}, p14 = {-3,-1}, p15 = {3,-1}, p16 = {-3,-2}, p17 = {-2,-2}, p18 = {-1,-2}, p19 = {0,-2}, p20 = {1,-2}, p21 = {3,-2};
+		LineSegment ls1 = new LineSegment(p6, p1);
+		LineSegment ls2 = new LineSegment(p1, p16);
+		LineSegment ls3 = new LineSegment(p16, p21);
+		LineSegment ls4 = new LineSegment(p21, p6);
+		LineSegment ls5 = new LineSegment(p7, p2);
+		LineSegment ls6 = new LineSegment(p10, p3);
+		LineSegment ls7 = new LineSegment(p14, p17);
+		LineSegment ls8 = new LineSegment(p10, p18);
+		LineSegment ls9 = new LineSegment(p19, p11);
+		LineSegment ls10 = new LineSegment(p20, p13);
+		LineSegment ls11 = new LineSegment(p11, p13);
+		LineSegment ls12 = new LineSegment(p13, p12);
+		LineSegment ls13 = new LineSegment(p13, p15);
+		LineSegment ls14 = new LineSegment(p4, p11);
+		LineSegment ls15 = new LineSegment(p5, p9);
+		LineSegment ls16 = new LineSegment(p9, p8);
+		LineSegment ls17 = new LineSegment(p11, p9);
+		LineSegment ls18 = new LineSegment(p9, p12);
 	}
 	
 	@Test

@@ -1069,7 +1069,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 				boundarySegments.add(b1);
 				boundarySegments.add(b3);
 			}
-			else if(getClosingDir() == ClosingDir.vClosed){
+			if(getClosingDir() == ClosingDir.vClosed){
 				boundarySegments.add(b2);
 				boundarySegments.add(b4);
 			}else{

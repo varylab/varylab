@@ -14,10 +14,13 @@ public class IntersectionPoint {
 	public enum ClosedBoundary {left, right, upper, lower, interior};
 	private double[] point = null;
 	private double sameIndexDist;
-	private HalfedgePoint parentHP = null;
+//	private HalfedgePoint parentHP = null;
 	private LinkedList<LineSegment> intersectingSegments;
 	private ClosedBoundary closedBoundary = null;
 	private LinkedList<Integer> indexList = null;
+	private LinkedList<IntersectionPoint> nbrs;
+	private LinkedList<IntersectionPoint> unusedNbrs;
+	private IntersectionPoint previous;
 	
 
 	public IntersectionPoint() {
@@ -91,6 +94,36 @@ public class IntersectionPoint {
 	public void setIndexList(LinkedList<Integer> indexList) {
 		this.indexList = indexList;
 	}
+	
+	
+
+	public LinkedList<IntersectionPoint> getNbrs() {
+		return nbrs;
+	}
+
+	public void setNbrs(LinkedList<IntersectionPoint> nbrs) {
+		this.nbrs = nbrs;
+	}
+
+	public LinkedList<IntersectionPoint> getUnusedNbrs() {
+		return unusedNbrs;
+	}
+
+	public void setUnusedNbrs(LinkedList<IntersectionPoint> unusedNbrs) {
+		this.unusedNbrs = unusedNbrs;
+	}
+
+	public IntersectionPoint getPrevious() {
+		return previous;
+	}
+
+	public void setPrevious(IntersectionPoint previous) {
+		this.previous = previous;
+	}
+
+	public ClosedBoundary getClosedBoundary() {
+		return closedBoundary;
+	}
 
 	public double[] getPoint() {
 		return point;
@@ -108,13 +141,13 @@ public class IntersectionPoint {
 		this.sameIndexDist = sameIndexDist;
 	}
 
-	public HalfedgePoint getParentHP() {
-		return parentHP;
-	}
-
-	public void setParentHP(HalfedgePoint parentHP) {
-		this.parentHP = parentHP;
-	}
+//	public HalfedgePoint getParentHP() {
+//		return parentHP;
+//	}
+//
+//	public void setParentHP(HalfedgePoint parentHP) {
+//		this.parentHP = parentHP;
+//	}
 
 	public LinkedList<LineSegment> getIntersectingSegments() {
 		return intersectingSegments;

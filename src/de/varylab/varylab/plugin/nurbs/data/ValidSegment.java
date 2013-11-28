@@ -3,7 +3,6 @@ package de.varylab.varylab.plugin.nurbs.data;
 public class ValidSegment {
 	
 	private boolean isValid;
-	private int shiftedIndex;
 	private int rightShift;
 	private int upShift;
 	
@@ -17,14 +16,6 @@ public class ValidSegment {
 
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
-	}
-
-	public int getShiftedIndex() {
-		return shiftedIndex;
-	}
-
-	public void setShiftedIndex(int shiftedIndex) {
-		this.shiftedIndex = shiftedIndex;
 	}
 
 	public int getRightShift() {

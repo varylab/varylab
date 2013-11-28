@@ -910,7 +910,7 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 	}
 	
 	
-	public LinkedList<PolygonalLine> computeIntegralLines(NURBSSurface ns, boolean firstVectorField, boolean secondVectorField, int curveIndex, double umbilicStop, List<double[]> singularities, List<double[]> startingPointsUV) {
+	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double umbilicStop, List<double[]> singularities, List<double[]> startingPointsUV) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] y0 : startingPointsUV) {
 				if (firstVectorField){
