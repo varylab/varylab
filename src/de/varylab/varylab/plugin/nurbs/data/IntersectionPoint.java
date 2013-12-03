@@ -6,21 +6,24 @@ import java.util.List;
 
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
+import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
 
 
 
 public class IntersectionPoint {
 	
 	public enum ClosedBoundary {left, right, upper, lower, interior};
+	public enum FaceVertex {faceVertex, noFaceVertex};
 	private double[] point = null;
 	private double sameIndexDist;
-//	private HalfedgePoint parentHP = null;
 	private LinkedList<LineSegment> intersectingSegments;
 	private ClosedBoundary closedBoundary = null;
+	private FaceVertex faceVertex = null;
 	private LinkedList<Integer> indexList = null;
 	private LinkedList<IntersectionPoint> nbrs;
 	private LinkedList<IntersectionPoint> unusedNbrs;
 	private IntersectionPoint previous;
+	private IntersectionPoint opposite = null;
 	
 
 	public IntersectionPoint() {
@@ -95,7 +98,32 @@ public class IntersectionPoint {
 		this.indexList = indexList;
 	}
 	
+
+	public FaceVertex getFaceVertex() {
+		if(faceVertex != null){
+			return faceVertex;
+		}
+		else{
+			if(getIndexList().size() > 2){
+				return FaceVertex.faceVertex;
+			}
+			return FaceVertex.noFaceVertex;
+		}
+	}
 	
+	
+
+	public IntersectionPoint getOpposite() {
+		return opposite;
+	}
+
+	public void setOpposite(IntersectionPoint opposite) {
+		this.opposite = opposite;
+	}
+
+	public void setFaceVertex(FaceVertex faceVertex) {
+		this.faceVertex = faceVertex;
+	}
 
 	public LinkedList<IntersectionPoint> getNbrs() {
 		return nbrs;

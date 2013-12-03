@@ -171,12 +171,16 @@ public class IntegralCurve {
 		}
 		if(closingDirection == ClosingDir.uClosed){
 			if(point[1] > vn || point[1] < v0){
+//				System.out.println("in pointIsOutsideOfExtendedDomain uClosed, this means: point[1] > vn || point[1] < v0)");
+//				System.out.println("and point[1] = " + point[1]);
 				return true;
 			}
 			return false;
 		}
 		if(closingDirection == ClosingDir.vClosed){
 			if(point[0] > um || point[0] < u0){
+//				System.out.println("in pointIsOutsideOfExtendedDomain vClosed, this means: point[0] > um || point[0] < u0");
+//				System.out.println("and point[0] = " + point[0]);
 				return true;
 			}
 			return false;
@@ -277,6 +281,10 @@ public class IntegralCurve {
 	}
 	
 	private double[] boundaryIntersection(LineSegment seg, List<LineSegment> boundary){
+//		System.out.println("in boundary intersection the boundary:");
+//		for (LineSegment ls : boundary) {
+//			System.out.println(ls.toString());
+//		}
 		double minDist = Double.MAX_VALUE;
 		double[] intersection = null;
 		for (LineSegment lS : boundary) {
@@ -653,6 +661,10 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
 				pointList = setIntoDomain(pointList);
 				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+				System.out.println("the lines");
+				for (double[] p : intObj.getPoints()) {
+					System.out.println(Arrays.toString(p));
+				}
 				return intObj;
 			}
 			k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
@@ -674,6 +686,10 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 			if(terminationConditionForPoints(next, pointList, boundary)){
 				pointList = setIntoDomain(pointList);
 				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+				System.out.println("the lines");
+				for (double[] p : intObj.getPoints()) {
+					System.out.println(Arrays.toString(p));
+				}
 				return intObj;
 			}
 			else{
@@ -708,6 +724,10 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 				System.out.println("closed");
 				pointList = setIntoDomain(pointList);
 				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+				System.out.println("the lines");
+				for (double[] p : intObj.getPoints()) {
+					System.out.println(Arrays.toString(p));
+				}
 				return intObj;
 			}
 			else{
@@ -717,6 +737,10 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 	}
 	pointList = setIntoDomain(pointList);
 	IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+	System.out.println("the lines");
+	for (double[] p : intObj.getPoints()) {
+		System.out.println(Arrays.toString(p));
+	}
 	return intObj;
 }
 	
@@ -851,16 +875,16 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 		return vs;
 	}
 	
-	public int curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> segments, int curveIndex, double[] startPoint, boolean maxMin, double minSigularityDistance) {
+	public int curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> segments, int curveIndex, double[] startPoint, boolean firstVectorField, double minSigularityDistance) {
 		LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 		LinkedList<double[]> all = new LinkedList<double[]>();
-		IntObjects intObj = rungeKutta(startPoint, false, maxMin, singularities, minSigularityDistance);
+		IntObjects intObj = rungeKutta(startPoint, false, firstVectorField, singularities, minSigularityDistance);
 		Collections.reverse(intObj.getPoints());
 		all.addAll(intObj.getPoints());
 		System.out.println("first size" + all.size());
 		boolean cyclic = false;
 		if(!intObj.isNearby()){
-			intObj = rungeKutta(startPoint, true, maxMin, singularities, minSigularityDistance);
+			intObj = rungeKutta(startPoint, true, firstVectorField, singularities, minSigularityDistance);
 			all.addAll(intObj.getPoints());
 		}else{
 			//add the first element of a closed curve
@@ -902,8 +926,17 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 				}
 			}
 		}
+//		System.out.println();
+//		System.out.println("in curveLine");
+//		System.out.println("firstVectorField = " + firstVectorField);
+//		System.out.println("start point = " + Arrays.toString(startPoint));
+		for (LineSegment ls : currentSegments) {
+			System.out.println(ls);
+			
+		}
+		
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
-		currentLine.setDescription((maxMin?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
+		currentLine.setDescription((firstVectorField?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
 		segments.add(currentLine);
 		curveIndex ++;
 		return curveIndex;
@@ -912,12 +945,14 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 	
 	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double umbilicStop, List<double[]> singularities, List<double[]> startingPointsUV) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
-		for(double[] y0 : startingPointsUV) {
+		System.out.println();
+		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, y0, true, umbilicStop);
+					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, umbilicStop);
+					
 				}
 				if (secondVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, y0, false, umbilicStop);
+					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, umbilicStop);
 				}
 		}
 		return currentLines;

@@ -240,8 +240,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					activeNurbsSurface = surface;
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-					System.out.println("The NURBS surface:");
-					System.out.println(surface.toReadableInputString());
+//					System.out.println("The NURBS surface to copy:");
+//					System.out.println(surface.toReadableInputString());
+					System.out.println("The NURBS surface to string:");
+					System.out.println(surface.toString());
 					int dialogOk = JOptionPane.showConfirmDialog(
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
@@ -750,56 +752,57 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					allSegments.addAll(pl.getpLine());
 				}
 				int shiftedIndex = allSegments.size();
-				List<LineSegment> boundarySegments = activeNurbsSurface.getBoundarySegments();
+//				List<LineSegment> boundarySegments = activeNurbsSurface.getBoundarySegments();
+				List<LineSegment> completeDomainBoundarySegments = activeNurbsSurface.getCompleteDomainBoundarySegments();
 				
 				double[] U = activeNurbsSurface.getUKnotVector();
 				double[] V = activeNurbsSurface.getVKnotVector();
-				double u0 = U[0];
-				double um = U[U.length - 1];
-				double v0 = V[0];
-				double vn = V[V.length - 1];
+//				double u0 = U[0];
+//				double um = U[U.length - 1];
+//				double v0 = V[0];
+//				double vn = V[V.length - 1];
 				
 				// with domain boundary
 				
-				System.out.println("FIRST CHECK");
-				for (LineSegment bs : boundarySegments) {
-					System.out.println(bs.toString());
-				}
-				System.out.println("FIRST CHECK END");
+//				System.out.println("FIRST CHECK");
+//				for (LineSegment bs : boundarySegments) {
+//					System.out.println(bs.toString());
+//				}
+//				System.out.println("FIRST CHECK END");
+//				
+//				
+//				if(activeNurbsSurface.getClosingDir() == ClosingDir.uClosed){
+//					double[][] seg2 = {{um,v0},{um,vn}};
+//					double[][] seg4 = {{u0,v0},{u0,vn}};
+//					LineSegment ls2 = new LineSegment(seg2, 1 ,2);
+//					LineSegment ls4 = new LineSegment(seg4, 1, 4);
+//					boundarySegments.add(ls2);
+//					boundarySegments.add(ls4);
+//				}
+//				else if(activeNurbsSurface.getClosingDir() == ClosingDir.vClosed){
+//					double[][] seg1 = {{u0,v0},{um,v0}};
+//					double[][] seg3 = {{u0,vn},{um,vn}};
+//					LineSegment ls1 = new LineSegment(seg1, 1, 1);
+//					LineSegment ls3 = new LineSegment(seg3, 1, 3);
+//					boundarySegments.add(ls1);
+//					boundarySegments.add(ls3);
+//				}
 				
-				
-				if(activeNurbsSurface.getClosingDir() == ClosingDir.uClosed){
-					double[][] seg2 = {{um,v0},{um,vn}};
-					double[][] seg4 = {{u0,v0},{u0,vn}};
-					LineSegment ls2 = new LineSegment(seg2, 1 ,2);
-					LineSegment ls4 = new LineSegment(seg4, 1, 4);
-					boundarySegments.add(ls2);
-					boundarySegments.add(ls4);
-				}
-				else if(activeNurbsSurface.getClosingDir() == ClosingDir.vClosed){
-					double[][] seg1 = {{u0,v0},{um,v0}};
-					double[][] seg3 = {{u0,vn},{um,vn}};
-					LineSegment ls1 = new LineSegment(seg1, 1, 1);
-					LineSegment ls3 = new LineSegment(seg3, 1, 3);
-					boundarySegments.add(ls1);
-					boundarySegments.add(ls3);
-				}
-				
-				System.out.println("SECOND CHECK");
-				for (LineSegment bs : boundarySegments) {
-					System.out.println(bs.toString());
-				}
-				System.out.println("SECOND CHECK END");
+//				System.out.println("SECOND CHECK");
+//				for (LineSegment bs : boundarySegments) {
+//					System.out.println(bs.toString());
+//				}
+//				System.out.println("SECOND CHECK END");
 				
 				//end
 				
 				
-				for (LineSegment bs : boundarySegments) {
+				for (LineSegment bs : completeDomainBoundarySegments) {
 					System.out.println("boundary segment ");
 					bs.setCurveIndex(bs.getCurveIndex() + shiftedIndex);
 					System.out.println(bs.getCurveIndex());
 				}
-				allSegments.addAll(boundarySegments);			
+				allSegments.addAll(completeDomainBoundarySegments);			
 				
 		
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
@@ -810,6 +813,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				double firstTimeBentley = System.currentTimeMillis();
 				double dilation = 1000000000.0;
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments, dilation);
+				System.out.println();
+				System.out.println("NURBS manager plugin all intersections");
+				for (IntersectionPoint ip : intersections) {
+					System.out.println(ip.toString());
+				}
 				GenerateFaceSet gfs = new GenerateFaceSet(activeNurbsSurface, dilation, intersections);
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
@@ -817,12 +825,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 //				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(activeNurbsSurface, dilation, intersections);
 
-				System.out.println("boundary values after algorithm");
-				Set<Double> checkList = activeNurbsSurface.getBoundaryValuesPastIntersection(dilation);
-				for (Double value : checkList) {
-					System.out.println(value);
-				}
-				System.out.println();
+//				System.out.println("boundary values after algorithm");
+//				Set<Double> checkList = activeNurbsSurface.getBoundaryValuesPastIntersection(dilation);
+//				for (Double value : checkList) {
+//					System.out.println(value);
+//				}
+//				System.out.println();
 				FaceSet fs = gfs.createFaceSet(activeNurbsSurface.getBoundaryVerticesUV());
 				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];

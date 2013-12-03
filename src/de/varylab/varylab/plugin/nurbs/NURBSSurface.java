@@ -922,11 +922,20 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			str = str + '\n' + "boundary lines: " + boundaryToString() + '\n';
 			
 			if(revDir == null){
-				str = str + "no surface of revolution ";
+				str = str + "no surface of revolution " + '\n';
 			}else{
 				str = str + "surface of revolution ";
-				str = str + '\n' + revDir;
+				str = str + '\n' + revDir + '\n';
 			}
+			closDir = getClosingDir();
+			if(closDir == ClosingDir.nonClosed){
+				str = str + "surface is nonclosed ";
+			}
+			else{
+				str = str + "closed surface";
+				str = str + '\n' + closDir;
+			}
+			
 			return str;
 		}
 		
@@ -1038,6 +1047,38 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			boundaryVerts.add(boundVert4);
 			return boundaryVerts;
 		}
+		
+		public List<LineSegment> getCompleteDomainBoundarySegments() {
+			List<LineSegment> boundarySegments = new LinkedList<LineSegment>();
+			List<double[]> boundaryVertices = getBoundaryVerticesUV();
+			double[] 
+					boundVert1 = boundaryVertices.get(0),
+					boundVert2 = boundaryVertices.get(1),
+					boundVert3 = boundaryVertices.get(2),
+					boundVert4 = boundaryVertices.get(3);
+					
+			double[][] seg1 = new double[2][2];
+			seg1[0] = boundVert1;
+			seg1[1] = boundVert2;
+			LineSegment b1 = new LineSegment(seg1, 1, 1);
+			double[][] seg2 = new double[2][2];
+			seg2[0] = boundVert2;
+			seg2[1] = boundVert3;
+			LineSegment b2 = new LineSegment(seg2, 1, 2);
+			double[][] seg3 = new double[2][2];
+			seg3[0] = boundVert3;
+			seg3[1] = boundVert4;
+			LineSegment b3 = new LineSegment(seg3, 1, 3);
+			double[][] seg4 = new double[2][2];
+			seg4[0] = boundVert4;
+			seg4[1] = boundVert1;
+			LineSegment b4 = new LineSegment(seg4, 1, 4);
+			boundarySegments.add(b1);
+			boundarySegments.add(b2);
+			boundarySegments.add(b3);
+			boundarySegments.add(b4);
+			return boundarySegments;
+		}
 
 		public List<LineSegment> getBoundarySegments() {
 			List<LineSegment> boundarySegments = new LinkedList<LineSegment>();
@@ -1064,21 +1105,20 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			seg4[0] = boundVert4;
 			seg4[1] = boundVert1;
 			LineSegment b4 = new LineSegment(seg4, 1, 4);
-
-			if(getClosingDir() == ClosingDir.uClosed){
-				boundarySegments.add(b1);
-				boundarySegments.add(b3);
-			}
-			if(getClosingDir() == ClosingDir.vClosed){
-				boundarySegments.add(b2);
-				boundarySegments.add(b4);
-			}else{
+			if(getClosingDir() == ClosingDir.nonClosed){
 				boundarySegments.add(b1);
 				boundarySegments.add(b2);
 				boundarySegments.add(b3);
 				boundarySegments.add(b4);
 			}
-			
+			else if(getClosingDir() == ClosingDir.uClosed){
+				boundarySegments.add(b1);
+				boundarySegments.add(b3);
+			}
+			else if(getClosingDir() == ClosingDir.vClosed){
+				boundarySegments.add(b2);
+				boundarySegments.add(b4);
+			}
 			return boundarySegments;
 		}
 		

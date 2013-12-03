@@ -134,7 +134,7 @@ public class LineSegment {
 	public String toString() {
 		return //"LineSegmentIntersection [segment=" + Arrays.toString(segment[0]) + " " + Arrays.toString(segment[1])
 				//+ ", index=" + indexOnCurve +
-				curveIndex+ "|" + indexOnCurve + " endpoints " + Arrays.toString(segment[0]) + Arrays.toString(segment[1]) + " rightShift = " + rightShift + " upShift = " + upShift;
+				"curve index = " +curveIndex+ ", index on curve = " + indexOnCurve + ", endpoints " + Arrays.toString(segment[0]) + Arrays.toString(segment[1]) + " rightShift = " + rightShift + ", upShift = " + upShift;
 	}
 
 

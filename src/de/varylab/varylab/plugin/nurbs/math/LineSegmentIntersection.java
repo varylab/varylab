@@ -32,14 +32,14 @@ public class LineSegmentIntersection {
 			double u1 = U[U.length - 1];
 			double v0 = V[0];
 			double v1 = V[V.length - 1];
-			System.out.println("START");
+//			System.out.println("START");
 			int curves = 120;
 			double uFactor = curves / (u1 - u0);
 			double vFactor = curves / (v1 - v0);
-			System.out.println("all original segemtns");
-			for (LineSegment ls : segList) {
-				System.out.println(ls.toString());
-			}
+//			System.out.println("all original segemtns");
+//			for (LineSegment ls : segList) {
+//				System.out.println(ls.toString());
+//			}
 			
 			Partition[][] partition = new Partition[curves + 1][curves + 1];
 			System.out.println("Start ini");
