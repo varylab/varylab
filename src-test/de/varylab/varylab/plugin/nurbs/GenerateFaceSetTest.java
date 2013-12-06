@@ -9,9 +9,7 @@ import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.ClosedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.FaceVertex;
-import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
-//import org.junit.Test;
-//import junit.framework.Assert;
+import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 
 public class GenerateFaceSetTest {
 	
@@ -387,24 +385,24 @@ public class GenerateFaceSetTest {
 		LinkedList<IntersectionPoint> intersections = getCombinatoricCaseUClosed();
 		
 		double dilation = 1000000000.0;
-		GenerateFaceSet gfs = new GenerateFaceSet(openSpindle, dilation, intersections);
+		FaceSetGenerator fsg = new FaceSetGenerator(openSpindle, dilation, intersections);
 
-		gfs.getNextNbr(intersections.get(12), intersections.get(10));
+		fsg.getNextNbr(intersections.get(12), intersections.get(10));
 		
 		// check case 2.1.1
-		Assert.assertTrue(intersections.get(18) == gfs.getNextNbr(intersections.get(12), intersections.get(10)));
+		Assert.assertTrue(intersections.get(18) == fsg.getNextNbr(intersections.get(12), intersections.get(10)));
 		// check case 2.1.2.1
 //		Assert.assertTrue(ip2 == gfs.getNextNbr(ip5, ip9));
-		Assert.assertTrue(intersections.get(1) == gfs.getNextNbr(intersections.get(4), intersections.get(8)));
+		Assert.assertTrue(intersections.get(1) == fsg.getNextNbr(intersections.get(4), intersections.get(8)));
 //		// check case 2.1.2.2
 //		Assert.assertTrue(ip12 == gfs.getNextNbr(ip8, ip9));
-		Assert.assertTrue(intersections.get(11) == gfs.getNextNbr(intersections.get(7), intersections.get(8)));
+		Assert.assertTrue(intersections.get(11) == fsg.getNextNbr(intersections.get(7), intersections.get(8)));
 //		// check case 2.2.1
 //		Assert.assertTrue(ip9 == gfs.getNextNbr(ip13, ip12));
-		Assert.assertTrue(intersections.get(8) == gfs.getNextNbr(intersections.get(12), intersections.get(11)));
+		Assert.assertTrue(intersections.get(8) == fsg.getNextNbr(intersections.get(12), intersections.get(11)));
 //		// check case 2.2.2
 //		Assert.assertTrue(ip2 == gfs.getNextNbr(ip9, ip8));
-		Assert.assertTrue(intersections.get(1) == gfs.getNextNbr(intersections.get(8), intersections.get(7)));
+		Assert.assertTrue(intersections.get(1) == fsg.getNextNbr(intersections.get(8), intersections.get(7)));
 //		// check case 1.1	
 //		Assert.assertTrue(ip9 == gfs.getNextNbr(null, ip11));
 //		// check case 1.2.1
@@ -442,7 +440,7 @@ public class GenerateFaceSetTest {
 		IntersectionPoint ip3 = intersections.get(2);
 		
 		double dilation = 1000000000.0;
-		GenerateFaceSet gfs = new GenerateFaceSet(openSpindle, dilation, intersections);
+		FaceSetGenerator gfs = new FaceSetGenerator(openSpindle, dilation, intersections);
 		
 		IntersectionPoint ip = intersections.get(8);
 		int i = 0;
@@ -502,7 +500,7 @@ public class GenerateFaceSetTest {
 		
 		LinkedList<IntersectionPoint> intersections = getCombinatoricCaseUClosed();
 		double dilation = 1000000000.0;
-		GenerateFaceSet gfs = new GenerateFaceSet(openSpindle, dilation, intersections);
+		FaceSetGenerator gfs = new FaceSetGenerator(openSpindle, dilation, intersections);
 		gfs.setLocalNbrs(intersections);
 		gfs.setOrientedNbrs(intersections);
 		FaceSet fs =  gfs.createFaceSet();

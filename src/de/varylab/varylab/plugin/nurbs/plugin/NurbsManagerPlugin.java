@@ -104,7 +104,7 @@ import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
-import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
+import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
@@ -818,7 +818,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				for (IntersectionPoint ip : intersections) {
 					System.out.println(ip.toString());
 				}
-				GenerateFaceSet gfs = new GenerateFaceSet(activeNurbsSurface, dilation, intersections);
+				FaceSetGenerator gfs = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();

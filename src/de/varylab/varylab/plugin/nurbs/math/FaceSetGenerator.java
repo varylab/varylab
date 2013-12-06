@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
@@ -20,11 +21,9 @@ import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.ClosedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.FaceVertex;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 
-public class GenerateFaceSet {
+public class FaceSetGenerator {
 	
-	
-	
-//	private static Logger log = Logger.getLogger(GenerateFaceSet.class.getName());
+	private static Logger log = Logger.getLogger(FaceSetGenerator.class.getName());
 	private LinkedList<IntersectionPoint> leftBound = new LinkedList<IntersectionPoint>();
 	private LinkedList<IntersectionPoint> rightBound = new LinkedList<IntersectionPoint>();
 	private LinkedList<IntersectionPoint> upperBound = new LinkedList<IntersectionPoint>();
@@ -37,7 +36,7 @@ public class GenerateFaceSet {
 	LinkedList<IntersectionPoint> orientedNbrs = null;
 	
 	
-	public GenerateFaceSet(NURBSSurface surface, double d, LinkedList<IntersectionPoint> ipl) {
+	public FaceSetGenerator(NURBSSurface surface, double d, LinkedList<IntersectionPoint> ipl) {
 		ipList = ipl;
 		dilation = d;
 		ns = surface;
@@ -492,7 +491,7 @@ public class GenerateFaceSet {
 	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, IntersectionPoint current){
 		IntersectionPoint next = null;
-		System.out.println("C U R R E N T = " + current);
+		log.info("C U R R E N T = " + current);
 		if(previous == null){
 			System.out.println("case 1 previous == null");
 			IntersectionPoint nextLocal = current.getUnusedNbrs().pollLast();
