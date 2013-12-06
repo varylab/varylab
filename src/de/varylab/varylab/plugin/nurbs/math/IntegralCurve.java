@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
@@ -744,103 +745,103 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 	return intObj;
 }
 	
-	private IntObjects rungeKuttaFixedStep(double[] startPoint, boolean secondOrientation, boolean firstVectorField, List<double[]> singularities, double minSigularityDistance) {
-		int counter = 0;
-		double[] initialValue = startPoint.clone();
-		LinkedList<double[]> pointList = new LinkedList<double[]>();
-		double h = Math.max(um - u0, vn - v0) / 500.;
-		double [] vec1 = new double[2];
-		double [] vec2 = new double[2];
-		boolean closed = false;
-		pointList.add(initialValue);
-		double[] orientation = new double[2];
-		if (!secondOrientation) {
-//			orientation = getConjugateVecField(initialValue, firstVectorField);
-			orientation = getVecField(initialValue, firstVectorField, vfc);
-		} else {
-			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, vfc));
-		}
-		boolean nearBy = false;
-		double dist;
-		double[] ori = orientation;
-		LineSegment seg = new LineSegment();
-	
-		while (!nearBy && counter < 2000) {
-			counter++;
-			if(counter == 2000){
-				System.out.println("termination after 2000 steps");
-			}
-			System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
-			double[] k1 = new double[2];
-			double[] k2 = new double[2];
-			double[] k3 = new double[2];
-			double[] last = pointList.getLast().clone();
-			double[] vectorfieldPoint = new double[2];
-			// the current point is in the extended domain!!!
-			k1 = getVecField(getPointInOriginalDomain(last), firstVectorField, vfc);
-			k1 = getContinuousNormalizedVectorField(orientation, k1);		
-			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.5 * h, k1));
-			
-			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
-				pointList = setIntoDomain(pointList);
-				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-				return intObj;
-			}
-			
-			k2 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
-			k2 = getContinuousNormalizedVectorField(orientation, k2);	
-			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.75 * h, k2));
-			
-			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
-				pointList = setIntoDomain(pointList);
-				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-				return intObj;
-			}
-			k3 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
-			k3 = getContinuousNormalizedVectorField(orientation, k3);
-			
-			double[] next = Rn.add(null, last, Rn.times(null, h, Rn.add(null, Rn.times(null, 2.0 / 9.0, k1), Rn.add(null, Rn.times(null, 1.0 / 3.0, k2), Rn.times(null, 4.0 / 9.0, k3)))));
-//			double[] next = Rn.add(null, last, Rn.times(null, h, k1));
-			if(terminationConditionForPoints(next, pointList, boundary)){
-				pointList = setIntoDomain(pointList);
-				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-				return intObj;
-			}
-			Rn.subtract(orientation, next, pointList.getLast());
-			pointList.add(next);
-			
-			if(pointList.size() == 2){
-				vec1 = Rn.subtract(null, pointList.getLast(), pointList.getFirst());
-			}
-			if(pointList.size() > 2){
-				double[][] lastSegment = new double[2][2];
-				lastSegment[1] = pointList.pollLast();
-				lastSegment[0] = pointList.getLast();
-				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
-				seg.setSegment(lastSegment);
-				dist = distLineSegmentPoint(startPoint, seg);
-				if(Rn.innerProduct(vec1, vec2) < 0){
-					closed = true;
-				}
-				if(dist < minSigularityDistance && closed){
-					nearBy = true;
-					System.out.println("closed");
-					pointList = setIntoDomain(pointList);
-					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-					return intObj;
-				}
-				else{
-					pointList.add(lastSegment[1]);
-				}
-			}
-			
-		}
-//		System.out.println("u.size() " + pointList.size());
-		pointList = setIntoDomain(pointList);
-		IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//		System.out.println("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
-		return intObj;
-	}
+//	private IntObjects rungeKuttaFixedStep(double[] startPoint, boolean secondOrientation, boolean firstVectorField, List<double[]> singularities, double minSigularityDistance) {
+//		int counter = 0;
+//		double[] initialValue = startPoint.clone();
+//		LinkedList<double[]> pointList = new LinkedList<double[]>();
+//		double h = Math.max(um - u0, vn - v0) / 500.;
+//		double [] vec1 = new double[2];
+//		double [] vec2 = new double[2];
+//		boolean closed = false;
+//		pointList.add(initialValue);
+//		double[] orientation = new double[2];
+//		if (!secondOrientation) {
+////			orientation = getConjugateVecField(initialValue, firstVectorField);
+//			orientation = getVecField(initialValue, firstVectorField, vfc);
+//		} else {
+//			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, vfc));
+//		}
+//		boolean nearBy = false;
+//		double dist;
+//		double[] ori = orientation;
+//		LineSegment seg = new LineSegment();
+//	
+//		while (!nearBy && counter < 2000) {
+//			counter++;
+//			if(counter == 2000){
+//				System.out.println("termination after 2000 steps");
+//			}
+//			System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
+//			double[] k1 = new double[2];
+//			double[] k2 = new double[2];
+//			double[] k3 = new double[2];
+//			double[] last = pointList.getLast().clone();
+//			double[] vectorfieldPoint = new double[2];
+//			// the current point is in the extended domain!!!
+//			k1 = getVecField(getPointInOriginalDomain(last), firstVectorField, vfc);
+//			k1 = getContinuousNormalizedVectorField(orientation, k1);		
+//			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.5 * h, k1));
+//			
+//			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
+//				pointList = setIntoDomain(pointList);
+//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+//				return intObj;
+//			}
+//			
+//			k2 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
+//			k2 = getContinuousNormalizedVectorField(orientation, k2);	
+//			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.75 * h, k2));
+//			
+//			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
+//				pointList = setIntoDomain(pointList);
+//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+//				return intObj;
+//			}
+//			k3 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
+//			k3 = getContinuousNormalizedVectorField(orientation, k3);
+//			
+//			double[] next = Rn.add(null, last, Rn.times(null, h, Rn.add(null, Rn.times(null, 2.0 / 9.0, k1), Rn.add(null, Rn.times(null, 1.0 / 3.0, k2), Rn.times(null, 4.0 / 9.0, k3)))));
+////			double[] next = Rn.add(null, last, Rn.times(null, h, k1));
+//			if(terminationConditionForPoints(next, pointList, boundary)){
+//				pointList = setIntoDomain(pointList);
+//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+//				return intObj;
+//			}
+//			Rn.subtract(orientation, next, pointList.getLast());
+//			pointList.add(next);
+//			
+//			if(pointList.size() == 2){
+//				vec1 = Rn.subtract(null, pointList.getLast(), pointList.getFirst());
+//			}
+//			if(pointList.size() > 2){
+//				double[][] lastSegment = new double[2][2];
+//				lastSegment[1] = pointList.pollLast();
+//				lastSegment[0] = pointList.getLast();
+//				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
+//				seg.setSegment(lastSegment);
+//				dist = distLineSegmentPoint(startPoint, seg);
+//				if(Rn.innerProduct(vec1, vec2) < 0){
+//					closed = true;
+//				}
+//				if(dist < minSigularityDistance && closed){
+//					nearBy = true;
+//					System.out.println("closed");
+//					pointList = setIntoDomain(pointList);
+//					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+//					return intObj;
+//				}
+//				else{
+//					pointList.add(lastSegment[1]);
+//				}
+//			}
+//			
+//		}
+////		System.out.println("u.size() " + pointList.size());
+//		pointList = setIntoDomain(pointList);
+//		IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
+////		System.out.println("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
+//		return intObj;
+//	}
 	
 	
 

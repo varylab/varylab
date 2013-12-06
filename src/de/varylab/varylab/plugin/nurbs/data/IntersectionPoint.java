@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
-import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
 
 
 

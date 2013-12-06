@@ -1,6 +1,7 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.LinkedList;
+
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Rn;

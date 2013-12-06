@@ -9,11 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import java.util.logging.Logger;
-
-
-
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;

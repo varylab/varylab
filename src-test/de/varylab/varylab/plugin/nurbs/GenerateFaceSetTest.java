@@ -1,8 +1,6 @@
 package de.varylab.varylab.plugin.nurbs;
 
 import java.util.LinkedList;
-//import org.junit.Test;
-//import junit.framework.Assert;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,6 +10,8 @@ import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.ClosedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.FaceVertex;
 import de.varylab.varylab.plugin.nurbs.math.GenerateFaceSet;
+//import org.junit.Test;
+//import junit.framework.Assert;
 
 public class GenerateFaceSetTest {
 	
