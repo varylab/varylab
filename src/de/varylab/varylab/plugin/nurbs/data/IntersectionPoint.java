@@ -24,24 +24,43 @@ public class IntersectionPoint {
 	private LinkedList<IntersectionPoint> unusedNbrs;
 	private IntersectionPoint previous;
 	private IntersectionPoint opposite = null;
+	private Boolean boundaryPoint = null;
 	
 
 	public IntersectionPoint() {
 		
 	}
 	
-//	public IntersectionPoint clone(){
-//		IntersectionPoint clone = new IntersectionPoint();
-//		clone.setClosedBoundary(closedBoundary);
-//		clone.setIndexList(indexList);
-//		clone.setIntersectingSegments(intersectingSegments);
-//		clone.setParentHP(parentHP);
-//		clone.setPoint(point);
-//		clone.setSameIndexDist(sameIndexDist);
-//		return clone;
-//	}
+
+	public Boolean isBoundaryPoint(List<Double> boundaryValues){
+		if(boundaryPoint == null){
+			double[] point = getPoint();
+			for (Double value : boundaryValues) {
+				if(point[0] == value || point[1] == value){
+					System.out.println("point " + Arrays.toString(point) + " is a boundary point");
+					return true;
+				}
+			}
+			System.out.println("point [" + point[0] + ", " + point[1] +"] is NOT a boundary point");
+			return false;
+		}
+		else{
+			return boundaryPoint;
+		}
+		
+	}
 	
 	
+
+	public void setBoundaryPoint(boolean boundaryPoint) {
+		this.boundaryPoint = boundaryPoint;
+	}
+
+
+
+
+
+
 	public ClosedBoundary getClosedBoundary(NURBSSurface ns, double dilation){
 		if(closedBoundary == null){
 			if(ns.getClosingDir() == ClosingDir.uClosed){
@@ -186,17 +205,7 @@ public class IntersectionPoint {
 	}
 	
 	
-	public boolean isBoundaryPoint(List<Double> boundaryValues){
-		double[] point = getPoint();
-		for (Double value : boundaryValues) {
-			if(point[0] == value || point[1] == value){
-				System.out.println("point " + Arrays.toString(point) + " is a boundary point");
-				return true;
-			}
-		}
-		System.out.println("point [" + point[0] + ", " + point[1] +"] is NOT a boundary point");
-		return false;
-	}
+	
 
 
 	@Override

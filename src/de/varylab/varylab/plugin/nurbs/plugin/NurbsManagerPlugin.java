@@ -831,7 +831,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //					System.out.println(value);
 //				}
 //				System.out.println();
-				FaceSet fs = gfs.createFaceSet(activeNurbsSurface.getBoundaryVerticesUV());
+				FaceSet fs = gfs.createFaceSet();
 				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];
 					activeNurbsSurface.getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);
