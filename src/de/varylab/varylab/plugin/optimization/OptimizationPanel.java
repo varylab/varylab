@@ -190,11 +190,11 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		return job;
 	}
 	
-	public void optimizeAnimated() {
+	public void optimizeAnimated(HalfedgeLayer layer) {
 		if (animateToggle.isSelected()) {
 			VHDS hds = hif.get(new VHDS());
 			VaryLabFunctional fun = createFunctional(hds);
-			job = new AnimatedOptimizationJob(fun, hif);
+			job = new AnimatedOptimizationJob(fun, hif, layer);
 			job.setMethod(getTaoMethod());
 			job.setConstraints(createConstraints(hds));
 			job.addOptimizationListener(this);
@@ -215,15 +215,14 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	}
 	
 	@Override
-	public void optimizationProgress(AbstractOptimizationJob abstractJob, double[] solution, int iteration) {
-		OptimizationJob job = (OptimizationJob)abstractJob;
+	public void optimizationProgress(AbstractOptimizationJob job, double[] solution, int iteration) {
 		progressBar.setValue(iteration);
 		progressBar.setString("" + iteration);
 		progressBar.repaint();
 		if (protocolPanel.isProtocolActive()) {
 			List<IterationProtocol> protocol = new LinkedList<IterationProtocol>();
 			for (VarylabOptimizerPlugin op : pluginsPanel.getActiveOptimizers()) {
-				protocol.add(op.getIterationProtocol(solution, job.getHds()));
+				protocol.add(op.getIterationProtocol(solution, job.getHDS()));
 			}
 			protocolPanel.appendIterationProtocol(protocol);
 		}
@@ -231,8 +230,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	
 	@Override
-	public void optimizationFinished(AbstractOptimizationJob abstractJob, GetSolutionStatusResult stat, double[] x) {
-		OptimizationJob job = (OptimizationJob)abstractJob;
+	public void optimizationFinished(AbstractOptimizationJob job, GetSolutionStatusResult stat, double[] x) {
 		final HalfedgeLayer layer = job.getSourceLayer();
 		String status = stat.toString().replace("getSolutionStatus : ", "");
 		System.out.println("optimization status ------------------------------------");
@@ -324,7 +322,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 			optimize();
 		} 
 		if(animateToggle == s) {
-			optimizeAnimated();
+			optimizeAnimated(hif.getActiveLayer());
 		}
 	}
 	

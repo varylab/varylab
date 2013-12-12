@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.Method;
@@ -24,6 +25,10 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 
 	private HalfedgeInterface
 		hif = null;
+	private HalfedgeLayer
+		sourceLayer = null;
+	private VHDS
+		hds = null;
 	private VaryLabFunctional
 		functional = null;
 	private List<Constraint>
@@ -33,19 +38,21 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 	private int 
 		gcCounter = 0;
 
-	public AnimatedOptimizationJob(VaryLabFunctional fun, HalfedgeInterface hif) {
+	public AnimatedOptimizationJob(VaryLabFunctional fun, HalfedgeInterface hif, HalfedgeLayer sourceLayer) {
 		super("Animated Optimization");
 		this.hif = hif;
+		this.sourceLayer = sourceLayer;
 		this.functional = fun;
+		
 	}
 	
 	@Override
 	public void executeJob() throws Exception {
 		hif.update(); // create undo step
+		this.hds = sourceLayer.get(new VHDS());
 		fireOptimizationStarted(1);
 		PetscTaoUtility.initializePetscTao();
 		Tao solver = new Tao(method);
-		VHDS hds = hif.get(new VHDS());
 		Vec xVec = new Vec(hds.numVertices() * 3);
 		xVec.setBlockSize(3);
 		CoordinatePetscAdapter xAdapter = new CoordinatePetscAdapter(xVec, 1);
@@ -107,6 +114,15 @@ public class AnimatedOptimizationJob extends AbstractOptimizationJob {
 	
 	public void setConstraints(List<Constraint> constraints) {
 		this.constraints = constraints;
+	}
+	
+	@Override
+	public HalfedgeLayer getSourceLayer() {
+		return sourceLayer;
+	}
+	@Override
+	public VHDS getHDS() {
+		return hds;
 	}
 	
 }

@@ -6,8 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.jreality.plugin.job.AbstractCancelableJob;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jpetsc.Vec;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
+import de.varylab.varylab.halfedge.VHDS;
 
 public abstract class AbstractOptimizationJob extends AbstractCancelableJob {
 
@@ -19,6 +21,9 @@ public abstract class AbstractOptimizationJob extends AbstractCancelableJob {
 	public AbstractOptimizationJob(String name) {
 		this.jobName = name;
 	}
+	
+	public abstract HalfedgeLayer getSourceLayer();
+	public abstract VHDS getHDS();
 	
 	@Override
 	public String getJobName() {

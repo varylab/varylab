@@ -125,7 +125,7 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 	public void setSmoothingEnabled(boolean smoothingEnabled) {
 		this.smoothingEnabled = smoothingEnabled;
 	}
-	public VHDS getHds() {
+	public VHDS getHDS() {
 		return hds;
 	}
 	public HalfedgeLayer getSourceLayer() {
