@@ -187,13 +187,7 @@ public class IntersectionPoint {
 		this.sameIndexDist = sameIndexDist;
 	}
 
-//	public HalfedgePoint getParentHP() {
-//		return parentHP;
-//	}
-//
-//	public void setParentHP(HalfedgePoint parentHP) {
-//		this.parentHP = parentHP;
-//	}
+
 
 	public LinkedList<LineSegment> getIntersectingSegments() {
 		return intersectingSegments;

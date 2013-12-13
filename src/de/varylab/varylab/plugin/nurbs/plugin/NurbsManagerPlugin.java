@@ -54,6 +54,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 
+import com.itextpdf.text.log.SysoLogger;
+
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -104,6 +106,7 @@ import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.math.ConstructionTools;
 import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
@@ -238,6 +241,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					}
 					surface.setName(file.getName());
 					activeNurbsSurface = surface;
+// this is only for construction				
+					
+//					NURBSSurface openTorus = ConstructionTools.constructOpenTorus(surface);				
+//					surface = openTorus;
+//					activeNurbsSurface = openTorus;
+					
+// end construction					
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
 //					System.out.println("The NURBS surface to copy:");
@@ -254,6 +264,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 						}
 					}
+//					NURBSSurface newNS = surface;
+					
+//					System.out.println("NEW SURFACE");
+//					System.out.println(newNS.toString());
+//					System.out.println("OBJ");
+//					System.out.println(openTorus.toObj());
+					
 				} 
 			} catch (Exception ex) {
 				ex.printStackTrace();

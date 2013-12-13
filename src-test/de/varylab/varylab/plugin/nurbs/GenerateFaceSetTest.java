@@ -520,17 +520,6 @@ public class GenerateFaceSetTest {
 		Assert.assertArrayEquals(face5, fs.getFaces()[5]);
 		Assert.assertArrayEquals(face6, fs.getFaces()[6]);
 		Assert.assertArrayEquals(face7, fs.getFaces()[7]);
-//		System.out.println("Verts");
-//		for (double[] v : fs.getVerts()) {
-//			System.out.println(Arrays.toString(v));
-//		}
-//		System.out.println("Faces");
-//		for (int i = 0; i < fs.getFaces().length; i++) {
-//			System.out.println("face" + i + ". " + Arrays.toString(fs.getFaces()[i]));
-//		}
-		// face 0 
-
-		
 	}
 
 	

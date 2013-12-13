@@ -58,13 +58,64 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-	public double[] getSymmetricConjugateDirection(double[] p) {
+//	public double[] getSymmetricConjugateDirection(double[] p) {
+//		double[] dir = {1,1};
+//		if(!ns.isSurfaceOfRevolution()){
+//			return dir;
+//		}
+//		else{
+//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
+//			double[][] sF = ci.getSecondFundamental();
+//			double l = sF[0][0];
+//			double n = sF[1][1];
+//			double K = ci.getGaussCurvature();
+//			if(K >= 0){
+//				dir[0] = Math.sqrt(n / l);
+//				return dir;
+//			}
+//			else{
+//				return getAssymptoticDirection(ns, p);
+//				
+//			}
+//		}
+//	}
+	
+	public double[] getSymmetricConjugateDirection(double[] point) {
 		double[] dir = {1,1};
+		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
 		if(!ns.isSurfaceOfRevolution()){
+			double K = ci.getGaussCurvature();
+		
+			if(K > 0){
+				double[] v = ci.getCurvatureDirectionsDomain()[0];
+				double v1 = v[0]; double v2 = v[1];
+				double[][] sF = ci.getSecondFundamental();
+				double l = sF[0][0];
+				double m = sF[0][1];
+				double n = sF[1][1];
+				double a = l - 2 * l * v1 * v1 - 2 * n * v1 * v2;
+				double b = (m - m * v1 * v1 - n * v1 * v2 - l * v1 * v2 - m * v2 * v2);
+				double c = n - 2 * (m * v1 * v2 + n * v2 * v2);
+				double p = b / a;
+				double q = c / a;
+				if(a != 0.0 && (p * p - q) >= 0){
+					System.err.println("NEUE SYMMETRIE");
+					dir[0] =  -p + Math.sqrt(p * p - q);
+					System.out.println(Arrays.toString(dir));
+				}
+				else{
+					return dir;
+				}
+			}
+			else{
+				return getAssymptoticDirection(ns, point);
+			}
+				
+				
+				
 			return dir;
 		}
 		else{
-			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
 			double[][] sF = ci.getSecondFundamental();
 			double l = sF[0][0];
 			double n = sF[1][1];
@@ -74,7 +125,7 @@ public class IntegralCurve {
 				return dir;
 			}
 			else{
-				return getAssymptoticDirection(ns, p);
+				return getAssymptoticDirection(ns, point);
 				
 			}
 		}
@@ -89,7 +140,7 @@ public class IntegralCurve {
 	 * </br>
 	 * Let K be the gaussian curvature</br>
 	 * 1.case: assume n != 0 and set v1 = 1, then </br>
-	 * v2^2  + 2 * (m/n) * v2 + l/n = 0 <=> v2 = (-m + sqrt(m^2 _ l * n)) / n = (-m + sqrt(-K)) / n
+	 * v2^2  + 2 * (m/n) * v2 + l/n = 0 <=> v2 = (-m + sqrt(m^2 - l * n)) / n = (-m + sqrt(-K)) / n
 	 * @param ns
 	 * @param p
 	 * @return assymptotic direction at a point p
