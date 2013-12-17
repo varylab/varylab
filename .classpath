@@ -64,5 +64,6 @@
 	<classpathentry kind="lib" path="lib/jtem/discretegroup.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/blas.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/riemann.jar"/>
+	<classpathentry kind="lib" path="lib/jreality/hidapi-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

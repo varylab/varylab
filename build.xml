@@ -81,6 +81,7 @@
 		<pathelement location="${lib}/jreality/jython-standalone-2.5.3.jar"/>
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
+		<pathelement location="${lib}/jreality/hidapi-1.1.jar"/>
 	</path>
 
 	<path id="jtem.libraryclasspath">
@@ -221,6 +222,7 @@
 		</javac>
 		<copy todir="${build-test}">
 			<fileset dir="${src-test}" includes="**/testSegments.xml"/>
+			<fileset dir="${src-test}" includes="**/logging.properties"></fileset>
 		</copy>
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath path="${build}"/>
