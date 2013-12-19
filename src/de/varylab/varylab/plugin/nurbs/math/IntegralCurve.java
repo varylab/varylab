@@ -86,30 +86,30 @@ public class IntegralCurve {
 		if(!ns.isSurfaceOfRevolution()){
 			double K = ci.getGaussCurvature();
 		
-			if(K > 0){
-				double[] v = ci.getCurvatureDirectionsDomain()[0];
-				double v1 = v[0]; double v2 = v[1];
-				double[][] sF = ci.getSecondFundamental();
-				double l = sF[0][0];
-				double m = sF[0][1];
-				double n = sF[1][1];
-				double a = l - 2 * l * v1 * v1 - 2 * n * v1 * v2;
-				double b = (m - m * v1 * v1 - n * v1 * v2 - l * v1 * v2 - m * v2 * v2);
-				double c = n - 2 * (m * v1 * v2 + n * v2 * v2);
-				double p = b / a;
-				double q = c / a;
-				if(a != 0.0 && (p * p - q) >= 0){
-					System.err.println("NEUE SYMMETRIE");
-					dir[0] =  -p + Math.sqrt(p * p - q);
-					System.out.println(Arrays.toString(dir));
-				}
-				else{
-					return dir;
-				}
-			}
-			else{
-				return getAssymptoticDirection(ns, point);
-			}
+//			if(K > 0){
+//				double[] v = ci.getCurvatureDirectionsDomain()[0];
+//				double v1 = v[0]; double v2 = v[1];
+//				double[][] sF = ci.getSecondFundamental();
+//				double l = sF[0][0];
+//				double m = sF[0][1];
+//				double n = sF[1][1];
+//				double a = l - 2 * l * v1 * v1 - 2 * n * v1 * v2;
+//				double b = (m - m * v1 * v1 - n * v1 * v2 - l * v1 * v2 - m * v2 * v2);
+//				double c = n - 2 * (m * v1 * v2 + n * v2 * v2);
+//				double p = b / a;
+//				double q = c / a;
+//				if(a != 0.0 && (p * p - q) >= 0){
+//					System.err.println("NEUE SYMMETRIE");
+//					dir[0] =  -p - Math.sqrt(p * p - q);
+//					System.out.println(Arrays.toString(dir));
+//				}
+//				else{
+//					return dir;
+//				}
+//			}
+//			else{
+//				return getAssymptoticDirection(ns, point);
+//			}
 				
 				
 				
@@ -671,8 +671,8 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 	int counter = 0;
 	double[] initialValue = startPoint.clone();
 	LinkedList<double[]> pointList = new LinkedList<double[]>();
-	double h = Math.max(um - u0, vn - v0) / 10;
-	double maxDist = Math.min(um - u0, vn - v0) / 4;
+	double h = Math.max(um - u0, vn - v0) / 100;
+	double maxDist = Math.min(um - u0, vn - v0) / 40;
 	double [] vec1 = new double[2];
 	double [] vec2 = new double[2];
 	boolean closed = false;
@@ -765,6 +765,8 @@ public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boo
 			double[][] lastSegment = new double[2][2];
 			lastSegment[1] = pointList.pollLast();
 			lastSegment[0] = pointList.getLast();
+//			lastSegment[1] = getPointInOriginalDomain(pointList.pollLast().clone());
+//			lastSegment[0] = getPointInOriginalDomain(pointList.getLast().clone());
 			vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
 			seg.setSegment(lastSegment);
 			dist = distLineSegmentPoint(startPoint, seg);

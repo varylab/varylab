@@ -193,6 +193,7 @@ public class FaceSetGenerator {
 		}
 		return rightShift;
 	}
+	
 	private static int getUpShiftFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
 		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
 		int upShift = 0;
