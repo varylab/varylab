@@ -123,48 +123,53 @@ public class NURBSCurvatureUtility {
 		//H
 		dG.setMeanCurvature((a11 + a22) / 2);
 		
-		double[][] curvatureVectorDomain = new double[2][2];
+		double[][] w = new double[2][2];
 		if(a12 != 0){
-			curvatureVectorDomain[0][0] = 1; 
-			curvatureVectorDomain[0][1] = (lambda - a11) / a12; 
+			w[0][0] = 1; 
+			w[0][1] = (lambda - a11) / a12; 
 	
 		}
 		else if(a21 != 0){
-			curvatureVectorDomain[0][0] = (lambda - a22)/a21; 
-			curvatureVectorDomain[0][1] = 1; 
+			w[0][0] = (lambda - a22)/a21; 
+			w[0][1] = 1; 
 	
 		}
 		else if(Math.abs(a11 - lambda) < Math.abs(a22 - lambda) ){
-			curvatureVectorDomain[0][0] = 1; 
-			curvatureVectorDomain[0][1] = 0; 
+			w[0][0] = 1; 
+			w[0][1] = 0; 
 		}
 		else if(Math.abs(a22 - lambda) < Math.abs(a11 - lambda)){
-			curvatureVectorDomain[0][0] = 0; 
-			curvatureVectorDomain[0][1] = 1;
+			w[0][0] = 0; 
+			w[0][1] = 1;
 		}
 		if(a12 != 0){
-			curvatureVectorDomain[1][0] = 1; 
-			curvatureVectorDomain[1][1] = (my - a11) / a12; 
+			w[1][0] = 1; 
+			w[1][1] = (my - a11) / a12; 
 		}
 		else if(a21 != 0){
-			curvatureVectorDomain[1][0] = (my - a22)/a21; 
-			curvatureVectorDomain[1][1] = 1; 
+			w[1][0] = (my - a22)/a21; 
+			w[1][1] = 1; 
 	
 		}
 		else if(Math.abs(a11 - my) < Math.abs(a22 - my)){
-			curvatureVectorDomain[1][0] = 1; 
-			curvatureVectorDomain[1][1] = 0; 
+			w[1][0] = 1; 
+			w[1][1] = 0; 
 		}
 		else if(Math.abs(a22 - my) < Math.abs(a11 - my)){
-			curvatureVectorDomain[1][0] = 0; 
-			curvatureVectorDomain[1][1] = 1; 
+			w[1][0] = 0; 
+			w[1][1] = 1; 
 		}
-		dG.setCurvatureDirectionsDomain(curvatureVectorDomain);
-		double[][] curvatureVectorManifold = new double[2][3];
-		curvatureVectorManifold[0] = Rn.add(null, Rn.times(null, curvatureVectorDomain[0][0], SKL[1][0]), Rn.times(null, curvatureVectorDomain[0][1], SKL[0][1]));
-		curvatureVectorManifold[1] = Rn.add(null, Rn.times(null, curvatureVectorDomain[1][0], SKL[1][0]), Rn.times(null, curvatureVectorDomain[1][1], SKL[0][1]));
-		dG.setCurvatureDirectionsManifold(curvatureVectorManifold);
-//		System.out.println("end CurvatureInfo");
+		double[][] e = new double[2][3];
+		Rn.add(e[0], Rn.times(null, w[0][0], SKL[1][0]), Rn.times(null, w[0][1], SKL[0][1]));
+		Rn.add(e[1], Rn.times(null, w[1][0], SKL[1][0]), Rn.times(null, w[1][1], SKL[0][1]));
+		// the w's are the coefficients of the normalized curvature directions in the basis Su, Sv
+		Rn.times(w[0], 1 / Math.sqrt(Rn.innerProduct(e[0],e[0])), w[0]);
+		Rn.times(w[1], 1 / Math.sqrt(Rn.innerProduct(e[1],e[1])), w[1]);
+		
+		dG.setPrincipalDirections(w);
+		Rn.normalize(e[0], e[0]);
+		Rn.normalize(e[1], e[1]);
+		dG.setCurvatureDirections(e);
 		return dG;
 	}
 	

@@ -11,8 +11,8 @@ public class CurvatureInfo {
 	private double [] Svv;
 	private double [] normal;
 
-	private double [][] curvatureDirectionsManifold;
-	private double [][] curvatureDirectionsDomain;
+	private double [][] curvatureDirections;
+	private double [][] pricipalDirections;
 	private double minCurvature;
 	private double maxCurvature;
 	private double [][] Weingartenoperator;
@@ -22,8 +22,8 @@ public class CurvatureInfo {
 	private double MainCurvature;
 	
 	public CurvatureInfo(double[][]cM,double[][]cD, double l, double m, double[][] W, double[][] R){
-		curvatureDirectionsManifold = cM;
-		curvatureDirectionsDomain = cD;
+		curvatureDirections = cM;
+		pricipalDirections = cD;
 		minCurvature = l;
 		maxCurvature = m;
 		Weingartenoperator = W;
@@ -33,8 +33,8 @@ public class CurvatureInfo {
 	
 
 	public CurvatureInfo(){
-		curvatureDirectionsManifold = null;
-		curvatureDirectionsDomain = null;
+		curvatureDirections = null;
+		pricipalDirections = null;
 		minCurvature = 0;
 		maxCurvature = 0;
 		Weingartenoperator = null;
@@ -118,20 +118,20 @@ public class CurvatureInfo {
 		this.normal = normal;
 	}
 
-	public double[][] getCurvatureDirectionsManifold() {
-		return curvatureDirectionsManifold;
+	public double[][] getCurvatureDirections() {
+		return curvatureDirections;
 	}
 
-	public void setCurvatureDirectionsManifold(double[][] cuvatureDirectionsManifold) {
-		this.curvatureDirectionsManifold = cuvatureDirectionsManifold;
+	public void setCurvatureDirections(double[][] cuvatureDirectionsManifold) {
+		this.curvatureDirections = cuvatureDirectionsManifold;
 	}
 
-	public double[][] getCurvatureDirectionsDomain() {
-		return curvatureDirectionsDomain;
+	public double[][] getPrincipalDirections() {
+		return pricipalDirections;
 	}
 
-	public void setCurvatureDirectionsDomain(double[][] cuvatureDirectionsDomain) {
-		this.curvatureDirectionsDomain = cuvatureDirectionsDomain;
+	public void setPrincipalDirections(double[][] pd) {
+		this.pricipalDirections = pd;
 	}
 
 	public double getMinCurvature() {
@@ -186,15 +186,15 @@ public class CurvatureInfo {
 		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
 			System.out.println("umbilic point");
 		} else {
-			System.out.println(Arrays.toString(curvatureDirectionsManifold[0]));
-			System.out.println(Arrays.toString(curvatureDirectionsManifold[1]));
+			System.out.println(Arrays.toString(curvatureDirections[0]));
+			System.out.println(Arrays.toString(curvatureDirections[1]));
 		}
 		System.out.println("curvature directions in the domain:");
 		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
 			System.out.println("umbilic point");
 		}else{
-		System.out.println(Arrays.toString(curvatureDirectionsDomain[0]));
-		System.out.println(Arrays.toString(curvatureDirectionsDomain[1]));
+		System.out.println(Arrays.toString(pricipalDirections[0]));
+		System.out.println(Arrays.toString(pricipalDirections[1]));
 		}
 		System.out.println("curvatures:");
 		System.out.println("lambda: "+minCurvature);

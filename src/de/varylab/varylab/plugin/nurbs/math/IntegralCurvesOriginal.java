@@ -21,9 +21,9 @@ public class IntegralCurvesOriginal {
 
 	public static double[] getMaxMinCurv(NURBSSurface ns, double[] p,boolean max) {
 		if (max) {
-			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getCurvatureDirectionsDomain()[1];
+			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getPrincipalDirections()[1];
 		} else {	
-			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getCurvatureDirectionsDomain()[0];
+			return NURBSCurvatureUtility.curvatureAndDirections(ns, p).getPrincipalDirections()[0];
 		}
 	}
 	

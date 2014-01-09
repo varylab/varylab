@@ -60,8 +60,8 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
-				minCurvatureVFMap.put(index, ci.getCurvatureDirectionsManifold()[0]);
-				maxCurvatureVFMap.put(index, ci.getCurvatureDirectionsManifold()[1]);
+				minCurvatureVFMap.put(index, ci.getCurvatureDirections()[0]);
+				maxCurvatureVFMap.put(index, ci.getCurvatureDirections()[1]);
 				
 			}
 		}

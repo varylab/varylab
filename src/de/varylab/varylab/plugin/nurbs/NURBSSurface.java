@@ -1265,7 +1265,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			}
 			double[] p = {uCoord, vCoord};
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, p);
-			double[] vector = ci.getCurvatureDirectionsDomain()[0];
+			double[] vector = ci.getPrincipalDirections()[0];
 			linefield.set(v, vector, as);
 		}
 

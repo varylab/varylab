@@ -284,8 +284,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			private static final long serialVersionUID = 1L;
 
 			private SpinnerNumberModel
-				uModel = new SpinnerNumberModel(10,0,100,2),
-				vModel = new SpinnerNumberModel(10,0,100,2);
+				uModel = new SpinnerNumberModel(11,0,200,2),
+				vModel = new SpinnerNumberModel(11,0,200,2);
 			
 			private JSpinner
 				uSpinner = new JSpinner(uModel),
