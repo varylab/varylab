@@ -250,8 +250,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 // end construction					
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-//					System.out.println("The NURBS surface to copy:");
-//					System.out.println(surface.toReadableInputString());
+					System.out.println("The NURBS surface to copy:");
+					System.out.println(surface.toReadableInputString());
 					System.out.println("The NURBS surface to string:");
 					System.out.println(surface.toString());
 					int dialogOk = JOptionPane.showConfirmDialog(

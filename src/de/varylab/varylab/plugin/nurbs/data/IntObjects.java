@@ -10,6 +10,8 @@ public class IntObjects {
 	protected boolean nearby;
 	protected boolean maxMin;
 	protected boolean cyclic = false;
+	//only for debugging
+	private LinkedList<double[][]> basisList;
 
 	public IntObjects(){
 		points = null;
@@ -28,7 +30,15 @@ public class IntObjects {
 		nearby = n;
 	}
 
+	
 
+	public LinkedList<double[][]> getBasisList() {
+		return basisList;
+	}
+
+	public void setBasisList(LinkedList<double[][]> basisList) {
+		this.basisList = basisList;
+	}
 
 	public LinkedList<double[]> getPoints() {
 		return points;
