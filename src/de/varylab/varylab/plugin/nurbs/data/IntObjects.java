@@ -11,7 +11,6 @@ public class IntObjects {
 	protected boolean maxMin;
 	protected boolean cyclic = false;
 	//only for debugging
-	private LinkedList<double[][]> basisList;
 
 	public IntObjects(){
 		points = null;
@@ -31,14 +30,6 @@ public class IntObjects {
 	}
 
 	
-
-	public LinkedList<double[][]> getBasisList() {
-		return basisList;
-	}
-
-	public void setBasisList(LinkedList<double[][]> basisList) {
-		this.basisList = basisList;
-	}
 
 	public LinkedList<double[]> getPoints() {
 		return points;

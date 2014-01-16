@@ -5,7 +5,6 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NURBSCurvatureUtility {
-		
 	
 	/**
 	 * 
@@ -107,10 +106,10 @@ public class NURBSCurvatureUtility {
 		dG.setWeingartenOperator(W);
 		
 		//lambda
-		double lambda = (a11 + a22)/2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
+		double lambda = (a11 + a22) / 2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
 		
 		//my
-		double my = (a11 + a22)/2 - Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
+		double my = (a11 + a22) / 2 - Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
 		if(lambda > my) {
 			double tmp = my;
 			my = lambda;
@@ -124,17 +123,20 @@ public class NURBSCurvatureUtility {
 		dG.setMeanCurvature((a11 + a22) / 2);
 		
 		double[][] w = new double[2][2];
-		if(a12 != 0){
+		if(Math.abs(a12) > 0.00001){
+//			System.out.println("a12 != 0");
+//			System.out.println("a12 = " + a12);
 			w[0][0] = 1; 
 			w[0][1] = (lambda - a11) / a12; 
 	
 		}
-		else if(a21 != 0){
+		else if(Math.abs(a21) > 0.00001){
+//			System.out.println("a21 != 0");
 			w[0][0] = (lambda - a22)/a21; 
 			w[0][1] = 1; 
 	
 		}
-		else if(Math.abs(a11 - lambda) < Math.abs(a22 - lambda) ){
+		else if(Math.abs(a11 - lambda) <= Math.abs(a22 - lambda)){
 			w[0][0] = 1; 
 			w[0][1] = 0; 
 		}
@@ -142,16 +144,16 @@ public class NURBSCurvatureUtility {
 			w[0][0] = 0; 
 			w[0][1] = 1;
 		}
-		if(a12 != 0){
+		if(Math.abs(a12) > 0.00001){
 			w[1][0] = 1; 
 			w[1][1] = (my - a11) / a12; 
 		}
-		else if(a21 != 0){
-			w[1][0] = (my - a22)/a21; 
+		else if(Math.abs(a21) > 0.00001){
+			w[1][0] = (my - a22) / a21; 
 			w[1][1] = 1; 
 	
 		}
-		else if(Math.abs(a11 - my) < Math.abs(a22 - my)){
+		else if(Math.abs(a11 - my) <= Math.abs(a22 - my)){
 			w[1][0] = 1; 
 			w[1][1] = 0; 
 		}

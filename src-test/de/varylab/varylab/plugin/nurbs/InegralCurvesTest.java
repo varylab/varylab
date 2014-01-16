@@ -7,8 +7,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.jreality.math.Rn;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.IntObjects;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
+import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 
@@ -181,26 +183,13 @@ public class InegralCurvesTest {
 	public void symmetricConjugateCurvatureDirectionTest(){
 		NURBSSurface openSpindle = createOpenSpindle();
 //		double[] start = {3.141592653589793, 0.0};
-		double[] start = {3., 0.0};
-		VecFieldCondition vfc = VecFieldCondition.conjugate;
-		IntegralCurve ic = new IntegralCurve(openSpindle, vfc, 0.001);
-		IntObjects io = ic.rungeKutta(start, false, false, null, 0);
-		LinkedList<double[]> pointList = io.getPoints();
-		IntObjects ioTest = ic.rungeKuttaTest(start, false, false, null, 0);
-		LinkedList<double[]> pointListTest = ioTest.getPoints();
-		int count = 0;
-		double[] point = io.getPoints().getFirst();
-		double[] pointTest = io.getPoints().getFirst();
-		while(Math.abs(Rn.euclideanDistance(point, pointTest)) < 0.01){
-			count++;
-			if(pointList.size() < count -1 && pointListTest.size() < count -1){
-				point = pointList.get(count);
-				pointTest = pointListTest.get(count);
-				System.out.println("point = " + Arrays.toString(point));
-				System.out.println("pointTest = " + Arrays.toString(pointTest));
-			}
-			
-		}
+		double[] point = {3.378534153691202, 1.5074123596222162};
+		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(openSpindle, point);
+		double[] w1 = ci.getPrincipalDirections()[0];
+		double[] w2 = ci.getPrincipalDirections()[1];
+		System.out.println("w1 = " + Arrays.toString(w1));
+		System.out.println("w2 = " + Arrays.toString(w2));
+		
 		
 	}
 
