@@ -995,11 +995,11 @@ public class IntegralCurve {
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
 	
-		while (!nearBy && counter < 100) {
+		while (!nearBy && counter < 1000) {
 
 			counter++;
-			if(counter == 100){
-				System.out.println("termination after 100 steps");
+			if(counter == 1000){
+				System.out.println("termination after 1000 steps");
 			}
 	//		System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
 			double[] last = pointList.getLast().clone();

@@ -6,6 +6,31 @@ import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NURBSCurvatureUtility {
 	
+	
+	public static double[] getEigenvector(double[][] matrix, double my, double eps){
+		double[] eig = {1,0};
+		double v1 = matrix[0][0] - my;
+		double v2 = matrix[1][0];
+		double w1 = matrix[0][1];
+		double w2 = matrix[1][1] - my;
+		double normV = Math.sqrt(v1 * v1 + v2 * v2);
+		if(normV == 0){
+			return eig;
+		}
+		double sin = -v2 / normV;
+		double cos = v1 / normV;
+		double coeff2 = cos * w1 - sin * w2;
+		if(normV > eps){
+			eig[1] = 1;
+			eig[0] = -coeff2 / normV;
+		}
+		else{
+			eig[0] = 1;
+			eig[1] = -normV / coeff2;
+		}
+		return eig;
+	}
+	
 	/**
 	 * 
 	 * @param ns
@@ -161,6 +186,10 @@ public class NURBSCurvatureUtility {
 			w[1][0] = 0; 
 			w[1][1] = 1; 
 		}
+		//only TEST
+//		w[0] = getEigenvector(W, lambda, 0.00001);
+//		w[1] = getEigenvector(W, my, 0.00001);
+		// end TEST
 		double[][] e = new double[2][3];
 		Rn.add(e[0], Rn.times(null, w[0][0], SKL[1][0]), Rn.times(null, w[0][1], SKL[0][1]));
 		Rn.add(e[1], Rn.times(null, w[1][0], SKL[1][0]), Rn.times(null, w[1][1], SKL[0][1]));
