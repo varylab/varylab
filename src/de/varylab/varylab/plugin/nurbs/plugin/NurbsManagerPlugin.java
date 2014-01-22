@@ -229,10 +229,29 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
+//					surface = surface.SurfaceKnotInsertion(false, 0.5, 1);
 					double[] U = surface.getUKnotVector();
 					System.out.println("u0 = " + U[0] + "um = " + U[U.length - 1]);
 					double[] V = surface.getVKnotVector();
 					System.out.println("v0 = " + V[0] + "vn = " + V[V.length - 1]);
+					//ONLY FOR CONSTRUCTION
+//					LinkedList<Double> insertingElements = new LinkedList<Double>();
+//					double before = V[0];
+//					for (int i = 0; i < V.length; i++) {
+//						System.out.println("before = " + before);
+//						System.out.println("V[i] =  " + V[i]);
+//						if(before != V[i]){
+//							insertingElements.add((V[i] + before) / 2.0);
+//							System.out.println();
+//							System.out.println("insertion");
+//						}
+//						before = V[i];
+//					}
+//					for (Double d : insertingElements) {
+//						System.out.println("d = " + d);
+//						surface = surface.SurfaceKnotInsertion(false, d, 1);
+//					}
+					//END CONSTRUCTION
 					if(surface.getClosingDir() == ClosingDir.uClosed){
 						System.out.println("surface.isClosedUDir()");
 					}
@@ -241,13 +260,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					}
 					surface.setName(file.getName());
 					activeNurbsSurface = surface;
-// this is only for construction				
-					
-//					NURBSSurface openTorus = ConstructionTools.constructOpenTorus(surface);				
-//					surface = openTorus;
-//					activeNurbsSurface = openTorus;
-					
-// end construction					
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
 					System.out.println("The NURBS surface to copy:");
