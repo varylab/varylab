@@ -100,177 +100,75 @@ public class IntegralCurve {
 	}
 	
 	
-	public double[] getSymmetricConjugateDirection(double[] point) {
-	double[] dir = {1,1};
-	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
-//	double[] e1 = {1,0};
-//	double[] e2 = {0,1};
-	double[] w1 = ci.getPrincipalDirections()[0];
-//	if(Math.abs(det(e1, w1)) > 0.001){
-//		System.out.println("w1 " + Arrays.toString(w1));
-//	}
-	double[] w2 = ci.getPrincipalDirections()[1];
-//	if(Math.abs(det(e2, w2)) > 0.001){
-//		System.out.println("w2 " + Arrays.toString(w2));
-//	}
-	if(!ns.isSurfaceOfRevolution()){
-		double K = ci.getGaussCurvature();
-	
-		if(K > 0){
-			double k1 = ci.getMinCurvature();
-			double k2 = ci.getMaxCurvature();
-//			System.out.println("theta = " + theta);
-		
-			
-//			boolean flip1 = false;
-			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//				flip1 = true;
-//				System.out.println("flip w1");
-//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-				flip(w1);
-			}
-			
-			prevW1 = w1;
-//			System.out.println("w1 = " + Arrays.toString(w1));
-//			boolean flip2 = false;
-			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				flip2 = true;
-//				System.out.println("flip w2");
-				
-//				System.out.println("revW2 " + Arrays.toString(prevW2));
-//				
-//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-				flip(w2);
-			}
-			
-			prevW2 = w2;
-			double theta;
-			if(k2 == 0){
-				theta = Math.PI / 2.;
-			}
-			else{
-				theta = Math.atan(Math.sqrt(k1 / k2));
-			}
-			
-			System.out.println("theta " + theta);
-			angle = theta;
-//			if(flip1 == flip2){
-//				theta = -theta;
-//			}
-//			System.out.println("w2 = " + Arrays.toString(w2));
-			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-			Rn.normalize(dir, dir);
-//			System.out.println("direction " + Arrays.toString(dir));
-//			basis = ci.getPrincipalDirections();
-//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-//				System.out.println();
-//				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-//				System.out.println();
-//				dir = getConj(dir, point);
-//			}
-			return dir;
-		}
-		else{
-			return getAssymptoticDirection(ns, point);
-		}
-	}
-	else{
-		double K = ci.getGaussCurvature();
-		if(K > 0){
-			double k1 = ci.getMinCurvature();
-			double k2 = ci.getMaxCurvature();
-//			System.out.println("theta = " + theta);
-		
-			
-//			boolean flip1 = false;
-			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//				flip1 = true;
-//				System.out.println("flip w1");
-//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-				flip(w1);
-			}
-			
-			prevW1 = w1;
-//			System.out.println("w1 = " + Arrays.toString(w1));
-//			boolean flip2 = false;
-			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				flip2 = true;
-//				System.out.println("flip w2");
-				
-//				System.out.println("revW2 " + Arrays.toString(prevW2));
-//				
-//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-				flip(w2);
-			}
-			
-			prevW2 = w2;
-			double theta;
-			if(k2 == 0){
-				theta = Math.PI / 2.;
-			}
-			else{
-				theta = Math.atan(Math.sqrt(k1 / k2));
-			}
-			
-			System.out.println("theta " + theta);
-			angle = theta;
-//			if(flip1 == flip2){
-//				theta = -theta;
-//			}
-//			System.out.println("w2 = " + Arrays.toString(w2));
-			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-			Rn.normalize(dir, dir);
-//			System.out.println("direction " + Arrays.toString(dir));
-//			basis = ci.getPrincipalDirections();
-//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-//				System.out.println();
-//				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-//				System.out.println();
-//				dir = getConj(dir, point);
-//			}
-			return dir;
-		}
-		else{
-			return getAssymptoticDirection(ns, point);
-		}
-	}
-}
-	
 //	public double[] getSymmetricConjugateDirection(double[] point) {
 //	double[] dir = {1,1};
 //	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
+////	double[] e1 = {1,0};
+////	double[] e2 = {0,1};
+//	double[] w1 = ci.getPrincipalDirections()[0];
+////	if(Math.abs(det(e1, w1)) > 0.001){
+////		System.out.println("w1 " + Arrays.toString(w1));
+////	}
+//	double[] w2 = ci.getPrincipalDirections()[1];
+////	if(Math.abs(det(e2, w2)) > 0.001){
+////		System.out.println("w2 " + Arrays.toString(w2));
+////	}
 //	if(!ns.isSurfaceOfRevolution()){
 //		double K = ci.getGaussCurvature();
 //	
 //		if(K > 0){
 //			double k1 = ci.getMinCurvature();
 //			double k2 = ci.getMaxCurvature();
-//			double theta = Math.atan(Math.sqrt(k1 / k2));
 ////			System.out.println("theta = " + theta);
-//			double[] w1 = ci.getPrincipalDirections()[0];
-////			if(!isInUpperHalfplane(w1)){
+//		
+//			
+////			boolean flip1 = false;
+////			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+////				flip1 = true;
+////				System.out.println("flip w1");
+////				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
 ////				flip(w1);
 ////			}
-//			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//				flip(w1);
-//			}
-//			prevW1 = w1;
+//			
+////			prevW1 = w1;
 ////			System.out.println("w1 = " + Arrays.toString(w1));
-//			double[] w2 = ci.getPrincipalDirections()[1];
-////			if(!isInUpperHalfplane(w2)){
+////			boolean flip2 = false;
+////			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+////				flip2 = true;
+////				System.out.println("flip w2");
+//				
+////				System.out.println("revW2 " + Arrays.toString(prevW2));
+////				
+////				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
 ////				flip(w2);
 ////			}
-//			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				flip(w2);
+//			
+////			prevW2 = w2;
+//			double theta;
+//			if(k2 == 0){
+//				theta = Math.PI / 2.;
 //			}
-//			prevW2 = w2;
+//			else{
+//				theta = Math.atan(Math.sqrt(k1 / k2));
+//			}
+//			
+//			System.out.println("theta " + theta);
+//			angle = theta;
+////			if(flip1 == flip2){
+////				theta = -theta;
+////			}
 ////			System.out.println("w2 = " + Arrays.toString(w2));
 //			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
 //			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+//			Rn.normalize(dir, dir);
 ////			System.out.println("direction " + Arrays.toString(dir));
-//			
+////			basis = ci.getPrincipalDirections();
+////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+////				System.out.println();
+////				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+////				System.out.println();
+////				dir = getConj(dir, point);
+////			}
 //			return dir;
 //		}
 //		else{
@@ -283,41 +181,55 @@ public class IntegralCurve {
 //			double k1 = ci.getMinCurvature();
 //			double k2 = ci.getMaxCurvature();
 ////			System.out.println("theta = " + theta);
-//			double[] w1 = ci.getPrincipalDirections()[0];
+//		
+//			
 ////			boolean flip1 = false;
 //			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
 ////				flip1 = true;
-//				System.out.println("flip w1");
-//				System.out.println("w1 " + Arrays.toString(w1));
-//				System.out.println("revW1 " + Arrays.toString(prevW1));
-//				
-//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+////				System.out.println("flip w1");
+////				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
 //				flip(w1);
 //			}
+//			
 //			prevW1 = w1;
-//			System.out.println("w1 = " + Arrays.toString(w1));
-//			double[] w2 = ci.getPrincipalDirections()[1];
+////			System.out.println("w1 = " + Arrays.toString(w1));
 ////			boolean flip2 = false;
 //			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
 ////				flip2 = true;
-//				System.out.println("flip w2");
-//				System.out.println("w2 " + Arrays.toString(w2));
-//				System.out.println("revW2 " + Arrays.toString(prevW2));
+////				System.out.println("flip w2");
 //				
-//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+////				System.out.println("revW2 " + Arrays.toString(prevW2));
+////				
+////				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
 //				flip(w2);
 //			}
+//			
 //			prevW2 = w2;
-//			double theta = Math.atan(Math.sqrt(k1 / k2));
+//			double theta;
+//			if(k2 == 0){
+//				theta = Math.PI / 2.;
+//			}
+//			else{
+//				theta = Math.atan(Math.sqrt(k1 / k2));
+//			}
+//			
 //			System.out.println("theta " + theta);
+//			angle = theta;
 ////			if(flip1 == flip2){
 ////				theta = -theta;
 ////			}
-//			System.out.println("w2 = " + Arrays.toString(w2));
+////			System.out.println("w2 = " + Arrays.toString(w2));
 //			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
 //			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-//			System.out.println("direction " + Arrays.toString(dir));
-//			basis = ci.getPrincipalDirections();
+//			Rn.normalize(dir, dir);
+////			System.out.println("direction " + Arrays.toString(dir));
+////			basis = ci.getPrincipalDirections();
+////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+////				System.out.println();
+////				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+////				System.out.println();
+////				dir = getConj(dir, point);
+////			}
 //			return dir;
 //		}
 //		else{
@@ -326,93 +238,94 @@ public class IntegralCurve {
 //	}
 //}
 	
-//	public double[] getSymmetricConjugateDirectionWRTCurvatureDirection(double[] point) {
-//		double[] dir = {1,1};
-//		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
-//		if(!ns.isSurfaceOfRevolution()){
-//			double K = ci.getGaussCurvature();
-//		
-//			if(K > 0){
-//				double k1 = ci.getMinCurvature();
-//				double k2 = ci.getMaxCurvature();
-//				double theta = Math.atan(Math.sqrt(k1 / k2));
-////				System.out.println("theta = " + theta);
-//				double[] w1 = ci.getPrincipalDirections()[0];
-////				if(!isInUpperHalfplane(w1)){
-////					flip(w1);
-////				}
-//				if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//					flip(w1);
-//				}
-//				prevW1 = w1;
-////				System.out.println("w1 = " + Arrays.toString(w1));
-//				double[] w2 = ci.getPrincipalDirections()[1];
-////				if(!isInUpperHalfplane(w2)){
-////					flip(w2);
-////				}
-//				if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//					flip(w2);
-//				}
-//				prevW2 = w2;
-////				System.out.println("w2 = " + Arrays.toString(w2));
-//				dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-//				dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-////				System.out.println("direction " + Arrays.toString(dir));
+	
+	public double[] getSymmetricConjugateDirection(double[] point) {
+	double[] dir = {1,1};
+	double[] givenDir = {0.5,1};
+	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
+	double[] w1 = ci.getPrincipalDirections()[0];
+	double[] w2 = ci.getPrincipalDirections()[1];
+		double K = ci.getGaussCurvature();
+		if(K > 0){
+			double k1 = ci.getMinCurvature();
+			double k2 = ci.getMaxCurvature();
+			double[] e1 = ci.getCurvatureDirections()[0];
+			double[] e2 = ci.getCurvatureDirections()[1];
+			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
+			System.out.println("inner product = " + Rn.innerProduct(v, e1));
+			double delta = 0.;
+			if(Rn.innerProduct(v, e1) > 1){
+				delta = 0.;
+			}
+			else if(Rn.innerProduct(v, e1) < -1){
+				delta = Math.PI;
+			}
+			else{
+				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
+			}
+			System.out.println("delta = " + delta);
+		
+			
+//			boolean flip1 = false;
+			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+//				flip1 = true;
+//				System.out.println("flip w1");
+//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+				flip(w1);
+			}
+			
+			prevW1 = w1;
+//			System.out.println("w1 = " + Arrays.toString(w1));
+//			boolean flip2 = false;
+			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+//				flip2 = true;
+//				System.out.println("flip w2");
+				
+//				System.out.println("revW2 " + Arrays.toString(prevW2));
 //				
-//				return dir;
+//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+				flip(w2);
+			}
+			
+			prevW2 = w2;
+			double theta;
+			if(k2 == 0){
+				theta = Math.PI / 2.;
+			}
+			else{
+//				theta = Math.atan(Math.sqrt(k1 / k2));
+				double q = k1 / k2;
+				double p = Math.tan(delta) * (1 + q) / 2;
+				System.out.println("p = " + p);
+				theta = Math.atan(p + Math.sqrt(p * p + q));
+				
+			}
+			
+			System.out.println("theta " + theta);
+			angle = theta;
+//			if(flip1 == flip2){
+//				theta = -theta;
 //			}
-//			else{
-//				return getAssymptoticDirection(ns, point);
+//			System.out.println("w2 = " + Arrays.toString(w2));
+			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
+			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+			Rn.normalize(dir, dir);
+//			System.out.println("direction " + Arrays.toString(dir));
+//			basis = ci.getPrincipalDirections();
+//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+//				System.out.println();
+//				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+//				System.out.println();
+//				dir = getConj(dir, point);
 //			}
-//		}
-//		else{
-//			double K = ci.getGaussCurvature();
-//			if(K > 0){
-//				double k1 = ci.getMinCurvature();
-//				double k2 = ci.getMaxCurvature();
-////				System.out.println("theta = " + theta);
-//				double[] w1 = ci.getPrincipalDirections()[0];
-////				boolean flip1 = false;
-//				if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-////					flip1 = true;
-//					System.out.println("flip w1");
-//					System.out.println("w1 " + Arrays.toString(w1));
-//					System.out.println("revW1 " + Arrays.toString(prevW1));
-//					
-//					System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-//					flip(w1);
-//				}
-//				prevW1 = w1;
-//				System.out.println("w1 = " + Arrays.toString(w1));
-//				double[] w2 = ci.getPrincipalDirections()[1];
-////				boolean flip2 = false;
-//				if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-////					flip2 = true;
-//					System.out.println("flip w2");
-//					System.out.println("w2 " + Arrays.toString(w2));
-//					System.out.println("revW2 " + Arrays.toString(prevW2));
-//					
-//					System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-//					flip(w2);
-//				}
-//				prevW2 = w2;
-//				double theta = Math.atan(Math.sqrt(k1 / k2));
-//				System.out.println("theta " + theta);
-////				if(flip1 == flip2){
-////					theta = -theta;
-////				}
-//				System.out.println("w2 = " + Arrays.toString(w2));
-//				dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-//				dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-//				System.out.println("direction " + Arrays.toString(dir));
-//				basis = ci.getPrincipalDirections();
-//				return dir;
-//			}
-//			else{
-//				return getAssymptoticDirection(ns, point);
-//			}
-//		}
-//	}
+			return dir;
+		}
+		else{
+			return getAssymptoticDirection(ns, point);
+		}
+}
+	
+
 	
 	
 
@@ -995,11 +908,11 @@ public class IntegralCurve {
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
 	
-		while (!nearBy && counter < 1000) {
+		while (!nearBy && counter < 100) {
 
 			counter++;
-			if(counter == 1000){
-				System.out.println("termination after 1000 steps");
+			if(counter == 100){
+				System.out.println("termination after 100 steps");
 			}
 	//		System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
 			double[] last = pointList.getLast().clone();

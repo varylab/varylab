@@ -1,6 +1,9 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import compgeom.Rational;
 
 import de.jreality.math.Rn;
@@ -16,6 +19,50 @@ public class NURBSCurvatureUtility {
 		Rational n = new Rational(cast);
 		Rational r = n.divide(dn);
 		return r;
+	}
+	
+	private static String toReadableString(Double d){
+		String str = d.toString();
+		System.out.println(str);
+		if(str.contains("E")){
+			String[] split = str.split("E");
+			boolean minus = false;
+			System.out.println("split[0] = " + split[0]);
+			if(split[0].startsWith("-")){
+				minus = true;
+				split[0] = split[0].substring(1);
+				System.out.println("split[0] = " + split[0]);
+			}
+			String[] digits = split[0].split("\\.");
+			System.out.println(digits.length);
+			System.out.println(digits[0]);
+			split[0] = digits[0].concat(digits[1]);
+			System.out.println("split[0] = " + split[0]);
+			System.out.println("split[1] = " + split[1]);
+			boolean minusExp = false;
+			if(split[1].startsWith("-")){
+				minusExp = true;
+				split[1] = split[1].substring(1);
+				
+//				int exp = (int)split[1];
+			}
+			Integer exp = Integer.parseInt(split[1]);
+			System.out.println("split[1] = " + split[1]);
+			System.out.println("exp = " + exp);
+			if(minusExp){
+				String prev = "0.";
+				for (int i = 1; i < exp; i++) {
+					prev = prev + "0";
+				}
+				str = prev + split[0];
+				System.out.println("str = " + str);
+			}
+			
+			return str;
+		}
+		else{
+			return str;
+		}
 	}
 	
 
@@ -53,6 +100,8 @@ public class NURBSCurvatureUtility {
 		}
 		return eig;
 	}
+	
+
 
 /**
  * 
@@ -171,6 +220,7 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	dG.setMeanCurvature((a11 + a22) / 2);
 	
 	double[][] w = new double[2][2];
+	
 	if(Math.abs(a12) > 0.00001){
 //		System.out.println("a12 != 0");
 //		System.out.println("a12 = " + a12);
@@ -211,8 +261,8 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	}
 	//only TEST
 //	System.out.println("call getEigenvector");
-//	w[0] = getEigenvector(W, lambda);
-//	w[1] = getEigenvector(W, my);
+	w[0] = getEigenvector(W, lambda);
+	w[1] = getEigenvector(W, my);
 	// end TEST
 	double[][] e = new double[2][3];
 	Rn.add(e[0], Rn.times(null, w[0][0], SKL[1][0]), Rn.times(null, w[0][1], SKL[0][1]));
@@ -229,13 +279,14 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 }
 
 public static void main(String[] args){
-	Double My = -1.4438315518565474;
-	Double a11 = -1.4438315518565474;
-	double a12 = -2.758943207208057E-16;
-
+//	Double My = -1.4438315518565474;
+//	Double a11 = -1.4438315518565474;
+	Double a12 = -2.758943207208057E-2;
+	toReadableString(a12);
+//
 //	String strMy = a12.toString();
-	Rational r = getRational(a12);
-	System.out.println(r.toString());
+//	Rational r = getRational(a12);
+//	System.out.println(r.toString());
 //	Rational rMy = new Rational(strMy);
 //	System.out.println(rMy.toString());
 }
