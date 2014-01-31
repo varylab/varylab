@@ -74,7 +74,6 @@ public class LatticeRemesher <
 //		child4.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child4);
 		
-		
 		SpringRemeshingUtility.straightenBoundary(lattice, edges, polygon.getCorners(), a);
 //		SceneGraphComponent child5 = new SceneGraphComponent("Straighten Boundary");
 //		child5.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
@@ -89,12 +88,18 @@ public class LatticeRemesher <
 		RemeshingUtility.alignRemeshBoundary(hds, surf, a);
 		
 //		JRViewer.display(root);
+
 		return hds;
 	}	
 
-	private void removeExteriorVertices(List<E> polygon) {
-		F intFace = polygon.get(0).getRightFace();
-		HalfEdgeDataStructure<V, E, F> hds = intFace.getHalfEdgeDataStructure();
+	private void removeOutside(LinkedList<E> polygon, HDS hds) {
+		F intFace = null;
+		for(E be : HalfEdgeUtils.boundaryEdges(hds)) {
+			if(!(polygon.contains(be) || polygon.contains(be.getOppositeEdge()))) {
+				intFace = be.getRightFace();
+				break;
+			}
+		}
 		LinkedList<F> queue = new LinkedList<F>();
 		HashSet<F> visited = new HashSet<F>();
 		queue.add(intFace);
@@ -103,21 +108,26 @@ public class LatticeRemesher <
 			F actFace = queue.poll();
 			List<F> star = new LinkedList<F>();
 			for(E e : HalfEdgeUtils.boundaryEdges(actFace)) {
+				if(polygon.contains(e) || polygon.contains(e.getOppositeEdge())){
+					continue;
+				}
 				if(e.getRightFace() != null) {
 					star.add(e.getRightFace());
 				}
 			}
 			for (F f : star){
-				if (!visited.contains(f)){
+				if (!visited.contains(f)){	
 					visited.add(f);
 					queue.offer(f);
 				}
 			}
 		}
 		Set<V> outsideVerts = new HashSet<V>();
-		outsideVerts.addAll(hds.getVertices());
 		for(F f : visited) {
-			outsideVerts.removeAll(HalfEdgeUtils.boundaryVertices(f));
+			outsideVerts.addAll(HalfEdgeUtils.boundaryVertices(f));
+		}
+		for(E pe : polygon) {
+			outsideVerts.remove(pe.getStartVertex());
 		}
 		for(V v : outsideVerts) {
 			TopologyAlgorithms.removeVertex(v);
@@ -130,13 +140,6 @@ public class LatticeRemesher <
 				TopologyAlgorithms.removeEdge(e);
 			}
 		}
-	}
-
-	private void removeOutside(LinkedList<E> polygon, HDS hds) {
-		for(E e : polygon) {
-			hds.removeFace(e.getLeftFace());
-		}
-		removeExteriorVertices(polygon);
 	}
 	
 
