@@ -17,9 +17,19 @@
 		hexagons. You can use the predefined pattern textures to 
 		preview the result.
 	</description>
+	
 	<plugin class="de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin"/>
 	<plugin class="de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator"/>
+	
 	<plugin class="de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin"/>
 	<plugin class="de.varylab.varylab.plugin.topology.StitchCutPathPlugin"/>
+	<plugin class="de.varylab.varylab.plugin.topology.Collapse2ValentPlugin"/>
+	<plugin class="de.varylab.varylab.plugin.topology.CollapseToNeighborPlugin"/>
+	
+	<plugin class="de.varylab.varylab.plugin.selection.LatticeSelection"/>
+	<plugin class="de.varylab.varylab.plugin.selection.GeodesicSelection"/>
+	<plugin class="de.varylab.varylab.plugin.selection.BoundaryEarsSelection"/>
+	<plugin class="de.varylab.varylab.plugin.selection.TextureEdgeSelection"/>
+	<plugin class="de.varylab.varylab.plugin.selection.TextureVertexSelection"/>
 	
 </module>
