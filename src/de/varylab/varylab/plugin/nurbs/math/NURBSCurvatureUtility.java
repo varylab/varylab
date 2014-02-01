@@ -1,9 +1,6 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import compgeom.Rational;
 
 import de.jreality.math.Rn;
@@ -26,10 +23,8 @@ public class NURBSCurvatureUtility {
 		System.out.println(str);
 		if(str.contains("E")){
 			String[] split = str.split("E");
-			boolean minus = false;
 			System.out.println("split[0] = " + split[0]);
 			if(split[0].startsWith("-")){
-				minus = true;
 				split[0] = split[0].substring(1);
 				System.out.println("split[0] = " + split[0]);
 			}

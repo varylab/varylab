@@ -1,7 +1,5 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
-import java.util.Arrays;
-
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
 public class ConstructionTools {

@@ -1,18 +1,13 @@
 package de.varylab.varylab.plugin.nurbs;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
-import de.varylab.varylab.plugin.nurbs.data.IntObjects;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
-import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
+import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 
 public class InegralCurvesTest {
 	
