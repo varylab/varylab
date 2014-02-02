@@ -99,6 +99,7 @@ import de.varylab.varylab.plugin.subdivision.StripSubdivisionPlugin;
 import de.varylab.varylab.plugin.topology.Collapse2ValentPlugin;
 import de.varylab.varylab.plugin.topology.CollapseToNeighborPlugin;
 import de.varylab.varylab.plugin.topology.CollapseTrianglesPlugin;
+import de.varylab.varylab.plugin.topology.ExplodePlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.topology.StitchCutPathPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
@@ -205,6 +206,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(PythonConsole.class);
 		pSet.add(Inspector.class);
 		pSet.add(GrasshopperPlugin.class);
+		pSet.add(ExplodePlugin.class);
 	}
 
 
