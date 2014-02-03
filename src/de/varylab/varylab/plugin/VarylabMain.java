@@ -20,6 +20,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.adapter.ConicalNormalAdapter;
 import de.varylab.varylab.halfedge.adapter.GeodesicLabelAdapter;
 import de.varylab.varylab.halfedge.adapter.NodeWeigthAdapter;
 import de.varylab.varylab.halfedge.adapter.SingularityAdapter;
@@ -86,6 +87,7 @@ public class VarylabMain extends Plugin {
 		hif.addAdapter(new GeodesicLabelAdapter(), true);
 		hif.addAdapter(new SingularityAdapter(), true);
 		hif.addAdapter(new UndirectedEdgeIndex(), true);
+		hif.addAdapter(new ConicalNormalAdapter(), true);
 		hif.setTemplateHDS(new VHDS());
 		hif.set(new VHDS());
 	}
