@@ -137,8 +137,7 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	NURBSAlgorithm.RatSurfaceDerivs(Aders, wders, p+q, SKL);
 	dG.setSu(SKL[1][0]);
 	dG.setSv(SKL[0][1]);
-	
-	
+
 	dG.setSuv(SKL[1][1]);
 	if(p <= 1) {
 		dG.setSuu(new double[]{0,0,0});
@@ -164,7 +163,7 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	
 	double[] normal = new double[3];
 
-	Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
+	Rn.crossProduct(normal, SKL[1][0],  SKL[0][1]);
 	Rn.normalize(normal, normal);
 	
 	dG.setNormal(normal);
@@ -256,8 +255,8 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	}
 	//only TEST
 //	System.out.println("call getEigenvector");
-	w[0] = getEigenvector(W, lambda);
-	w[1] = getEigenvector(W, my);
+//	w[0] = getEigenvector(W, lambda);
+//	w[1] = getEigenvector(W, my);
 	// end TEST
 	double[][] e = new double[2][3];
 	Rn.add(e[0], Rn.times(null, w[0][0], SKL[1][0]), Rn.times(null, w[0][1], SKL[0][1]));
