@@ -100,6 +100,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
@@ -110,6 +111,7 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VecFieldCondition;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
@@ -273,6 +275,43 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 						}
 					}
+					
+					// ONLY DEBUG
+					double[] p1 = {1,0};
+					double[] p2 = {1,1};
+					IntegralCurve ic = new IntegralCurve(surface, VecFieldCondition.conjugate, 0.001);
+					System.out.println("point = " + Arrays.toString(p1));
+					double[] vcf1 = ic.getSymmetricConjugateDirection(p1);
+					System.err.println("vcf1 = " + Arrays.toString(vcf1));
+					CurvatureInfo ci1 = NURBSCurvatureUtility.curvatureAndDirections(surface, p1);
+					double[][] sf1 = ci1.getSecondFundamental();
+					System.out.println("|Su| = " + Rn.euclideanNorm(ci1.getSu()));
+					System.out.println("Su = " +Arrays.toString(ci1.getSu()));
+					System.out.println("|Sv| = " + Rn.euclideanNorm(ci1.getSv()));
+					System.out.println("Sv = " +Arrays.toString(ci1.getSv()));
+					double n1 = sf1[1][1];
+					double l1 = sf1[0][0];
+					System.err.println("l1 = " + l1 + " n1 = " + n1);
+					double[][] principal1 = ci1.getPrincipalDirections();
+					System.err.println("p11 = " + Arrays.toString(Rn.normalize(null, principal1[0])));
+					System.err.println("p12 = " + Arrays.toString(principal1[1]));
+					System.out.println("point = " + Arrays.toString(p2));
+					double[] vcf2 = ic.getSymmetricConjugateDirection(p2);
+					
+					System.err.println("vcf2 = " + Arrays.toString(vcf2));
+					CurvatureInfo ci2 = NURBSCurvatureUtility.curvatureAndDirections(surface, p2);
+					double[][] sf2 = ci2.getSecondFundamental();
+					System.out.println("|Su| = " + Rn.euclideanNorm(ci2.getSu()));
+					System.out.println("|Sv| = " + Rn.euclideanNorm(ci2.getSv()));
+					double n2 = sf2[1][1];
+					double l2 = sf2[0][0];
+					System.err.println("l2 = " + l2 + " n2 = " + n2);
+					double[][] principal2 = ci2.getPrincipalDirections();
+					System.err.println("p21 = " + Arrays.toString(Rn.normalize(null, principal2[0])));
+					System.err.println("p12 = " + Arrays.toString(principal2[1]));
+					//END DEBUGG
+					
+					
 //					NURBSSurface newNS = surface;
 					
 //					System.out.println("NEW SURFACE");
@@ -451,8 +490,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 						b = as.getD(NurbsUVCoordinate.class, v);
 					}
 				}
+				
 			if(segmentButton.isSelected()){
-				LinkedList<double[]> points = IntegralCurvesOriginal.geodesicSegmentBetweenTwoPoints(activeNurbsSurface, a, b, eps, tol,nearby);
+				LinkedList<double[]> points = IntegralCurvesOriginal.geodesicSegmentBetweenTwoPoints(activeNurbsSurface, a, b, eps, tol, nearby);
 				PointSetFactory psf = new PointSetFactory();
 				int p = activeNurbsSurface.getUDegree();
 				int q = activeNurbsSurface.getVDegree();

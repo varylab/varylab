@@ -291,13 +291,26 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		} else if(source == selectionButton) {
 			AdapterSet as = hif.getActiveAdapters();
 			as.addAll(hif.getAdapters());
-			for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
-				double[] pt = as.getD(NurbsUVCoordinate.class, v);
-				if(!activeModel.contains(pt)) {
-					activeModel.add(pt);
-					selectedPointsComponent.addChild(createPointComponent(pt));
+			if(surface.isSurfaceOfRevolution() && hif.getSelection().getVertices().size() == 1){
+				for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
+					double[] pt = as.getD(NurbsUVCoordinate.class, v);
+					pt[1] = pt[1] = 1;
+					if(!activeModel.contains(pt)) {
+						activeModel.add(pt);
+						selectedPointsComponent.addChild(createPointComponent(pt));
+					}
 				}
 			}
+			else{
+				for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
+					double[] pt = as.getD(NurbsUVCoordinate.class, v);
+					if(!activeModel.contains(pt)) {
+						activeModel.add(pt);
+						selectedPointsComponent.addChild(createPointComponent(pt));
+					}
+				}
+			}
+			
 		}
 		activeModel.fireTableDataChanged();
 	}

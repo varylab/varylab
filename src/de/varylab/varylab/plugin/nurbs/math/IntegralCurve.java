@@ -16,6 +16,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 public class IntegralCurve {
 	
+	
+	
 	public enum VecFieldCondition{conjugate, curvature};
 	private NURBSSurface ns;
 	private double u0, um, v0, vn;
@@ -32,6 +34,47 @@ public class IntegralCurve {
 	private VecFieldCondition vfc;
 	private double angle = 1000000;
 	
+	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n){
+		LinkedList<double[]> points = new LinkedList<double[]>();
+		double[] V = ns.getVKnotVector();
+		double step = (V[V.length - 1] - V[0]) / n;
+		for (int i = 0; i < n; i++) {
+			double[] p = {0.0, i * step};
+			points.add(p);
+		}
+		return points;
+	}
+	
+	public static double[] newtonMethod(NURBSSurface ns, double[] p1, double[] p2, double[] x){
+		double[] Sp1 = ns.getSurfacePoint(p1[0], p1[1]);
+		double[] Sp2 = ns.getSurfacePoint(p2[0], p2[1]);
+		double[] Sx = ns.getSurfacePoint(x[0], x[1]);
+		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(ns, x);
+		double[] Sxv = ci.getSv();
+		double f = Rn.euclideanNormSquared(Sp1) - 2 * Rn.innerProduct(Sp1, Sx) - Rn.euclideanNormSquared(Sp2) + 2 * Rn.innerProduct(Sp2, Sx);
+		double fv = 2 * Rn.innerProduct(Sxv, Rn.subtract(null, Sp2, Sp1));
+		while(Math.abs(f) > 0.00001){
+			x[1] = x[1] - f / fv;
+			Sx = ns.getSurfacePoint(x[0], x[1]);
+			ci = NURBSCurvatureUtility.curvatureAndDirections(ns, x);
+			Sxv = ci.getSv();
+			f = Rn.euclideanNormSquared(Sp1) - 2 * Rn.innerProduct(Sp1, Sx) - Rn.euclideanNormSquared(Sp2) + 2 * Rn.innerProduct(Sp2, Sx);
+			fv = 2 * Rn.innerProduct(Sxv, Rn.subtract(null, Sp2, Sp1));
+		}
+		return x;
+	}
+	
+	
+//	public static LinkedList<double[]> getEquidistantEquatorPoints(NURBSSurface ns, int n){
+//		LinkedList<double[]> points = new LinkedList<double[]>();
+//		double[] V = ns.getVKnotVector();
+//		double step = (V[V.length - 1] - V[0]) / n;
+//		for (int i = 0; i < n; i++) {
+//			double[] p = {0.0, i * step};
+//			points.add(p);
+//		}
+//		return points;
+//	}
 	
 	
 	public IntegralCurve(NURBSSurface surface, VecFieldCondition vecFieldCondition, double tolerance){
@@ -66,29 +109,30 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-//	public double[] getSymmetricConjugateDirection(double[] p) {
-//		double[] dir = {1,1};
-//		if(!ns.isSurfaceOfRevolution()){
-//			return dir;
-//		}
-//		else{
-//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
-//			double[][] sF = ci.getSecondFundamental();
-//			double l = sF[0][0];
-//			double n = sF[1][1];
-//			double K = ci.getGaussCurvature();
-//			if(K >= 0){
-//				dir[0] = Math.sqrt(n / l);
+	public double[] getSymmetricConjugateDirection(double[] p) {
+		double[] dir = {1,1};
+		if(!ns.isSurfaceOfRevolution()){
+			return dir;
+		}
+		else{
+			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
+			double[][] sF = ci.getSecondFundamental();
+			double l = sF[0][0];
+			double n = sF[1][1];
+			double K = ci.getGaussCurvature();
+			if(K >= 0){
+				dir[0] = Math.sqrt(n / l);
+				System.out.println("Math.sqrt(n / l) = " + dir[0]);
 //				basis = ci.getPrincipalDirections();
-//				return dir;
-//				
-//			}
-//			else{
-//				return getAssymptoticDirection(ns, p);
-//				
-//			}
-//		}
-//	}
+				return dir;
+				
+			}
+			else{
+				return getAssymptoticDirection(ns, p);
+				
+			}
+		}
+	}
 	
 	public double det(double[] vec1, double[] vec2){
 		return vec1[0] * vec2[1] + vec2[0] * vec1[1];
@@ -239,91 +283,91 @@ public class IntegralCurve {
 //}
 	
 	
-	public double[] getSymmetricConjugateDirection(double[] point) {
-	double[] dir = {1,1};
-	double[] givenDir = {0.5,1};
-	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
-	double[] w1 = ci.getPrincipalDirections()[0];
-	double[] w2 = ci.getPrincipalDirections()[1];
-		double K = ci.getGaussCurvature();
-		if(K > 0){
-			double k1 = ci.getMinCurvature();
-			double k2 = ci.getMaxCurvature();
-			double[] e1 = ci.getCurvatureDirections()[0];
-			double[] e2 = ci.getCurvatureDirections()[1];
-			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
-			System.out.println("inner product = " + Rn.innerProduct(v, e1));
-			double delta = 0.;
-			if(Rn.innerProduct(v, e1) > 1){
-				delta = 0.;
-			}
-			else if(Rn.innerProduct(v, e1) < -1){
-				delta = Math.PI;
-			}
-			else{
-				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
-			}
-			System.out.println("delta = " + delta);
-		
-			
-//			boolean flip1 = false;
-			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//				flip1 = true;
-//				System.out.println("flip w1");
-//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-				flip(w1);
-			}
-			
-			prevW1 = w1;
-//			System.out.println("w1 = " + Arrays.toString(w1));
-//			boolean flip2 = false;
-			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				flip2 = true;
-//				System.out.println("flip w2");
-				
-//				System.out.println("revW2 " + Arrays.toString(prevW2));
+//	public double[] getSymmetricConjugateDirection(double[] point) {
+//	double[] dir = {1,1};
+//	double[] givenDir = {0.5,1};
+//	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
+//	double[] w1 = ci.getPrincipalDirections()[0];
+//	double[] w2 = ci.getPrincipalDirections()[1];
+//		double K = ci.getGaussCurvature();
+//		if(K > 0){
+//			double k1 = ci.getMinCurvature();
+//			double k2 = ci.getMaxCurvature();
+//			double[] e1 = ci.getCurvatureDirections()[0];
+//			double[] e2 = ci.getCurvatureDirections()[1];
+//			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
+//			System.out.println("inner product = " + Rn.innerProduct(v, e1));
+//			double delta = 0.;
+//			if(Rn.innerProduct(v, e1) > 1){
+//				delta = 0.;
+//			}
+//			else if(Rn.innerProduct(v, e1) < -1){
+//				delta = Math.PI;
+//			}
+//			else{
+//				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
+//			}
+//			System.out.println("delta = " + delta);
+//		
+//			
+////			boolean flip1 = false;
+//			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+////				flip1 = true;
+////				System.out.println("flip w1");
+////				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+//				flip(w1);
+//			}
+//			
+//			prevW1 = w1;
+////			System.out.println("w1 = " + Arrays.toString(w1));
+////			boolean flip2 = false;
+//			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+////				flip2 = true;
+////				System.out.println("flip w2");
 //				
-//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-				flip(w2);
-			}
-			
-			prevW2 = w2;
-			double theta;
-			if(k2 == 0){
-				theta = Math.PI / 2.;
-			}
-			else{
-//				theta = Math.atan(Math.sqrt(k1 / k2));
-				double q = k1 / k2;
-				double p = Math.tan(delta) * (1 + q) / 2;
-				System.out.println("p = " + p);
-				theta = Math.atan(p + Math.sqrt(p * p + q));
-				
-			}
-			
-			System.out.println("theta " + theta);
-			angle = theta;
-//			if(flip1 == flip2){
-//				theta = -theta;
+////				System.out.println("revW2 " + Arrays.toString(prevW2));
+////				
+////				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+//				flip(w2);
 //			}
-//			System.out.println("w2 = " + Arrays.toString(w2));
-			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-			Rn.normalize(dir, dir);
-//			System.out.println("direction " + Arrays.toString(dir));
-//			basis = ci.getPrincipalDirections();
-//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-//				System.out.println();
-//				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-//				System.out.println();
-//				dir = getConj(dir, point);
+//			
+//			prevW2 = w2;
+//			double theta;
+//			if(k2 == 0){
+//				theta = Math.PI / 2.;
 //			}
-			return dir;
-		}
-		else{
-			return getAssymptoticDirection(ns, point);
-		}
-}
+//			else{
+////				theta = Math.atan(Math.sqrt(k1 / k2));
+//				double q = k1 / k2;
+//				double p = Math.tan(delta) * (1 + q) / 2;
+//				System.out.println("p = " + p);
+//				theta = Math.atan(p + Math.sqrt(p * p + q));
+//				
+//			}
+//			
+//			System.out.println("theta " + theta);
+//			angle = theta;
+////			if(flip1 == flip2){
+////				theta = -theta;
+////			}
+////			System.out.println("w2 = " + Arrays.toString(w2));
+//			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
+//			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+//			Rn.normalize(dir, dir);
+////			System.out.println("direction " + Arrays.toString(dir));
+////			basis = ci.getPrincipalDirections();
+////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+////				System.out.println();
+////				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+////				System.out.println();
+////				dir = getConj(dir, point);
+////			}
+//			return dir;
+//		}
+//		else{
+//			return getAssymptoticDirection(ns, point);
+//		}
+//}
 	
 
 	
@@ -908,11 +952,11 @@ public class IntegralCurve {
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
 	
-		while (!nearBy && counter < 100) {
+		while (!nearBy && counter < 2000) {
 
 			counter++;
-			if(counter == 100){
-				System.out.println("termination after 100 steps");
+			if(counter == 2000){
+				System.out.println("termination after 2000 steps");
 			}
 	//		System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
 			double[] last = pointList.getLast().clone();
@@ -970,6 +1014,13 @@ public class IntegralCurve {
 					pointList.add(next);
 				}
 			}
+//			else{
+//				double hOld = h;
+//				h = h * Math.sqrt(tol * etha / tau);
+//				if(h > maxDist){
+//					h = hOld;
+//				}
+//			}
 			if ((tau <= tol * etha / 2 || tau >= tol * etha)) {
 	//			System.out.println("nachregeln");
 				double hOld = h;
