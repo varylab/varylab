@@ -76,6 +76,9 @@ public class NURBSAlgorithm {
 	 * @return 
 	 */
 	public static int FindSpan(int n, int p, double u, double[] U) {
+		if(!isClamped(U,p)) {
+			throw new RuntimeException("Knot vector is not clamped :(");
+		}
 		if (u == U[n + 1])
 			return n;
 		int low = p;
@@ -92,6 +95,10 @@ public class NURBSAlgorithm {
 		return mid;
 	}
 	
+	public static boolean isClamped(double[] u, int p) {
+		return (u[0] == u[p]) && (u[u.length-1] == u[u.length-1-p]);
+	}
+
 	public static double[][][] affineCoords(double[][][] P){
 		double affine[][][] = new double [P.length][P[0].length][3];
 		for (int i = 0; i < P.length; i++) {
