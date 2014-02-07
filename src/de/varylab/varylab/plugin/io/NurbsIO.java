@@ -346,11 +346,16 @@ public class NurbsIO {
 			ns.setControlMesh(controlMesh);
 			ns.setHoleCurves(holeC);
 			ns.setTrimCurves(trimC);
-			ns.setUKnotVector(U);
-			ns.setVKnotVector(V);
 			ns.setUDegree(p);
 			ns.setVDegree(q);
+			ns.setUKnotVector(U);
+			ns.setVKnotVector(V);
+			if(!ns.hasClampedKnotVectors()){
+				System.out.println("NOT CLAMPED");
+				ns.repairKnotVectors();
+			}
 			ns.setRevolutionDir();
+			
 //			System.out.println("gelesene NURBS flaeche");
 //			System.out.println(ns.toString());
 //			System.out.println("end");

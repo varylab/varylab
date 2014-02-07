@@ -104,6 +104,59 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			U = NurbsSurfaceUtility.uniformKnotVector(m, pDeg);
 			V = NurbsSurfaceUtility.uniformKnotVector(n, qDeg);
 		}
+		
+		public boolean hasClampedKnotVectors(){
+			return (NURBSAlgorithm.isClamped(U, p) && NURBSAlgorithm.isClamped(V, q));
+		}
+		
+		private static boolean isLeftClampedKnotVector(double[] U, int p){
+			return (U[0] == U[p]);
+		}
+		
+		private static boolean isRightClampedKnotVector(double[] U, int p){
+			return (U[U.length-1] == U[U.length-1-p]);
+		}
+		
+		private void repairLeftSide(double[] U, boolean dir, int p){
+			double u0 = U[0];
+			int mult = getMultiplicity(u0, U);
+			System.out.println("mult = " + mult);
+//			int r = p - mult ;
+			int r = 1;
+			SurfaceKnotInsertion(dir, u0, r);
+		}
+		
+		private void repairRightSide(double[] U, boolean dir, int p){
+			double un = U[U.length - 1];
+			int mult = getMultiplicity(un, U);
+			System.out.println("mult = " + mult);
+//			int r = p - mult;
+			int r = 1;
+			SurfaceKnotInsertion(dir, un, r);
+			
+		}
+		
+		
+		
+		public void repairKnotVectors(){
+			if(!NURBSAlgorithm.isClamped(U, p)){
+				if(!isLeftClampedKnotVector(U, p)){
+					repairLeftSide(U, true, p);
+				}
+				if(!isRightClampedKnotVector(U, p)){
+					repairRightSide(U, true, p);
+				}
+				
+			}
+			if(!NURBSAlgorithm.isClamped(V, q)){
+				if(!isLeftClampedKnotVector(V, q)){
+					repairLeftSide(V, false, q);
+				}
+				if(!isRightClampedKnotVector(V, q)){
+					repairRightSide(V, false, q);
+				}
+			}
+		}
 
 		/**
 		 * if this surface is no surface of revolution, then revDir = null
@@ -528,12 +581,24 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			int mq = mp;
 			if(dir){
 				mult = getMultiplicity(uv, UP);
-				k = NURBSAlgorithm.FindSpan(np, p, uv, UP);
+				if(uv == UP[0]){
+					System.out.println("set k  in U");
+					k = mult - 1;
+				}
+				else{
+					k = NURBSAlgorithm.FindSpan(np, p, uv, UP);					
+				}
 				nq = np + r;
 			}
 			else{
 				mult = getMultiplicity(uv, VP);
-				k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
+				if(uv == VP[0]){
+					System.out.println("set k  in V");
+					k = mult - 1;
+				}
+				else{
+					k = NURBSAlgorithm.FindSpan(mp, q, uv, VP);
+				}
 				mq = mp + r;
 			}
 			double[] UQ = new double[nq + p + 2];
