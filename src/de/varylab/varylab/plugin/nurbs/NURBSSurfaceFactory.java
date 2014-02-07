@@ -35,10 +35,12 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 	@Override
 	protected void updateImpl() {
 		double[][] S = new double[getVLineCount()*getULineCount()][4];
-		double uStart = surface.getUKnotVector()[0];
-		double uEnd = surface.getUKnotVector()[surface.getUKnotVector().length - 1];
-		double vStart = surface.getVKnotVector()[0];
-		double vEnd = surface.getVKnotVector()[surface.getVKnotVector().length - 1];
+		int p = surface.getUDegree();
+		double uStart = surface.getUKnotVector()[p];
+		double uEnd = surface.getUKnotVector()[surface.getUKnotVector().length - (p+1)];
+		int q = surface.getVDegree();
+		double vStart = surface.getVKnotVector()[q];
+		double vEnd = surface.getVKnotVector()[surface.getVKnotVector().length - (q+1)];
 		for(int j = 0; j < getVLineCount(); ++j) {
 			for(int i = 0; i < getULineCount(); ++i) {
 				double u = uStart + (i / (double)(getULineCount() - 1) * (uEnd - uStart));
@@ -52,8 +54,8 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 					maxCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
 					continue;
 				}
-				double[] p = {u, v};
-				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p);
+				double[] pt = {u, v};
+				CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, pt);
 				
 				if(ci.getMinCurvature() == ci.getMaxCurvature()) { //umbillic point
 					minCurvatureVFMap.put(index, new double[]{0.0,0.0,0.0});
