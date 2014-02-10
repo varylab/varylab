@@ -193,21 +193,6 @@ public class InegralCurvesTest {
 		
 	}
 	
-	 @Test
-	 public void newtonMethodTest(){
-		 NURBSSurface sphere = createRhino_1Sphere();
-		 double[] p1 = {0.0, 0.0};
-		 double[] p2 = {0.0, 1.0};
-		 double[] x  = {0.0, 0.5};
-		 double d1 = Rn.euclideanDistance(sphere.getSurfacePoint(p1[0], p1[1]), sphere.getSurfacePoint(x[0], x[1]));
-		 double d2 = Rn.euclideanDistance(sphere.getSurfacePoint(p2[0], p2[1]), sphere.getSurfacePoint(x[0], x[1]));
-		 System.out.println("d1 = " + d1 + " d2 = " + d2);
-		 x = IntegralCurve.newtonMethod(sphere, p1, p2, x);
-		 d1 = Rn.euclideanDistance(sphere.getSurfacePoint(p1[0], p1[1]), sphere.getSurfacePoint(x[0], x[1]));
-		 d2 = Rn.euclideanDistance(sphere.getSurfacePoint(p2[0], p2[1]), sphere.getSurfacePoint(x[0], x[1]));
-		 System.out.println("danach");
-		 System.out.println("d1 = " + d1 + " d2 = " + d2);
-	 }
 	
 
 	

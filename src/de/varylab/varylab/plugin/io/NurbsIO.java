@@ -350,11 +350,11 @@ public class NurbsIO {
 			ns.setVDegree(q);
 			ns.setUKnotVector(U);
 			ns.setVKnotVector(V);
-			if(!ns.hasClampedKnotVectors()){
-				System.out.println("NOT CLAMPED");
-				ns.repairKnotVectors();
-			}
-			ns.setRevolutionDir();
+//			if(!ns.hasClampedKnotVectors()){
+//				System.out.println("NOT CLAMPED");
+//				ns.repairKnotVectors();
+//			}
+//			ns.setRevolutionDir();
 			
 //			System.out.println("gelesene NURBS flaeche");
 //			System.out.println(ns.toString());

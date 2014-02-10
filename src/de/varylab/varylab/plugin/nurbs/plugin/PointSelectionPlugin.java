@@ -44,6 +44,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
@@ -292,9 +293,15 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			AdapterSet as = hif.getActiveAdapters();
 			as.addAll(hif.getAdapters());
 			if(surface.isSurfaceOfRevolution() && hif.getSelection().getVertices().size() == 1){
-				for(Vertex<?,?,?> v : hif.getSelection().getVertices()) {
-					double[] pt = as.getD(NurbsUVCoordinate.class, v);
-					pt[1] = pt[1] = 1;
+				LinkedList<Vertex<?,?,?> > list = new LinkedList<Vertex<?,?,?>>();
+				for (Vertex<?, ?, ?> v : hif.getSelection().getVertices()) {
+					list.add(v);
+				}
+						
+				Vertex<?,?,?> v = list.getFirst();
+				double[] initialPoint = as.getD(NurbsUVCoordinate.class, v);
+				LinkedList<double[]> pts = IntegralCurve.getEquidistantRotatedPoints(surface, 22, initialPoint);
+				for (double[] pt : pts) {
 					if(!activeModel.contains(pt)) {
 						activeModel.add(pt);
 						selectedPointsComponent.addChild(createPointComponent(pt));

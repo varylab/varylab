@@ -233,24 +233,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					System.out.println("u0 = " + U[0] + "um = " + U[U.length - 1]);
 					double[] V = surface.getVKnotVector();
 					System.out.println("v0 = " + V[0] + "vn = " + V[V.length - 1]);
-					//ONLY FOR CONSTRUCTION
-//					LinkedList<Double> insertingElements = new LinkedList<Double>();
-//					double before = V[0];
-//					for (int i = 0; i < V.length; i++) {
-//						System.out.println("before = " + before);
-//						System.out.println("V[i] =  " + V[i]);
-//						if(before != V[i]){
-//							insertingElements.add((V[i] + before) / 2.0);
-//							System.out.println();
-//							System.out.println("insertion");
-//						}
-//						before = V[i];
-//					}
-//					for (Double d : insertingElements) {
-//						System.out.println("d = " + d);
-//						surface = surface.SurfaceKnotInsertion(false, d, 1);
-//					}
-					//END CONSTRUCTION
+					
 					if(surface.getClosingDir() == ClosingDir.uClosed){
 						System.out.println("surface.isClosedUDir()");
 					}
@@ -275,42 +258,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 						}
 					}
-					
-					// ONLY DEBUG
-					double[] p1 = {1,0};
-					double[] p2 = {1,1};
-					IntegralCurve ic = new IntegralCurve(surface, VecFieldCondition.conjugate, 0.001);
-					System.out.println("point = " + Arrays.toString(p1));
-					double[] vcf1 = ic.getSymmetricConjugateDirection(p1);
-					System.err.println("vcf1 = " + Arrays.toString(vcf1));
-					CurvatureInfo ci1 = NURBSCurvatureUtility.curvatureAndDirections(surface, p1);
-					double[][] sf1 = ci1.getSecondFundamental();
-					System.out.println("|Su| = " + Rn.euclideanNorm(ci1.getSu()));
-					System.out.println("Su = " +Arrays.toString(ci1.getSu()));
-					System.out.println("|Sv| = " + Rn.euclideanNorm(ci1.getSv()));
-					System.out.println("Sv = " +Arrays.toString(ci1.getSv()));
-					double n1 = sf1[1][1];
-					double l1 = sf1[0][0];
-					System.err.println("l1 = " + l1 + " n1 = " + n1);
-					double[][] principal1 = ci1.getPrincipalDirections();
-					System.err.println("p11 = " + Arrays.toString(Rn.normalize(null, principal1[0])));
-					System.err.println("p12 = " + Arrays.toString(principal1[1]));
-					System.out.println("point = " + Arrays.toString(p2));
-					double[] vcf2 = ic.getSymmetricConjugateDirection(p2);
-					
-					System.err.println("vcf2 = " + Arrays.toString(vcf2));
-					CurvatureInfo ci2 = NURBSCurvatureUtility.curvatureAndDirections(surface, p2);
-					double[][] sf2 = ci2.getSecondFundamental();
-					System.out.println("|Su| = " + Rn.euclideanNorm(ci2.getSu()));
-					System.out.println("|Sv| = " + Rn.euclideanNorm(ci2.getSv()));
-					double n2 = sf2[1][1];
-					double l2 = sf2[0][0];
-					System.err.println("l2 = " + l2 + " n2 = " + n2);
-					double[][] principal2 = ci2.getPrincipalDirections();
-					System.err.println("p21 = " + Arrays.toString(Rn.normalize(null, principal2[0])));
-					System.err.println("p12 = " + Arrays.toString(principal2[1]));
-					//END DEBUGG
-					
 					
 //					NURBSSurface newNS = surface;
 					
