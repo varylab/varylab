@@ -228,6 +228,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
+//					System.out.println("HALLLLOOOO");
+					System.out.println("original surface " + surface.toString());
+//					NURBSSurface[] split1 = surface.splitInTheMiddle(false);
+					
+					NURBSSurface[] split1 = surface.splitAtKnot(false, 0.0);
+					surface = split1[1];
+					NURBSSurface[] split2 = surface.splitAtKnot(false, 573.4675668352676);
+					surface = split2[0];
+					
 //					surface = surface.SurfaceKnotInsertion(false, 0.5, 1);
 					double[] U = surface.getUKnotVector();
 					System.out.println("u0 = " + U[0] + "um = " + U[U.length - 1]);
@@ -258,6 +267,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 						}
 					}
+					
+					//ONLY FOR CONSTRUCTION
+		
+//					System.out.println(split1[1].toString());
 					
 //					NURBSSurface newNS = surface;
 					
@@ -724,7 +737,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				boolean firstVectorField = maxCurvatureBox.isSelected();
 				boolean secondVectorField = minCurvatureBox.isSelected();
 
-				VecFieldCondition vfc = VecFieldCondition.conjugate;
+				VecFieldCondition vfc = VecFieldCondition.curvature;
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol);
 				
 				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);

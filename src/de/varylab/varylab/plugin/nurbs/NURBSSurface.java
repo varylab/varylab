@@ -79,7 +79,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			boundLines.add(BoundaryLines.um);
 			boundLines.add(BoundaryLines.v0);
 			boundLines.add(BoundaryLines.vn);
-			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
+//			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 			closDir = getClosingDir();
 		}
 		
@@ -91,7 +91,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			q = qDegree;
 			cornerPoints = cornerList;
 			boundLines = boundList;
-			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
+//			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 			closDir = getClosingDir();
 		}
 		
@@ -668,6 +668,19 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return Integer.MAX_VALUE;
 		}
 		
+		public NURBSSurface[] splitInTheMiddle(boolean dir){
+			double middle;
+			if(dir){
+				double[] U = getUKnotVector();
+				middle = U[0] + (U[U.length - 1] - U[0]) / 2.0;
+			}
+			else{
+				double[] V = getVKnotVector();
+				middle = V[0] + (V[V.length - 1] - V[0]) / 2.0;
+			}
+			return splitAtKnot(dir, middle);
+		}
+		
 		/**
 		 * 
 		 * @param dir
@@ -678,7 +691,50 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		public NURBSSurface[] splitAtKnot(boolean dir, double uv){
 			NURBSSurface[] splitSurf = new NURBSSurface[2];
 			NURBSSurface nsFilled = this;
-			if(!dir){
+			if(dir){
+				int mult = getMultiplicity(uv, U);
+				int insertNumber = p - mult;
+				nsFilled = SurfaceKnotInsertion(nsFilled, true, uv, insertNumber);
+				double[][][] cmFilled = nsFilled.getControlMesh();
+				double[] filledU = nsFilled.getUKnotVector();
+				int first = getFirstPositionOfKnotInKnotVector(filledU, uv);
+				double[] U1 = new double[first + p + 1];
+				for (int i = 0; i < U1.length - 1; i++) {
+					U1[i] = filledU[i];
+				}
+				U1[U1.length - 1] = uv;
+				double[] U2 = new double[filledU.length - first + 1];
+				for (int i = 1; i < U2.length; i++) {
+					U2[i] = filledU[i + first - 1];
+				}
+				U2[0] = uv;
+				int l = U1.length - 1;
+				int k = U2.length - 1;
+				double[][][] cm1 = new double[l - p][cmFilled[0].length][];
+				for (int i = 0; i < cm1.length; i++) {
+					for (int j = 0; j < cm1[0].length; j++) {
+						cm1[i][j] = cmFilled[i][j];
+					}
+					
+				}
+				NURBSSurface ns1 = new NURBSSurface(U1, V, cm1, p, q);
+				System.out.println("ns1");
+				System.out.println(ns1.toObj());
+				double[][][] cm2 = new double[k - p][cmFilled[0].length][];
+			
+				for (int i = l - p - 1; i < cmFilled.length; i++) {
+					for (int j = 0; j < cm2[0].length; j++) {
+						cm2[i - l + p + 1][j] = cmFilled[i][j];
+					}
+				}
+				NURBSSurface ns2 = new NURBSSurface(U2, V, cm2, p, q);
+				System.out.println("ns2");
+				System.out.println(ns2.toObj());
+				splitSurf[0] = ns1;
+				splitSurf[1] = ns2;
+				return splitSurf;
+			}
+			else{
 				int mult = getMultiplicity(uv, V);
 				int insertNumber = q - mult;
 				nsFilled = SurfaceKnotInsertion(nsFilled, false, uv, insertNumber);
@@ -720,7 +776,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 				splitSurf[1] = ns2;
 				return splitSurf;
 			}
-			return splitSurf;
 		}
 		
 		
