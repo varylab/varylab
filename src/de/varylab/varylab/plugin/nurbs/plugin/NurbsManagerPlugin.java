@@ -54,6 +54,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 
+import com.itextpdf.text.log.SysoLogger;
+
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -232,10 +234,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					System.out.println("original surface " + surface.toString());
 //					NURBSSurface[] split1 = surface.splitInTheMiddle(false);
 					
-					NURBSSurface[] split1 = surface.splitAtKnot(false, 0.0);
-					surface = split1[1];
-					NURBSSurface[] split2 = surface.splitAtKnot(false, 573.4675668352676);
-					surface = split2[0];
+//					NURBSSurface[] split1 = surface.splitAtKnot(false, 0.0);
+//					surface = split1[1];
+//					NURBSSurface[] split2 = surface.splitAtKnot(false, 573.4675668352676);
+//					surface = split2[0];
+				
 					
 //					surface = surface.SurfaceKnotInsertion(false, 0.5, 1);
 					double[] U = surface.getUKnotVector();
@@ -251,6 +254,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					}
 					surface.setName(file.getName());
 					activeNurbsSurface = surface;
+					System.out.println("THE NEW SURFACE");
+					System.out.println(activeNurbsSurface.toString());
+					System.out.println();
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
 					System.out.println("The NURBS surface to copy:");
@@ -267,18 +273,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 						}
 					}
-					
-					//ONLY FOR CONSTRUCTION
-		
-//					System.out.println(split1[1].toString());
-					
-//					NURBSSurface newNS = surface;
-					
-//					System.out.println("NEW SURFACE");
-//					System.out.println(newNS.toString());
-//					System.out.println("OBJ");
-//					System.out.println(openTorus.toObj());
-					
 				} 
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -1175,6 +1169,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 
 		private double[] calculateClosestPoint(double[] point) {
+//			activeNurbsSurface.setRevolutionDir();
+			if(activeNurbsSurface != null){
+				System.out.println("not NULL");
+			}
+			else{
+				System.out.println(" NULL");
+			}
+			System.out.println("in calculate closest point  " + activeNurbsSurface.toString());
 			double[] surfacePoint = activeNurbsSurface.getClosestPoint(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");

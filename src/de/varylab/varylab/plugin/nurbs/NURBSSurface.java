@@ -609,6 +609,14 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return ns;
 		}
 		
+		public NURBSSurface SurfaceKnotInsertion(NURBSSurface ns, boolean dir, double uv){
+			NURBSSurface nsReturn = new NURBSSurface();
+			if(dir){
+				
+			}
+			return nsReturn;
+		}
+		
 		/**
 		 * insert the knot uv r times into the knot vector of the surface ns. If dir == true into
 		 *  U else into V
@@ -820,6 +828,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		 */
 		
 		public NURBSSurface[][] decomposeIntoBezierSurfaces(){
+			
 			NURBSSurface nsDecompose = decomposeSurface();
 			double[] U = nsDecompose.getUKnotVector();
 			double[] V = nsDecompose.getVKnotVector();
@@ -830,6 +839,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			double vn = V[V.length - 1];
 			double[][][]Pw = nsDecompose.getControlMesh();
 			int p = getDegreeFromClampedKnotVector(U);
+//			System.out.println("V = " + Arrays.toString(V));
 			int q = getDegreeFromClampedKnotVector(V);
 			double[] differentUknots = getAllDifferentKnotsFromFilledKnotVector(U, p);
 			double[] differentVknots = getAllDifferentKnotsFromFilledKnotVector(V, q);
@@ -867,10 +877,13 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					if(VknotVector[VknotVector.length - 1] == vn && originalBl.contains(BoundaryLines.vn)){
 						bl.add(BoundaryLines.vn);
 					}
-					
+//					System.out.println("Pw.length = " + Pw.length + " UknotVector.length - p - 1 = " + (UknotVector.length - p - 1));
+//					System.out.println("Pw[0].length = " + Pw[0].length + " VknotVector.length - q - 1 = " + (VknotVector.length - q - 1));
 					double[][][]BezierControlPoints = new double[UknotVector.length - p - 1][VknotVector.length - q - 1][4];
 					for (int iB = 0; iB < BezierControlPoints.length; iB++) {
 						for (int jB = 0; jB < BezierControlPoints[0].length; jB++) {
+//							System.out.println("q * j + jB = " + (q * j + jB)); System.out.println("q = " + q);
+//							System.out.println("BezierSurfaces[0].length - 1 = " + (BezierSurfaces[0].length - 1) + " j = " + j);
 							BezierControlPoints[iB][jB] = Pw[p * i + iB][q * j + jB];
 						}
 					}
