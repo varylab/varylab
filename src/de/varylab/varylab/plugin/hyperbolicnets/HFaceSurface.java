@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.visualizers;
+package de.varylab.varylab.plugin.hyperbolicnets;
 
 import static de.jtem.projgeom.P5.LINE_SPACE;
 
@@ -65,6 +65,9 @@ public class HFaceSurface {
 		}
 		while(!queue.isEmpty()) {
 			vf = queue.pollLast();
+			if(facesDone.contains(vf)) {
+				continue;
+			}
 			hf = vhMap.get(vf);
 			VEdge prevEdge = edgeForPreviousQMap.get(vf);
 			VEdge aktEdge = prevEdge.getOppositeEdge();

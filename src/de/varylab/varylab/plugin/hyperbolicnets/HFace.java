@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.visualizers;
+package de.varylab.varylab.plugin.hyperbolicnets;
 
 import static de.jtem.projgeom.P5.LINE_SPACE;
 import hyperbolicnets.core.DataModel;

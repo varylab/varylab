@@ -113,7 +113,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		expertModeChecker = new JCheckBox("Expert Mode"),
 		newVerticesBox = new JCheckBox("Insert new Vertices", true),
 		forceOnLatticeBox = new JCheckBox("Force corners on Lattice", true),
-		projectiveCoordsBox = new JCheckBox("Use projective texture", true);
+		projectiveCoordsBox = new JCheckBox("Use projective texture", true),
+		relaxInteriorBox = new JCheckBox("Relax interior", true);
 	
 	private VHDS 
 		surface = new VHDS(),
@@ -167,6 +168,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			quantOptsPanel.add(projectiveCoordsBox, c2);
 			quantOptsPanel.add(newVerticesBox, c2);
 			quantOptsPanel.add(forceOnLatticeBox, c2);
+			quantOptsPanel.add(relaxInteriorBox, c2);
 			shrinkPanel.add(quantOptsPanel, c2);
 		}
 		
@@ -309,7 +311,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		// create pattern
 		LatticeRemesher<VVertex, VEdge, VFace, VHDS> remesher = 
 			new LatticeRemesher<VVertex, VEdge, VFace, VHDS>(newVerticesBox.isSelected(),
-															 forceOnLatticeBox.isSelected()
+															 forceOnLatticeBox.isSelected(),
+															 relaxInteriorBox.isSelected()
 		);
 		remesh = new VHDS();
 		switch (getPattern()) {

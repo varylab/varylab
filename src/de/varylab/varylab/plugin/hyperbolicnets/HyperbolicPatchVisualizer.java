@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.visualizers;
+package de.varylab.varylab.plugin.hyperbolicnets;
 
 import hyperbolicnets.core.DataModel;
 import hyperbolicnets.core.HyperbolicPatch;
@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import de.jreality.math.Rn;
 import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;

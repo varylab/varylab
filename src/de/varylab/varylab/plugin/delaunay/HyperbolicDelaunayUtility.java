@@ -27,13 +27,13 @@ public class HyperbolicDelaunayUtility {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void liftToHyperboloid(HDS hds, AdapterSet as) {
+	> void poincareToHyperboloid(HDS hds, AdapterSet as) {
 		for(V v : hds.getVertices()) {
-			as.set(Position.class, v, toHyperboloid(as.getD(Position2d.class,v)));
+			as.set(Position.class, v, poincareToHyperboloid(as.getD(Position2d.class,v)));
 		}
 	}
 	
-	protected static double[] toHyperboloid(double[] src) {
+	protected static double[] poincareToHyperboloid(double[] src) {
 		double[] dest = new double[src.length+1];
 		int n = src.length;
 		if(dest.length < src.length+1) {
@@ -53,18 +53,37 @@ public class HyperbolicDelaunayUtility {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void projectToPointcareDisc(HDS hds, AdapterSet as) {
+	> void hyperboloidToPoincare(HDS hds, AdapterSet as) {
 //		VHDS hds = hif.get(new VHDS());
 //		AdapterSet as = hif.getAdapters();
 		for(V v : hds.getVertices()) {
-			as.set(Position.class, v, toPoincareDisc(as.getD(Position3d.class,v)));
+			as.set(Position.class, v, hyperboloidToPoincareDisc(as.getD(Position3d.class,v)));
 		}
 	}
 
-	protected static double[] toPoincareDisc(double[] src) {
+	protected static double[] hyperboloidToPoincareDisc(double[] src) {
 		double[] dest = new double[src.length-1];
 		for (int i = 0; i < dest.length; i++) {
 			dest[i] = src[i]/(src[src.length-1]+1);
+		}
+		return dest;
+	}
+	
+	protected static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void hyperboloidToKlein(HDS hds, AdapterSet as) {
+		for(V v : hds.getVertices()) {
+			as.set(Position.class, v, hyperboloidToKleinDisc(as.getD(Position3d.class,v)));
+		}
+	}
+	
+	protected static double[] hyperboloidToKleinDisc(double[] src) {
+		double[] dest = new double[src.length-1];
+		for (int i = 0; i < dest.length; i++) {
+			dest[i] = src[i]/src[src.length-1];
 		}
 		return dest;
 	}
@@ -198,5 +217,51 @@ public class HyperbolicDelaunayUtility {
 		} else { //n1[2] < 0!
 			return ((Rn.innerProduct(n1, n1)*n2[2] - Rn.innerProduct(n1, n2)*n1[2]) < 0);
 		}
+	}
+
+	protected static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void poincareToKlein(HDS hds, AdapterSet as) {
+		poincareToHyperboloid(hds, as);
+		hyperboloidToKlein(hds, as);
+	}
+	
+	protected static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void kleinToHyperboloid(HDS hds, AdapterSet as) {
+		for(V v : hds.getVertices()) {
+			as.set(Position.class, v, kleinToHyperboloid(as.getD(Position2d.class,v)));
+		}
+	}
+	
+	protected static double[] kleinToHyperboloid(double[] src) {
+		double[] dest = new double[src.length+1];
+		int n = src.length;
+		if(dest.length < src.length+1) {
+			n = dest.length-1;
+		}
+		double sq = Rn.euclideanNormSquared(src);
+		dest[n] = 1; 
+		for(int i = 0; i < n; ++i) {
+			dest[i] = src[i];
+		}
+		Rn.times(dest, 1.0/Math.sqrt(1.0-sq), dest);
+		return dest;
+	}
+
+	protected static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void kleinToPoincare(HDS hds, AdapterSet as) {
+		kleinToHyperboloid(hds, as);
+		hyperboloidToPoincare(hds, as);
 	}
 }

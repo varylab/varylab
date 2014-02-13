@@ -24,21 +24,27 @@ public class LatticeRemesher <
 
 	private boolean addNewVertices = true;
 	private boolean cornersOnLattice = true;
+	private boolean relaxInterior = true;
 //	private ConverterHeds2JR conv = new ConverterHeds2JR();
 //	private SceneGraphComponent root = new SceneGraphComponent();
 	
-	public LatticeRemesher(Lattice<V, E, F, HDS> l, boolean newVertices, boolean cornersOnLattice) {
+	public LatticeRemesher(Lattice<V, E, F, HDS> l, boolean newVertices, boolean cornersOnLattice, boolean relaxInterior) {
 		lattice = l;
 		this.addNewVertices = newVertices;
 		this.cornersOnLattice = cornersOnLattice;
+		this.relaxInterior = relaxInterior;
 	}
 	
 	public LatticeRemesher(boolean newVertices, boolean cornersOnLattice) {
-		this(null, newVertices, cornersOnLattice);
+		this(null, newVertices, cornersOnLattice, true);
+	}
+	
+	public LatticeRemesher(boolean newVertices, boolean cornersOnLattice, boolean relaxInterior) {
+		this(null, newVertices, cornersOnLattice, relaxInterior);
 	}
 	
 	public LatticeRemesher(Lattice<V, E, F, HDS> l) {
-		this(l, true, true);
+		this(l, true, true, true);
 	}
 	
 	public HDS remesh(HDS surf, AdapterSet a) throws RemeshingException {
@@ -80,7 +86,9 @@ public class LatticeRemesher <
 //		root.addChild(child5);
 		
 		
-		SpringRemeshingUtility.relaxInterior(lattice, polygon.getCorners(), true, false, a);
+		if(relaxInterior) {
+			SpringRemeshingUtility.relaxInterior(lattice, polygon.getCorners(), true, false, a);
+		}
 //		SceneGraphComponent child6 = new SceneGraphComponent("Relax Interior");
 //		child6.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child6);

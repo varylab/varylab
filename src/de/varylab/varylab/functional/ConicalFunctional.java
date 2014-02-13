@@ -123,7 +123,8 @@ public class ConicalFunctional<
 						
 						FunctionalUtils.addVectorToGradient(G, 3*sind, ds);
 						FunctionalUtils.addVectorToGradient(G, 3*vind, dv);
-						FunctionalUtils.addVectorToGradient(G, 3*tind, dt);						e = e.getNextEdge().getOppositeEdge();
+						FunctionalUtils.addVectorToGradient(G, 3*tind, dt);						
+						e = e.getNextEdge().getOppositeEdge();
 					} while(e != v.getIncomingEdge());
 				} else { // non degree 4 vertices
 					

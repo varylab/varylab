@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin.visualizers;
+package de.varylab.varylab.plugin.hyperbolicnets;
 
 import java.util.HashMap;
 import java.util.HashSet;

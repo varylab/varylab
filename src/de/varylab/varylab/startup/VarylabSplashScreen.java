@@ -12,18 +12,13 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.util.logging.Logger;
 
 import javax.swing.JPanel;
-
-import com.sun.awt.AWTUtilities;
 
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 
 public class VarylabSplashScreen extends SplashScreen {
 
-	private Logger
-		log = Logger.getLogger(getClass().getName());
 	private static final long 
 		serialVersionUID = 1L;
 	private Image
@@ -47,7 +42,6 @@ public class VarylabSplashScreen extends SplashScreen {
 	
 	static {
 		isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-		isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
 	}
 	
 	public VarylabSplashScreen() {
@@ -62,20 +56,10 @@ public class VarylabSplashScreen extends SplashScreen {
 		setIconImages(StaticSetup.getMainIconList());
 		this.lowResImage = lowResImage;
 		this.hiResImage = hiResImage;
-		try {
-			if (isLinux) throw new Exception();
-			AWTUtilities.setWindowOpaque(this, false);
-		} catch (Throwable t) {
-			setBackground(Color.WHITE);
-			log.warning("non opaque windows not supported. " + t);
-		}
-		setAlwaysOnTop(true);
+		this.setBackground(new Color(1f,1f,1f,0f));
 		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		int[] dpi = getDPI(gc);
 		useHighRes = dpi[0] > 110;
-		if (isLinux) {
-			useHighRes = false;
-		}
 		Dimension size = new Dimension();
 		if (useHighRes) {
 			size.width = hiResImage.getWidth(this) / 2;

@@ -25,6 +25,8 @@ public class RandomPointsUnitDisc extends AlgorithmPlugin {
 	private int
 		extraPoints = 20;
 
+	private double radius = 1.0;
+
 	@Override
 	public String getCategory() {
 		return "Hyperbolic Delaunay";
@@ -66,7 +68,7 @@ public class RandomPointsUnitDisc extends AlgorithmPlugin {
 			double sq = Rn.euclideanNormSquared(sites[i]);
 			if(sq >= 1) { continue; }
 			V v = r.addNewVertex();
-			a.set(Position.class, v, sites[i]);
+			a.set(Position.class, v, Rn.times(null, radius, sites[i]));
 			++i;
 		}
 		hi.set(r);
@@ -74,7 +76,7 @@ public class RandomPointsUnitDisc extends AlgorithmPlugin {
 
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Create hyperbolic Delaunay complex of random pointset");
+		PluginInfo info = new PluginInfo("Create random pointset in unit disc");
 		info.icon = ImageHook.getIcon("RandomSphere.png",16,16);
 		return info;
 	}
@@ -83,4 +85,7 @@ public class RandomPointsUnitDisc extends AlgorithmPlugin {
 		rnd.setSeed(seed);
 	}
 
+	public void setRadius(double r) {
+		radius  = r;
+	}
 }

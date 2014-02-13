@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -22,10 +24,12 @@ import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.ParametricSurfaceFactory;
 import de.jreality.geometry.ParametricSurfaceFactory.Immersion;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.content.ContentAppearance;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
@@ -38,6 +42,7 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
+import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
@@ -87,6 +92,13 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		hyperboloidBox = new JCheckBox("Show hyperboloid"),
 		paraboloidBox = new JCheckBox("Show paraboloid");
 	
+	private ButtonGroup
+		modelGroup = new ButtonGroup();
+	
+	private JRadioButton
+		poincareButton = new JRadioButton("Poincare model"),
+		kleinButton = new JRadioButton("Klein model");
+	
 	private RandomPointsUnitDisc 
 		pointsGenerator = null;
 
@@ -98,10 +110,13 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		unitDiscComponent = new SceneGraphComponent("Unit disc"),
 		circlesComponent = new SceneGraphComponent("Circumcircles"),
 		hyperboloidComponent = new SceneGraphComponent("Hyperboloid"),
-		paraboloidComponent = new SceneGraphComponent("Paraboloid");
+		paraboloidComponent = new SceneGraphComponent("Paraboloid"),
+		poincareGeodesicsComponent = new SceneGraphComponent("Poincare");
 	
 	private Map<Face<?,?,?>, SceneGraphComponent>
 		faceComponentMap = new HashMap<Face<?,?,?>, SceneGraphComponent>();
+
+	private ContentAppearance contentAppearance = null;
 	
 	public PlanarDelaunayExplorer() {
 		panel.setLayout(new GridBagLayout());
@@ -119,27 +134,34 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		euclideanDelaunayButton.addActionListener(this);
 		paraboloidBox.addActionListener(this);
 		
-		circlesBox.addActionListener(this);
-		unitDiscBox.addActionListener(this);
-		hyperboloidBox.addActionListener(this);
-		
-		visualizationPanel.add(unitDiscBox,rc);
-		unitDiscBox.setSelected(true);
 		
 		stepPanel.add(new JLabel("Seed"),lc);
 		stepPanel.add(seedSpinner,rc);
 		stepPanel.add(generateRandomPointsButton,rc);
 		stepPanel.add(liftToHyperboloidButton,rc);
 		
-		visualizationPanel.add(hyperboloidBox,rc);
-		visualizationPanel.add(paraboloidBox,rc);
-		
 		stepPanel.add(calculateConvexHullButton,rc);
 		stepPanel.add(extractHyperbolicFacesButton,rc);
 		stepPanel.add(projectToDiscButton,rc);
 		stepPanel.setShrinked(true);
-		visualizationPanel.add(circlesBox,rc);
 		
+		circlesBox.addActionListener(this);
+		unitDiscBox.addActionListener(this);
+		hyperboloidBox.addActionListener(this);
+		poincareButton.addActionListener(this);
+		kleinButton.addActionListener(this);
+		
+		unitDiscBox.setSelected(true);
+		visualizationPanel.add(unitDiscBox,rc);
+		visualizationPanel.add(hyperboloidBox,rc);
+		visualizationPanel.add(paraboloidBox,rc);
+		visualizationPanel.add(circlesBox,rc);
+		modelGroup.add(poincareButton);
+		modelGroup.add(kleinButton);
+		visualizationPanel.add(poincareButton,rc);
+		poincareButton.setSelected(true);
+		visualizationPanel.add(kleinButton, rc);
+
 		panel.add(hyperbolicDelaunayButton,rc);
 		panel.add(euclideanDelaunayButton,rc);
 		panel.add(stepPanel,rc);
@@ -150,6 +172,7 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		initUnitCircle();
 		initHyperboloidComponent();
 		initParaboloidComponent();
+		initPoincareComponent();
 		initCirclesComponent();
 		initAuxComponent();
 		
@@ -171,24 +194,43 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		app.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SMOOTH_SHADING, true);
 		hyperboloidComponent.setAppearance(app);
 	}
+	
+	private void initPoincareComponent() {
+		Appearance app = new Appearance();
+		app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		app.setAttribute(CommonAttributes.EDGE_DRAW, true);
+		app.setAttribute(CommonAttributes.LINE_SHADER + "." + CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SMOOTH_SHADING, true);
+
+		poincareGeodesicsComponent.setAppearance(app);
+	}
 
 	private void initAuxComponent() {
+//		Appearance app = new Appearance();
+//		app.setAttribute(CommonAttributes.LINE_SHADER + "." + CommonAttributes.PICKABLE, false);
+//		app.setAttribute(CommonAttributes.POINT_SHADER + "." + CommonAttributes.PICKABLE, false);
+//		app.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.PICKABLE, false);
+//		auxComponent.setAppearance(app);
+		auxComponent.setPickable(false);
 		auxComponent.addChild(unitDiscComponent);
 		auxComponent.addChild(circlesComponent);
 		auxComponent.addChild(hyperboloidComponent);
 		auxComponent.addChild(paraboloidComponent);
+		auxComponent.addChild(poincareGeodesicsComponent);
 	}
 
 	private void initCirclesComponent() {
 		Appearance app = new Appearance();
 		app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		app.setAttribute(CommonAttributes.LINE_SHADER + "." + CommonAttributes.TUBES_DRAW, false);
+		app.setAttribute(CommonAttributes.LINE_SHADER + "." + CommonAttributes.DIFFUSE_COLOR, Color.RED);
 		circlesComponent.setAppearance(app);
 	}
 
 	private void initUnitCircle() {
 		Appearance app = new Appearance();
 		app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		app.setAttribute(CommonAttributes.LINE_SHADER + "." + CommonAttributes.DIFFUSE_COLOR, Color.BLACK);
 		unitDiscComponent.setAppearance(app);
 		unitDiscComponent.setGeometry(IndexedLineSetUtility.circle(100));
@@ -207,28 +249,52 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 			pointsGenerator.setSeed(seedModel.getNumber().intValue());
 			pointsGenerator.execute();
 			resetCheckBoxes();
+			poincareGeodesicsComponent.setVisible(false);
 		} else if(src == liftToHyperboloidButton) {
-			HyperbolicDelaunayUtility.liftToHyperboloid(hif.get(), hif.getAdapters());
+			if(poincareButton.isSelected()) {
+				HyperbolicDelaunayUtility.poincareToHyperboloid(hif.get(), hif.getAdapters());
+			}
+			if(kleinButton.isSelected()) {
+				HyperbolicDelaunayUtility.kleinToHyperboloid(hif.get(), hif.getAdapters());
+			}
 			hif.update();
+			poincareGeodesicsComponent.setVisible(false);
 		} else if(src == calculateConvexHullButton) {
 			HalfedgeUtility.retainEdges(hif.get(new VHDS()), new HashSet<VEdge>());
 			ConvexHull.convexHull(hif.get(), hif.getAdapters(), 1E-8);
 			hif.update();
+			poincareGeodesicsComponent.setVisible(false);
 		} else if(src == extractHyperbolicFacesButton) {
 			HyperbolicDelaunayUtility.extractHyperbolicFaces(hif.get(), hif.getAdapters());
 			hif.update();
+			poincareGeodesicsComponent.setVisible(false);
 		} else if(src == projectToDiscButton) {
-			HyperbolicDelaunayUtility.projectToPointcareDisc(hif.get(), hif.getAdapters());
+			if(poincareButton.isSelected()) {
+				HyperbolicDelaunayUtility.hyperboloidToPoincare(hif.get(), hif.getAdapters());
+			}
+			if(kleinButton.isSelected()) {
+				HyperbolicDelaunayUtility.hyperboloidToKlein(hif.get(), hif.getAdapters());
+			}
 			hif.update();
+			updatePoincareComponent();
+			poincareGeodesicsComponent.setVisible(poincareButton.isSelected());
+			contentAppearance.getAppearanceInspector().setShowLines(kleinButton.isSelected());
+			contentAppearance.getAppearanceInspector().setShowFaces(kleinButton.isSelected());
 		} else if(src == circlesBox || src == unitDiscBox || src == hyperboloidBox || src == paraboloidBox) {
 			updateAuxComponent();
 		} else if(src == hyperbolicDelaunayButton) {
-			HyperbolicDelaunayUtility.liftToHyperboloid(hif.get(), hif.getAdapters());
+			HyperbolicDelaunayUtility.poincareToHyperboloid(hif.get(), hif.getAdapters());
 			HalfedgeUtility.retainEdges(hif.get(new VHDS()), new HashSet<VEdge>());
 			ConvexHull.convexHull(hif.get(), hif.getAdapters(), 1E-8);
 			HyperbolicDelaunayUtility.extractHyperbolicFaces(hif.get(), hif.getAdapters());
-			HyperbolicDelaunayUtility.projectToPointcareDisc(hif.get(), hif.getAdapters());
+			HyperbolicDelaunayUtility.hyperboloidToPoincare(hif.get(), hif.getAdapters());
 			hif.update();
+			if(poincareButton.isSelected()) {
+				updatePoincareComponent();
+			}
+			contentAppearance.getAppearanceInspector().setShowLines(kleinButton.isSelected());
+			contentAppearance.getAppearanceInspector().setShowFaces(kleinButton.isSelected());
+			poincareGeodesicsComponent.setVisible(poincareButton.isSelected());
 		} else if(src == euclideanDelaunayButton) {
 			EuclideanDelaunayUtility.liftToParaboloid(hif.get(), hif.getAdapters());
 			HalfedgeUtility.retainEdges(hif.get(new VHDS()), new HashSet<VEdge>());
@@ -236,6 +302,25 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 			EuclideanDelaunayUtility.extractEuclideanLowerFaces(hif.get(), hif.getAdapters());
 			EuclideanDelaunayUtility.projectVertically(hif.get(), hif.getAdapters());
 			hif.update();
+			poincareButton.setSelected(true);
+			poincareGeodesicsComponent.setVisible(false);
+		} else if(src == kleinButton) {
+			HyperbolicDelaunayUtility.poincareToKlein(hif.get(), hif.getAdapters());
+			hif.update();
+			poincareGeodesicsComponent.setVisible(false);
+			contentAppearance.getAppearanceInspector().setShowLines(true);
+			contentAppearance.getAppearanceInspector().setShowFaces(true);
+			circlesBox.setSelected(false);
+			circlesBox.setEnabled(false);
+			circlesComponent.setVisible(false);
+		} else if(src == poincareButton) {
+			HyperbolicDelaunayUtility.kleinToPoincare(hif.get(), hif.getAdapters());
+			hif.update();
+			poincareGeodesicsComponent.setVisible(true);
+			updatePoincareComponent();
+			contentAppearance.getAppearanceInspector().setShowLines(false);
+			contentAppearance.getAppearanceInspector().setShowFaces(false);
+			circlesBox.setEnabled(true);
 		}
 		hif.removeTemporaryGeometry(auxComponent);
 		hif.addTemporaryGeometry(auxComponent);
@@ -252,9 +337,14 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		updateCirclesComponent();
 		updateHyperboloidComponent();
 		updateParaboloidComponent();
+//		updatePoincareComponent();
 		
 		unitDiscComponent.setVisible(unitDiscBox.isSelected());
-		circlesComponent.setVisible(circlesBox.isSelected());
+		if(poincareButton.isSelected()) {
+			circlesComponent.setVisible(circlesBox.isSelected());
+		} else {
+			circlesComponent.setVisible(false);
+		}
 		hyperboloidComponent.setVisible(hyperboloidBox.isSelected());
 		paraboloidComponent.setVisible(paraboloidBox.isSelected());
 	}
@@ -356,11 +446,43 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 		public boolean isImmutable() { return true; }
 	};
 
+	private void updatePoincareComponent() {
+		poincareGeodesicsComponent.removeAllChildren();
+		VHDS hds = hif.get(new VHDS());
+		AdapterSet as = hif.getAdapters();
+		for(VEdge e : hds.getPositiveEdges()) {
+			double[] 
+					v1 = as.getD(Position3d.class, e.getStartVertex()),
+					v2 = as.getD(Position3d.class, e.getTargetVertex()),
+					v3 = Rn.times(null, 1/Rn.euclideanNormSquared(v1), v1);
+			double[] circle = GeometryUtility.circumCircle(v1, v2, v3);
+			IndexedLineSet circularArc = circularArc(v1,v2,circle, 30);
+			SceneGraphComponent sgc = new SceneGraphComponent(e.toString());
+			sgc.setGeometry(circularArc);
+			poincareGeodesicsComponent.addChild(sgc);
+		}
+	}
+	
+	private IndexedLineSet circularArc(double[] v1, double[] v2, double[] circle, int n) {
+		double[][] points = new double[n+1][v1.length];
+		double[] center = new double[]{circle[0], circle[1], circle[2]};
+//		double radius = circle[3];
+		double angle = FunctionalUtils.angle(v1, center, v2);
+		double step = angle/n;
+		double[] b1 = Rn.subtract(null, v1, center);
+		double[] b2 = Rn.crossProduct(null, b1, Rn.normalize(null, Rn.crossProduct(null, b1, Rn.subtract(null, v2, center))));
+		for(int i = 0; i < n+1; ++i) {
+			points[i] = Rn.add(null, center, Rn.linearCombination(null, Math.cos(-i*step), b1, Math.sin(-i*step), b2)); 
+		}
+		return IndexedLineSetUtility.createCurveFromPoints(points, false);
+	}
+
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		pointsGenerator = c.getPlugin(RandomPointsUnitDisc.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		contentAppearance = c.getPlugin(ContentAppearance.class);
 		hif.addSelectionListener(this);
 		hif.addHalfedgeListener(this);
 	}

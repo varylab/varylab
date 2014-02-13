@@ -54,6 +54,8 @@ import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
 import de.varylab.varylab.plugin.grasshopper.GrasshopperPlugin;
+import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicNetsPlugin;
+import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
@@ -72,6 +74,7 @@ import de.varylab.varylab.plugin.meshoptimizer.InflateOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.MeanEdgeLengthOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.MinimalPathsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.NURBSSurfaceOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.NgonRegularizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeAnglesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.OppositeEdgesCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer;
@@ -110,7 +113,6 @@ import de.varylab.varylab.plugin.visualizers.CurvatureLinesQualityVisualizer;
 import de.varylab.varylab.plugin.visualizers.DiagonalLengthVisualizer;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
-import de.varylab.varylab.plugin.visualizers.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.visualizers.IncircleVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
@@ -206,6 +208,8 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(PythonConsole.class);
 		pSet.add(Inspector.class);
 		pSet.add(GrasshopperPlugin.class);
+		
+		//Wanda facade
 		pSet.add(ExplodePlugin.class);
 	}
 
@@ -249,6 +253,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(IndexMedialGraph.class);
 		pSet.add(EdgeNormalTorsion.class);
 		pSet.add(Conicality.class);
+		pSet.add(HyperbolicNetsPlugin.class);
 	}
 
 
@@ -281,6 +286,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(NURBSSurfaceOptimizer.class);
 		pSet.add(MinimalPathsOptimizer.class);
 		pSet.add(ForceConeOptimizer.class);
+		pSet.add(NgonRegularizer.class);
 		
 	}
 	

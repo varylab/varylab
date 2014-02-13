@@ -6,13 +6,11 @@
 	<classpathentry kind="src" path="src-website"/>
 	<classpathentry kind="src" path="src-resource"/>
 	<classpathentry kind="src" path="src-modules"/>
-	<classpathentry kind="src" path="exp"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="lib/substance/substance-6.0.jar" sourcepath="/Substance"/>
 	<classpathentry kind="lib" path="lib/substance/trident-6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/jpetsctao.jar" sourcepath="/jTao"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedge.jar" sourcepath="/halfedge"/>
-	<classpathentry kind="lib" path="lib/jtem/halfedgetools.jar" sourcepath="/halfedgetools"/>
 	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality">
 		<attributes>
 			<attribute name="javadoc_location" value="http://www3.math.tu-berlin.de/jreality/api/"/>
@@ -66,5 +64,6 @@
 	<classpathentry kind="lib" path="lib/jtem/riemann.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/hidapi-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/misc/antlr-3.4-complete.jar"/>
+	<classpathentry kind="lib" path="lib/jtem/halfedgetools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

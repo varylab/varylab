@@ -47,8 +47,7 @@ public class MySoftClippedWindow extends JPanel     {
                 Container cp = w.getContentPane();
                 cp.setLayout(new BorderLayout());
                 cp.add(new MySoftClippedWindow());
-                w.setAlwaysOnTop(true);
-                com.sun.awt.AWTUtilities.setWindowOpaque (w, false);
+                w.setBackground(new Color(1f, 1f, 1f, 0f));
                 w.setSize(1017 / 2, 850 / 2);
                 w.setLocationRelativeTo(null);
                 w.setVisible(true);
