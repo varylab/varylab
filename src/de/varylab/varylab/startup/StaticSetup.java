@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import sun.misc.JarFilter;
 import de.varylab.varylab.startup.definitions.VaryLabUltimate;
 
 public class StaticSetup {
@@ -80,6 +80,15 @@ public class StaticSetup {
 		addURLMethod.setAccessible(true);
 		addURLMethod.invoke(varylabLoader, url);
 		addURLMethod.setAccessible(false);
+	}
+	
+	private static class JarFilter implements FilenameFilter {
+
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith(".jar");
+		}
+		
 	}
 	
 	
