@@ -234,11 +234,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					System.out.println("original surface " + surface.toString());
 //					NURBSSurface[] split1 = surface.splitInTheMiddle(false);
 					
-//					NURBSSurface[] split1 = surface.splitAtKnot(false, 0.0);
+//					NURBSSurface[] split1 = surface.splitAtKnot1(false, 0.0);
 //					surface = split1[1];
-//					NURBSSurface[] split2 = surface.splitAtKnot(false, 573.4675668352676);
+//					NURBSSurface[] split2 = surface.splitAtKnot1(false, 573.4675668352676);
 //					surface = split2[0];
-				
+					
+//					surface = surface.SurfaceKnotInsertion(true, 1.5);
+	
+//					double[] p1 = surface.getSurfacePoint(2.0, 0.0);
+//					System.err.println("point 1 = " + Arrays.toString(p1));
+//					surface = surface.SurfaceKnotInsertion(true, 2.0);
+//					double[] p2 = surface.getSurfacePoint(2.0, 0.0);
+//					System.err.println("point 2 = " + Arrays.toString(p2));
 					
 //					surface = surface.SurfaceKnotInsertion(false, 0.5, 1);
 					double[] U = surface.getUKnotVector();
@@ -255,14 +262,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					surface.setName(file.getName());
 					activeNurbsSurface = surface;
 					System.out.println("THE NEW SURFACE");
-					System.out.println(activeNurbsSurface.toString());
+					System.out.println(activeNurbsSurface.toObj());
 					System.out.println();
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-					System.out.println("The NURBS surface to copy:");
-					System.out.println(surface.toReadableInputString());
-					System.out.println("The NURBS surface to string:");
-					System.out.println(surface.toString());
+//					System.out.println("The NURBS surface to copy:");
+//					System.out.println(surface.toReadableInputString());
+//					System.out.println("The NURBS surface to string:");
+//					System.out.println(surface.toString());
 					int dialogOk = JOptionPane.showConfirmDialog(
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
@@ -731,7 +738,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				boolean firstVectorField = maxCurvatureBox.isSelected();
 				boolean secondVectorField = minCurvatureBox.isSelected();
 
-				VecFieldCondition vfc = VecFieldCondition.curvature;
+				VecFieldCondition vfc = VecFieldCondition.conjugate;
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol);
 				
 				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);

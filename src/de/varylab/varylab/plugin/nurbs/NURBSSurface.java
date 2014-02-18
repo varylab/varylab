@@ -80,7 +80,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			boundLines.add(BoundaryLines.v0);
 			boundLines.add(BoundaryLines.vn);
 //			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
-			closDir = getClosingDir();
+//			closDir = getClosingDir();
 		}
 		
 		public NURBSSurface(double[] UVec, double[] VVec, double[][][] cm, int pDegree, int qDegree, LinkedList<BoundaryLines> boundList, LinkedList<CornerPoints> cornerList){
@@ -114,46 +114,55 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		}
 		
 		private static boolean isRightClampedKnotVector(double[] U, int p){
-			return (U[U.length-1] == U[U.length-1-p]);
+			return (U[U.length - 1] == U[U.length - 1 - p]);
 		}
 		
-		private void repairLeftSide(double[] U, boolean dir, int p){
-			double u0 = U[0];
-			int mult = getMultiplicity(u0, U);
-			System.out.println("mult = " + mult);
-//			int r = p - mult ;
-			int r = 1;
-			SurfaceKnotInsertion(dir, u0, r);
+		private void repairLeftSide(boolean dir){
+			double uv;
+			if(dir){
+				uv = U[p];
+			}
+			else{
+				uv = V[q];
+			}
+			NURBSSurface[] split = splitAtKnot1(dir, uv);
+			this.setControlMesh(split[1].getControlMesh());
+			this.setUKnotVector(split[1].getUKnotVector());
+			this.setVKnotVector(split[1].getVKnotVector());
 		}
 		
-		private void repairRightSide(double[] U, boolean dir, int p){
-			double un = U[U.length - 1];
-			int mult = getMultiplicity(un, U);
-			System.out.println("mult = " + mult);
-//			int r = p - mult;
-			int r = 1;
-			SurfaceKnotInsertion(dir, un, r);
+		private void repairRightSide(boolean dir){
+			double uv;
+			if(dir){
+				uv = U[U.length - 1 - p];
+			}
+			else{
+				uv = V[V.length - 1 - q];
+			}
+			NURBSSurface[] split = splitAtKnot1(dir, uv);
+			this.setControlMesh(split[0].getControlMesh());
+			this.setUKnotVector(split[0].getUKnotVector());
+			this.setVKnotVector(split[0].getVKnotVector());
 			
 		}
-		
 		
 		
 		public void repairKnotVectors(){
 			if(!NURBSAlgorithm.isClamped(U, p)){
 				if(!isLeftClampedKnotVector(U, p)){
-					repairLeftSide(U, true, p);
+					repairLeftSide(true);
 				}
 				if(!isRightClampedKnotVector(U, p)){
-					repairRightSide(U, true, p);
+					repairRightSide(true);
 				}
 				
 			}
 			if(!NURBSAlgorithm.isClamped(V, q)){
 				if(!isLeftClampedKnotVector(V, q)){
-					repairLeftSide(V, false, q);
+					repairLeftSide(false);
 				}
 				if(!isRightClampedKnotVector(V, q)){
-					repairRightSide(V, false, q);
+					repairRightSide(false);
 				}
 			}
 		}
@@ -609,13 +618,74 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return ns;
 		}
 		
-		public NURBSSurface SurfaceKnotInsertion(NURBSSurface ns, boolean dir, double uv){
-			NURBSSurface nsReturn = new NURBSSurface();
-			if(dir){
-				
+		private static double[] insertUInKnot(int p, double u, double[] U){
+			int k = NURBSAlgorithm.FindSpan(U.length - p - 2, p, u, U);
+			double[] newU = new double[U.length + 1];
+			for (int i = 0; i <= k; i++) {
+				newU[i] = U[i];
 			}
-			return nsReturn;
+			newU[k + 1] = u;
+			for (int i = k+2; i < newU.length; i++) {
+				newU[i] = U[i - 1];
+			}
+			return newU;
 		}
+		
+		public NURBSSurface SurfaceKnotInsertion(boolean dir, double uv){
+			double[] U = getUKnotVector();
+			double[] V = getVKnotVector();
+			int p = getUDegree();
+			int q = getVDegree();
+			double[][][] Pw = getControlMesh();
+			if(dir){
+				double[] newU = insertUInKnot(p, uv, U);
+				double[][][] newPw = new double[Pw.length + 1][Pw[0].length][4];
+				int k = NURBSAlgorithm.FindSpan(U.length - p - 2, p, uv, U);
+				double[] alpha = new double[p];
+				for (int i = 0; i < alpha.length; i++) {
+					int j = i + k - p + 1;
+					alpha[i] = (uv - U[j]) / (U[j + p] - U[j]);
+				}
+				for (int j = 0; j < newPw[0].length; j++) {
+					for (int i = 0; i <= k - p; i++) {
+						newPw[i][j] = Pw[i][j];
+					}
+					for (int i = k - p + 1; i <= k; i++) {
+						Rn.add(newPw[i][j], Rn.times(null, alpha[i - k + p - 1], Pw[i][j]), Rn.times(null, 1 - alpha[i - k + p - 1], Pw[i - 1][j]));
+								
+					}
+					for (int i = k + 1; i < newPw.length; i++) {
+						newPw[i][j] = Pw[i - 1][j];
+					}
+				}
+				return new NURBSSurface(newU, V, newPw, p, q);
+			}
+			else{
+				double[] newV = insertUInKnot(q, uv, V);
+				double[][][] newPw = new double[Pw.length][Pw[0].length + 1][4];
+				int k = NURBSAlgorithm.FindSpan(V.length - q - 2, q, uv, V);
+				double[] alpha = new double[q];
+				for (int i = 0; i < alpha.length; i++) {
+					int j = i + k - q + 1;
+					alpha[i] = (uv - V[j]) / (V[j + q] - V[j]);
+				}
+				for (int i = 0; i < newPw.length; i++) {
+					for (int j = 0; j <= k - q; j++) {
+						newPw[i][j] = Pw[i][j];
+					}
+					for (int j = k - q + 1; j <= k; j++) {
+						Rn.add(newPw[i][j], Rn.times(null, alpha[j - k + q - 1], Pw[i][j]), Rn.times(null, 1 - alpha[j - k + q - 1], Pw[i][j - 1]));
+								
+					}
+					for (int j = k + 1; j < newPw[0].length; j++) {
+						newPw[i][j] = Pw[i][j - 1];
+					}
+				}
+				return new NURBSSurface(U, newV, newPw, p, q);
+			}
+		}
+		
+		
 		
 		/**
 		 * insert the knot uv r times into the knot vector of the surface ns. If dir == true into
@@ -746,6 +816,100 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 				int mult = getMultiplicity(uv, V);
 				int insertNumber = q - mult;
 				nsFilled = SurfaceKnotInsertion(nsFilled, false, uv, insertNumber);
+				double[][][] cmFilled = nsFilled.getControlMesh();
+				double[] filledV = nsFilled.getVKnotVector();
+				int first = getFirstPositionOfKnotInKnotVector(filledV, uv);
+				double[] V1 = new double[first + q + 1];
+				for (int i = 0; i < V1.length - 1; i++) {
+					V1[i] = filledV[i];
+				}
+				V1[V1.length - 1] = uv;
+				double[] V2 = new double[filledV.length - first + 1];
+				for (int i = 1; i < V2.length; i++) {
+					V2[i] = filledV[i + first - 1];
+				}
+				V2[0] = uv;
+				int l = V1.length - 1;
+				int k = V2.length - 1;
+				double[][][] cm1 = new double[cmFilled.length][l - q][];
+				for (int i = 0; i < cm1.length; i++) {
+					for (int j = 0; j < cm1[0].length; j++) {
+						cm1[i][j] = cmFilled[i][j];
+					}
+					
+				}
+				NURBSSurface ns1 = new NURBSSurface(U, V1, cm1, p, q);
+				System.out.println("ns1");
+				System.out.println(ns1.toObj());
+				double[][][] cm2 = new double[cmFilled.length][k - q][];
+				for (int i = 0; i < cm2.length; i++) {
+					for (int j = l - q - 1; j < cmFilled[0].length; j++) {
+						cm2[i][j - l + q + 1] = cmFilled[i][j];
+					}
+				}
+				NURBSSurface ns2 = new NURBSSurface(U, V2, cm2, p, q);
+				System.out.println("ns2");
+				System.out.println(ns2.toObj());
+				splitSurf[0] = ns1;
+				splitSurf[1] = ns2;
+				return splitSurf;
+			}
+		}
+		
+		public NURBSSurface[] splitAtKnot1(boolean dir, double uv){
+			NURBSSurface[] splitSurf = new NURBSSurface[2];
+			NURBSSurface nsFilled = this;
+			if(dir){
+				int mult = getMultiplicity(uv, U);
+				int insertNumber = p - mult;
+				for (int i = 0; i < insertNumber; i++) {
+					nsFilled = nsFilled.SurfaceKnotInsertion(true, uv);
+				}
+				double[][][] cmFilled = nsFilled.getControlMesh();
+				double[] filledU = nsFilled.getUKnotVector();
+				int first = getFirstPositionOfKnotInKnotVector(filledU, uv);
+				double[] U1 = new double[first + p + 1];
+				for (int i = 0; i < U1.length - 1; i++) {
+					U1[i] = filledU[i];
+				}
+				U1[U1.length - 1] = uv;
+				double[] U2 = new double[filledU.length - first + 1];
+				for (int i = 1; i < U2.length; i++) {
+					U2[i] = filledU[i + first - 1];
+				}
+				U2[0] = uv;
+				int l = U1.length - 1;
+				int k = U2.length - 1;
+				double[][][] cm1 = new double[l - p][cmFilled[0].length][];
+				for (int i = 0; i < cm1.length; i++) {
+					for (int j = 0; j < cm1[0].length; j++) {
+						cm1[i][j] = cmFilled[i][j];
+					}
+					
+				}
+				NURBSSurface ns1 = new NURBSSurface(U1, V, cm1, p, q);
+//				System.out.println("ns1");
+//				System.out.println(ns1.toObj());
+				double[][][] cm2 = new double[k - p][cmFilled[0].length][];
+			
+				for (int i = l - p - 1; i < cmFilled.length; i++) {
+					for (int j = 0; j < cm2[0].length; j++) {
+						cm2[i - l + p + 1][j] = cmFilled[i][j];
+					}
+				}
+				NURBSSurface ns2 = new NURBSSurface(U2, V, cm2, p, q);
+//				System.out.println("ns2");
+//				System.out.println(ns2.toObj());
+				splitSurf[0] = ns1;
+				splitSurf[1] = ns2;
+				return splitSurf;
+			}
+			else{
+				int mult = getMultiplicity(uv, V);
+				int insertNumber = q - mult;
+				for (int i = 0; i < insertNumber; i++) {
+					nsFilled = nsFilled.SurfaceKnotInsertion(false, uv);
+				}
 				double[][][] cmFilled = nsFilled.getControlMesh();
 				double[] filledV = nsFilled.getVKnotVector();
 				int first = getFirstPositionOfKnotInKnotVector(filledV, uv);
@@ -1547,5 +1711,13 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		qmf.setSurface(this);
 		qmf.update();
 		return qmf.getGeometry();
+	}
+	
+	public static void main(String[] args){
+		double[] U = {0,0,0,2,2,2};
+		double u = 1;
+		int p = 2;
+		double[] newU = insertUInKnot(p, u, U);
+		System.out.println(Arrays.toString(newU));
 	}
 }
