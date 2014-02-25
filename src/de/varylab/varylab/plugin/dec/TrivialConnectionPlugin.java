@@ -77,8 +77,8 @@ public class TrivialConnectionPlugin extends AlgorithmPlugin {
 		double totalSingularities = 0.0;
 		int nVertices = heds.numVertices();
 		for(V v: heds.getVertices()) {
-			double val = -gca.get(v,adapters);
-			double sing = adapters.get(Singularity.class, v, Double.class);
+			Double val = -gca.get(v,adapters);
+			Double sing = adapters.get(Singularity.class, v, Double.class);
 			totalSingularities += sing;
 			val += 2*Math.PI*sing;
 			b.set(v.getIndex(), val);
@@ -97,7 +97,7 @@ public class TrivialConnectionPlugin extends AlgorithmPlugin {
 			nz[vi] = new int[edges.size()];
 			int i = 0;
 			for(E e: edges) {
-				nz[vi][i] = adapters.get(EdgeIndex.class, e, Integer.class);
+				nz[vi][i] = adapters.get(EdgeIndex.class, e, Integer.class).intValue();
 				i++;
 			}
 			
@@ -110,7 +110,7 @@ public class TrivialConnectionPlugin extends AlgorithmPlugin {
 			nz[heds.numVertices()-1+fi] = new int[edges.size()];
 			int i = 0;
 			for(E e : edges) {
-				nz[heds.numVertices()-1+fi][i] = adapters.get(EdgeIndex.class, e, Integer.class);
+				nz[heds.numVertices()-1+fi][i] = adapters.get(EdgeIndex.class, e, Integer.class).intValue();
 				i++;
 			}
 		}
@@ -260,8 +260,8 @@ public class TrivialConnectionPlugin extends AlgorithmPlugin {
 			curvature += adapters.get(Connection.class, e, Double.class);
 			e = e.getNextEdge().getOppositeEdge();
 		} while(e != v.getIncomingEdge());
-		double singCurvature = adapters.get(Singularity.class, v, Double.class);
-		double gaussCurvature = gca.getV(v, adapters);
+		Double singCurvature = adapters.get(Singularity.class, v, Double.class);
+		Double gaussCurvature = gca.getV(v, adapters);
 		boolean vOK = (Math.abs(curvature + gaussCurvature - singCurvature*2*Math.PI ) <= 1E-6);
 		if(!vOK) {
 			System.out.println(v +":"+curvature +"!="+singCurvature*2*Math.PI +"+"+gaussCurvature);

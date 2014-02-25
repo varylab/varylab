@@ -208,7 +208,7 @@ public class ChristoffelTransform extends AlgorithmDialogPlugin {
 					double factor = 0;
 					double[] r12 = decomposeEdgeLength(de, a);
 					factor = r12[0] * r12[1];
-					boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
+					Boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
 					double scale = (edgeSign ? -1 : 1) / factor;
 					vec[0] *= scale;
 					vec[1] *= scale;

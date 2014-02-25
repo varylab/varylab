@@ -47,7 +47,7 @@ implements Functional<V, E, F> {
 		if (E != null) E.setZero();
 		if (G != null) G.setZero();
 		for (F f : hds.getFaces()) {
-			double w = aSet.getDefault(Weight.class, f, 1.0);
+			Double w = aSet.getDefault(Weight.class, f, 1.0);
 			if (w == 0.0) continue;
 			List<V> b = boundaryVertices(f);
 			if (b.size() != 4) continue;

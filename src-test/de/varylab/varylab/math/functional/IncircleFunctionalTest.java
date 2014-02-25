@@ -33,10 +33,10 @@ public class IncircleFunctionalTest extends FunctionalTest<VVertex, VEdge, VFace
 			v4 = hds.addNewVertex();
 		
 		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v3,v4);
-		v1.setP(new double[] {0.0,0.0,0.0});
-		v2.setP(new double[] {1.0,0.0,0.0});
-		v3.setP(new double[] {rnd.nextDouble() + 1,rnd.nextDouble() + 1,0.0});
-		v4.setP(new double[] {0.0, 1.0, 0.0});
+		v1.setP(new double[] {0.0,0.0,0.0,1.0});
+		v2.setP(new double[] {1.0,0.0,0.0,1.0});
+		v3.setP(new double[] {rnd.nextDouble() + 1,rnd.nextDouble() + 1,0.0,1.0});
+		v4.setP(new double[] {0.0, 1.0, 0.0,1.0});
 		
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {

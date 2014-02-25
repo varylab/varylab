@@ -117,10 +117,10 @@ public class IncircleVisualizer extends VisualizerPlugin implements ActionListen
 			List<V> bd = boundaryVertices(f);
 			List<E> ebd = boundaryEdges(f);
 			if (bd.size() != 4) continue;
-			double l1 = a.get(Length.class, ebd.get(0), Double.class);
-			double l2 = a.get(Length.class, ebd.get(1), Double.class);
-			double l3 = a.get(Length.class, ebd.get(2), Double.class);
-			double l4 = a.get(Length.class, ebd.get(3), Double.class);
+			Double l1 = a.get(Length.class, ebd.get(0), Double.class);
+			Double l2 = a.get(Length.class, ebd.get(1), Double.class);
+			Double l3 = a.get(Length.class, ebd.get(2), Double.class);
+			Double l4 = a.get(Length.class, ebd.get(3), Double.class);
 			double ie = l1 + l3 - l2 - l4;
 			// do we have a meaningfull incircle
 			if (ie * ie > l1 * 1E-2) continue;

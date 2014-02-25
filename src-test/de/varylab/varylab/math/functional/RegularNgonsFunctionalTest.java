@@ -48,7 +48,7 @@ public class RegularNgonsFunctionalTest extends FunctionalTest<VVertex, VEdge, V
 		MyDomainValue pos = new MyDomainValue(result);
 		setXGradient(pos);
 		setHDS(hds);
-		RegularNgonsFunctional<VVertex, VEdge, VFace> functional = new RegularNgonsFunctional<>();
+		RegularNgonsFunctional<VVertex, VEdge, VFace> functional = new RegularNgonsFunctional<VVertex, VEdge, VFace>();
 		functional.setSizes(4);
 		setEps(1E-8);
 		setFunctional(functional);

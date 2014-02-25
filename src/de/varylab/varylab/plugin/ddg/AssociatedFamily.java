@@ -222,7 +222,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		@Override
 		public Double getEdgeValue(VEdge e, AdapterSet a) {
 			double initL = initialLengthMap.get(e.getIndex());
-			double l = a.get(Length.class, e, Double.class);
+			Double l = a.get(Length.class, e, Double.class);
 			return l - initL;
 		}
 		

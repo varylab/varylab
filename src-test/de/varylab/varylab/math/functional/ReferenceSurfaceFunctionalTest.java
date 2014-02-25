@@ -30,13 +30,13 @@ public class ReferenceSurfaceFunctionalTest extends FunctionalTest<VVertex, VEdg
 			v3 = refSurface.addNewVertex();
 		
 		HalfEdgeUtils.constructFaceByVertices(refSurface, v1,v2,v3);
-		v1.setP(new double[] {0.0,0.0,0.0});
-		v2.setP(new double[] {1.0,0.0,0.0});
-		v3.setP(new double[] {0.0,1.0,0.0});
+		v1.setP(new double[] {0.0,0.0,0.0,1.0});
+		v2.setP(new double[] {1.0,0.0,0.0,1.0});
+		v3.setP(new double[] {0.0,1.0,0.0,1.0});
 		
 		VHDS hds = new VHDS();
 		VVertex vh = hds.addNewVertex();
-		vh.setP(new double[] {Math.random(), Math.random(), 1.0});
+		vh.setP(new double[] {Math.random(), Math.random(), 1.0,1.0});
 
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {

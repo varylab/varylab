@@ -133,7 +133,7 @@ public class CollapseTrianglesPlugin extends AlgorithmDialogPlugin implements Ch
 		infoLabel.setText("");
 		HalfedgeSelection identifySel = new HalfedgeSelection();
 		for(F f : hds.getFaces()) {
-			double area = a.get(Area.class, f, Double.class);
+			Double area = a.get(Area.class, f, Double.class);
 			if(area < distance) {
 				identifySel.add(f);
 				collapseSet.add(f);
@@ -155,7 +155,7 @@ public class CollapseTrianglesPlugin extends AlgorithmDialogPlugin implements Ch
 		oldSelection = hcp.getSelection();
 		double minTriangleArea = Double.POSITIVE_INFINITY;
 		for(F f : hds.getFaces()) {
-			double area = a.get(Area.class, f, Double.class);
+			Double area = a.get(Area.class, f, Double.class);
 			if(area < minTriangleArea) {
 				minTriangleArea = area;
 			}

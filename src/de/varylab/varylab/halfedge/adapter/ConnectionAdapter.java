@@ -37,7 +37,7 @@ public class ConnectionAdapter extends AbstractAdapter<Double> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> Double getE(E e, AdapterSet a) {
-		int ei = a.get(EdgeIndex.class, e, Integer.class);
+		Integer ei = a.get(EdgeIndex.class, e, Integer.class);
 		return (e.isPositive()?1.0:-1.0)*edgeValue.get(ei);
 	}
 	

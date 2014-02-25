@@ -36,12 +36,12 @@ public class TouchingIncirclesFunctionalTan2Test extends FunctionalTest<VVertex,
 		
 		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v4,v3);
 		HalfEdgeUtils.constructFaceByVertices(hds, v5,v6,v2,v1);
-		v1.setP(new double[] {0.0,0.0,rnd.nextDouble()});
-		v2.setP(new double[] {1.0,0.25,0.0});
-		v3.setP(new double[] {0.0,1.0,0.0});
-		v4.setP(new double[] {1.0,1.0,0.0});
-		v5.setP(new double[] {0.0,-1.0,0.0});
-		v6.setP(new double[] {1.0,-1.0,rnd.nextDouble()});
+		v1.setP(new double[] {0.0,0.0,rnd.nextDouble(),1.0});
+		v2.setP(new double[] {1.0,0.25,0.0,1.0});
+		v3.setP(new double[] {0.0,1.0,0.0,1.0});
+		v4.setP(new double[] {1.0,1.0,0.0,1.0});
+		v5.setP(new double[] {0.0,-1.0,0.0,1.0});
+		v6.setP(new double[] {1.0,-1.0,rnd.nextDouble(),1.0});
 		
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {

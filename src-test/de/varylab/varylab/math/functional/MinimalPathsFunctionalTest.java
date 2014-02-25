@@ -35,10 +35,10 @@ public class MinimalPathsFunctionalTest extends FunctionalTest<VVertex, VEdge, V
 		HalfEdgeUtils.constructFaceByVertices(hds, v1,v2,v4);
 		HalfEdgeUtils.constructFaceByVertices(hds, v2,v3,v4);
 		HalfEdgeUtils.constructFaceByVertices(hds, v3,v1,v4);
-		v1.setP(new double[] {0.0,0.0,0.0});
-		v2.setP(new double[] {1.0,0.0,0.0});
-		v3.setP(new double[] {0.0, 1.0, 0.0});
-		v4.setP(new double[] {rnd.nextDouble(),rnd.nextDouble(),0.0});
+		v1.setP(new double[] {0.0,0.0,0.0,1.0});
+		v2.setP(new double[] {1.0,0.0,0.0,1.0});
+		v3.setP(new double[] {0.0,1.0,0.0,1.0});
+		v4.setP(new double[] {rnd.nextDouble(),rnd.nextDouble(),0.0,1.0});
 				
 		Vector result = new DenseVector(hds.numVertices() * 3);
 		for (VVertex v : hds.getVertices()) {

@@ -22,8 +22,8 @@
 	<property name="version" value="B${time}"/>
 	<property name="vendor" value="VaryLab Development Team"/>
 
-	<property name="target" value="1.6"/>
-	<property name="source" value="1.6"/>
+	<property name="target" value="1.7"/>
+	<property name="source" value="1.7"/>
 	<property name="src" value="src"/>
 	<property name="src-test" value="src-test"/>
 	<property name="src-resource" value="src-resource"/>

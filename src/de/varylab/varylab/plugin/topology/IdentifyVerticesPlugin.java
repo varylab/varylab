@@ -241,7 +241,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		minEdgeLength = Double.POSITIVE_INFINITY;
 		minDistance = Double.POSITIVE_INFINITY;
 		for(E e : hds.getPositiveEdges()) {
-			double length = a.get(Length.class, e, Double.class);
+			Double length = a.get(Length.class, e, Double.class);
 			if(length < minEdgeLength) {
 				minEdgeLength = length;
 			}

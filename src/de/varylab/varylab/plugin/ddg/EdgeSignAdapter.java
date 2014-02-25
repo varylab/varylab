@@ -70,8 +70,8 @@ public class EdgeSignAdapter extends AbstractAdapter<Boolean> {
 			signMap.put(actEdge.getOppositeEdge(), !prevLabel);
 			actEdge = actEdge.getNextEdge();
 		}
-		boolean edgeLabel = a.get(EdgeSign.class, edge, Boolean.class);
-		boolean prevLabel = a.get(EdgeSign.class, edge.getPreviousEdge(), Boolean.class);
+		Boolean edgeLabel = a.get(EdgeSign.class, edge, Boolean.class);
+		Boolean prevLabel = a.get(EdgeSign.class, edge.getPreviousEdge(), Boolean.class);
 		if (prevLabel == edgeLabel){
 			System.err.println("could not label face " + edge.getLeftFace() + " correctly, continuing...");
 		}

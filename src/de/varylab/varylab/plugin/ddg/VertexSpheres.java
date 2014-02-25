@@ -512,7 +512,7 @@ public class VertexSpheres extends ShrinkPanelPlugin implements ActionListener, 
 					}
 					double[] vec = a.getD(EdgeVector.class,e);
 					double factor = getRadius(v.getIndex())*getRadius(v2.getIndex());						
-					boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
+					Boolean edgeSign = a.get(EdgeSign.class, e, Boolean.class);
 					double scale = (edgeSign ? -1 : 1) / factor;
 					vec[0] *= scale;
 					vec[1] *= scale;

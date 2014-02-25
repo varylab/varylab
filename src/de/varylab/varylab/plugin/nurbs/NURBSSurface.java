@@ -1571,7 +1571,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		LinkedList<Double> umbFaces = new LinkedList<Double>();
 		LinkedList<VFace> umbilicFaces = new LinkedList<VFace>();
 		for (VFace f : hds.getFaces()) {
-			double result = indexAdapter.get(f, as);
+			Double result = indexAdapter.get(f, as);
 			if (Math.abs(Math.abs(result) - 1) < 0.01
 					|| Math.abs(Math.abs(result) - 2) < 0.01) {
 				umbFaces.add(result);
