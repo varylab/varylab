@@ -103,8 +103,10 @@
 	</path>
 
 	<path id="substance.libraryclasspath">
-		<pathelement location="${lib}/substance/substance-6.0.jar"/>
-		<pathelement location="${lib}/substance/trident-6.0.jar"/>
+		<pathelement location="${lib}/substance/substance-7.2.1.jar"/>
+		<pathelement location="${lib}/substance/trident-7.2.1.jar"/>
+		<pathelement location="${lib}/substance/laf-plugin-7.2.1.jar"/>
+		<pathelement location="${lib}/substance/laf-widget-7.2.1.jar"/>
 	</path>
 
 	<path id="xstream.libraryclasspath">

@@ -20,7 +20,7 @@ import de.varylab.varylab.halfedge.VVertex;
 public class HyperbolicNet {
 
 	private HashMap<VFace,Double> 
-		weightMap = new HashMap<>();
+		weightMap = new HashMap<VFace,Double>();
 	
 	
 //	private StripDecomposition<VEdge, VFace, VHDS>
@@ -47,8 +47,8 @@ public class HyperbolicNet {
 	} 
 	
 	private void propagateWeights() {
-		HashSet<VFace> facesDone = new HashSet<>();
-		HashMap<VFace,VEdge> edgeForPreviousQMap = new HashMap<>();
+		HashSet<VFace> facesDone = new HashSet<VFace>();
+		HashMap<VFace,VEdge> edgeForPreviousQMap = new HashMap<VFace,VEdge>();
 		
 		int i = 0;
 		VFace f = hds.getFace(i);
@@ -58,7 +58,7 @@ public class HyperbolicNet {
 		
 		weightMap.put(f, initialWeight);
 		
-		LinkedList<VFace> queue = new LinkedList<>();
+		LinkedList<VFace> queue = new LinkedList<VFace>();
 		
 		facesDone.add(f);
 		addNonVisitedNeighbors(f, facesDone, edgeForPreviousQMap, queue);
@@ -113,9 +113,9 @@ public class HyperbolicNet {
 
 	public void adjustHomogeneousCoordinates() {
 		VFace f = hds.getFaces().get(0);
-		LinkedList<VFace> queue = new LinkedList<>();
-		HashSet<VFace> visitedFaces = new HashSet<>(hds.numFaces());
-		HashSet<VVertex> availableVertices = new HashSet<>(hds.getVertices());
+		LinkedList<VFace> queue = new LinkedList<VFace>();
+		HashSet<VFace> visitedFaces = new HashSet<VFace>(hds.numFaces());
+		HashSet<VVertex> availableVertices = new HashSet<VVertex>(hds.getVertices());
 		queue.add(f);
 		while(!queue.isEmpty()) {
 			f = queue.pollLast();
