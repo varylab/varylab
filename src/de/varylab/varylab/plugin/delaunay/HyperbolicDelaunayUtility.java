@@ -167,7 +167,7 @@ public class HyperbolicDelaunayUtility {
 		double e1e1 = Pn.innerProduct(e1, e1, metric);
 		double e2e2 = Pn.innerProduct(e2, e2, metric);
 		double e1e2 = Pn.innerProduct(e1, e2, metric);
-		return e1e1*(e1e1*e2e2-e1e2*e1e2) > 0;
+		return (e1e1*e2e2-e1e2*e1e2) > 0; //TODO: CheckIt
 	}
 	
 	protected static boolean isHyperbolicLowerFace(double[] hypNormal) {

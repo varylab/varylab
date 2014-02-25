@@ -10,7 +10,7 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 public class ClosestPointTests {
 	
 	@Test
-	public void closestPointTest1(){
+	public void testClosestPointTest1(){
 		NURBSSurface ns = new NURBSSurface();
 		try {
 			ns = NurbsIO.readNURBS(new FileReader("data/nurbs/plane.obj"));

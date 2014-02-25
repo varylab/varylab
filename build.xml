@@ -223,7 +223,7 @@
 			<classpath refid="junit.libraryclasspath"/>
 		</javac>
 		<copy todir="${build-test}">
-			<fileset dir="${src-test}" includes="**/testSegments.xml"/>
+			<fileset dir="${src-test}" includes="**/*.xml"/>
 			<fileset dir="${src-test}" includes="**/logging.properties"></fileset>
 		</copy>
 		<junit printsummary="yes" haltonfailure="yes">

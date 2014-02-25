@@ -12,7 +12,7 @@ import de.varylab.varylab.utilities.MathUtility;
 public class PointProjectionCurveTest {
 	
 	@Test
-	public void NewtonMethodTest(){
+	public void testNewtonMethod(){
 		double[] point = {2,2,0,1};
 		double[] P0 = {1,0,0,1};
 		double[] P1 = {1,1,0,1};
