@@ -26,7 +26,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -73,7 +72,6 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		tablePanel.setBorder(BorderFactory.createTitledBorder("Optimizer Plugins"));
 		tablePanel.add(pluginScroller);
 		pluginTable.setBorder(BorderFactory.createEtchedBorder());
-		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
 		pluginTable.setRowHeight(22);
 		pluginTable.getSelectionModel().addListSelectionListener(this);
 		pluginTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
@@ -109,11 +107,11 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		VarylabOptimizerPlugin p = optimizerPlugins.get(row);
 		if (p.getOptionPanel() == null) {
 			pluginOptionsPanel.add(new JLabel("No Options"));
-			pluginOptionsPanel.updateUI();
-			return;
+		} else {
+			pluginOptionsPanel.add(p.getOptionPanel());
 		}
-		pluginOptionsPanel.add(p.getOptionPanel());
-		pluginOptionsPanel.updateUI();
+		pluginOptionsPanel.revalidate();
+		pluginOptionsPanel.repaint();
 	}
 	
 	
@@ -166,6 +164,14 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 					break;
 			}
 			return value;
+		}
+		
+		@Override
+		public void setValueAt(Object aValue, int row, int column) {
+			if (column == 1) {
+				VarylabOptimizerPlugin op = optimizerPlugins.get(row);
+				setActive(op, (boolean)aValue);
+			}
 		}
 		
 		@Override
@@ -241,25 +247,6 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		
 	}
 	
-	
-	private class PluginActivationListener implements CellEditorListener {
-
-		@Override
-		public void editingCanceled(ChangeEvent e) {
-		}
-
-		@Override
-		public void editingStopped(ChangeEvent e) {
-			int row = pluginTable.getSelectedRow();
-			if (pluginTable.getRowSorter() != null) {
-				row = pluginTable.getRowSorter().convertRowIndexToModel(row);
-			}
-			VarylabOptimizerPlugin op = optimizerPlugins.get(row);
-			setActive(op, !isActive(op));
-		}
-		
-	}
-
 	public double getCoefficient(VarylabOptimizerPlugin op) {
 		if (!coefficientMap.containsKey(op.getName())) {
 			coefficientMap.put(op.getName(), 1.0);
