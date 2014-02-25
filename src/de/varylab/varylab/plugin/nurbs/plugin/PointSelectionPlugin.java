@@ -300,7 +300,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 						
 				Vertex<?,?,?> v = list.getFirst();
 				double[] initialPoint = as.getD(NurbsUVCoordinate.class, v);
-				LinkedList<double[]> pts = IntegralCurve.getEquidistantRotatedPoints(surface, 22, initialPoint);
+				LinkedList<double[]> pts = IntegralCurve.getEquidistantRotatedPoints(surface, 11, initialPoint);
 				for (double[] pt : pts) {
 					if(!activeModel.contains(pt)) {
 						activeModel.add(pt);
