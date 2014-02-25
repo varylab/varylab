@@ -63,12 +63,12 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	private Set<Node<?,?,?>>
 		selectedNodes = new TreeSet<Node<?,?,?>>(new NodeComparator<Node<?,?,?>>());
 	
-	private JList
-		selectedNodesList = new JList();
+	private JList<Node<?,?,?>>
+		selectedNodesList = new JList<>();
 	private JScrollPane
 		selectionScroller = new JScrollPane(selectedNodesList);
-	private JComboBox
-		adapterCombo = new JComboBox();
+	private JComboBox<Adapter<?>>
+		adapterCombo = new JComboBox<>();
 	private InspectorPanel
 		inspector = new InspectorPanel(true);
 	private JScrollPane
@@ -154,7 +154,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 		}
 		if (selectVerticesButton == s || selectEdgesButton == s || selectFacesButton == s) {
 			List<Integer> indexList = new LinkedList<Integer>();
-			ListModel model = selectedNodesList.getModel();
+			ListModel<Node<?,?,?>> model = selectedNodesList.getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Object o = model.getElementAt(i);
 				if (o instanceof Vertex<?, ?, ?> && selectVerticesButton == s) {
@@ -198,7 +198,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	public void selectionChanged(HalfedgeSelection s, HalfedgeInterface hif) {
 		selectedNodes.clear();
 		selectedNodes.addAll(s.getNodes());
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel<Node<?,?,?>> model = new DefaultListModel<>();
 		for (Node<?,?,?> n : selectedNodes) {
 			model.addElement(n);
 		}
@@ -229,7 +229,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 				compSet.add(a);
 			}
 		}
-		DefaultComboBoxModel adapterModel = new DefaultComboBoxModel();
+		DefaultComboBoxModel<Adapter<?>> adapterModel = new DefaultComboBoxModel<>();
 		for (Adapter<?> a : compSet) {
 			adapterModel.addElement(a);
 		}
@@ -241,12 +241,7 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	
 	
 	private List<Node<?,?,?>> getSelectedNodes() {
-		Object[] listSelection = selectedNodesList.getSelectedValues();
-		List<Node<?,?,?>> result = new LinkedList<Node<?,?,?>>();
-		for (Object o : listSelection) {
-			result.add((Node<?,?,?>)o);
-		}
-		return result;
+		return selectedNodesList.getSelectedValuesList();
 	}
 	
 	

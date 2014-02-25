@@ -40,6 +40,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jtao.Tao;
 import de.jtem.jtao.Tao.GetSolutionStatusResult;
+import de.jtem.jtao.Tao.Method;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -80,8 +81,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		animateToggle = new JToggleButton("Animate", ImageHook.getIcon("animate.png"));
 	private JButton
 		optimizeButton = new JButton("Optimize", ImageHook.getIcon("surface.png"));
-	private JComboBox
-		methodCombo = new JComboBox(Tao.Method.values());
+	private JComboBox<Method>
+		methodCombo = new JComboBox<>(Tao.Method.values());
 
 	private JCheckBox
 		fixSelectionXChecker = new JCheckBox("X", true),

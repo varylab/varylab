@@ -12,14 +12,12 @@ import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelPlugin;
 
 public class SubstanceLnF extends LookAndFeelPlugin implements ActionListener {
 
-	private JComboBox
-		skinCombo = new JComboBox();
-	
+	private JComboBox<String>
+		skinCombo = new JComboBox<>();
 	
 	public SubstanceLnF() {
 		skinCombo.addActionListener(this);
 	}
-	
 	
 	@Override
 	public String getLnFClassName() {

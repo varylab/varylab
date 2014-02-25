@@ -99,8 +99,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		jobQueuePlugin = null;
 	
 	// ui components
-	private JComboBox
-		patternCombo = new JComboBox();	
+	private JComboBox<Pattern>
+		patternCombo = new JComboBox<>();	
 	private GridBagConstraints
 		c1 = new GridBagConstraints(),
 		c2 = new GridBagConstraints();
@@ -148,12 +148,12 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 		shrinkPanel.add(expertModeChecker, c2);
 		shrinkPanel.add(new JLabel("Pattern"), c1);
-		ComboBoxModel model = null;
+		ComboBoxModel<Pattern> model = null;
 		if (expert) {
-			model = new DefaultComboBoxModel(Pattern.values());
+			model = new DefaultComboBoxModel<>(Pattern.values());
 		} else {
 			Pattern[] patterns = {Pattern.Triangles, Pattern.Quads, Pattern.TrianglesQuantized, Pattern.QuadsQuantized};
-			model = new DefaultComboBoxModel(patterns);
+			model = new DefaultComboBoxModel<>(patterns);
 		}
 		patternCombo.setModel(model);
 		

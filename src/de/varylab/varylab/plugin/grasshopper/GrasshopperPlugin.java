@@ -247,6 +247,8 @@ public class GrasshopperPlugin extends Plugin {
 		
 		private OptimizationPanel
 			optPanel = null;
+		private boolean 
+			keepRunning = true;
 		
 		public Server(OptimizationPanel optPanel) {
 			super();
@@ -263,7 +265,7 @@ public class GrasshopperPlugin extends Plugin {
 				log.warning("could not start grashopper server: " + e);
 				return;
 			}
-			while (true) {
+			while (keepRunning) {
 				try {
 					Socket compSocket = server.accept();
 					log.info("grashopper component connected at " + compSocket);
@@ -272,6 +274,11 @@ public class GrasshopperPlugin extends Plugin {
 				} catch (IOException e) {
 					log.warning("error connecting grashopper component: " + e);
 				}
+			}
+			try {
+				server.close();
+			} catch (Exception e) {
+				log.warning(e.toString());
 			}
 		}
 	}

@@ -2,7 +2,6 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 
 import compgeom.Rational;
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
@@ -60,7 +59,8 @@ public class NURBSCurvatureUtility {
 		}
 	}
 	
-
+	
+	@SuppressWarnings("unused")
 	private static double[] getEigenvector(double[][] matrix, double my){
 		double[] eig = {1., 0.};
 //		String sMy = my.toString();

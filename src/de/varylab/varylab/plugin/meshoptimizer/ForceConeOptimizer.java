@@ -26,10 +26,10 @@ public class ForceConeOptimizer extends VarylabOptimizerPlugin {
 
 	private JPanel
 		optionsPanel = new JPanel();
-	private JComboBox
-		angleTermCombo = new JComboBox(new String[]{"Term 1", "Term 2", "Term 3"}),
-		distanceTermCombo = new JComboBox(new String[]{"Term 1", "Term 2", "Term 3", "Term 4"}),
-		vertexTermCombo = new JComboBox(new String[]{"Term 1", "Term 2"});
+	private JComboBox<String>
+		angleTermCombo = new JComboBox<>(new String[]{"Term 1", "Term 2", "Term 3"}),
+		distanceTermCombo = new JComboBox<>(new String[]{"Term 1", "Term 2", "Term 3", "Term 4"}),
+		vertexTermCombo = new JComboBox<>(new String[]{"Term 1", "Term 2"});
 	private JCheckBox
 		angleChecker = new JCheckBox("Angle"),
 		distanceChecker = new JCheckBox("Distance"),

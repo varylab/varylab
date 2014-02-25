@@ -201,6 +201,8 @@ public class BlenderPlugin extends Plugin {
 		
 		private OptimizationPanel
 			optPanel = null;
+		private boolean
+			keepRunning = true;
 		
 		public Server(OptimizationPanel optPanel) {
 			super();
@@ -217,7 +219,7 @@ public class BlenderPlugin extends Plugin {
 				log.warning("could not start blender server: " + e);
 				return;
 			}
-			while (true) {
+			while (keepRunning) {
 				try {
 					Socket compSocket = server.accept();
 					log.info("blender component connected at " + compSocket);
@@ -226,6 +228,11 @@ public class BlenderPlugin extends Plugin {
 				} catch (IOException e) {
 					log.warning("error connecting blender component: " + e);
 				}
+			}
+			try {
+				server.close();
+			} catch (Exception e) {
+				log.warning(e.toString());
 			}
 		}
 	}

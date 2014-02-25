@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 

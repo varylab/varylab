@@ -81,8 +81,8 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		sel = null;
 	private Random
 		rnd = new Random();
-	private JComboBox
-		methodCombo = new JComboBox(NormalMethod.values());
+	private JComboBox<NormalMethod>
+		methodCombo = new JComboBox<>(NormalMethod.values());
 	
 	public AssociatedFamily() {
 		shrinkPanel.setTitle("Associated Family");
