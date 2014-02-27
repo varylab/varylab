@@ -110,6 +110,7 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.math.CurveType;
 import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
@@ -133,8 +134,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private GeodesicPanel
 		geodesicPanel = new GeodesicPanel();
 	
-	private CurvatureLinesPanel
-		curvatureLinesPanel = new CurvatureLinesPanel();
+	private IntegralCurvesPanel
+		curvatureLinesPanel = new IntegralCurvesPanel();
 	
 	private PointDistancePanel
 		pointDistancePanel = new PointDistancePanel();
@@ -533,128 +534,25 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		}
 	}
 	
-//	private class ConjugateLinesPanel extends ShrinkPanel implements ActionListener{
-//		
-//		private static final long 
-//		serialVersionUID = 1L;
-//		
-//		private SpinnerNumberModel
-//		tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1);
-//		private JSpinner
-//		tolSpinner = new JSpinner(tolExpModel);
-//		
-//		private JButton
-//		goButton = new JButton("Go");
-//		
-//		private JRadioButton
-//		directionButton = new JRadioButton("direction"),
-//		conjugateDirectionButton = new JRadioButton("conjugate direction"),
-//		intersectionButton = new JRadioButton("Bentley Ottmann");
-//		
-//		private CurveTableModel
-//		curveTableModel = new CurveTableModel();
-//		private JTable 
-//		curveTable = new JTable(curveTableModel);
-//		private JScrollPane 
-//		curveScrollPanel = new JScrollPane(curveTable, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
-//		
-//		public ConjugateLinesPanel() {
-//			super("Conjugate Lines");
-//			setShrinked(true);
-//			
-//			setLayout(new GridBagLayout());
-//			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
-//			GridBagConstraints rc = LayoutFactory.createRightConstraint();
-//			add(new JLabel("Tolerance Exp"), lc);
-//			add(tolSpinner, rc);
-//			add(directionButton, rc);
-//			add(conjugateDirectionButton, rc);
-//			add(intersectionButton, rc);
-//			add(goButton, rc);
-//			goButton.addActionListener(this);
-//			curveTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
-//			curveTable.setRowHeight(22);
-//			curveTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
-//			curveScrollPanel.setMinimumSize(new Dimension(100, 150));
-//			add(curveScrollPanel, rc);
-//			curveTable.getDefaultEditor(Boolean.class).addCellEditorListener(new CurveVisibilityListener());		
-//		}
-//		
-//		public void actionPerformed(ActionEvent e){
-//			VHDS hds = hif.get(new VHDS());
-//			Set<VVertex> vSet = new TreeSet<VVertex>(new VertexComparator());
-//			vSet.addAll(hif.getSelection().getVertices(hds));
-//			AdapterSet as = hif.getAdapters();
-//			double tol = tolExpModel.getNumber().doubleValue();
-//			tol = Math.pow(10, tol);
-//			
-//			int p = surfaces.get(surfacesTable.getSelectedRow()).getUDegree();
-//			int q = surfaces.get(surfacesTable.getSelectedRow()).getVDegree();
-//			double[] U = surfaces.get(surfacesTable.getSelectedRow()).getUKnotVector();
-//			double[] V = surfaces.get(surfacesTable.getSelectedRow()).getVKnotVector();
-//			double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
-//	
-//			boolean max = maxButton.isSelected();
-//			boolean min = minButton.isSelected();
-//			boolean inter = intersectionButton.isSelected();
-//			LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
-////			LinkedList<LinkedList<LineSegment>> currentSegments = new LinkedList<LinkedList<LineSegment>>();
-//			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
-//			LinkedList<double[]> boundaryVerts = new LinkedList<double[]>();
-//			double[] boundVert1 = new double[2];
-//			boundVert1[0] = U[0];
-//			boundVert1[1] = V[0];
-//			double[] boundVert2 = new double[2];
-//			boundVert2[0] = U[U.length - 1];
-//			boundVert2[1] = V[0];
-//			double[] boundVert3 = new double[2];
-//			boundVert3[0] = U[U.length - 1];
-//			boundVert3[1] = V[V.length - 1];
-//			double[] boundVert4 = new double[2];
-//			boundVert4[0] = U[0];
-//			boundVert4[1] = V[V.length - 1];
-//			boundaryVerts.add(boundVert1);
-//			boundaryVerts.add(boundVert2);
-//			boundaryVerts.add(boundVert3);
-//			boundaryVerts.add(boundVert4);
-//			LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-//
-//			double[][] seg1 = new double[2][2];
-//			seg1[0] = boundVert1;
-//			seg1[1] = boundVert2;
-//			LineSegment b1 = new LineSegment(seg1, 1, 1);
-//			double[][] seg2 = new double[2][2];
-//			seg2[0] = boundVert2;
-//			seg2[1] = boundVert3;
-//			LineSegment b2 = new LineSegment(seg2, 1, 2);
-//			double[][] seg3 = new double[2][2];
-//			seg3[0] = boundVert3;
-//			seg3[1] = boundVert4;
-//			LineSegment b3 = new LineSegment(seg3, 1, 3);
-//			double[][] seg4 = new double[2][2];
-//			seg4[0] = boundVert4;
-//			seg4[1] = boundVert1;
-//			LineSegment b4 = new LineSegment(seg4, 1, 4);
-//			boundarySegments.add(b1);
-//			boundarySegments.add(b2);
-//			boundarySegments.add(b3);
-//			boundarySegments.add(b4);
-//			
-//		}
-//	}
+
 	
-	private class CurvatureLinesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener {
+	private class IntegralCurvesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener {
 		
 		private static final long 
 			serialVersionUID = 1L;
 		
+		private double[] vecField = null;
+		
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
-			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1);
-			
+			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
+			vecFieldModel = new SpinnerNumberModel(10, 0, 180, 1);
+		
 		private JSpinner
 			tolSpinner = new JSpinner(tolExpModel),
-			nearUmbilicSpinner = new JSpinner(nearUmbilicModel);
+			nearUmbilicSpinner = new JSpinner(nearUmbilicModel),
+			vecFieldSpinner = new JSpinner(vecFieldModel);
+		
 		
 		private JButton 
 		    intersectionsButton = new JButton("Discretize!"),
@@ -663,7 +561,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private JCheckBox
 			immediateCalculationBox = new JCheckBox("Immediate"),
 			maxCurvatureBox = new JCheckBox("Max (red)"),
-			minCurvatureBox = new JCheckBox("Min (cyan)");
+			minCurvatureBox = new JCheckBox("Min (cyan)"),
+			vecFieldBox = new JCheckBox("vec. field (red)"),
+			conjFieldBox = new JCheckBox("conj. field (cyan)"),
+			symConjBox = new JCheckBox(),
+			symConjCurvatureBox = new JCheckBox();
+		
 		
 		private JComboBox<CurveType>
 			curveCombo = new JComboBox<CurveType>();
@@ -683,7 +586,17 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private SceneGraphComponent
 			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
 		
-		public CurvatureLinesPanel() {
+		private double[] getVecField(){
+			if(vecFieldSpinner.isEnabled()){
+				double grad = vecFieldModel.getNumber().doubleValue();
+				double phi = grad * Math.PI / 180.0;
+				double[] vec = {Math.cos(phi), Math.sin(phi)};
+				return vec;
+			}
+			return null;
+		}
+		
+		public IntegralCurvesPanel() {
 			super("Integral Curves");
 			setShrinked(true);
 			
@@ -696,15 +609,45 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			curveCombo.addItem(CurveType.ASYMPTOTIC);
 			curveCombo.addItemListener(this);
 			
+			lc.gridwidth = 2;
 			add(new JLabel("Curve Type"),lc);
+			lc.gridwidth = 1;
 			add(curveCombo,rc);
-			add(new JLabel("Tolerance Exp"), lc);
+			lc.gridwidth = 2;
+			add(new JLabel("Vector Field (angle 0 - 180)"),lc);
+			lc.gridwidth = 1;
+			add(vecFieldSpinner, rc);
+			vecFieldSpinner.setEnabled(true);
+			lc.gridwidth = 2;
+			add(new JLabel("Runge-Kutta Tolerance Exp"), lc);
+			lc.gridwidth = 1;
 			add(tolSpinner, rc);
-			add(new JLabel("Near Umbilic Exp"), lc);
+			lc.gridwidth = 2;
+			add(new JLabel("Singularity Neighbourhood Exp"), lc);
+			lc.gridwidth = 1;
 			add(nearUmbilicSpinner, rc);
 			add(new JLabel("Curvature lines:"), lc);
 			add(minCurvatureBox, lc);
+			minCurvatureBox.setEnabled(false);
 			add(maxCurvatureBox, rc);
+			maxCurvatureBox.setEnabled(false);
+			add(new JLabel("Conjugate lines:"), lc);
+			add(vecFieldBox, lc);
+			vecFieldBox.setEnabled(true);
+			add(conjFieldBox, rc);
+			conjFieldBox.setEnabled(true);
+			lc.gridwidth = 2;
+			add(new JLabel("Sym conj w.r.t direction:"), lc);
+			lc.gridwidth = 1;
+			add(symConjBox, rc);
+			symConjBox.addActionListener(this);
+			symConjBox.setEnabled(true);
+			lc.gridwidth = 2;
+			add(new JLabel("Sym conj w.r.t curvature direction:"), lc);
+			lc.gridwidth = 1;
+			add(symConjCurvatureBox, rc);
+			symConjCurvatureBox.setEnabled(true);
+			symConjCurvatureBox.addActionListener(this);
 			
 			add(immediateCalculationBox,lc);
 			add(goButton, rc);
@@ -734,7 +677,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		public void actionPerformed(ActionEvent e){
 					
 			Object source = e.getSource();
-			
 			if(source == goButton) {
 				List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
 				System.out.println("ALL STARTING POINTS");
@@ -745,41 +687,31 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				tol = Math.pow(10, tol);
 				double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
 				umbilicStop = Math.pow(10, umbilicStop);
-				boolean firstVectorField = maxCurvatureBox.isSelected();
-				boolean secondVectorField = minCurvatureBox.isSelected();
+				
 
 				CurveType vfc = (CurveType)curveCombo.getSelectedItem();
+				boolean firstVectorField = true;
+				boolean secondVectorField = true;
+				if(vfc == CurveType.CURVATURE){
+					firstVectorField = maxCurvatureBox.isSelected();
+					secondVectorField = minCurvatureBox.isSelected();
+				}
+				else if(vfc == CurveType.CONJUGATE){
+					firstVectorField = vecFieldBox.isSelected();
+					secondVectorField = conjFieldBox.isSelected();
+				}
 				
-				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol);
+				SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+				if(symConjBox.isSelected()){
+					symDir = SymmetricDir.DIRECTION;
+				}
+				else if(symConjCurvatureBox.isSelected()){
+					symDir = SymmetricDir.CURVATURE;
+				}	
+				
+				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField());
 				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
 				
-//				List<PolygonalLine> currentLines = IntegralCurvesOriginal.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, startingPointsUV, startingPointsUV);
-//			int count = 0;
-//			for (PolygonalLine pl : currentLines) {
-//				count++;
-//				System.out.println(count + ". line");
-//				for (LineSegment ls : pl.getpLine()) {
-
-//				IntegralCurve ic = new IntegralCurve(activeNurbsSurface);
-//				List<PolygonalLine> currentLines = ic.computeIntegralLines(activeNurbsSurface, firstVectorField, secondVectorField, curveIndex, tol, umbilicStop, singularities, startingPointsUV);
-//			int count = 0;
-//			for (PolygonalLine pl : currentLines) {
-//				count++;
-//				System.out.println(count + ". line");
-				//for (LineSegment ls : pl.getpLine()) {
-
-//					if(Arrays.equals(ls.getSegment()[0], ls.getSegment()[1])){
-//						System.out.println(Arrays.toString(ls.getSegment()[0]) + " " + Arrays.toString(ls.getSegment()[1]));
-//					}
-//				}
-//			}
-//				}
-//				
-//				
-//			}
-
-		
-			
 				activeModel.addAll(currentLines);
 				hif.clearSelection();
 				activeModel.fireTableDataChanged();
@@ -802,8 +734,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					System.out.println(bs.getCurveIndex());
 				}
 				allSegments.addAll(completeDomainBoundarySegments);			
-				
-		
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
 //				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
@@ -821,15 +751,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				double lastTimeBentley = System.currentTimeMillis();
 				System.out.println("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
-
-//				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(activeNurbsSurface, dilation, intersections);
-
-//				System.out.println("boundary values after algorithm");
-//				Set<Double> checkList = activeNurbsSurface.getBoundaryValuesPastIntersection(dilation);
-//				for (Double value : checkList) {
-//					System.out.println(value);
-//				}
-//				System.out.println();
 				FaceSet fs = gfs.createFaceSet();
 				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];
@@ -907,7 +828,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			boolean firstVectorField = maxCurvatureBox.isSelected();
 			boolean secondVectorField = minCurvatureBox.isSelected();
 			if(immediateCalculationBox.isSelected()) {
-				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, (CurveType) curveCombo.getSelectedItem(), tol);
+				SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+				if(symConjBox.isSelected()){
+					symDir = SymmetricDir.DIRECTION;
+				}
+				else if(symConjCurvatureBox.isSelected()){
+					symDir = SymmetricDir.CURVATURE;
+				}	
+
+				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, (CurveType) curveCombo.getSelectedItem(), tol, symDir, getVecField());
 				
 				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
 //				LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
@@ -1040,7 +969,47 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			// TODO Auto-generated method stub
-			// disable and enable corresponding gui elements
+			updateIntegralCurvesPanel();
+		}
+
+
+		private void updateIntegralCurvesPanel() {
+			if(CurveType.CONJUGATE == curveCombo.getSelectedItem()){
+				vecFieldSpinner.setEnabled(true);
+				vecFieldBox.setEnabled(true);
+				conjFieldBox.setEnabled(true);
+				symConjBox.setEnabled(true);
+				symConjCurvatureBox.setEnabled(true);
+			}
+			else{
+				vecFieldSpinner.setEnabled(false);
+				vecFieldBox.setEnabled(false);
+				conjFieldBox.setEnabled(false);
+				symConjBox.setEnabled(false);
+				symConjCurvatureBox.setEnabled(false);
+			}
+			if(CurveType.CURVATURE == curveCombo.getSelectedItem()){
+				minCurvatureBox.setEnabled(true);
+				maxCurvatureBox.setEnabled(true);
+			}
+			else{
+				minCurvatureBox.setEnabled(false);
+				maxCurvatureBox.setEnabled(false);
+			}
+//			if(symConjBox.isSelected() == true){
+//				symConjCurvatureBox.setEnabled(false);
+//			}
+//			else{
+//				symConjCurvatureBox.setEnabled(true);
+//			}
+//			if(symConjCurvatureBox.isSelected() == true){
+//				symConjBox.setEnabled(false);
+//			}
+//			else{
+//				symConjBox.setEnabled(true);
+//			}
+			
+			
 		}
 	}
 	

@@ -17,24 +17,25 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 public class IntegralCurve {
 	
+	public enum SymmetricDir{CURVATURE, DIRECTION, NO_SYMMETRIE};
+	
 	private static Logger logger = Logger.getLogger(IntegralCurve.class.getName());
 	
 	private NURBSSurface ns;
 	private double u0, um, v0, vn;
 	private ClosingDir closingDirection = null;
 	List<LineSegment> boundary;
-//	private int leftBoundaryCounter = 0;
-//	private int rightBoundaryCounter = 0;
-//	private int upperBoundaryCounter = 0;
-//	private int lowerBoundaryCounter = 0;
 	double[] prevW1 = null;
 	double[] prevW2 = null;
 	double[][] basis;
 	private double tol;
 	private CurveType curveType = CurveType.CURVATURE;
 	private double angle = 1000000;
+	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+	private double[] vecField = null;
 	
-	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance){
+	
+	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance, SymmetricDir sd, double[] vf){
 		ns = surface;
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
@@ -46,6 +47,9 @@ public class IntegralCurve {
 		boundary = ns.getBoundarySegments();
 		tol = tolerance;
 		curveType = cType;
+		symDir = sd;
+		vecField = vf;
+		
 	}
 	
 	/**
@@ -99,148 +103,148 @@ public class IntegralCurve {
 	}
 	
 	
-//	public double[] getSymmetricConjugateDirection(double[] point) {
-//	double[] dir = {1,1};
-//	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
-////	double[] e1 = {1,0};
-////	double[] e2 = {0,1};
-//	double[] w1 = ci.getPrincipalDirections()[0];
-////	if(Math.abs(det(e1, w1)) > 0.001){
-////		logger.info("w1 " + Arrays.toString(w1));
-////	}
-//	double[] w2 = ci.getPrincipalDirections()[1];
-////	if(Math.abs(det(e2, w2)) > 0.001){
-////		logger.info("w2 " + Arrays.toString(w2));
-////	}
-//	if(!ns.isSurfaceOfRevolution()){
-//		double K = ci.getGaussCurvature();
-//	
-//		if(K > 0){
-//			double k1 = ci.getMinCurvature();
-//			double k2 = ci.getMaxCurvature();
-////			logger.info("theta = " + theta);
-//		
-//			
-////			boolean flip1 = false;
-////			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-////				flip1 = true;
-////				logger.info("flip w1");
-////				logger.info("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-////				flip(w1);
-////			}
-//			
-////			prevW1 = w1;
-////			logger.info("w1 = " + Arrays.toString(w1));
-////			boolean flip2 = false;
-////			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-////				flip2 = true;
-////				logger.info("flip w2");
-//				
-////				logger.info("revW2 " + Arrays.toString(prevW2));
-////				
-////				logger.info("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-////				flip(w2);
-////			}
-//			
-////			prevW2 = w2;
-//			double theta;
-//			if(k2 == 0){
-//				theta = Math.PI / 2.;
-//			}
-//			else{
-//				theta = Math.atan(Math.sqrt(k1 / k2));
-//			}
-//			
-//			logger.info("theta " + theta);
-//			angle = theta;
-////			if(flip1 == flip2){
-////				theta = -theta;
-////			}
-////			logger.info("w2 = " + Arrays.toString(w2));
-//			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-//			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-//			Rn.normalize(dir, dir);
-////			logger.info("direction " + Arrays.toString(dir));
-////			basis = ci.getPrincipalDirections();
-////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-////				logger.info();
-////				logger.info("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-////				logger.info();
-////				dir = getConj(dir, point);
-////			}
-//			return dir;
-//		}
-//		else{
-//			return getAssymptoticDirection(ns, point);
-//		}
-//	}
-//	else{
-//		double K = ci.getGaussCurvature();
-//		if(K > 0){
-//			double k1 = ci.getMinCurvature();
-//			double k2 = ci.getMaxCurvature();
-////			logger.info("theta = " + theta);
-//		
-//			
-////			boolean flip1 = false;
-//			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-////				flip1 = true;
-////				logger.info("flip w1");
-////				logger.info("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-//				flip(w1);
-//			}
-//			
-//			prevW1 = w1;
-////			logger.info("w1 = " + Arrays.toString(w1));
-////			boolean flip2 = false;
-//			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-////				flip2 = true;
-////				logger.info("flip w2");
-//				
-////				logger.info("revW2 " + Arrays.toString(prevW2));
-////				
-////				logger.info("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-//				flip(w2);
-//			}
-//			
-//			prevW2 = w2;
-//			double theta;
-//			if(k2 == 0){
-//				theta = Math.PI / 2.;
-//			}
-//			else{
-//				theta = Math.atan(Math.sqrt(k1 / k2));
-//			}
-//			
-//			logger.info("theta " + theta);
-//			angle = theta;
-////			if(flip1 == flip2){
-////				theta = -theta;
-////			}
-////			logger.info("w2 = " + Arrays.toString(w2));
-//			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-//			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-//			Rn.normalize(dir, dir);
-////			logger.info("direction " + Arrays.toString(dir));
-////			basis = ci.getPrincipalDirections();
-////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-////				logger.info();
-////				logger.info("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-////				logger.info();
-////				dir = getConj(dir, point);
-////			}
-//			return dir;
-//		}
-//		else{
-//			return getAssymptoticDirection(ns, point);
-//		}
-//	}
-//}
-	
-	
 	public double[] getSymmetricConjugateDirection(double[] point) {
 	double[] dir = {1,1};
-	double[] givenDir = {1,0.5};
+	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
+//	double[] e1 = {1,0};
+//	double[] e2 = {0,1};
+	double[] w1 = ci.getPrincipalDirections()[0];
+//	if(Math.abs(det(e1, w1)) > 0.001){
+//		logger.info("w1 " + Arrays.toString(w1));
+//	}
+	double[] w2 = ci.getPrincipalDirections()[1];
+//	if(Math.abs(det(e2, w2)) > 0.001){
+//		logger.info("w2 " + Arrays.toString(w2));
+//	}
+	if(!ns.isSurfaceOfRevolution()){
+		double K = ci.getGaussCurvature();
+	
+		if(K > 0){
+			double k1 = ci.getMinCurvature();
+			double k2 = ci.getMaxCurvature();
+//			logger.info("theta = " + theta);
+		
+			
+//			boolean flip1 = false;
+//			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+//				flip1 = true;
+//				logger.info("flip w1");
+//				logger.info("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+//				flip(w1);
+//			}
+			
+//			prevW1 = w1;
+//			logger.info("w1 = " + Arrays.toString(w1));
+//			boolean flip2 = false;
+//			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+//				flip2 = true;
+//				logger.info("flip w2");
+				
+//				logger.info("revW2 " + Arrays.toString(prevW2));
+//				
+//				logger.info("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+//				flip(w2);
+//			}
+			
+//			prevW2 = w2;
+			double theta;
+			if(k2 == 0){
+				theta = Math.PI / 2.;
+			}
+			else{
+				theta = Math.atan(Math.sqrt(k1 / k2));
+			}
+			
+			logger.info("theta " + theta);
+			angle = theta;
+//			if(flip1 == flip2){
+//				theta = -theta;
+//			}
+//			logger.info("w2 = " + Arrays.toString(w2));
+			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
+			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+			Rn.normalize(dir, dir);
+//			logger.info("direction " + Arrays.toString(dir));
+//			basis = ci.getPrincipalDirections();
+//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+//				logger.info();
+//				logger.info("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+//				logger.info();
+//				dir = getConj(dir, point);
+//			}
+			return dir;
+		}
+		else{
+			return getAssymptoticDirection(ns, point);
+		}
+	}
+	else{
+		double K = ci.getGaussCurvature();
+		if(K > 0){
+			double k1 = ci.getMinCurvature();
+			double k2 = ci.getMaxCurvature();
+//			logger.info("theta = " + theta);
+		
+			
+//			boolean flip1 = false;
+			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+//				flip1 = true;
+//				logger.info("flip w1");
+//				logger.info("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+				flip(w1);
+			}
+			
+			prevW1 = w1;
+//			logger.info("w1 = " + Arrays.toString(w1));
+//			boolean flip2 = false;
+			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+//				flip2 = true;
+//				logger.info("flip w2");
+				
+//				logger.info("revW2 " + Arrays.toString(prevW2));
+//				
+//				logger.info("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+				flip(w2);
+			}
+			
+			prevW2 = w2;
+			double theta;
+			if(k2 == 0){
+				theta = Math.PI / 2.;
+			}
+			else{
+				theta = Math.atan(Math.sqrt(k1 / k2));
+			}
+			
+			logger.info("theta " + theta);
+			angle = theta;
+//			if(flip1 == flip2){
+//				theta = -theta;
+//			}
+//			logger.info("w2 = " + Arrays.toString(w2));
+			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
+			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+			Rn.normalize(dir, dir);
+//			logger.info("direction " + Arrays.toString(dir));
+//			basis = ci.getPrincipalDirections();
+//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+//				logger.info();
+//				logger.info("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+//				logger.info();
+//				dir = getConj(dir, point);
+//			}
+			return dir;
+		}
+		else{
+			return getAssymptoticDirection(ns, point);
+		}
+	}
+}
+	
+	
+	public double[] getSymmetricConjugateDirectionWRTdirection(double[] point) {
+	double[] dir = {1,1};
+	double[] givenDir = vecField;
 	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
 	double[] w1 = ci.getPrincipalDirections()[0];
 	double[] w2 = ci.getPrincipalDirections()[1];
@@ -379,7 +383,19 @@ public class IntegralCurve {
 	}
 	
 	private double[] getConjugateVecField(double[] p, boolean conj) {
-		double[] vec = getSymmetricConjugateDirection(p);
+		double[] vec = vecField;
+		if(symDir == SymmetricDir.CURVATURE){
+			if(ns.isSurfaceOfRevolution()){
+				vec = getSymmetricConjugateDirectionRotationSurface(p);
+			}
+			else{
+				vec = getSymmetricConjugateDirection(p);
+			}
+			
+		}
+		else if(symDir == SymmetricDir.DIRECTION){
+			vec = getSymmetricConjugateDirectionWRTdirection(p);
+		}
 		if(conj){
 //			if(!ns.isSurfaceOfRevolution()){
 				return getConj(vec, p);
