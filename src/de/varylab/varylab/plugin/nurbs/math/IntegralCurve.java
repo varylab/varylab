@@ -16,9 +16,6 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 public class IntegralCurve {
 	
-	
-	
-	public enum VecFieldCondition{conjugate, curvature};
 	private NURBSSurface ns;
 	private double u0, um, v0, vn;
 	private ClosingDir closingDirection = null;
@@ -31,120 +28,10 @@ public class IntegralCurve {
 	double[] prevW2 = null;
 	double[][] basis;
 	private double tol;
-	private VecFieldCondition vfc;
+	private CurveType curveType = CurveType.CURVATURE;
 	private double angle = 1000000;
 	
-	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n, double[] point){
-		LinkedList<double[]> points = new LinkedList<double[]>();
-		if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionUDir(ns)){
-			System.out.println("HALLLLLOOOOOOOOO");
-			double[] V = ns.getVKnotVector();
-			double v0 = V[0];
-			double vm = V[V.length - 1];
-			double length = vm - v0;
-			double angle = 2 * Math.PI / (double)n;
-			System.out.println("angle = " + angle);
-			for (int i = 0; i < n; i++) {
-				double phi = i * angle;
-				System.out.println("phi = " + phi);
-				if(phi <= Math.PI / 2.){
-					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					v = v0 + v;
-					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else if(Math.PI / 2. < phi && phi <= Math.PI){
-					phi = phi - Math.PI / 2.;
-					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					v = v0 + v + length / 4.;
-					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else if(Math.PI < phi && phi <= 3. * Math.PI / 2.){
-					phi = phi - Math.PI;
-					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					v = v0 + v + length / 2.;
-					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else{
-					phi = phi - 3. * Math.PI / 2.;
-					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					v = v0 + v + 3. * length / 4.;
-					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-			}
-			
-		}
-		else if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionVDir(ns)){
-			System.out.println("drinn");
-			double[] U = ns.getUKnotVector();
-			double u0 = U[0];
-			double un = U[U.length - 1];
-			double length = un - u0;
-			double angle = 2 * Math.PI / (double)n;
-			System.out.println("angle = " + angle);
-			for (int i = 0; i < n; i++) {
-				double phi = i * angle;
-				System.out.println("phi = " + phi);
-				if(phi <= Math.PI / 2.){
-					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					u = u0 + u;
-					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else if(Math.PI / 2. < phi && phi <= Math.PI){
-					phi = phi - Math.PI / 2.;
-					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					u = u0 + u + length / 4.;
-					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else if(Math.PI < phi && phi <= 3. * Math.PI / 2.){
-					phi = phi - Math.PI;
-					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					u = u0 + u + length / 2.;
-					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-				else{
-					phi = phi - 3. * Math.PI / 2.;
-					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
-					u = u0 + u + 3. * length / 4.;
-					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
-					points.add(p);
-				}
-			}
-			
-		}
-		else{
-			double[] V = ns.getVKnotVector();
-			double step = (V[V.length - 1] - V[0]) / n;
-			for (int i = 0; i < n; i++) {
-				double[] p = {0.0, i * step};
-				points.add(p);
-			}
-		}
-		return points;
-	}
-	
-
-	
-
-	
-	
-	
-	
-	public IntegralCurve(NURBSSurface surface, VecFieldCondition vecFieldCondition, double tolerance){
+	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance){
 		ns = surface;
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
@@ -155,10 +42,8 @@ public class IntegralCurve {
 		closingDirection = ns.getClosingDir();
 		boundary = ns.getBoundarySegments();
 		tol = tolerance;
-		vfc = vecFieldCondition;
+		curveType = cType;
 	}
-	
-
 	
 	/**
 	 * 
@@ -176,7 +61,7 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-	public double[] getSymmetricConjugateDirection(double[] p) {
+	public double[] getSymmetricConjugateDirectionRotationSurface(double[] p) {
 		double[] dir = {1,1};
 		if(!ns.isSurfaceOfRevolution()){
 			return dir;
@@ -350,91 +235,91 @@ public class IntegralCurve {
 //}
 	
 	
-//	public double[] getSymmetricConjugateDirection(double[] point) {
-//	double[] dir = {1,1};
-//	double[] givenDir = {1,0.2};
-//	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
-//	double[] w1 = ci.getPrincipalDirections()[0];
-//	double[] w2 = ci.getPrincipalDirections()[1];
-//		double K = ci.getGaussCurvature();
-//		if(K > 0){
-//			double k1 = ci.getMinCurvature();
-//			double k2 = ci.getMaxCurvature();
-//			double[] e1 = ci.getCurvatureDirections()[0];
-//			double[] e2 = ci.getCurvatureDirections()[1];
-//			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
-////			System.out.println("inner product = " + Rn.innerProduct(v, e1));
-//			double delta = 0.;
-//			if(Rn.innerProduct(v, e1) > 1){
-//				delta = 0.;
-//			}
-//			else if(Rn.innerProduct(v, e1) < -1){
-//				delta = Math.PI;
-//			}
-//			else{
-//				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
-//			}
-////			System.out.println("delta = " + delta);
-//		
-//			
-////			boolean flip1 = false;
-//			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-////				flip1 = true;
-////				System.out.println("flip w1");
-////				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
-//				flip(w1);
-//			}
-//			
-//			prevW1 = w1;
-////			System.out.println("w1 = " + Arrays.toString(w1));
-////			boolean flip2 = false;
-//			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-////				flip2 = true;
-////				System.out.println("flip w2");
+	public double[] getSymmetricConjugateDirection(double[] point) {
+	double[] dir = {1,1};
+	double[] givenDir = {1,0.5};
+	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
+	double[] w1 = ci.getPrincipalDirections()[0];
+	double[] w2 = ci.getPrincipalDirections()[1];
+		double K = ci.getGaussCurvature();
+		if(K > 0){
+			double k1 = ci.getMinCurvature();
+			double k2 = ci.getMaxCurvature();
+			double[] e1 = ci.getCurvatureDirections()[0];
+			double[] e2 = ci.getCurvatureDirections()[1];
+			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
+//			System.out.println("inner product = " + Rn.innerProduct(v, e1));
+			double delta = 0.;
+			if(Rn.innerProduct(v, e1) > 1){
+				delta = 0.;
+			}
+			else if(Rn.innerProduct(v, e1) < -1){
+				delta = Math.PI;
+			}
+			else{
+				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
+			}
+//			System.out.println("delta = " + delta);
+		
+			
+//			boolean flip1 = false;
+			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
+//				flip1 = true;
+//				System.out.println("flip w1");
+//				System.out.println("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
+				flip(w1);
+			}
+			
+			prevW1 = w1;
+//			System.out.println("w1 = " + Arrays.toString(w1));
+//			boolean flip2 = false;
+			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
+//				flip2 = true;
+//				System.out.println("flip w2");
+				
+//				System.out.println("revW2 " + Arrays.toString(prevW2));
 //				
-////				System.out.println("revW2 " + Arrays.toString(prevW2));
-////				
-////				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
-//				flip(w2);
+//				System.out.println("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
+				flip(w2);
+			}
+			
+			prevW2 = w2;
+			double theta;
+			if(k2 == 0){
+				theta = Math.PI / 2.;
+			}
+			else{
+//				theta = Math.atan(Math.sqrt(k1 / k2));
+				double q = k1 / k2;
+				double p = Math.tan(delta) * (1 + q) / 2;
+//				System.out.println("p = " + p);
+				theta = Math.atan(p + Math.sqrt(p * p + q));
+				
+			}
+			
+//			System.out.println("theta " + theta);
+			angle = theta;
+//			if(flip1 == flip2){
+//				theta = -theta;
 //			}
-//			
-//			prevW2 = w2;
-//			double theta;
-//			if(k2 == 0){
-//				theta = Math.PI / 2.;
+//			System.out.println("w2 = " + Arrays.toString(w2));
+			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
+			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
+			Rn.normalize(dir, dir);
+//			System.out.println("direction " + Arrays.toString(dir));
+//			basis = ci.getPrincipalDirections();
+//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
+//				System.out.println();
+//				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
+//				System.out.println();
+//				dir = getConj(dir, point);
 //			}
-//			else{
-////				theta = Math.atan(Math.sqrt(k1 / k2));
-//				double q = k1 / k2;
-//				double p = Math.tan(delta) * (1 + q) / 2;
-////				System.out.println("p = " + p);
-//				theta = Math.atan(p + Math.sqrt(p * p + q));
-//				
-//			}
-//			
-////			System.out.println("theta " + theta);
-//			angle = theta;
-////			if(flip1 == flip2){
-////				theta = -theta;
-////			}
-////			System.out.println("w2 = " + Arrays.toString(w2));
-//			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
-//			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
-//			Rn.normalize(dir, dir);
-////			System.out.println("direction " + Arrays.toString(dir));
-////			basis = ci.getPrincipalDirections();
-////			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-////				System.out.println();
-////				System.out.println("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-////				System.out.println();
-////				dir = getConj(dir, point);
-////			}
-//			return dir;
-//		}
-//		else{
-//			return getAssymptoticDirection(ns, point);
-//		}
-//}
+			return dir;
+		}
+		else{
+			return getAssymptoticDirection(ns, point);
+		}
+}
 	
 
 	
@@ -963,11 +848,11 @@ public class IntegralCurve {
 		}
 	}
 	
-	private double[] getVecField(double[] p, boolean firstVecField, VecFieldCondition vfc){
-		if(vfc == VecFieldCondition.conjugate){
+	private double[] getVecField(double[] p, boolean firstVecField, CurveType vfc){
+		if(vfc == CurveType.CONJUGATE){
 			return getConjugateVecField(p, firstVecField);
 		}
-		if(vfc == VecFieldCondition.curvature){
+		if(vfc == CurveType.CURVATURE){
 			return getMaxMinCurv(p, firstVecField);
 		}
 		return null;
@@ -1010,9 +895,9 @@ public class IntegralCurve {
 		double[] orientation = new double[2];
 		if (!secondOrientation) {
 	//		orientation = getConjugateVecField(initialValue, firstVectorField);
-			orientation = getVecField(initialValue, firstVectorField, vfc);
+			orientation = getVecField(initialValue, firstVectorField, curveType);
 		} else {
-			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, vfc));
+			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, curveType));
 		}
 		boolean nearBy = false;
 		double dist;
@@ -1032,7 +917,7 @@ public class IntegralCurve {
 			double[] vectorfieldPoint = new double[2];
 			// the current point is in the extended domain!!!
 			
-			k[0] = getVecField(getPointInOriginalDomain(last), firstVectorField, vfc);
+			k[0] = getVecField(getPointInOriginalDomain(last), firstVectorField, curveType);
 			k[0] = getContinuousNormalizedVectorField(orientation, k[0]);		
 			
 			for (int l = 1; l < c1.length; l++) {
@@ -1050,7 +935,7 @@ public class IntegralCurve {
 					}
 					return intObj;
 				}
-				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
+				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, curveType);
 				k[l] = getContinuousNormalizedVectorField(orientation, k[l]);		
 			}
 			
@@ -1162,9 +1047,9 @@ public class IntegralCurve {
 		double[] orientation = new double[2];
 		if (!secondOrientation) {
 	//		orientation = getConjugateVecField(initialValue, firstVectorField);
-			orientation = getVecField(initialValue, firstVectorField, vfc);
+			orientation = getVecField(initialValue, firstVectorField, curveType);
 		} else {
-			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, vfc));
+			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, curveType));
 		}
 		boolean nearBy = false;
 		double dist;
@@ -1183,7 +1068,7 @@ public class IntegralCurve {
 			double[] vectorfieldPoint = new double[2];
 			// the current point is in the extended domain!!!
 			
-			k[0] = getVecField(getPointInOriginalDomain(last), firstVectorField, vfc);
+			k[0] = getVecField(getPointInOriginalDomain(last), firstVectorField, curveType);
 			k[0] = getContinuousNormalizedVectorField(orientation, k[0]);		
 			
 			for (int l = 1; l < c1.length; l++) {
@@ -1201,7 +1086,7 @@ public class IntegralCurve {
 					}
 					return intObj;
 				}
-				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
+				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, curveType);
 				k[l] = getContinuousNormalizedVectorField(orientation, k[l]);		
 			}
 			
@@ -1481,16 +1366,16 @@ public class IntegralCurve {
 	}
 	
 	
-	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double umbilicStop, List<double[]> singularities, List<double[]> startingPointsUV) {
+	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, List<double[]> startingPointsUV) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		System.out.println();
 		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, umbilicStop);
+					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, singularityNeighbourhood);
 					
 				}
 				if (secondVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, umbilicStop);
+					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, singularityNeighbourhood);
 				}
 		}
 		return currentLines;
