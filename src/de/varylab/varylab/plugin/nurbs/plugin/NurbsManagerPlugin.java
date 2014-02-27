@@ -541,8 +541,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private static final long 
 			serialVersionUID = 1L;
 		
-		private double[] vecField = null;
-		
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
 			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
@@ -637,7 +635,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(conjFieldBox, rc);
 			conjFieldBox.setEnabled(true);
 			lc.gridwidth = 2;
-			add(new JLabel("Sym conj w.r.t direction:"), lc);
+			add(new JLabel("Sym conj w.r.t Vector Field:"), lc);
 			lc.gridwidth = 1;
 			add(symConjBox, rc);
 			symConjBox.addActionListener(this);
@@ -968,12 +966,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 		@Override
 		public void itemStateChanged(ItemEvent e) {
-			// TODO Auto-generated method stub
-			updateIntegralCurvesPanel();
+			updateIntegralCurvesPanelUI();
 		}
 
 
-		private void updateIntegralCurvesPanel() {
+		private void updateIntegralCurvesPanelUI() {
 			if(CurveType.CONJUGATE == curveCombo.getSelectedItem()){
 				vecFieldSpinner.setEnabled(true);
 				vecFieldBox.setEnabled(true);
@@ -1125,18 +1122,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 
 		private double[] calculateClosestPoint(double[] point) {
-//			activeNurbsSurface.setRevolutionDir();
-			if(activeNurbsSurface != null){
-				System.out.println("not NULL");
-			}
-			else{
-				System.out.println(" NULL");
-			}
-			System.out.println("in calculate closest point  " + activeNurbsSurface.toString());
 			double[] surfacePoint = activeNurbsSurface.getClosestPoint(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
-			surfPoint.setName("Point ");
-//			
+			surfPoint.setName("Point ");			
 			hif.addLayer(surfPoint);
 			hif.update();
 			PointSetFactory psfPoint = new PointSetFactory();

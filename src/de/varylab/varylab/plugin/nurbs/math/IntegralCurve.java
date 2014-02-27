@@ -68,7 +68,7 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-	public double[] getSymmetricConjugateDirectionRotationSurface(double[] p) {
+	public double[] getSymmetricConjugateDirectionSurfaceOfRevolution(double[] p) {
 		double[] dir = {1,1};
 		if(!ns.isSurfaceOfRevolution()){
 			return dir;
@@ -103,7 +103,7 @@ public class IntegralCurve {
 	}
 	
 	
-	public double[] getSymmetricConjugateDirection(double[] point) {
+	public double[] getSymmetricConjugateDirectionWRTCuvatureDirection(double[] point) {
 	double[] dir = {1,1};
 	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
 //	double[] e1 = {1,0};
@@ -266,6 +266,7 @@ public class IntegralCurve {
 			else{
 				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
 			}
+			System.out.println("delta = " + delta);
 //			logger.info("delta = " + delta);
 		
 			
@@ -281,7 +282,6 @@ public class IntegralCurve {
 //			logger.info("w1 = " + Arrays.toString(w1));
 //			boolean flip2 = false;
 			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				flip2 = true;
 //				logger.info("flip w2");
 				
 //				logger.info("revW2 " + Arrays.toString(prevW2));
@@ -306,21 +306,10 @@ public class IntegralCurve {
 			
 //			logger.info("theta " + theta);
 			angle = theta;
-//			if(flip1 == flip2){
-//				theta = -theta;
-//			}
 //			logger.info("w2 = " + Arrays.toString(w2));
 			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
 			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
 			Rn.normalize(dir, dir);
-//			logger.info("direction " + Arrays.toString(dir));
-//			basis = ci.getPrincipalDirections();
-//			if(det(w1, dir) < 0 && Rn.innerProduct(w1, dir) > 0){
-//				logger.info();
-//				logger.info("CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE CONJUGATE");
-//				logger.info();
-//				dir = getConj(dir, point);
-//			}
 			return dir;
 		}
 		else{
@@ -386,12 +375,11 @@ public class IntegralCurve {
 		double[] vec = vecField;
 		if(symDir == SymmetricDir.CURVATURE){
 			if(ns.isSurfaceOfRevolution()){
-				vec = getSymmetricConjugateDirectionRotationSurface(p);
+				vec = getSymmetricConjugateDirectionSurfaceOfRevolution(p);
 			}
 			else{
-				vec = getSymmetricConjugateDirection(p);
+				vec = getSymmetricConjugateDirectionWRTCuvatureDirection(p);
 			}
-			
 		}
 		else if(symDir == SymmetricDir.DIRECTION){
 			vec = getSymmetricConjugateDirectionWRTdirection(p);
@@ -1373,7 +1361,7 @@ public class IntegralCurve {
 //		logger.info("firstVectorField = " + firstVectorField);
 //		logger.info("start point = " + Arrays.toString(startPoint));
 		for (LineSegment ls : currentSegments) {
-			logger.info(ls.toString());
+//			logger.info(ls.toString());
 			
 		}
 		
