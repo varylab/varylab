@@ -558,10 +558,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		private JCheckBox
 			immediateCalculationBox = new JCheckBox("Immediate"),
-			maxCurvatureBox = new JCheckBox("Max (red)"),
-			minCurvatureBox = new JCheckBox("Min (cyan)"),
-			vecFieldBox = new JCheckBox("vec. field (red)"),
-			conjFieldBox = new JCheckBox("conj. field (cyan)"),
+			maxCurvatureBox = new JCheckBox("Max (cyan)"),
+			minCurvatureBox = new JCheckBox("Min (red)"),
+			vecFieldBox = new JCheckBox("Vec. Field (red)"),
+			conjFieldBox = new JCheckBox("Conj. Field (cyan)"),
 			symConjBox = new JCheckBox(),
 			symConjCurvatureBox = new JCheckBox();
 		
@@ -612,7 +612,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			lc.gridwidth = 1;
 			add(curveCombo,rc);
 			lc.gridwidth = 2;
-			add(new JLabel("Vector Field (angle 0 - 180)"),lc);
+			add(new JLabel("Vector Field (angle: 0° - 180°)"),lc);
 			lc.gridwidth = 1;
 			add(vecFieldSpinner, rc);
 			vecFieldSpinner.setEnabled(true);
@@ -624,24 +624,24 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(new JLabel("Singularity Neighbourhood Exp"), lc);
 			lc.gridwidth = 1;
 			add(nearUmbilicSpinner, rc);
-			add(new JLabel("Curvature lines:"), lc);
+			add(new JLabel("Curvature Lines:"), lc);
 			add(minCurvatureBox, lc);
 			minCurvatureBox.setEnabled(false);
 			add(maxCurvatureBox, rc);
 			maxCurvatureBox.setEnabled(false);
-			add(new JLabel("Conjugate lines:"), lc);
+			add(new JLabel("Conjugate Lines:"), lc);
 			add(vecFieldBox, lc);
 			vecFieldBox.setEnabled(true);
 			add(conjFieldBox, rc);
 			conjFieldBox.setEnabled(true);
 			lc.gridwidth = 2;
-			add(new JLabel("Sym conj w.r.t Vector Field:"), lc);
+			add(new JLabel("Sym. Conj. w.r.t Vector Field:"), lc);
 			lc.gridwidth = 1;
 			add(symConjBox, rc);
 			symConjBox.addActionListener(this);
 			symConjBox.setEnabled(true);
 			lc.gridwidth = 2;
-			add(new JLabel("Sym conj w.r.t curvature direction:"), lc);
+			add(new JLabel("Sym. Conj. w.r.t Curvature Direction:"), lc);
 			lc.gridwidth = 1;
 			add(symConjCurvatureBox, rc);
 			symConjCurvatureBox.setEnabled(true);
