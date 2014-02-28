@@ -695,6 +695,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					secondVectorField = minCurvatureBox.isSelected();
 				}
 				else if(vfc == CurveType.CONJUGATE){
+					System.out.println("conj vec");
 					firstVectorField = vecFieldBox.isSelected();
 					secondVectorField = conjFieldBox.isSelected();
 				}
