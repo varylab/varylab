@@ -60,7 +60,7 @@ public class NurbsIO {
 			double[] surfDomain = new double[4];
 
 			Pattern vertex = Pattern
-					.compile("v(\\s[-+]?[0-9]*\\.?[0-9]*(e-[0-9]+)?)*");
+					.compile("v(\\s[-+]?[0-9]*\\.?[0-9]*([eE]-[0-9]+)?)*");
 			Pattern paramU = Pattern
 					.compile("parm\\su(\\s[-+]?[0-9]*\\.?[0-9]*)+");
 			Pattern paramV = Pattern
@@ -285,9 +285,9 @@ public class NurbsIO {
 			for (int i = 0; i < surfIndex.size(); i++) {
 				ctrlPoints.add(vList.get(surfIndex.get(i) - 1));
 			}
-			for (int i = 0; i < ctrlPoints.size(); i++) {
+//			for (int i = 0; i < ctrlPoints.size(); i++) {
 //				System.out.println("ctrl " + Arrays.toString(ctrlPoints.get(i)));
-			}
+//			}
 			// hier werden trimkurven definiert
 			for (int i = 0; i < trimCurvesList.size(); i++) {
 				NURBSTrimLoop loop = new NURBSTrimLoop();
