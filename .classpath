@@ -67,5 +67,6 @@
 	<classpathentry kind="lib" path="lib/substance/laf-widget-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/substance/laf-plugin-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="lib/jopennurbs/jopennurbs.jar" sourcepath="/jOpenNurbs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
