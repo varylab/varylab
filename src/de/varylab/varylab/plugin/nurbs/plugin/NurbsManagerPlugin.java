@@ -765,6 +765,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				hel.set(fs.getIndexedFaceSet());
 				hif.addLayer(hel);
 				hif.update();
+			} else if(source == symConjBox || source == symConjCurvatureBox) {
+				if(symConjBox.isSelected()) {
+					symConjCurvatureBox.setEnabled(false);
+				} else if(symConjCurvatureBox.isSelected()) {
+					symConjBox.setEnabled(false);
+				} else {
+					symConjCurvatureBox.setEnabled(true);
+					symConjBox.setEnabled(true);
+				}
 			}
 		}
 
