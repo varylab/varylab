@@ -50,6 +50,7 @@ import de.varylab.varylab.plugin.editor.HeightFieldEditor;
 import de.varylab.varylab.plugin.editor.Toolbox;
 import de.varylab.varylab.plugin.editor.VertexCreatorPlugin;
 import de.varylab.varylab.plugin.generator.HexMeshGenerator;
+import de.varylab.varylab.plugin.generator.OffsetMeshGenerator;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.generator.SimpleRoofGenerator;
 import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
@@ -219,6 +220,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(HexMeshGenerator.class);
 		pSet.add(SimpleRoofGenerator.class);
 		pSet.add(TschebyscheffSphereGenerator.class);
+		pSet.add(OffsetMeshGenerator.class);
 	}
 
 

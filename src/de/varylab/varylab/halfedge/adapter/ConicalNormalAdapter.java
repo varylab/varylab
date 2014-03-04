@@ -1,6 +1,7 @@
 package de.varylab.varylab.halfedge.adapter;
 
 import java.util.Collection;
+import java.util.List;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedgetools.adapter.AbstractTypedAdapter;
@@ -24,10 +25,17 @@ public class ConicalNormalAdapter extends AbstractTypedAdapter<VVertex, VEdge, V
 	@Override
 	public double[] getVertexValue(VVertex v, AdapterSet a) {
 		double[] normal = new double[3];
-		for(Collection<VFace> triples : CollectionUtility.subsets(HalfEdgeUtilsExtra.getFaceStar(v),3)) {
-			Rn.add(normal, normal, coneNormal(triples,a));
+		List<VFace> fStar = HalfEdgeUtilsExtra.getFaceStar(v);
+		if (fStar.size() < 3) {
+			for (VFace f : fStar) {
+				double[] fNormal = a.getD(Normal.class, f);
+				Rn.add(normal, normal, fNormal);
+			}
+		} else {
+			for(Collection<VFace> triples : CollectionUtility.subsets(fStar, 3)) {
+				Rn.add(normal, normal, coneNormal(triples,a));
+			}
 		}
-		
 		return normal;
 	}
 	
@@ -39,17 +47,7 @@ public class ConicalNormalAdapter extends AbstractTypedAdapter<VVertex, VEdge, V
 		for(VFace f: neighbors) {
 			faceNormals[i++] = as.getD(Normal.class,f);
 		}
-		
-		double[]
-				b = new double[]{Rn.euclideanNorm(faceNormals[0]), Rn.euclideanNorm(faceNormals[1]), Rn.euclideanNorm(faceNormals[2])};
-//		double[][] 
-//				Q = new double[3][3],
-//				R = new double[3][3];
-//		Householder.decompose(faceNormals, Q, R);
-//		double[] x = new double[3];
-//		RXB.solve(R, x, b);
-//		MatrixOperations.transpose(Q, Q);
-//		MatrixOperations.times(normal, x, Q);
+		double[] b = new double[]{Rn.euclideanNorm(faceNormals[0]), Rn.euclideanNorm(faceNormals[1]), Rn.euclideanNorm(faceNormals[2])};
 		AXB.solve(faceNormals, normal, b);
 		return normal;
 	}
