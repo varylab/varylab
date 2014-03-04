@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.jreality.scene.Geometry;
@@ -38,6 +39,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 
 	public class NURBSSurface {
+		
+		private static Logger logger = Logger.getLogger(NURBSSurface.class.getName());
 		
 		public enum BoundaryLines{u0, um, v0, vn};
 		public enum CornerPoints{P00, Pm0, P0n, Pmn};
@@ -591,7 +594,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			if(dir){
 				mult = getMultiplicity(uv, UP);
 				if(uv == UP[0]){
-					System.out.println("set k  in U");
+					logger.info("set k  in U");
 					k = mult - 1;
 				}
 				else{
@@ -602,7 +605,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			else{
 				mult = getMultiplicity(uv, VP);
 				if(uv == VP[0]){
-					System.out.println("set k  in V");
+					logger.info("set k  in V");
 					k = mult - 1;
 				}
 				else{
@@ -796,8 +799,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					
 				}
 				NURBSSurface ns1 = new NURBSSurface(U1, V, cm1, p, q);
-				System.out.println("ns1");
-				System.out.println(ns1.toObj());
+				logger.info("ns1");
+				logger.info(ns1.toObj());
 				double[][][] cm2 = new double[k - p][cmFilled[0].length][];
 			
 				for (int i = l - p - 1; i < cmFilled.length; i++) {
@@ -806,8 +809,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					}
 				}
 				NURBSSurface ns2 = new NURBSSurface(U2, V, cm2, p, q);
-				System.out.println("ns2");
-				System.out.println(ns2.toObj());
+				logger.info("ns2");
+				logger.info(ns2.toObj());
 				splitSurf[0] = ns1;
 				splitSurf[1] = ns2;
 				return splitSurf;
@@ -839,8 +842,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					
 				}
 				NURBSSurface ns1 = new NURBSSurface(U, V1, cm1, p, q);
-				System.out.println("ns1");
-				System.out.println(ns1.toObj());
+				logger.info("ns1");
+				logger.info(ns1.toObj());
 				double[][][] cm2 = new double[cmFilled.length][k - q][];
 				for (int i = 0; i < cm2.length; i++) {
 					for (int j = l - q - 1; j < cmFilled[0].length; j++) {
@@ -848,8 +851,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					}
 				}
 				NURBSSurface ns2 = new NURBSSurface(U, V2, cm2, p, q);
-				System.out.println("ns2");
-				System.out.println(ns2.toObj());
+				logger.info("ns2");
+				logger.info(ns2.toObj());
 				splitSurf[0] = ns1;
 				splitSurf[1] = ns2;
 				return splitSurf;
@@ -888,8 +891,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					
 				}
 				NURBSSurface ns1 = new NURBSSurface(U1, V, cm1, p, q);
-//				System.out.println("ns1");
-//				System.out.println(ns1.toObj());
+//				logger.info("ns1");
+//				logger.info(ns1.toObj());
 				double[][][] cm2 = new double[k - p][cmFilled[0].length][];
 			
 				for (int i = l - p - 1; i < cmFilled.length; i++) {
@@ -898,8 +901,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					}
 				}
 				NURBSSurface ns2 = new NURBSSurface(U2, V, cm2, p, q);
-//				System.out.println("ns2");
-//				System.out.println(ns2.toObj());
+//				logger.info("ns2");
+//				logger.info(ns2.toObj());
 				splitSurf[0] = ns1;
 				splitSurf[1] = ns2;
 				return splitSurf;
@@ -933,8 +936,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					
 				}
 				NURBSSurface ns1 = new NURBSSurface(U, V1, cm1, p, q);
-				System.out.println("ns1");
-				System.out.println(ns1.toObj());
+				logger.info("ns1");
+				logger.info(ns1.toObj());
 				double[][][] cm2 = new double[cmFilled.length][k - q][];
 				for (int i = 0; i < cm2.length; i++) {
 					for (int j = l - q - 1; j < cmFilled[0].length; j++) {
@@ -942,8 +945,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					}
 				}
 				NURBSSurface ns2 = new NURBSSurface(U, V2, cm2, p, q);
-				System.out.println("ns2");
-				System.out.println(ns2.toObj());
+				logger.info("ns2");
+				logger.info(ns2.toObj());
 				splitSurf[0] = ns1;
 				splitSurf[1] = ns2;
 				return splitSurf;
@@ -1003,7 +1006,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			double vn = V[V.length - 1];
 			double[][][]Pw = nsDecompose.getControlMesh();
 			int p = getDegreeFromClampedKnotVector(U);
-//			System.out.println("V = " + Arrays.toString(V));
+//			logger.info("V = " + Arrays.toString(V));
 			int q = getDegreeFromClampedKnotVector(V);
 			double[] differentUknots = getAllDifferentKnotsFromFilledKnotVector(U, p);
 			double[] differentVknots = getAllDifferentKnotsFromFilledKnotVector(V, q);
@@ -1041,13 +1044,13 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 					if(VknotVector[VknotVector.length - 1] == vn && originalBl.contains(BoundaryLines.vn)){
 						bl.add(BoundaryLines.vn);
 					}
-//					System.out.println("Pw.length = " + Pw.length + " UknotVector.length - p - 1 = " + (UknotVector.length - p - 1));
-//					System.out.println("Pw[0].length = " + Pw[0].length + " VknotVector.length - q - 1 = " + (VknotVector.length - q - 1));
+//					logger.info("Pw.length = " + Pw.length + " UknotVector.length - p - 1 = " + (UknotVector.length - p - 1));
+//					logger.info("Pw[0].length = " + Pw[0].length + " VknotVector.length - q - 1 = " + (VknotVector.length - q - 1));
 					double[][][]BezierControlPoints = new double[UknotVector.length - p - 1][VknotVector.length - q - 1][4];
 					for (int iB = 0; iB < BezierControlPoints.length; iB++) {
 						for (int jB = 0; jB < BezierControlPoints[0].length; jB++) {
-//							System.out.println("q * j + jB = " + (q * j + jB)); System.out.println("q = " + q);
-//							System.out.println("BezierSurfaces[0].length - 1 = " + (BezierSurfaces[0].length - 1) + " j = " + j);
+//							logger.info("q * j + jB = " + (q * j + jB)); logger.info("q = " + q);
+//							logger.info("BezierSurfaces[0].length - 1 = " + (BezierSurfaces[0].length - 1) + " j = " + j);
 							BezierControlPoints[iB][jB] = Pw[p * i + iB][q * j + jB];
 						}
 					}
@@ -1538,9 +1541,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return resultSet;
 		}
 		
-
-		
-		//TODO: Why does this method need hds and as?
+	//	TODO: Why does this method need hds and as?
 	public LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
 		
 		VectorFieldMapAdapter linefield = new VectorFieldMapAdapter();
@@ -1555,10 +1556,10 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			double uCoord = NurbsuvCoordinate[0];
 			double vCoord = NurbsuvCoordinate[1];
 			if (uCoord < u0 || uCoord > u1) {
-				System.out.println("uCoord is out of domain " + uCoord);
+				logger.info("uCoord is out of domain " + uCoord);
 			}
 			if (vCoord < v0 || vCoord > v1) {
-				System.out.println("uCoord is out of domain " + vCoord);
+				logger.info("uCoord is out of domain " + vCoord);
 			}
 			double[] p = {uCoord, vCoord};
 			CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(this, p);
@@ -1583,15 +1584,15 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		
 		LinkedList<double[]> possibleUmbs = new LinkedList<double[]>();
 		for (VFace f : umbilicFaces) {
-			System.out.println("Faceindex: " + f.getIndex());
+			logger.info("Faceindex: " + f.getIndex());
 			VVertex v = f.getBoundaryEdge().getStartVertex();
 			double[] start = as.get(NurbsUVCoordinate.class, v, double[].class);
 			double[][] xi = computeXi(start);
 			double value = NelderMead.search(start, xi, 1E-12, fun, 100,
 					new Info());
-			System.out.println();
-			System.out.println("NM Value " + value);
-			System.out.println("NM Pos " + Arrays.toString(start));
+			logger.info("\n");
+			logger.info("NM Value " + value);
+			logger.info("NM Pos " + Arrays.toString(start));
 			possibleUmbs.add(start);
 		}
 
@@ -1671,13 +1672,13 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			double v0 = V[0];
 			double v1 = V[V.length - 1];
 			if (p[0] < u0 || p[0] > u1) {
-				// System.out.println("Nelder-Mead out of domain");
-				// System.out.println("p[0]: " + p[0]);
+				// logger.info("Nelder-Mead out of domain");
+				// logger.info("p[0]: " + p[0]);
 				return 10000;
 			}
 			if (p[1] < v0 || p[1] > v1) {
-				// System.out.println("Nelder-Mead out of domain");
-				// System.out.println("p[1]: " + p[1]);
+				// logger.info("Nelder-Mead out of domain");
+				// logger.info("p[1]: " + p[1]);
 				return 10000;
 			}
 			// if(p[0] < u0){
@@ -1718,6 +1719,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		double u = 1;
 		int p = 2;
 		double[] newU = insertUInKnot(p, u, U);
-		System.out.println(Arrays.toString(newU));
+		logger.info(Arrays.toString(newU));
 	}
 }

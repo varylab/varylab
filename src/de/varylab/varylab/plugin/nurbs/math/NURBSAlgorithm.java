@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
@@ -46,6 +47,8 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
  */
 
 public class NURBSAlgorithm {
+	
+	private static Logger logger = Logger.getLogger(NURBSAlgorithm.class.getName());
 	
 	private static long binomialCoefficient(int n, int k) {
 		if (n - k == 1 || k == 1)
@@ -595,16 +598,16 @@ public class NURBSAlgorithm {
 				double[][] Rw = new double[p + 1][]; // length = p + 1
 				for(int i = 0; i <= p ; i++){ // hier liegt der Fehler
 					Rw[i] = Pw[k - p + i][row];
-//					System.out.println("UEBERTRAGEN Rw["+i+"] " + Arrays.toString(Rw[i]));
+//					logger.info("UEBERTRAGEN Rw["+i+"] " + Arrays.toString(Rw[i]));
 				}
 				for(int j = 1; j <= r; j++){
 					int L = k - p + j;
 					for(int i = 0; i <= p - j - s ; i++ ){
 						Rw[i] = Rn.add(null, Rn.times(null, alpha[i][j], Rw[i + 1]), Rn.times(null, 1.0 - alpha[i][j], Rw[i]));
-//						System.out.println(" INNEN Rw["+i+"] " + Arrays.toString(Rw[i]));
+//						logger.info(" INNEN Rw["+i+"] " + Arrays.toString(Rw[i]));
 					}
 					for (int i = 0; i < Rw.length; i++) {
-//						System.out.println("FERTIG Rw["+i+"] " + Arrays.toString(Rw[i]));
+//						logger.info("FERTIG Rw["+i+"] " + Arrays.toString(Rw[i]));
 					}
 					Qw[L][row] = Rw[0];
 					Qw[k + r - j][row] = Rw[p - j];
@@ -680,13 +683,13 @@ public class NURBSAlgorithm {
 
 //		double[] Utest = {0,0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,5};
 //		double[] knots = getAllDifferentKnotsFromFilledKnotVector(Utest, 3);
-//		System.out.println("KNOTS "+Arrays.toString(knots));
-//		System.out.println("Utest " + Arrays.toString(Utest));
+//		logger.info("KNOTS "+Arrays.toString(knots));
+//		logger.info("Utest " + Arrays.toString(Utest));
 //		ArrayList<Double> newKnots = new ArrayList<Double>();
 //		ArrayList<Integer> multiplicity = new ArrayList<Integer>();
 //		getAllNewKnots(Utest, newKnots, multiplicity);
-//		System.out.println("newKnots "+ newKnots.toString());
-//		System.out.println("mult "+ multiplicity.toString());
+//		logger.info("newKnots "+ newKnots.toString());
+//		logger.info("mult "+ multiplicity.toString());
 		
 		 /**
 		  * initialize first surface
@@ -708,7 +711,7 @@ public class NURBSAlgorithm {
 
 		NURBSSurface ns0 = new NURBSSurface(U, V, Pw0, p, q);
 		double[] s0 = ns0.getSurfacePoint(uv[0], uv[1]);
-		System.out.println("s0 " + Arrays.toString(s0));
+		logger.info("s0 " + Arrays.toString(s0));
 		NURBSSurface ns1 = new NURBSSurface(U, V, Pw0, p, q);
 		
 		/**
@@ -729,13 +732,13 @@ public class NURBSAlgorithm {
 		}
 		
 		double[] s1 = ns1.getSurfacePoint(uv[0], uv[1]);
-		System.out.println("s1 " + Arrays.toString(s1));
+		logger.info("s1 " + Arrays.toString(s1));
 
 		NURBSSurface decomposed = ns1.decomposeSurface();
-		System.out.println("decomposed " + decomposed.toString());
+		logger.info("decomposed " + decomposed.toString());
 
 		double[] sDecomposed = decomposed.getSurfacePoint(uv[0], uv[1]);
-		System.out.println("sDecomdosed " + Arrays.toString(sDecomposed));
+		logger.info("sDecomdosed " + Arrays.toString(sDecomposed));
 		
 		NURBSSurface[][] BezierSurfaces = ns1.decomposeIntoBezierSurfaces();
 		NURBSSurface Bezier = new NURBSSurface();
@@ -751,10 +754,10 @@ public class NURBSAlgorithm {
 				}
 			}
 		}
-		System.out.println("BEZIER");
-		System.out.println(Bezier.toString());
+		logger.info("BEZIER");
+		logger.info(Bezier.toString());
 		double[] BezierPoint = Bezier.getSurfacePoint(uv[0], uv[1]);
-		System.out.println("BezierPoint " + Arrays.toString(BezierPoint));
+		logger.info("BezierPoint " + Arrays.toString(BezierPoint));
 
 	}
 	

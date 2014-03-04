@@ -206,7 +206,7 @@ public class IntegralCurve {
 			else{
 				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
 			}
-			System.out.println("delta = " + delta);
+			logger.info("delta = " + delta);
 //			logger.info("delta = " + delta);
 		
 			
@@ -317,7 +317,7 @@ public class IntegralCurve {
 		if(symDir == SymmetricDir.CURVATURE){
 //			if(ns.isSurfaceOfRevolution()){
 //				vec = getSymConjDirSurfaceOfRevolution(p);
-//				System.out.println("Hallo");
+//				logger.info("Hallo");
 //			}
 //			else{
 				vec = getSymConjDirWRTCuvatureDirection(p);

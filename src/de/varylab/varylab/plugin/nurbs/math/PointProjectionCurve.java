@@ -156,8 +156,8 @@ public class PointProjectionCurve {
 //		}
 		LinkedList<NURBSCurve> possibleCurves = new LinkedList<NURBSCurve>();
 		NURBSCurve closestCurve = getClosestSubcurve(curveList, p);
-//		System.out.println("closest curve");
-//		System.out.println(closestCurve.toString());
+//		logger.info("closest curve");
+//		logger.info(closestCurve.toString());
 		double closestMaxDistance = getMaxDist(p, MathUtility.get3DControlPoints(closestCurve.getControlPoints()));
 //		double[][] closestCP = getClosestSubcurve(curveList, p);
 		possibleCurves.add(closestCurve);

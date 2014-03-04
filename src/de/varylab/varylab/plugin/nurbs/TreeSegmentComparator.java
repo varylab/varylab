@@ -72,8 +72,8 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 		}
 		
 		if(segmentsIntersectInEventpoint){
-//			System.out.println("intersection in EventPoint");
-//			System.out.println("first " + s1.toString() + " second " + s2.toString() + " result " + (int)signum(angleOrder(a1, a2, b1, b2, c1, c2, d1, d2)));
+//			logger.info("intersection in EventPoint");
+//			logger.info("first " + s1.toString() + " second " + s2.toString() + " result " + (int)signum(angleOrder(a1, a2, b1, b2, c1, c2, d1, d2)));
 			return (int)signum(angleOrder(a1, a2, b1, b2, c1, c2, d1, d2));
 		}
 		else{
@@ -91,8 +91,8 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 			else{
 				compareS2 = a1 + ((b1 - a1) * (a2 - p.getPoint()[1]) / (a2 - b2));
 			}
-//			System.out.println("do not intersect in same EventPoint");
-//			System.out.println("first " + s1.toString() + " second " + s2.toString() + " result " + (int)signum(compareS1 - compareS2));
+//			logger.info("do not intersect in same EventPoint");
+//			logger.info("first " + s1.toString() + " second " + s2.toString() + " result " + (int)signum(compareS1 - compareS2));
 			return (int)signum(compareS1 - compareS2);
 		}
 	}

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,8 @@ import de.varylab.varylab.plugin.nurbs.NURBSTrimLoop;
 
 public class NurbsIO {
 
+	private static Logger logger = Logger.getLogger(NurbsIO.class.getName());
+	
 	private static class NURBSCtrlPoints {
 		
 		private double[] point;
@@ -372,7 +375,7 @@ public class NurbsIO {
 			
 			
 			if(!ns.hasClampedKnotVectors()){
-				System.out.println("NOT CLAMPED");
+				logger.info("NOT CLAMPED");
 				ns.repairKnotVectors();
 			}
 			ns.setRevolutionDir();

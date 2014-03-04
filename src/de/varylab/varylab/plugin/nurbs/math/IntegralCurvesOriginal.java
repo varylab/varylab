@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
@@ -18,6 +19,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 	public class IntegralCurvesOriginal {
 		
+		private static Logger logger = Logger.getLogger(IntegralCurvesOriginal.class.getName());
 		public enum VectorField{curvature, conjugate};
 
 		public static double[] getMaxMinCurv(NURBSSurface ns, double[] p,boolean max) {
@@ -68,7 +70,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			double[] W = Rn.add(null, Rn.times(null, w[0], fu), Rn.times(null, w[1], fv));
 //			Rn.normalize(W, W);
 //			if(Math.abs(1 - Rn.euclideanNorm(W)) > 0.001){
-//				System.out.println("length: " + Rn.euclideanNorm(w));
+//				logger.info("length: " + Rn.euclideanNorm(w));
 //			}
 			return w;
 		}
@@ -119,8 +121,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //		private static boolean segmentIntersectBoundary(LineSegment seg, List<LineSegment> boundary){
 //			for (LineSegment lS : boundary) {
 //				if(LineSegmentIntersection.segmentIntersectsLine(seg, lS)){
-//					System.out.println("segment " + seg.toString());
-//					System.out.println("boundary " + lS.toString());
+//					logger.info("segment " + seg.toString());
+//					logger.info("boundary " + lS.toString());
 //					return true;
 //				}
 //			}
@@ -173,9 +175,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			LinkedList<Double> boundaryValues = ns.getBoundaryValues();
 			for (Double value : boundaryValues) {
 				if(point[0] == value || point[1] == value){
-					System.out.println();
-					System.out.println(" not at boundary,  U = "+ Arrays.toString(ns.getUKnotVector())+" V = " +ns.getVKnotVector()+" point = " + Arrays.toString(point));
-					System.out.println();
+					logger.info("\n not at boundary,  U = "+ Arrays.toString(ns.getUKnotVector())+" V = " +ns.getVKnotVector()+" point = " + Arrays.toString(point) + "\n");
 					return false;
 				}
 			}
@@ -227,7 +227,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				}
 			}
 			if(isNotAtBoundary(ns, intersection)){
-				System.out.println("NOT AT BOUNDARY");
+				logger.info("NOT AT BOUNDARY");
 				intersection = projectOntoBoundary(ns, intersection);
 			}
 			return intersection;
@@ -322,7 +322,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		LineSegment seg = new LineSegment();
 
 		while (!nearBy) {
-			System.out.println("THE POINT " + Arrays.toString(u.getLast()));
+			logger.info("THE POINT " + Arrays.toString(u.getLast()));
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
@@ -348,19 +348,19 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				segment[1][1]= v[1] + h * sumA[1];
 				seg.setSegment(segment);
 //				if (segmentIntersectBoundary(seg, boundary)) {
-//					System.out.println("out of domain 1");
+//					logger.info("out of domain 1");
 //					double[] intersection = boundaryIntersection(ns, seg, boundary);
 //					u.add(intersection);
 //					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-//					System.out.println("letztes element: " +
+//					logger.info("letztes element: " +
 //							Arrays.toString(intObj.getPoints().getLast()));
 //					return intObj;
 //				}
 				if(terminationCondition(ns, seg, u, boundary)){
-					System.out.println("out of domain 1");
+					logger.info("out of domain 1");
 					u = setIntoDomain(ns, u0, um, v0, vn, u);
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+					logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
 				
@@ -395,8 +395,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 							u.add(umb);
 							IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 //							intObj.setUmbilicIndex(umbilics.indexOf(umb));
-							System.out.println("near umbilic");
-							System.out.println("letztes element: " +
+							logger.info("near umbilic");
+							logger.info("letztes element: " +
 									Arrays.toString(intObj.getPoints().getLast()));
 							return intObj;
 						}
@@ -406,7 +406,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					}
 				}
 //				if (segmentIntersectBoundary(seg, boundary)) {
-//					System.out.println("out of domain 2");
+//					logger.info("out of domain 2");
 //					double[] intersection = boundaryIntersection(ns ,seg, boundary);
 //					if(isOutOfDomain(ns, intersection)){
 //						intersection = projectPointIntoDomain(ns, intersection);
@@ -414,18 +414,18 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					u.pollLast();
 //					u.add(intersection);
 //					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-//					System.out.println("letztes element: " +
+//					logger.info("letztes element: " +
 //							Arrays.toString(intObj.getPoints().getLast()));
 //					return intObj;
 //				}
 				if(terminationCondition(ns, seg, u, boundary)){
-					System.out.println("out of domain 2");
+					logger.info("out of domain 2");
 					double[] last = u.pollLast();
 					u.pollLast();
 					u.add(last);
 					u = setIntoDomain(ns, u0, um, v0, vn, u);
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+					logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
 				if (Rn.innerProduct(orientation,IntegralCurvesOriginal.getMaxMinCurv(ns, u.getLast(), max)) > 0) {
@@ -453,13 +453,13 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				dist = distLineSegmentPoint(y0, seg);
 				if(Rn.innerProduct(vec1, vec2) < 0){
 					closed = true;
-					// System.out.println(" innerproduct > 0");
-					// System.out.println("vec1 " + Arrays.toString(vec1));
-					// System.out.println("vec2 " + Arrays.toString(vec1));
+					// logger.info(" innerproduct > 0");
+					// logger.info("vec1 " + Arrays.toString(vec1));
+					// logger.info("vec2 " + Arrays.toString(vec1));
 				}
 				if(dist < umbilicStop && closed){
 					nearBy = true;
-					System.out.println("closed");
+					logger.info("closed");
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 					return intObj;
 				}
@@ -468,9 +468,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					}
 				}
 			}
-			System.out.println("u.size() " + u.size());
+			logger.info("u.size() " + u.size());
 			IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-			System.out.println("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
+			logger.info("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
 			return intObj;
 		}
 		
@@ -481,9 +481,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		
 		
 		public static IntObjects rungeKuttaConjugateLine(NURBSSurface ns, double[] y0, double tol, boolean secondOrientation, boolean conj, List<double[]> umbilics, double umbilicStop, List<LineSegment> boundary) {
-			System.out.println("INPUT BOUNDARY");
+			logger.info("INPUT BOUNDARY");
 			for (LineSegment bs : boundary) {
-				System.out.println(bs.toString());
+				logger.info(bs.toString());
 			}
 			double lowBound = 0.0000001;
 			double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{2 / 9., 1 / 3., 4 / 9., 0 } };
@@ -521,7 +521,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			LineSegment seg = new LineSegment();
 		
 			while (!nearBy) {
-				System.out.println("THE POINT " + Arrays.toString(pointList.getLast()));
+				logger.info("THE POINT " + Arrays.toString(pointList.getLast()));
 				double[] v = new double[dim];
 				double[] sumA = new double[dim];
 				for (int i = 0; i < dim; i++) {
@@ -543,10 +543,10 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					Rn.add(segment[1], v, Rn.times(null, h, sumA));
 					seg.setSegment(segment);
 					if(terminationCondition(ns, seg, pointList, boundary)){
-						System.out.println("out of domain 1");
+						logger.info("out of domain 1");
 						pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 						IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+						logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 						return intObj;
 					}
 					double[] vf = getVecField(ns, getPointInDomain(u0, um, v0, vn, segment[1]), conj);
@@ -567,20 +567,20 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					tau = Rn.euclideanNorm(Rn.subtract(null, Phi2, Phi1));
 //				}
 				
-				System.out.println("TAU " + tau);
+				logger.info("TAU " + tau);
 				vau = Rn.euclideanNorm(pointList.getLast()) + 1;
 				if (tau <= tol * vau) {
 					segment[0] = pointList.getLast();
 					segment[1] = Rn.add(null, pointList.getLast(), Rn.times(null, h, Phi1));
 					seg.setSegment(segment);
 					if(terminationCondition(ns, seg, pointList, boundary)){
-						System.out.println("out of domain 2");
+						logger.info("out of domain 2");
 						double[] last = pointList.pollLast();
 						pointList.pollLast();
 						pointList.add(last);
 						pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 						IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+						logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 						return intObj;
 					}
 					pointList.add(segment[1]);
@@ -620,7 +620,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					}
 					if(dist < umbilicStop && closed){
 						nearBy = true;
-						System.out.println("closed");
+						logger.info("closed");
 						pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 						IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
 						return intObj;
@@ -630,10 +630,10 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					}
 				}
 			}
-			System.out.println("u.size() " + pointList.size());
+			logger.info("u.size() " + pointList.size());
 			pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 			IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-			System.out.println("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
+			logger.info("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
 			return intObj;
 		}
 		
@@ -676,7 +676,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		LineSegment seg = new LineSegment();
 
 		while (!nearBy) {
-//			System.out.println("pointList.size() "+pointList.size());
+//			logger.info("pointList.size() "+pointList.size());
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
@@ -698,19 +698,19 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				Rn.add(segment[1], v, Rn.times(null, h, sumA));
 				seg.setSegment(segment);
 //				if (segmentIntersectBoundary(seg, boundary)) {
-//				System.out.println("out of domain 1");
+//				logger.info("out of domain 1");
 //				double[] intersection = boundaryIntersection(ns, seg, boundary);
 //				pointList.add(intersection);
 //				IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-//				System.out.println("letztes element: " +
+//				logger.info("letztes element: " +
 //						Arrays.toString(intObj.getPoints().getLast()));
 //				return intObj;
 //				}
 				if(terminationCondition(ns, seg, pointList, boundary)){
-					System.out.println("out of domain 1");
+					logger.info("out of domain 1");
 					pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+					logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
 				double[] vf = getVecField(ns, getPointInDomain(u0, um, v0, vn, segment[1]), conj);
@@ -734,13 +734,13 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				segment[1] = Rn.add(null, pointList.getLast(), Rn.times(null, h, Phi1));
 				seg.setSegment(segment);
 				if(terminationCondition(ns, seg, pointList, boundary)){
-					System.out.println("out of domain 2");
+					logger.info("out of domain 2");
 					double[] last = pointList.pollLast();
 					pointList.pollLast();
 					pointList.add(last);
 					pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+					logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
 				pointList.add(segment[1]);
@@ -769,13 +769,13 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				dist = distLineSegmentPoint(y0, seg);
 				if(Rn.innerProduct(vec1, vec2) < 0){
 					closed = true;
-					// System.out.println(" innerproduct > 0");
-					// System.out.println("vec1 " + Arrays.toString(vec1));
-					// System.out.println("vec2 " + Arrays.toString(vec1));
+					// logger.info(" innerproduct > 0");
+					// logger.info("vec1 " + Arrays.toString(vec1));
+					// logger.info("vec2 " + Arrays.toString(vec1));
 				}
 				if(dist < umbilicStop && closed){
 					nearBy = true;
-					System.out.println("closed");
+					logger.info("closed");
 					pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
 					return intObj;
@@ -785,10 +785,10 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				}
 			}
 		}
-			System.out.println("u.size() " + pointList.size());
+			logger.info("u.size() " + pointList.size());
 			pointList = setIntoDomain(ns, u0, um, v0, vn, pointList);
 			IntObjects intObj = new IntObjects(pointList, ori, nearBy, conj);
-			System.out.println("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
+			logger.info("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
 			return intObj;
 		}
 		
@@ -824,8 +824,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			boolean up = false;
 //			LinkedList<double[]> u = new LinkedList<double[]>();
 ////			int dim = y0.length;
-//			System.out.println("y0 " + Arrays.toString(y0));
-//			System.out.println(" surface point in rungekutta " + Arrays.toString(ns.getSurfacePoint(y0[0], y0[1])));
+//			logger.info("y0 " + Arrays.toString(y0));
+//			logger.info(" surface point in rungekutta " + Arrays.toString(ns.getSurfacePoint(y0[0], y0[1])));
 //			double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] - ns.getUKnotVector()[ns.getUKnotVector().length - 1]), Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
 //			double h = maxDist / 50;
 //			double tau;
@@ -844,7 +844,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			double v0 = V[0];
 //			double vn = V[V.length - 1];
 //			if(y0[0] < u0 || y0[0] > um || y0[1] < v0 || y0[1] > vn){
-//				System.out.println(" OUT OF DOMAIN !");
+//				logger.info(" OUT OF DOMAIN !");
 //			}
 //			boolean nearBy = false;
 //			double[] ori = orientation;
@@ -856,8 +856,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					u.pollLast();
 //					double[] last = u.getLast();
 //					if(Math.abs(Rn.euclideanDistance(v, last))< 0.00001){
-//						System.out.println("v " + Arrays.toString(v));
-//						System.out.println("last " + Arrays.toString(last));
+//						logger.info("v " + Arrays.toString(v));
+//						logger.info("last " + Arrays.toString(last));
 //					}
 //					u.add(v);
 //				}
@@ -887,9 +887,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //						else{
 //						seg.setSegment(segment);
 //						if(terminationCondition(ns, seg, u, boundary)){
-//							System.out.println("out of domain 1");
+//							logger.info("out of domain 1");
 //							IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//							System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//							logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //							return intObj;
 //							}
 //						}
@@ -901,8 +901,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //						LineSegment shiftedSeg = new LineSegment();
 //						shiftedSeg.setSegment(shiftedSegment);
 //						if(down){
-//							System.out.println("DDDDDOOOOWWWWWNNN");
-//							System.out.println("down");
+//							logger.info("DDDDDOOOOWWWWWNNN");
+//							logger.info("down");
 //							double[][] downSegment = {{u0,v0},{um,v0}};
 //							LineSegment downSeg = new LineSegment();
 //							downSeg.setSegment(downSegment);
@@ -913,34 +913,34 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //							LineSegment firstSeg = new LineSegment();
 //							firstSeg.setSegment(firstSegment);
 //							if(terminationCondition(ns, firstSeg, u, boundary)){
-//								System.out.println("out of domain 1 VBoundary first segment down");
+//								logger.info("out of domain 1 VBoundary first segment down");
 //								IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//								System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//								logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //								return intObj;
 //							}
 //							u.add(intersection);
-//							System.out.println();
-//							System.out.println("u.add(intersection) down" + Arrays.toString(intersection));
-//							System.out.println();
+//							logger.info();
+//							logger.info("u.add(intersection) down" + Arrays.toString(intersection));
+//							logger.info();
 //							double[] second = {intersection[0], vn};
 //							double[][] secondSegment = {second, segment[1]};
 //							LineSegment secondSeg = new LineSegment();
 //							secondSeg.setSegment(secondSegment);
 //							if(terminationCondition(ns, secondSeg, u, downList)){
-//								System.out.println("out of domain 1 VBoundary second segment down");
+//								logger.info("out of domain 1 VBoundary second segment down");
 //								IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//								System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//								logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //								return intObj;
 //							}
 //							u.add(second);
-//							System.out.println();
-//							System.out.println("u.add(second) down" + Arrays.toString(second));
-//							System.out.println();
+//							logger.info();
+//							logger.info("u.add(second) down" + Arrays.toString(second));
+//							logger.info();
 //							u.add(segment[1]);
 //							
 //						}
 //						else if(up){
-//							System.out.println("up");
+//							logger.info("up");
 //							double[][] upSegment = {{u0,vn},{um,vn}};
 //							LineSegment upSeg = new LineSegment();
 //							upSeg.setSegment(upSegment);
@@ -951,38 +951,38 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //							LineSegment firstSeg = new LineSegment();
 //							firstSeg.setSegment(firstSegment);
 //							if(terminationCondition(ns, firstSeg, u, upList)){
-//								System.out.println("out of domain 1 VBoundary first segment up");
+//								logger.info("out of domain 1 VBoundary first segment up");
 //								IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//								System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//								logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //								return intObj;
 //							}
 	//
 //							u.add(intersection);
-//							System.out.println();
-//							System.out.println("u.add(intersection) up" + Arrays.toString(intersection));
-//							System.out.println();
+//							logger.info();
+//							logger.info("u.add(intersection) up" + Arrays.toString(intersection));
+//							logger.info();
 //							double[] second = {intersection[0], v0};
 //							double[][] secondSegment = {second, segment[1]};
 //							LineSegment secondSeg = new LineSegment();
 //							secondSeg.setSegment(secondSegment);
 //							if(terminationCondition(ns, secondSeg, u, upList)){
-//								System.out.println("out of domain 1 VBoundary second segment up");
+//								logger.info("out of domain 1 VBoundary second segment up");
 //								IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//								System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//								logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //								return intObj;
 //							}
 //							u.add(second);
-//							System.out.println();
-//							System.out.println("u.add(second) up" + Arrays.toString(second));
-//							System.out.println();
+//							logger.info();
+//							logger.info("u.add(second) up" + Arrays.toString(second));
+//							logger.info();
 //							u.add(segment[1]);
 //						}
 //						else{
 //							seg.setSegment(segment);
 //							if(terminationCondition(ns, seg, u, boundary)){
-//								System.out.println("out of domain 1");
+//								logger.info("out of domain 1");
 //								IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//								System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//								logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //								return intObj;
 //							}
 //						}
@@ -990,9 +990,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					else{
 //						seg.setSegment(segment);
 //						if(terminationCondition(ns, seg, u, boundary)){
-//							System.out.println("out of domain 1");
+//							logger.info("out of domain 1");
 //							IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//							System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//							logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //							return intObj;
 //						}
 //					}
@@ -1024,9 +1024,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					seg.setSegment(segment);
 ////					
 //					if(terminationCondition(ns, seg, u, boundary)){
-//						System.out.println("out of domain 2");
+//						logger.info("out of domain 2");
 //						IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//						logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //						return intObj;
 //					}
 //					u.add(segment[1]);
@@ -1044,9 +1044,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					}
 //				}
 //			}
-//			System.out.println("u.size() " + u.size());
+//			logger.info("u.size() " + u.size());
 //			IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//			System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
+//			logger.info("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 //			return intObj;
 //		}
 		
@@ -1058,7 +1058,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					domainList.add(domainPoint);
 //				}
 //				else{
-//					System.out.println("domainPoint " + Arrays.toString(domainPoint));
+//					logger.info("domainPoint " + Arrays.toString(domainPoint));
 //				}
 //			}
 //			return domainList;
@@ -1070,12 +1070,12 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			double length = right - left;
 			double mod = xShift % length;
 			if(Math.signum(mod) < 0){
-//				System.out.println("KLEINER NULL");
+//				logger.info("KLEINER NULL");
 				return right + mod;
 			}
 			else{
 				if(mod >= length){
-					System.out.println("GROESSER LENGTH");
+					logger.info("GROESSER LENGTH");
 				}
 				return left + mod;
 			}
@@ -1093,7 +1093,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			}
 //			else{
 //				int mod = (int)(-xShift / interval);
-//				System.out.println("mod = " + mod);
+//				logger.info("mod = " + mod);
 //				return -mod;
 //			}
 //			
@@ -1103,7 +1103,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 ////				xShift = xShift - interval;
 ////			}
 ////			if(xShift % interval == 0){
-////				System.out.println("shit");
+////				logger.info("shit");
 ////			}
 ////			return (int)(xShift / interval);
 	//
@@ -1173,7 +1173,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //		}
 		
 		public static double[][] getShiftedBoundaryIntersectionPoints(double u0, double um, double v0, double vn, double[] point1, double[] point2){
-			System.out.println("GET SHIFTED");
+			logger.info("GET SHIFTED");
 			double[][] intersectionPoints = new double[2][2];
 			int[] domain1 = getModDomain(u0, um, v0, vn, point1);
 			int[] domain2 = getModDomain(u0, um, v0, vn, point2);
@@ -1191,7 +1191,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				double[] rightIntersection = {um, leftIntersection[1]};
 				intersectionPoints[0] = leftIntersection;
 				intersectionPoints[1] = rightIntersection;
-				System.out.println("left");
+				logger.info("left");
 				
 			}else if(domain1[0] < domain2[0]){ // right
 				double Shift =  um - u0;
@@ -1206,7 +1206,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				double[] leftIntersection = {u0, rightIntersection[1]};
 				intersectionPoints[0] = rightIntersection;
 				intersectionPoints[1] = leftIntersection;
-				System.out.println("right");
+				logger.info("right");
 			}else if(domain1[1] > domain2[1]){ // lower
 				double Shift =  vn - v0;
 				seg[0] = getPointInDomain(u0, um, v0, vn, point1);
@@ -1220,7 +1220,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				double[] upperIntersection = {lowerIntersection[0],vn};
 				intersectionPoints[0] = lowerIntersection;
 				intersectionPoints[1] = upperIntersection;
-				System.out.println("lower");
+				logger.info("lower");
 			}
 			else{ // upper
 				double Shift =  vn - v0;
@@ -1235,7 +1235,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				double[] lowerIntersection = {upperIntersection[0],v0};
 				intersectionPoints[0] = upperIntersection;
 				intersectionPoints[1] = lowerIntersection;
-				System.out.println("upper");
+				logger.info("upper");
 			}
 			return intersectionPoints;
 		}
@@ -1285,7 +1285,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //							domainList.add(domainPoint);
 //						}
 //						else{
-//							System.out.println("DOPPEL PUNKT");
+//							logger.info("DOPPEL PUNKT");
 //						}
 //					}
 //					seg[0] = p.clone();
@@ -1298,9 +1298,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		private static LinkedList<double[]> setIntoDomain(NURBSSurface ns, double u0, double um, double v0, double vn, LinkedList<double[]> pointList){
 			LinkedList<double[]> domainList = new LinkedList<double[]>();
 			int counter = 0;
-//			System.out.println("check runge kutta list");
+//			logger.info("check runge kutta list");
 //			for (double[] point : pointList) {
-//				System.out.println(Arrays.toString(point));
+//				logger.info(Arrays.toString(point));
 //			}
 			double[][] seg = new double[2][2];
 			domainList.add(pointList.getFirst());
@@ -1329,15 +1329,15 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 						domainList.add(domainPoint);
 					}
 					else{
-						System.out.println("DOPPEL PUNKT");
+						logger.info("DOPPEL PUNKT");
 					}
 					seg[0] = p.clone();
 				}
 				counter++;
 			}
-//			System.out.println("setIntoDomain");
+//			logger.info("setIntoDomain");
 //			for (double[] point : domainList) {
-//				System.out.println(Arrays.toString(point));
+//				logger.info(Arrays.toString(point));
 //			}
 			return domainList;
 		}
@@ -1422,7 +1422,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			boolean up = false;
 //			LinkedList<double[]> u = new LinkedList<double[]>();
 //			int dim = y0.length;
-//			System.out.println("y0 " + Arrays.toString(y0));
+//			logger.info("y0 " + Arrays.toString(y0));
 //			double maxDist = Math.min(Math.abs(ns.getUKnotVector()[0] - ns.getUKnotVector()[ns.getUKnotVector().length - 1]), Math.abs(ns.getVKnotVector()[0] - ns.getVKnotVector()[ns.getVKnotVector().length - 1]));
 //			double h = maxDist / 50;
 //			double tau;
@@ -1471,8 +1471,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					segment[1][0]= v[0] + h * sumA[0];
 //					segment[1][1]= v[1] + h * sumA[1];
 ////					if(ns.getClosingDir() == ClosingDir.uClosed){
-//////						System.out.println("go over V boundary");
-//////						System.out.println("check: S(u0,v0) = " + Arrays.toString(ns.getSurfacePoint(u0, v0)) + " S(um,v0) = " + Arrays.toString(ns.getSurfacePoint(um, v0)));
+//////						logger.info("go over V boundary");
+//////						logger.info("check: S(u0,v0) = " + Arrays.toString(ns.getSurfacePoint(u0, v0)) + " S(um,v0) = " + Arrays.toString(ns.getSurfacePoint(um, v0)));
 ////						nextPoint = goOverUBoundary(u0, um, segment[1],left,right);
 ////						if(left){
 ////							double[][] leftSegment = {{u0,v0},{u0,vn}};
@@ -1511,8 +1511,8 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 ////						
 ////					}
 ////					else if(ns.getClosingDir() == ClosingDir.vClosed){
-//////						System.out.println("go over U boundary");
-//////						System.out.println("check: S(u0,v0) = " + Arrays.toString(ns.getSurfacePoint(u0, v0)) + " S(u0,vn) = " + Arrays.toString(ns.getSurfacePoint(u0, vn)));
+//////						logger.info("go over U boundary");
+//////						logger.info("check: S(u0,v0) = " + Arrays.toString(ns.getSurfacePoint(u0, v0)) + " S(u0,vn) = " + Arrays.toString(ns.getSurfacePoint(u0, vn)));
 ////						nextPoint = goOverVBoundary(v0, vn, segment[1], down, up);
 ////						if(down){
 ////							double[][] downSegment = {{u0,v0},{um,v0}};
@@ -1557,9 +1557,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 ////					u.addAll(nextPoints);
 //					if (segmentIntersectBoundary(seg, boundary)) {
 ////						if(left || right || down || up){
-////							System.out.println("segmentIntersectBoundary the segment = "+seg.toString());
+////							logger.info("segmentIntersectBoundary the segment = "+seg.toString());
 ////						}
-//						System.out.println("out of domain 1");
+//						logger.info("out of domain 1");
 //						double[] intersection = boundaryIntersection(seg, boundary);
 //						if(isOutOfDomain(ns, intersection)){
 //							intersection = projectPointIntoDomain(ns, intersection);
@@ -1567,7 +1567,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 ////						u.pollLast();
 //						u.add(intersection);
 //						IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//						logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //						return intObj;
 //					}
 //					if (Rn.innerProduct(orientation,Rn.normalize(null,getVecField(ns, segment[1][0], segment[1][1], conj))) > 0) {
@@ -1589,11 +1589,11 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					segment[0] = u.getLast();
 //					segment[1] = Rn.add(null, u.getLast(), Rn.times(null, h, Phi1));
 //					if(ns.getClosingDir() == ClosingDir.uClosed){
-////						System.out.println("go over V boundary");
+////						logger.info("go over V boundary");
 //						segment[1] = goOverUBoundary(u0, um, segment[1], left,right);
 //					}
 //					if(ns.getClosingDir() == ClosingDir.vClosed){
-////						System.out.println("go over U boundary");
+////						logger.info("go over U boundary");
 //						segment[1] = goOverVBoundary(v0, vn, segment[1],down,up);
 //					}
 //					seg.setSegment(segment);
@@ -1601,10 +1601,10 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					
 //					if (segmentIntersectBoundary(seg, boundary)) {
 //						if(left || right || down || up){
-//							System.out.println("segmentIntersectBoundary the segment = "+seg.toString());
+//							logger.info("segmentIntersectBoundary the segment = "+seg.toString());
 //						}
-//						System.out.println("alles richtig segmentIntersectBoundary the segment = "+seg.toString());
-//						System.out.println("out of domain 2");
+//						logger.info("alles richtig segmentIntersectBoundary the segment = "+seg.toString());
+//						logger.info("out of domain 2");
 //						double[] intersection = boundaryIntersection(seg, boundary);
 //						if(isOutOfDomain(ns, intersection)){
 //							intersection = projectPointIntoDomain(ns, intersection);
@@ -1612,7 +1612,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //						u.pollLast();
 //						u.add(intersection);
 //						IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+//						logger.info("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 //						return intObj;
 //					}
 //					if (Rn.innerProduct(orientation,getVecField(ns, u.getLast()[0],u.getLast()[1], conj)) > 0) {
@@ -1629,9 +1629,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					}
 //				}
 //			}
-//			System.out.println("u.size() " + u.size());
+//			logger.info("u.size() " + u.size());
 //			IntObjects intObj = new IntObjects(u, ori, nearBy, conj);
-//			System.out.println("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
+//			logger.info("letzter Punkt: "+Arrays.toString(intObj.getPoints().getLast()));
 //			return intObj;
 //		}
 		
@@ -1684,7 +1684,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 						sumA = Rn.add(null, sumA, Rn.times(null, A[l][m], k[m]));
 					}
 					if (!((v[0] + h * sumA[0]) < u2) || !((v[0] + h * sumA[0]) > u1) || !((v[1] + h * sumA[1]) < v2) || !((v[1] + h * sumA[1]) > v1)) {
-						System.out.println("1. out of domain");
+						logger.info("1. out of domain");
 						return u;
 					}
 					ChristoffelInfo cl = NURBSChristoffelUtility.christoffel(ns, v[0] + h * sumA[0], v[1] + h * sumA[1]);
@@ -1707,7 +1707,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 						if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
 								|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
 							u.pollLast();
-							System.out.println("2. out of domain");
+							logger.info("2. out of domain");
 							return u;
 						}
 					}
@@ -1782,7 +1782,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			double angle1 = 0;
 			double h = 1/5.;
 			double[] startDirection = Rn.add(null, b, Rn.times(null, -1, a));
-			System.out.println("Startrichtung " + Arrays.toString(startDirection));
+			logger.info("Startrichtung " + Arrays.toString(startDirection));
 //			double[] y01 = {a[0], a[1], startDirection[0], startDirection[1]};
 			double[] y01 = {a[0], a[1], 1. , 0};
 			LinkedList<double[]> line1 = IntegralCurvesOriginal.geodesicExponential(ns, y01, eps, tol);
@@ -1790,11 +1790,11 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			if(dist1 < 0){
 				sign1 = -1;
 			}
-			System.out.println("SIGN1 " + sign1);
+			logger.info("SIGN1 " + sign1);
 			int counter = 0;
 			while(sign1 == 1){
 				counter++;
-				System.out.println(counter);
+				logger.info(""+counter);
 				angle1 = angle1 + h;
 				y01[2] = Math.cos(angle1);
 				y01[3] = Math.sin(angle1);
@@ -1804,7 +1804,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					sign1 = -1;
 				}
 			}
-			System.out.println("counter "+ counter);
+			logger.info("counter "+ counter);
 			int sign2 = sign1;
 			double dist2 = 0;
 			double[] y02 = {a[0], a[1], y01[2], y01[3]};
@@ -1816,7 +1816,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				y02[3] = Math.sin(angle2);
 				line2 = IntegralCurvesOriginal.geodesicExponential(ns, y02, eps, tol);
 				dist2 = IntegralCurvesOriginal.orientedInnerproductDistanceLinePoint(line2, a, b);
-				System.out.println("dist2 " + dist2);
+				logger.info("dist2 " + dist2);
 				if(dist2 < 0){
 					sign2 = -1;
 				}else{
@@ -1828,9 +1828,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			double angle;
 			LinkedList<double[]> line = new LinkedList<double[]>();
 			double[] y0 = y01;
-			System.out.println("Start Bisection");
-			System.out.println("angle1 " + angle1 + " angle2 " + angle2);
-			System.out.println("dist1 " + dist1 + " dist2 " + dist2);
+			logger.info("Start Bisection");
+			logger.info("angle1 " + angle1 + " angle2 " + angle2);
+			logger.info("dist1 " + dist1 + " dist2 " + dist2);
 			while(Math.abs(dist) > nearby){
 				angle = 0.5 * angle1 + 0.5 * angle2;
 				y0[2] = Math.cos(angle);
@@ -1838,7 +1838,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				line = IntegralCurvesOriginal.geodesicExponential(ns, y0, eps, tol);
 				dist = IntegralCurvesOriginal.orientedInnerproductDistanceLinePoint(line, a, b);
 				if(dist == 0 ){
-					System.out.println("1 case");
+					logger.info("1 case");
 					return line;
 				}
 //				else if(angle1 == angle || angle2 == angle){
@@ -1851,11 +1851,11 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					angle2 = angle;
 //				}
 				else if( dist1 * dist < 0 ){
-					System.out.println("2. case");
+					logger.info("2. case");
 					angle2 = angle;
 					dist2 = dist;
 				}else{
-					System.out.println("3. case");
+					logger.info("3. case");
 					angle1 = angle;
 					dist1 = dist;
 				}
@@ -1891,7 +1891,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			seg.setSegment(segment);
 			double[] point = {0,6};
 			double dist = distLineSegmentPoint(point, seg);
-			System.out.println("dist " + dist);
+			logger.info("dist " + dist);
 		}
 		
 //		public LinkedList<PolygonalLine> computeCurvatureLines(NURBSSurface ns, boolean max, boolean min, double tol, double umbilicStop, List<double[]> startingPointsUV) {
@@ -1917,24 +1917,24 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			ValidSegment vs = new ValidSegment();
 			vs.setValid(false);
 			if (seg[0][0] == u0 && seg[1][0] == um){
-				System.out.println("leftShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+				logger.info("leftShift");
+				logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 				rightShift--;
 			} else if (seg[0][0] == um && seg[1][0] == u0){
-				System.out.println("rightShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+				logger.info("rightShift");
+				logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 				rightShift++;
 			} else if (seg[0][1] == v0 && seg[1][1] == vn){
-				System.out.println("downShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+				logger.info("downShift");
+				logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 				upShift--;
 			} else if (seg[0][1] == vn && seg[1][1] == v0){
-				System.out.println("upShift");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+				logger.info("upShift");
+				logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 				upShift++;
 			} else if (seg[0][0] == seg[1][0] && seg[0][1] == seg[1][1]){
-				System.out.println("not valid segment w.r.t. equal endpoints");
-				System.out.println("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
+				logger.info("not valid segment w.r.t. equal endpoints");
+				logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 			} else {
 				vs.setValid(true);
 			}
@@ -1959,44 +1959,44 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			IntObjects intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
 			
 			Collections.reverse(intObj.getPoints());
-//			System.out.println("intObj.getPoints() false and reversed");
+//			logger.info("intObj.getPoints() false and reversed");
 //			for (double[] point : intObj.getPoints()) {
-//				System.out.println(Arrays.toString(point));
+//				logger.info(Arrays.toString(point));
 //			}
 			all.addAll(intObj.getPoints());
-//			System.out.println("all.addAll(intObj.getPoints()); ");
+//			logger.info("all.addAll(intObj.getPoints()); ");
 //			for (double[] point : all) {
-//				System.out.println(Arrays.toString(point));
+//				logger.info(Arrays.toString(point));
 //			}
 			//only debugging
 //			double[] last = all.pollLast().clone();
-//			System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
+//			logger.info("LLLAAASSSSTTT " + Arrays.toString(last));
 			//end debugging
-			System.out.println("first size" + all.size());
+			logger.info("first size" + all.size());
 			boolean cyclic = false;
 			if(!intObj.isNearby()){
 //				all.pollLast();
 				intObj = IntegralCurvesOriginal.rungeKuttaCurvatureLine(ns, y0, tol,true, maxMin,  umbilics, umbilicStop, boundary);
 //				intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol, true , maxMin, umbilics, umbilicStop, boundary );
-//				System.out.println("intObj.getPoints() true ");
+//				logger.info("intObj.getPoints() true ");
 //				for (double[] point : intObjSecond.getPoints()) {
-//					System.out.println(Arrays.toString(point));
+//					logger.info(Arrays.toString(point));
 //				}
-//				System.out.println("THE FIRST POINTS");
-//				System.out.println("LLLAAASSSSTTT " + Arrays.toString(last));
+//				logger.info("THE FIRST POINTS");
+//				logger.info("LLLAAASSSSTTT " + Arrays.toString(last));
 //				all.add(last);
 //				for (double[] point : all) {
-//					System.out.println(Arrays.toString(point));
+//					logger.info(Arrays.toString(point));
 //				}
 				all.addAll(intObj.getPoints());
-//				System.out.println("all points concatinated from runge kutta derectly past adding");
+//				logger.info("all points concatinated from runge kutta derectly past adding");
 //				for (double[] point : all) {
-//					System.out.println(Arrays.toString(point));
+//					logger.info(Arrays.toString(point));
 //				}
 			}else{
 				//add the first element of a closed curve
 				cyclic = true;
-				System.out.println("add first");
+				logger.info("add first");
 				double[] first = new double [2];
 				first[0] = all.getFirst()[0];
 				first[1] = all.getFirst()[1];
@@ -2007,9 +2007,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			int rightShift = 0;
 			int upShift = 0;
 			double[] firstcurvePoint = all.getFirst();
-//			System.out.println("all points concatinated from runge kutta");
+//			logger.info("all points concatinated from runge kutta");
 //			for (double[] point : all) {
-//				System.out.println(Arrays.toString(point));
+//				logger.info(Arrays.toString(point));
 //			}
 			for (double[] secondCurvePoint : all) {
 				index ++;
@@ -2024,9 +2024,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //					shiftedIndex = vs.getShiftedIndex();
 					boolean segmentIsValid = vs.isValid();
 					if(segmentIsValid){
-//						System.out.println("shiftedIndex danach = " + shiftedIndex);
-						System.out.println("rightShifted danach = " + rightShift);
-						System.out.println("upShifted danach = " + upShift);
+//						logger.info("shiftedIndex danach = " + shiftedIndex);
+						logger.info("rightShifted danach = " + rightShift);
+						logger.info("upShifted danach = " + upShift);
 						LineSegment ls = new  LineSegment();
 						ls.setIndexOnCurve(index) ;
 						ls.setSegment(seg);
@@ -2045,9 +2045,9 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 				}
 			}
 			//begin check
-			System.out.println("check concatinated line");
+			logger.info("check concatinated line");
 			for (LineSegment ls : currentSegments) {
-				System.out.println(ls.toString());
+				logger.info(ls.toString());
 			}
 			//end check
 			PolygonalLine currentLine = new PolygonalLine(currentSegments);

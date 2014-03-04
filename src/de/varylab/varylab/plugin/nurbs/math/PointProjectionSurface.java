@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
@@ -20,6 +21,8 @@ import de.varylab.varylab.utilities.MathUtility;
 
 public class PointProjectionSurface {
 		
+	private static Logger logger = Logger.getLogger(PointProjectionSurface.class.getName());
+	
 	/**
 	 * necessary condition whether a point is projected to the corner point P00
 	 * @param P
@@ -474,7 +477,7 @@ public class PointProjectionSurface {
 				
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, p);
-//				System.out.println("possiblePatches.size(): " + possiblePatches.size());
+//				logger.info("possiblePatches.size(): " + possiblePatches.size());
 				for (NURBSSurface ns : possiblePatches) {
 					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
 				}
@@ -549,7 +552,7 @@ public class PointProjectionSurface {
 				
 				LinkedList<NURBSSurface> subdividedPatches = new LinkedList<NURBSSurface>();
 				possiblePatches = getPossiblePatches(possiblePatches, p);
-//				System.out.println("possiblePatches.size(): " + possiblePatches.size());
+//				logger.info("possiblePatches.size(): " + possiblePatches.size());
 				for (NURBSSurface ns : possiblePatches) {
 					subdividedPatches.addAll(ns.subdivideIntoFourNewPatches());
 				}
@@ -652,7 +655,7 @@ public class PointProjectionSurface {
 			gv = Rn.innerProduct(Sv, Sv) + Rn.innerProduct(r, Svv);
 		}
 		if(f > eps || g > eps){
-//			System.out.println("f " + f + " g " + g);
+//			logger.info("f " + f + " g " + g);
 		}
 		return new double[]{u,v};
 	}
@@ -662,6 +665,6 @@ public class PointProjectionSurface {
 	
 	public static void main(String[] args){
 		LinkedList<BoundaryLines> bList = new LinkedList<NURBSSurface.BoundaryLines>();
-		System.out.println(bList.contains(null));
+		logger.info(""+bList.contains(null));
 	}
 }

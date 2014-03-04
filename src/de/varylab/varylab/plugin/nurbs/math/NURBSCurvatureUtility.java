@@ -1,12 +1,16 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
 
+import java.util.logging.Logger;
+
 import compgeom.Rational;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 
 public class NURBSCurvatureUtility {
+	
+	private static Logger logger = Logger.getLogger(NURBSCurvatureUtility.class.getName());
 	
 	private static Rational getRational(double d){
 		long number = 1000000000;
@@ -19,20 +23,20 @@ public class NURBSCurvatureUtility {
 	
 	private static String toReadableString(Double d){
 		String str = d.toString();
-		System.out.println(str);
+		logger.info(str);
 		if(str.contains("E")){
 			String[] split = str.split("E");
-			System.out.println("split[0] = " + split[0]);
+			logger.info("split[0] = " + split[0]);
 			if(split[0].startsWith("-")){
 				split[0] = split[0].substring(1);
-				System.out.println("split[0] = " + split[0]);
+				logger.info("split[0] = " + split[0]);
 			}
 			String[] digits = split[0].split("\\.");
-			System.out.println(digits.length);
-			System.out.println(digits[0]);
+			logger.info(""+digits.length);
+			logger.info(digits[0]);
 			split[0] = digits[0].concat(digits[1]);
-			System.out.println("split[0] = " + split[0]);
-			System.out.println("split[1] = " + split[1]);
+			logger.info("split[0] = " + split[0]);
+			logger.info("split[1] = " + split[1]);
 			boolean minusExp = false;
 			if(split[1].startsWith("-")){
 				minusExp = true;
@@ -41,15 +45,15 @@ public class NURBSCurvatureUtility {
 //				int exp = (int)split[1];
 			}
 			Integer exp = Integer.parseInt(split[1]);
-			System.out.println("split[1] = " + split[1]);
-			System.out.println("exp = " + exp);
+			logger.info("split[1] = " + split[1]);
+			logger.info("exp = " + exp);
 			if(minusExp){
 				String prev = "0.";
 				for (int i = 1; i < exp; i++) {
 					prev = prev + "0";
 				}
 				str = prev + split[0];
-				System.out.println("str = " + str);
+				logger.info("str = " + str);
 			}
 			
 			return str;
@@ -64,13 +68,13 @@ public class NURBSCurvatureUtility {
 	private static double[] getEigenvector(double[][] matrix, double my){
 		double[] eig = {1., 0.};
 //		String sMy = my.toString();
-//		System.out.println("sMy = " + sMy);
+//		logger.info("sMy = " + sMy);
 //		Rational rMy = new Rational(sMy);
 //		String s11 = matrix[0][0].toString();
-//		System.out.println("s11 = " + s11);
+//		logger.info("s11 = " + s11);
 //		Rational r11 = new Rational(s11);
 //		String s12 = matrix[0][1].toString();
-//		System.out.println("s12 = " + s12);
+//		logger.info("s12 = " + s12);
 //		Rational r12 = new Rational(s12);
 	//	Rational r21 = new Rational(matrix[1][0].toString());
 	//	Rational r22 = new Rational(matrix[1][1].toString());
@@ -109,8 +113,8 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	double u = point[0];
 	double v = point[1];
 	CurvatureInfo dG = new CurvatureInfo();
-//	System.out.println("CurvatureInfo");
-//	System.out.println(ns.toString());
+//	logger.info("CurvatureInfo");
+//	logger.info(ns.toString());
 	double[] FFs = new double[6];
 	double[] U = ns.getUKnotVector();
 	double[] V = ns.getVKnotVector();
@@ -216,14 +220,14 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	double[][] w = new double[2][2];
 	
 	if(Math.abs(a12) > 0.00001){
-//		System.out.println("a12 != 0");
-//		System.out.println("a12 = " + a12);
+//		logger.info("a12 != 0");
+//		logger.info("a12 = " + a12);
 		w[0][0] = 1; 
 		w[0][1] = (lambda - a11) / a12; 
 
 	}
 	else if(Math.abs(a21) > 0.00001){
-//		System.out.println("a21 != 0");
+//		logger.info("a21 != 0");
 		w[0][0] = (lambda - a22)/a21; 
 		w[0][1] = 1; 
 
@@ -254,7 +258,7 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 		w[1][1] = 1; 
 	}
 	//only TEST
-//	System.out.println("call getEigenvector");
+//	logger.info("call getEigenvector");
 //	w[0] = getEigenvector(W, lambda);
 //	w[1] = getEigenvector(W, my);
 	// end TEST
@@ -280,9 +284,9 @@ public static void main(String[] args){
 //
 //	String strMy = a12.toString();
 //	Rational r = getRational(a12);
-//	System.out.println(r.toString());
+//	logger.info(r.toString());
 //	Rational rMy = new Rational(strMy);
-//	System.out.println(rMy.toString());
+//	logger.info(rMy.toString());
 }
 
 }

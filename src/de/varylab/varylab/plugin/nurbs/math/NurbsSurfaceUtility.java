@@ -2,13 +2,17 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class NurbsSurfaceUtility {
 
+	private static Logger logger = Logger.getLogger(NurbsSurfaceUtility.class.getName());
+	
 	public static void addNurbsMesh(NURBSSurface surf, HalfedgeLayer layer, int u, int v) {
 		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
 		qmf.setGenerateVertexNormals(true);
@@ -19,7 +23,8 @@ public class NurbsSurfaceUtility {
 		qmf.setSurface(surf);
 		qmf.update();
 		layer.set(qmf.getGeometry());
-		layer.addAdapter(qmf.getUVAdapter(), false);
+		NurbsUVAdapter uvAdapter = qmf.getUVAdapter();
+		layer.addAdapter(uvAdapter, false);
 //		layer.update();
 	}
 
@@ -45,21 +50,21 @@ public class NurbsSurfaceUtility {
 	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n, double[] point){
 		LinkedList<double[]> points = new LinkedList<double[]>();
 		if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionUDir(ns)){
-			System.out.println("HALLLLLOOOOOOOOO");
+			logger.info("HALLLLLOOOOOOOOO");
 			double[] V = ns.getVKnotVector();
 			double v0 = V[0];
 			double vm = V[V.length - 1];
 			double length = vm - v0;
 			double angle = 2 * Math.PI / (double)n;
-			System.out.println("angle = " + angle);
+			logger.info("angle = " + angle);
 			for (int i = 0; i < n; i++) {
 				double phi = i * angle;
-				System.out.println("phi = " + phi);
+				logger.info("phi = " + phi);
 				if(phi <= Math.PI / 2.){
 					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					v = v0 + v;
 					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else if(Math.PI / 2. < phi && phi <= Math.PI){
@@ -67,7 +72,7 @@ public class NurbsSurfaceUtility {
 					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					v = v0 + v + length / 4.;
 					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else if(Math.PI < phi && phi <= 3. * Math.PI / 2.){
@@ -75,7 +80,7 @@ public class NurbsSurfaceUtility {
 					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					v = v0 + v + length / 2.;
 					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else{
@@ -83,28 +88,28 @@ public class NurbsSurfaceUtility {
 					double v = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					v = v0 + v + 3. * length / 4.;
 					double [] p  = {point[0], v};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 			}
 			
 		}
 		else if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionVDir(ns)){
-			System.out.println("drinn");
+			logger.info("drinn");
 			double[] U = ns.getUKnotVector();
 			double u0 = U[0];
 			double un = U[U.length - 1];
 			double length = un - u0;
 			double angle = 2 * Math.PI / (double)n;
-			System.out.println("angle = " + angle);
+			logger.info("angle = " + angle);
 			for (int i = 0; i < n; i++) {
 				double phi = i * angle;
-				System.out.println("phi = " + phi);
+				logger.info("phi = " + phi);
 				if(phi <= Math.PI / 2.){
 					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					u = u0 + u;
 					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else if(Math.PI / 2. < phi && phi <= Math.PI){
@@ -112,7 +117,7 @@ public class NurbsSurfaceUtility {
 					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					u = u0 + u + length / 4.;
 					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else if(Math.PI < phi && phi <= 3. * Math.PI / 2.){
@@ -120,7 +125,7 @@ public class NurbsSurfaceUtility {
 					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					u = u0 + u + length / 2.;
 					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 				else{
@@ -128,7 +133,7 @@ public class NurbsSurfaceUtility {
 					double u = Math.PI / 2. * ((1 + Math.sqrt(2)) * (1 - Math.cos(phi)) + Math.sin(phi)) / (Math.sqrt(2) + 2 * Math.sin(phi));
 					u = u0 + u + 3. * length / 4.;
 					double [] p  = {u, point[1]};
-					System.out.println("p = " + Arrays.toString(p));
+					logger.info("p = " + Arrays.toString(p));
 					points.add(p);
 				}
 			}

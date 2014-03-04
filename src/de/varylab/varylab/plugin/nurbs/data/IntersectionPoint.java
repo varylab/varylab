@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin.nurbs.data;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
@@ -10,6 +11,8 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 
 
 public class IntersectionPoint {
+	
+	private static Logger logger = Logger.getLogger(IntersectionPoint.class.getName());
 	
 	public enum ClosedBoundary {left, right, upper, lower, interior};
 	public enum FaceVertex {faceVertex, noFaceVertex};
@@ -36,11 +39,11 @@ public class IntersectionPoint {
 			double[] point = getPoint();
 			for (Double value : boundaryValues) {
 				if(point[0] == value || point[1] == value){
-					System.out.println("point " + Arrays.toString(point) + " is a boundary point");
+					logger.info("point " + Arrays.toString(point) + " is a boundary point");
 					return true;
 				}
 			}
-			System.out.println("point [" + point[0] + ", " + point[1] +"] is NOT a boundary point");
+			logger.info("point [" + point[0] + ", " + point[1] +"] is NOT a boundary point");
 			return false;
 		}
 		else{

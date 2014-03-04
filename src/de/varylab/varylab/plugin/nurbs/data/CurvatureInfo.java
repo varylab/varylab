@@ -1,8 +1,11 @@
 package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class CurvatureInfo {
+	
+	private static Logger logger = Logger.getLogger(CurvatureInfo.class.getName());
 	
 	private double [] Su;
 	private double [] Sv;
@@ -19,7 +22,7 @@ public class CurvatureInfo {
 	private double [][] RiemannianMetric;
 	private double[][] secondFundamental;
 	private double GaussCurvature;
-	private double MainCurvature;
+	private double MeanCurvature;
 	
 	public CurvatureInfo(double[][]cM,double[][]cD, double l, double m, double[][] W, double[][] R){
 		curvatureDirections = cM;
@@ -85,11 +88,11 @@ public class CurvatureInfo {
 	}
 
 	public double getMainCurvature() {
-		return MainCurvature;
+		return MeanCurvature;
 	}
 
 	public void setMainCurvature(double mainCurvature) {
-		MainCurvature = mainCurvature;
+		MeanCurvature = mainCurvature;
 	}
 
 	public double[] getSu() {
@@ -167,45 +170,43 @@ public class CurvatureInfo {
 	}
 
 	public double getMeanCurvature() {
-		return MainCurvature;
+		return MeanCurvature;
 	}
 
 	public void setMeanCurvature(double mainCurvature) {
-		MainCurvature = mainCurvature;
+		MeanCurvature = mainCurvature;
 	}
 	
 	@Override
 	public String toString(){
 		String str = new String();
-		System.out.println("Su =  "+Arrays.toString(Su));
-		System.out.println("Sv = "+Arrays.toString(Sv));
-		System.out.println("Suu = "+Arrays.toString(Suu));
-		System.out.println("Suv = "+Arrays.toString(Suv));
-		System.out.println("Svv = "+Arrays.toString(Svv));
-		System.out.println("curvature directions at the manifold:");
+		logger.info("Su =  "+Arrays.toString(Su));
+		logger.info("Sv = "+Arrays.toString(Sv));
+		logger.info("Suu = "+Arrays.toString(Suu));
+		logger.info("Suv = "+Arrays.toString(Suv));
+		logger.info("Svv = "+Arrays.toString(Svv));
+		logger.info("curvature directions at the manifold:");
 		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
-			System.out.println("umbilic point");
+			logger.info("umbilic point");
 		} else {
-			System.out.println(Arrays.toString(curvatureDirections[0]));
-			System.out.println(Arrays.toString(curvatureDirections[1]));
+			logger.info(Arrays.toString(curvatureDirections[0]));
+			logger.info(Arrays.toString(curvatureDirections[1]));
 		}
-		System.out.println("curvature directions in the domain:");
+		logger.info("curvature directions in the domain:");
 		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
-			System.out.println("umbilic point");
+			logger.info("umbilic point");
 		}else{
-		System.out.println(Arrays.toString(pricipalDirections[0]));
-		System.out.println(Arrays.toString(pricipalDirections[1]));
+		logger.info(Arrays.toString(pricipalDirections[0]));
+		logger.info(Arrays.toString(pricipalDirections[1]));
 		}
-		System.out.println("curvatures:");
-		System.out.println("lambda: "+minCurvature);
-		System.out.println("my: "+maxCurvature);
-		System.out.println("shapeoperator:");
-		System.out.println(Weingartenoperator[0][0]+"  "+Weingartenoperator[0][1]);
-		System.out.println(Weingartenoperator[1][0]+"  "+Weingartenoperator[1][1]);
-		System.out.println("Gauss curvature: ");
-		System.out.println(GaussCurvature);
-		System.out.println(" Main curvature: ");
-		System.out.println(MainCurvature);
+		logger.info("curvatures:");
+		logger.info("lambda: "+minCurvature);
+		logger.info("my: "+maxCurvature);
+		logger.info("shapeoperator:");
+		logger.info(Weingartenoperator[0][0]+"  "+Weingartenoperator[0][1]);
+		logger.info(Weingartenoperator[1][0]+"  "+Weingartenoperator[1][1]);
+		logger.info("Gauss curvature: " + GaussCurvature);
+		logger.info(" Mean curvature: " + MeanCurvature);
 		return str;
 	}
 	
