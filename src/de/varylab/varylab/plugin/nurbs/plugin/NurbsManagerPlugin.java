@@ -229,6 +229,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
 //					logger.info("HALLLLOOOO");
 					logger.info("original surface " + surface.toString());
+//					double[][][] cm = surface.getControlMesh();
+//					for (int i = 0; i < cm.length; i++) {
+//						for (int j = 0; j < cm[0].length; j++) {
+//							if(cm[i][j][0] != 0.0 || cm[i][j][1] != 0.0){
+//								cm[i][j][0] = cm[i][j][0] * 1.4;
+//								cm[i][j][1] = cm[i][j][1] * 0.4;
+//							}
+//						}
+//					}
 //					NURBSSurface[] split1 = surface.splitInTheMiddle(false);
 					
 //					NURBSSurface[] split1 = surface.splitAtKnot1(false, 0.0);
@@ -237,6 +246,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //					surface = split2[0];
 					
 //					surface = surface.SurfaceKnotInsertion(true, 1.5);
+					
 	
 //					double[] p1 = surface.getSurfacePoint(2.0, 0.0);
 //					System.err.println("point 1 = " + Arrays.toString(p1));

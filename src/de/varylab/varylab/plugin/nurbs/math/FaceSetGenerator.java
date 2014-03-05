@@ -24,8 +24,7 @@ import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 public class FaceSetGenerator {
 	
 	private static Logger logger = Logger.getLogger(FaceSetGenerator.class.getName());
-	
-	private static Logger log = Logger.getLogger(FaceSetGenerator.class.getName());
+
 	private LinkedList<IntersectionPoint> leftBound = new LinkedList<IntersectionPoint>();
 	private LinkedList<IntersectionPoint> rightBound = new LinkedList<IntersectionPoint>();
 	private LinkedList<IntersectionPoint> upperBound = new LinkedList<IntersectionPoint>();
@@ -251,7 +250,7 @@ public class FaceSetGenerator {
 		logger.info("Boundary ");
 	
 		for (Double value : ns.getBoundaryValuesPastIntersection(dilation)) {
-			logger.info(""+value);
+			logger.info(value.toString());
 		
 		}
 		for (IntersectionPoint iP1 : ipList) {
@@ -378,14 +377,12 @@ public class FaceSetGenerator {
 //		}
 		logger.info("list of all points and its nbrs");
 		for (IntersectionPoint p : points) {
-				logger.info("point = " + Arrays.toString(p.getPoint()));
-				logger.info("nbrs");
-				for (IntersectionPoint ip : p.getNbrs()) {
-					logger.info(Arrays.toString(ip.getPoint()));
-					
-				}
+			logger.info("point = " + Arrays.toString(p.getPoint()));
+			logger.info("nbrs");
+			for (IntersectionPoint ip : p.getNbrs()) {
+				System.out.println(Arrays.toString(ip.getPoint()));
+			}
 		}
-		logger.info("ENDE");
 		return points;
 	}
 	
@@ -494,7 +491,7 @@ public class FaceSetGenerator {
 	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, IntersectionPoint current){
 		IntersectionPoint next = null;
-		log.info("C U R R E N T = " + current);
+		logger.info("C U R R E N T = " + current);
 		if(previous == null){
 			logger.info("case 1 previous == null");
 			IntersectionPoint nextLocal = current.getUnusedNbrs().pollLast();
@@ -525,7 +522,7 @@ public class FaceSetGenerator {
 		else{
 			logger.info("case 2 previous != null");
 			IntersectionPoint nextLocal = getNextNbrLocal(previous, current);
-			logger.info("next local " + Arrays.toString(nextLocal.getPoint()));
+//			logger.info("next local " + Arrays.toString(nextLocal.getPoint()));
 			
 			if(!isClosedBoundaryPoint(current)){
 				current.getUnusedNbrs().remove(nextLocal);

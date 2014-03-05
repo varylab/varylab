@@ -200,6 +200,7 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	W[1][1] = a22;
 	dG.setWeingartenOperator(W);
 	
+	
 	//lambda
 	Double lambda = (a11 + a22) / 2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
 	
@@ -219,14 +220,14 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	
 	double[][] w = new double[2][2];
 	
-	if(Math.abs(a12) > 0.00001){
+	if(Math.abs(a12) > 0.00000000001){
 //		logger.info("a12 != 0");
 //		logger.info("a12 = " + a12);
 		w[0][0] = 1; 
 		w[0][1] = (lambda - a11) / a12; 
 
 	}
-	else if(Math.abs(a21) > 0.00001){
+	else if(Math.abs(a21) > 0.00000000001){
 //		logger.info("a21 != 0");
 		w[0][0] = (lambda - a22)/a21; 
 		w[0][1] = 1; 
