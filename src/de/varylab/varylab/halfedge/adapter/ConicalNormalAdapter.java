@@ -13,9 +13,11 @@ import de.jtem.numericalMethods.algebra.linear.solve.AXB;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.halfedge.adapter.type.ConicalNormal;
 import de.varylab.varylab.optimization.util.CollectionUtility;
 
 @VectorField
+@ConicalNormal
 public class ConicalNormalAdapter extends AbstractTypedAdapter<VVertex, VEdge, VFace, double[]> {
 
 	public ConicalNormalAdapter() {

@@ -36,6 +36,7 @@ import de.varylab.varylab.plugin.datasource.IncircleCrossRatio;
 import de.varylab.varylab.plugin.datasource.IncircleCrossRatio2;
 import de.varylab.varylab.plugin.datasource.OppositeAnglesCurvature;
 import de.varylab.varylab.plugin.datasource.OppositeEdgesCurvature;
+import de.varylab.varylab.plugin.datasource.SCConicalConeDataSource;
 import de.varylab.varylab.plugin.ddg.AssociatedFamily;
 import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
 import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
@@ -289,7 +290,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(MinimalPathsOptimizer.class);
 		pSet.add(ForceConeOptimizer.class);
 		pSet.add(NgonRegularizer.class);
-		
+		pSet.add(SCConicalConeDataSource.class);
 	}
 	
 	private static void addLnFPlugins(Set<Class<? extends Plugin>> pSet) {

@@ -1,5 +1,8 @@
 package de.varylab.varylab.utilities;
 
+import de.jreality.math.Matrix;
+import de.jreality.math.Rn;
+
 public class MathUtility {
 	
 	public static long binomCoeff(int n, int k) {
@@ -66,4 +69,18 @@ public class MathUtility {
 		}
 		return P;
 	}
+	
+	public static Matrix makeMappingMatrix(double[][] from, double[][] to) {
+		double[] from1 = Rn.convertArray2DToArray1D(null, from);
+		Matrix F = new Matrix(from1);
+		F.transpose();
+		F.invert();
+		double[] to1 = Rn.convertArray2DToArray1D(null, to);
+		Matrix T = new Matrix(to1);
+		T.transpose();
+		T.multiplyOnRight(F);
+		return T;
+	}
+	
+	
 }
