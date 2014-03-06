@@ -14,6 +14,7 @@ import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointDistanceComparator;
 import de.varylab.varylab.plugin.nurbs.IntersectionPointIndexComparator;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IndexedCurveList;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
@@ -143,47 +144,6 @@ public class FaceSetGenerator {
 	}
 	
 
-//	private boolean areOppositePoints(IntersectionPoint ip1, IntersectionPoint ip2){
-//		IntersectionPoint opposite = getOppositePoint(ip1);
-//		if(opposite == null){
-//			return false;
-//		} else {
-//			if(!Arrays.equals(opposite.getPoint(), ip2.getPoint())){
-//				return false;
-//			} else {
-//				return true;
-//			}
-//		}
-//		
-//	}
-
-//	@SuppressWarnings("unused")
-//	private boolean areOppositePoints(IntersectionPoint ip1, IntersectionPoint ip2){
-//		IntersectionPoint opposite = getOppositePoint(ip1);
-//		if(opposite == null){
-//			return false;
-//		} else {
-//			if(!Arrays.equals(opposite.getPoint(), ip2.getPoint())){
-//				return false;
-//			} else {
-//				return true;
-//			}
-//		}
-//		
-//	}
-//	
-//	private static int getShiftedIndexFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
-//		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
-//		int shiftedIndex = 0;
-//		for (LineSegment ls : intersectingSegments) {
-//			if(ls.getCurveIndex() == curveIndex){
-//				shiftedIndex = ls.getShiftedIndex();
-//			}
-//		}
-//		return shiftedIndex;
-//	}
-
-	
 	private static int getRightShiftFromIntersectionPointAndCurveIndex(IntersectionPoint ip, int curveIndex){
 		LinkedList<LineSegment> intersectingSegments = ip.getIntersectingSegments();
 		int rightShift = 0;
@@ -487,9 +447,29 @@ public class FaceSetGenerator {
 		return false;
 	}
 	
-	
-	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, IntersectionPoint current){
+		if(ns.getClosingDir() == ClosingDir.nonClosed){
+			IntersectionPoint next = null;
+			if(previous == null){
+				logger.info("previous == null");
+				next = current.getUnusedNbrs().pollLast();
+				logger.info("next = " + Arrays.toString(next.getPoint()));
+				next.setPrevious(current);
+			} else {
+				logger.info("previous != null");
+				next = getNextNbrLocal(previous, current);
+				logger.info("next = " + Arrays.toString(next.getPoint()));
+				current.getUnusedNbrs().remove(next);				
+				next.setPrevious(current);
+			}
+			return next;
+		} else {
+			logger.info("getNextNbrClosedBoundary");
+			return getNextNbrClosedBoundary(previous, current);
+		}
+	}
+	
+	public IntersectionPoint getNextNbrClosedBoundary(IntersectionPoint previous, IntersectionPoint current){
 		IntersectionPoint next = null;
 		logger.info("C U R R E N T = " + current);
 		if(previous == null){

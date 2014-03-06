@@ -4,9 +4,29 @@ import java.util.LinkedList;
 
 public class PolygonalLine {
 	
-	private LinkedList<LineSegment>pLine;
+	private LinkedList<LineSegment> pLine;
 	private String description = null;
+	private int 
+			begin = 0,
+			end = 0;
+
 	
+
+	public int getBegin() {
+		return begin;
+	}
+
+	public void setBegin(int begin) {
+		this.begin = begin;
+	}
+
+	public int getEnd() {
+		return end;
+	}
+
+	public void setEnd(int end) {
+		this.end = end;
+	}
 
 	public PolygonalLine(){
 		pLine = null;
@@ -14,16 +34,21 @@ public class PolygonalLine {
 	
 	public PolygonalLine(LinkedList<LineSegment > polygonalLine){
 		pLine = polygonalLine;
-	}
-
-	public LinkedList<LineSegment> getpLine() {
-		return pLine;
-	}
-
-	public void setpLine(LinkedList<LineSegment> pLine) {
-		this.pLine = pLine;
+		end = pLine.size()+1;
 	}
 	
+	public LinkedList<LineSegment> getpLine(){
+		LinkedList<LineSegment> newpLine = new LinkedList<LineSegment>();
+		int count = 0;
+		for (LineSegment ls : pLine) {
+			if(count >= begin && count <= end){
+				newpLine.add(ls);
+			}
+			count++;
+		}
+		return newpLine;
+	}
+
 	public int getCurveIndex(){
 		return pLine.getFirst().getCurveIndex();
 	}

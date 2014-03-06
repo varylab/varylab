@@ -30,7 +30,7 @@ public class IntegralCurve {
 	double[][] basis;
 	private double tol;
 	private CurveType curveType = CurveType.CURVATURE;
-	private double angle = 1000000;
+//	private double angle = 1000000;
 	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
 	private double[] vecField = null;
 	
@@ -114,28 +114,19 @@ public class IntegralCurve {
 			double k2 = ci.getMaxCurvature();
 		if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
 			flip(w1);
-			logger.info("flip w1");
 		}
 		prevW1 = w1;
 		if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
 			flip(w2);
-			logger.info("flip w2");
 		}
 		prevW2 = w2;
 		double theta;
 		if(k2 == 0){
 			theta = Math.PI / 2.;
-			logger.info("k2 == 0");
 		}
 		else{
 			theta = Math.atan(Math.sqrt(k1 / k2));
-//			logger.info("theta = " + theta);
-//			if(theta == 0.7853981633974484){
-				logger.info("k1 = " + k1 + " k2  = " + k2);
-//			}
 		}
-		
-		angle = theta;
 		dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
 		dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
 		Rn.normalize(dir, dir);
@@ -162,7 +153,6 @@ public class IntegralCurve {
 			double[] e1 = ci.getCurvatureDirections()[0];
 			double[] e2 = ci.getCurvatureDirections()[1];
 			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
-//			logger.info("inner product = " + Rn.innerProduct(v, e1));
 			double delta = 0.;
 			if(Rn.innerProduct(v, e1) > 1){
 				delta = 0.;
@@ -173,48 +163,23 @@ public class IntegralCurve {
 			else{
 				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
 			}
-			logger.info("delta = " + delta);
-//			logger.info("delta = " + delta);
-		
-			
-//			boolean flip1 = false;
 			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-//				flip1 = true;
-//				logger.info("flip w1");
-//				logger.info("Rn.innerProduct(prevW1, w1) " + Rn.innerProduct(prevW1, w1));
 				flip(w1);
 			}
-			
 			prevW1 = w1;
-//			logger.info("w1 = " + Arrays.toString(w1));
-//			boolean flip2 = false;
 			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-//				logger.info("flip w2");
-				
-//				logger.info("revW2 " + Arrays.toString(prevW2));
-//				
-//				logger.info("Rn.innerProduct(prevW2, w2) " + Rn.innerProduct(prevW2, w2));
 				flip(w2);
 			}
-			
 			prevW2 = w2;
 			double theta;
 			if(k2 == 0){
 				theta = Math.PI / 2.;
 			}
 			else{
-//				theta = Math.atan(Math.sqrt(k1 / k2));
-				double q = 
-						k1 / k2;
+				double q = k1 / k2;
 				double p = Math.tan(delta) * (1 + q) / 2;
-//				logger.info("p = " + p);
 				theta = Math.atan(p + Math.sqrt(p * p + q));
-				
 			}
-			
-//			logger.info("theta " + theta);
-			angle = theta;
-//			logger.info("w2 = " + Arrays.toString(w2));
 			dir[0] = Math.cos(theta) * w1[0] + Math.sin(theta) * w2[0];
 			dir[1] = Math.cos(theta) * w1[1] + Math.sin(theta) * w2[1];
 			Rn.normalize(dir, dir);
@@ -223,12 +188,8 @@ public class IntegralCurve {
 		else{
 			return getAssymptoticDirection(ns, point);
 		}
-}
+	}
 	
-
-	
-	
-
 	
 	/**
 	 
@@ -821,11 +782,11 @@ public class IntegralCurve {
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
 	
-		while (!nearBy && counter < 2000) {
+		while (!nearBy && counter < 5000) {
 
 			counter++;
-			if(counter == 2000){
-				logger.info("termination after 2000 steps");
+			if(counter == 5000){
+				logger.info("termination after 5000 steps");
 			}
 			double[] last = pointList.getLast().clone();
 			double[] sumA = new double[2];

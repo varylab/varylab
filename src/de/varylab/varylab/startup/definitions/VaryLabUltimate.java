@@ -93,6 +93,7 @@ import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
+import de.varylab.varylab.plugin.selection.GeodesicVertexSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
 import de.varylab.varylab.plugin.selection.StripSelection;
 import de.varylab.varylab.plugin.selection.TextureEdgeSelection;
@@ -189,6 +190,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(NodePropertyEditor.class);
 		pSet.add(RemoveGeodesicPlugin.class);
 		pSet.add(GeodesicSelection.class);
+		pSet.add(GeodesicVertexSelection.class);
 		pSet.add(LatticeSelection.class);
 		pSet.add(StripSelection.class);
 		pSet.add(TextureVertexSelection.class);
