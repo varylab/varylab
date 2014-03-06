@@ -5,16 +5,16 @@ import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
 import java.awt.Color;
 
-import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphNode;
-import de.jreality.scene.proxy.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -24,8 +24,6 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
-import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -40,16 +38,31 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		coneGeometry = Primitives.cone(80);
 	private static double[]
 		e4 = {0,0,0,1};
-	private Appearance
-		coneAppearance = new Appearance();
+	private SceneGraphComponent
+		coneRoot = new SceneGraphComponent();
 	
 	public SCConicalConeDataSource() {
+		Appearance coneAppearance = new Appearance();
 		coneAppearance.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		coneAppearance.setAttribute(CommonAttributes.EDGE_DRAW, false);
 		coneAppearance.setAttribute(CommonAttributes.FACE_DRAW, true);
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.DIFFUSE_COLOR, new Color(60, 140, 200));
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COLOR, Color.RED);
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COEFFICIENT, 1.0);
+		coneRoot.setAppearance(coneAppearance);
+		SceneGraphComponent cone01 = new SceneGraphComponent();
+		SceneGraphComponent cone02 = new SceneGraphComponent();
+		cone01.setGeometry(coneGeometry);
+		cone02.setGeometry(coneGeometry);
+		MatrixBuilder mb01 = MatrixBuilder.euclidean();
+		MatrixBuilder mb02 = MatrixBuilder.euclidean();
+		mb01.rotate(Math.PI, 1, 0, 0);
+		mb01.translate(0, 0, -1);
+		mb02.translate(0, 0, -1);
+		mb01.assignTo(cone01);
+		mb02.assignTo(cone02);
+		coneRoot.addChild(cone01);
+		coneRoot.addChild(cone02);
 	}
 	
 	
@@ -82,18 +95,18 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 			}
 			F refFace = refEdge.getLeftFace();
 			double[] vPoint = a.getD(Position4d.class, v);
+			double[] diagX = calculateDiagonalIntersection(refFace, a);
 			double[] fNormal = a.getD(Normal.class, refFace);
-			
-//			double[] koenigsPoint = calculateDiagonalIntersection(refFace, a);
-//			double[] koenigsVec = Rn.subtract(null, koenigsPoint, vPoint);
 			double[] conicalNormal = a.getD(ConicalNormal.class, v);
-			double[] dir = Rn.projectOnto(null, conicalNormal, fNormal);
+			double[] dir = Rn.projectOntoComplement(null, conicalNormal, fNormal);
+			double len = Rn.euclideanNorm(Rn.subtract(null, diagX, vPoint));
+			Rn.setToLength(dir, dir, len);
+			
 			conicalNormal = Arrays.resize(conicalNormal, 4);
 			dir = Arrays.resize(dir, 4);
 			Matrix T = getConeMatrix(vPoint, conicalNormal, dir);
 			SceneGraphComponent c = new SceneGraphComponent();
-			c.setGeometry(coneGeometry);
-			c.setAppearance(coneAppearance);
+			c.addChild(coneRoot);
 			T.assignTo(c);
 			return c;
 		}
@@ -103,16 +116,17 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>
 		> double[] calculateDiagonalIntersection(F f, AdapterSet a) {
-//			E e1 = f.getBoundaryEdge();
-//			E e2 = e1.getNextEdge();
-//			E e3 = e2.getNextEdge();
-//			E e4 = e3.getNextEdge();
-//			double[] p1 = a.getD(Position4d.class, e1);
-//			double[] p2 = a.getD(Position4d.class, e2);
-//			double[] p3 = a.getD(Position4d.class, e3);
-//			double[] p4 = a.getD(Position4d.class, e4);
-//			return p1;
-			return a.getD(BaryCenter4d.class, f);
+			E e1 = f.getBoundaryEdge();
+			E e2 = e1.getNextEdge();
+			E e3 = e2.getNextEdge();
+			E e4 = e3.getNextEdge();
+			double[] N = Arrays.resize(a.getD(Normal.class, f), 4);
+			double[] p1 = a.getD(Position4d.class, e1);
+			double[] p2 = a.getD(Position4d.class, e2);
+			double[] p3 = a.getD(Position4d.class, e3);
+			double[] p4 = a.getD(Position4d.class, e4);
+			double[] r = MathUtility.getDiagonalIntersection(N, p1, p2, p3, p4);
+			return Pn.dehomogenize(r, r);
 		}
 		
 	}
@@ -133,8 +147,6 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		MatrixBuilder mb = MatrixBuilder.euclidean();
 		mb.translate(apex);
 		mb.times(T);
-		mb.rotate(Math.PI, 1, 0, 0);
-		mb.translate(0, 0, -1);
 		return mb.getMatrix();
 	}
 	

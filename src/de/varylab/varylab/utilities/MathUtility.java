@@ -1,6 +1,7 @@
 package de.varylab.varylab.utilities;
 
 import de.jreality.math.Matrix;
+import de.jreality.math.P3;
 import de.jreality.math.Rn;
 
 public class MathUtility {
@@ -80,6 +81,15 @@ public class MathUtility {
 		T.transpose();
 		T.multiplyOnRight(F);
 		return T;
+	}
+
+	public static double[] getDiagonalIntersection(double[] N, double[] p1, double[] p2, double[] p3, double[] p4) {
+		double[] p1N = Rn.add(null, p1, N);
+		double[] p2N = Rn.add(null, p2, N);
+		double[] planeF = P3.planeFromPoints(null, p1, p2, p3);
+		double[] plane01 = P3.planeFromPoints(null, p1, p3, p1N);
+		double[] plane02 = P3.planeFromPoints(null, p2, p4, p2N);
+		return P3.pointFromPlanes(null, planeF, plane01, plane02);
 	}
 	
 	
