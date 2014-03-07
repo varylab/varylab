@@ -42,6 +42,7 @@ import de.varylab.varylab.plugin.ddg.CentralExtensionSubdivision;
 import de.varylab.varylab.plugin.ddg.ChristoffelTransform;
 import de.varylab.varylab.plugin.ddg.GaussMapFromDual;
 import de.varylab.varylab.plugin.ddg.KoebeSphereProjection;
+import de.varylab.varylab.plugin.ddg.KoenigsDual;
 import de.varylab.varylab.plugin.ddg.LeastSquaresSphere;
 import de.varylab.varylab.plugin.ddg.VertexSpheres;
 import de.varylab.varylab.plugin.dec.TrivialConnectionPlugin;
@@ -317,6 +318,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(LeastSquaresSphere.class);
 		pSet.add(CurvatureLinesQualityVisualizer.class);
 		pSet.add(VertexSpheres.class);
+		pSet.add(KoenigsDual.class);
 	}
 	
 	

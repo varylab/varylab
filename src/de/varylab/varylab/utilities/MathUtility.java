@@ -2,7 +2,15 @@ package de.varylab.varylab.utilities;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.P3;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Normal;
+import de.jtem.halfedgetools.adapter.type.generic.Position4d;
+import de.jtem.numericalMethods.util.Arrays;
 
 public class MathUtility {
 	
@@ -90,6 +98,24 @@ public class MathUtility {
 		double[] plane01 = P3.planeFromPoints(null, p1, p3, p1N);
 		double[] plane02 = P3.planeFromPoints(null, p2, p4, p2N);
 		return P3.pointFromPlanes(null, planeF, plane01, plane02);
+	}
+
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> double[] calculateDiagonalIntersection(F f, AdapterSet a) {
+		E e1 = f.getBoundaryEdge();
+		E e2 = e1.getNextEdge();
+		E e3 = e2.getNextEdge();
+		E e4 = e3.getNextEdge();
+		double[] N = Arrays.resize(a.getD(Normal.class, f), 4);
+		double[] p1 = a.getD(Position4d.class, e1.getStartVertex());
+		double[] p2 = a.getD(Position4d.class, e2.getStartVertex());
+		double[] p3 = a.getD(Position4d.class, e3.getStartVertex());
+		double[] p4 = a.getD(Position4d.class, e4.getStartVertex());
+		double[] r = getDiagonalIntersection(N, p1, p2, p3, p4);
+		return Pn.dehomogenize(r, r);
 	}
 	
 	

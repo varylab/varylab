@@ -8,7 +8,6 @@ import java.awt.Color;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.scene.Appearance;
@@ -140,7 +139,7 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>
 		> SceneGraphNode getF(F f, AdapterSet a) {
-			double[] diagX = calculateDiagonalIntersection(f, a);
+			double[] diagX = MathUtility.calculateDiagonalIntersection(f, a);
 			SceneGraphComponent c = new SceneGraphComponent();
 			c.setGeometry(Primitives.point(diagX));
 			return c;
@@ -163,7 +162,7 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		}
 		F refFace = refEdge.getLeftFace();
 		double[] vPoint = a.getD(Position4d.class, v);
-		double[] diagX = calculateDiagonalIntersection(refFace, a);
+		double[] diagX = MathUtility.calculateDiagonalIntersection(refFace, a);
 		double[] fNormal = a.getD(Normal.class, refFace);
 		double[] conicalNormal = a.getD(ConicalNormal.class, v);
 		double[] dir = Rn.projectOntoComplement(null, conicalNormal, fNormal);
@@ -176,24 +175,6 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		SceneGraphComponent c = new SceneGraphComponent();
 		T.assignTo(c);
 		return c;
-	}
-	
-	public static <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>
-	> double[] calculateDiagonalIntersection(F f, AdapterSet a) {
-		E e1 = f.getBoundaryEdge();
-		E e2 = e1.getNextEdge();
-		E e3 = e2.getNextEdge();
-		E e4 = e3.getNextEdge();
-		double[] N = Arrays.resize(a.getD(Normal.class, f), 4);
-		double[] p1 = a.getD(Position4d.class, e1.getStartVertex());
-		double[] p2 = a.getD(Position4d.class, e2.getStartVertex());
-		double[] p3 = a.getD(Position4d.class, e3.getStartVertex());
-		double[] p4 = a.getD(Position4d.class, e4.getStartVertex());
-		double[] r = MathUtility.getDiagonalIntersection(N, p1, p2, p3, p4);
-		return Pn.dehomogenize(r, r);
 	}
 	
 	public static Matrix getConeMatrix(double[] apex, double[] normal, double[] dir) {

@@ -10,6 +10,7 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
+import de.varylab.varylab.utilities.MathUtility;
 import de.varylab.varylab.utilities.TestUtility;
 
 public class SCConicalConeDataSourceTest {
@@ -21,7 +22,7 @@ public class SCConicalConeDataSourceTest {
 		AdapterSet a = AdapterSet.createGenericAdapters();
 		a.add(new VPositionAdapter());
 		for (VFace f : HalfEdgeUtilsExtra.getFaceStar(v0)) {
-			double[] di = SCConicalConeDataSource.calculateDiagonalIntersection(f, a);
+			double[] di = MathUtility.calculateDiagonalIntersection(f, a);
 			double dist =Pn.distanceBetween(di, v0.getP(), Pn.EUCLIDEAN);
 			Assert.assertEquals(0.0276330690702, dist, 1E-10);
 		}
