@@ -23,8 +23,7 @@ public class ConnectionUtility {
 
 	public static double[] transportVector(
 			double[] vector, 
-			Face<?, ?, ?> actFace, 
-			Edge<?, ?, ?> bdEdge,
+			Edge<?, ?, ?> bdEdge, 
 			ConnectionAdapter trivialConnection,
 			AdapterSet adapters) {
 		double[]
@@ -85,7 +84,7 @@ public class ConnectionUtility {
 			do {
 				F neighFace = bdEdge.getRightFace();
 				if(neighFace != null && !(vf.containsKey(neighFace))) {
-					double[] neighVector = ConnectionUtility.transportVector(vf.get(actFace),actFace,bdEdge,connection,adapters);
+					double[] neighVector = ConnectionUtility.transportVector(vf.get(actFace),bdEdge,connection,adapters);
 					vf.put(neighFace, neighVector);
 					//	System.out.println(neighFace +":"+Arrays.toString(neighVector));
 					queue.add(neighFace);

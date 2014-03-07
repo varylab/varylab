@@ -29,6 +29,7 @@ import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VVertex;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class RemeshingUtility {
 
@@ -147,7 +148,18 @@ public class RemeshingUtility {
 				continue;
 			}
 			double[] bary = getBarycentricTexturePoint(patternPoint, f, a);
-			double[] newPos = getPointFromBarycentric(bary, f, a);
+			double[] newPos = null;
+			NurbsUVAdapter nurbsUVAdapter = a.query(NurbsUVAdapter.class);
+			if(nurbsUVAdapter != null) {
+				double[] A = nurbsUVAdapter.getV(f.getBoundaryEdge().getStartVertex(),a);
+				double[] B = nurbsUVAdapter.getV(f.getBoundaryEdge().getTargetVertex(),a);
+				double[] C = nurbsUVAdapter.getV(f.getBoundaryEdge().getNextEdge().getTargetVertex(),a);
+				double uc = bary[0]*A[0] + bary[1]*B[0] + bary[2]*C[0];
+				double vc = bary[0]*A[1] + bary[1]*B[1] + bary[2]*C[1];
+				newPos = nurbsUVAdapter.getSurface().getSurfacePoint(uc,vc);
+			} else {
+				newPos = getPointFromBarycentric(bary, f, a);
+			}
 			flatCoordMap.put(v, patternPoint);
 			a.set(Position.class, v, newPos);
 		}

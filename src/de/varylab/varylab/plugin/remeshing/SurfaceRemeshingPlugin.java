@@ -65,6 +65,7 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
+import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionListener {
 
@@ -273,11 +274,16 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	private void liftMesh() {
 		remesh = hcp.get(new VHDS());
 		HalfedgeSelection selection = hcp.getSelection();
-		RemeshingUtility.alignRemeshBoundary(remesh, surface, hcp.getAdapters());
+		AdapterSet adapters = new AdapterSet(hcp.getAdapters());
+		RemeshingUtility.alignRemeshBoundary(remesh, surface, adapters);
+		NurbsUVAdapter nurbsUVAdapter = hcp.getActiveAdapters().query(NurbsUVAdapter.class);
+		if(nurbsUVAdapter!= null) {
+			adapters.add(nurbsUVAdapter);
+		}
 		if(newOldFaceMap.isEmpty()) {
-			RemeshingUtility.mapInnerVertices(surface, surfaceKD, remesh, hcp.getAdapters());
+			RemeshingUtility.mapInnerVertices(surface, surfaceKD, remesh, adapters);
 		} else {
-			RemeshingUtility.mapInnerVertices(surface, newOldFaceMap, remesh, hcp.getAdapters());
+			RemeshingUtility.mapInnerVertices(surface, newOldFaceMap, remesh, adapters);
 		}
 		hcp.set(remesh);
 		hcp.setSelection(selection);

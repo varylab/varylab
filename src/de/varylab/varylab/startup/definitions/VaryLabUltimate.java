@@ -27,6 +27,7 @@ import de.varylab.discreteconformal.plugin.visualizer.FlippedTriangles;
 import de.varylab.discreteconformal.plugin.visualizer.IndexMedialGraph;
 import de.varylab.varylab.VaryLab;
 import de.varylab.varylab.plugin.VarylabMain;
+import de.varylab.varylab.plugin.affineminimal.AffineMinimalOptimizerPlugin;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
@@ -293,6 +294,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(MinimalPathsOptimizer.class);
 		pSet.add(ForceConeOptimizer.class);
 		pSet.add(NgonRegularizer.class);
+		pSet.add(AffineMinimalOptimizerPlugin.class);
 		pSet.add(SCConicalConeDataSource.class);
 	}
 	

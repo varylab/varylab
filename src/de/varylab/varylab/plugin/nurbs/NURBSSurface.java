@@ -474,6 +474,16 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		 */
 		public double[] getSurfacePoint( double u, double v) {
 			double[] S = new double[4];
+			if(u < U[0]) {
+				u = U[0];
+			} else if(u > U[U.length-1]) {
+				u = U[U.length-1];
+			}
+			if(v < V[0]) {
+				v = V[0];
+			} else if(v > V[V.length-1]) {
+				v = V[V.length-1];
+			}
 			NURBSAlgorithm.SurfacePoint(p, U, q, V, controlMesh, u, v, S);
 			return S;
 		}

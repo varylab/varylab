@@ -129,7 +129,10 @@
 		<pathelement location="${lib}/junit/hamcrest-core-1.3.jar"/>
 	</path>
 
-
+	<path id="jopennurbs.libraryclasspath">
+		<pathelement location="${lib}/jopennurbs/jopennurbs.jar"/>
+	</path>
+	
 	<target name="assemble classpath">
 		<manifestclasspath property="manifest.conformallab.classpath" jarfile="${jarfile}">
 			<classpath refid="conformallab.libraryclasspath"/>
@@ -183,6 +186,7 @@
 			<classpath refid="conformallab.libraryclasspath"/>
 			<classpath refid="jfreechart.libraryclasspath"/>
 			<classpath refid="jogamp.libraryclasspath"/>
+			<classpath refid="jopennurbs.libraryclasspath"/>
 			<classpath refid="jreality.libraryclasspath"/>
 			<classpath refid="jtem.libraryclasspath"/>
 			<classpath refid="substance.libraryclasspath"/>
@@ -238,6 +242,7 @@
 			<classpath refid="xstream.libraryclasspath"/>
 			<classpath refid="misc.libraryclasspath"/>
 			<classpath refid="junit.libraryclasspath"/>
+			<classpath refig="jopennurbs.libraryclasspath"/>
 			<batchtest>
 				<fileset dir="${src-test}">
 					<include name="**/*Test.java"/>
@@ -309,6 +314,7 @@
 		<copy todir="${appfolder}/native" description="copy native library folder">
 			<fileset dir="native">
 				<include name="**/**jpetsctao**"/>
+				<include name="**/**jopennurbs**"/>
 				<exclude name="**/**mpi**"/>
 			</fileset>
 		</copy>

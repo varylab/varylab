@@ -75,6 +75,7 @@ import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
+import de.jreality.util.NativePathUtility;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -88,6 +89,15 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
+import de.varylab.opennurbs.ONX_Model;
+import de.varylab.opennurbs.ONX_Model_Object;
+import de.varylab.opennurbs.ON_4dPoint;
+import de.varylab.opennurbs.ON_Brep;
+import de.varylab.opennurbs.ON_Geometry;
+import de.varylab.opennurbs.ON_NurbsSurface;
+import de.varylab.opennurbs.ON_Object;
+import de.varylab.opennurbs.ON_Surface;
+import de.varylab.opennurbs.Rhino3dmReader;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.io.NurbsIO;
@@ -98,6 +108,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
+import de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
@@ -114,6 +125,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
+import de.varylab.varylab.utilities.OpenNurbsUtility;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
@@ -204,6 +216,22 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				return getDescription();
 			}
 		});
+		chooser.addChoosableFileFilter(new FileFilter(){
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".3dm");
+			}
+
+			@Override
+			public String getDescription() {
+				return "OpenNurbs 3dm (*.3dm)";
+			}
+			
+			@Override
+			public String toString() {
+				return getDescription();
+			}
+		});
 	}	
 	
 	private class ImportAction extends AbstractAction {
@@ -287,7 +315,24 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 //						}
 					}
-				} 
+				} else if(file.getName().toLowerCase().endsWith(".3dm")) {
+					ONX_Model model = Rhino3dmReader.readFile(file.getPath());
+					List<NURBSSurface> nsurfaces = OpenNurbsUtility.getNurbsSurfaces(model);
+					int i = 1;
+					for(NURBSSurface surface : nsurfaces) {
+						if(!surface.hasClampedKnotVectors()) {
+							surface.repairKnotVectors();
+						}
+						NurbsParameterPanel npp = new NurbsParameterPanel(surface);
+						int dialogOk = JOptionPane.showConfirmDialog(w, npp, getPluginInfo().name, OK_CANCEL_OPTION, PLAIN_MESSAGE );
+						if(dialogOk == JOptionPane.OK_OPTION) {
+							HalfedgeLayer newLayer = new HalfedgeLayer(hif);
+							newLayer.setName(file.getName() + " surface " + i++);
+							NurbsSurfaceUtility.addNurbsMesh(surface,newLayer,npp.getU(),npp.getV());
+							hif.addLayer(newLayer);
+						}
+					}
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
@@ -300,8 +345,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			private static final long serialVersionUID = 1L;
 
 			private SpinnerNumberModel
-				uModel = new SpinnerNumberModel(11,0,200,2),
-				vModel = new SpinnerNumberModel(11,0,200,2);
+				uModel = new SpinnerNumberModel(11,0,Integer.MAX_VALUE,2),
+				vModel = new SpinnerNumberModel(11,0,Integer.MAX_VALUE,2);
 			
 			private JSpinner
 				uSpinner = new JSpinner(uModel),
@@ -330,8 +375,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				add(new JLabel("Parameters:"),rc);
 				
 				paramPanel.setLayout(new GridLayout(2,2));
+				uModel.setValue(2*surf.getNumUPoints());
 				paramPanel.add(new JLabel("u-Lines")); 
 				paramPanel.add(uSpinner);
+				vModel.setValue(2*surf.getNumVPoints());
 				paramPanel.add(new JLabel("v-Lines")); 
 				paramPanel.add(vSpinner);
 				
@@ -1227,6 +1274,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		pointSelectionPlugin.addPointSelectionListener(curvatureLinesPanel);
 		c.getPlugin(ExtractControlMesh.class);
 		c.getPlugin(NurbsSurfaceFromMesh.class);
+		c.getPlugin(ProjectToNurbsSurface.class);
 		c.getPlugin(VertexEditorPlugin.class);
 		c.getPlugin(QuadMeshGenerator.class);
 	}
@@ -1346,6 +1394,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	}
 	
 	public static void main(String[] args) {
+		NativePathUtility.set("native");
+		try {
+			System.loadLibrary("jopennurbs");
+		} catch (UnsatisfiedLinkError e) {
+			logger.severe("Could not find libjopennurbs in natives path.");
+		}
 		JRViewer v = new JRViewer();
 		v.addContentUI();
 		v.addBasicUI();

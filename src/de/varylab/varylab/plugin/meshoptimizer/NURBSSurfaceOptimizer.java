@@ -172,6 +172,9 @@ public class NURBSSurfaceOptimizer extends VarylabOptimizerPlugin implements Act
 			try {
 				FileReader nurbsReader = new FileReader(nurbsFile);
 				NURBSSurface surface = NurbsIO.readNURBS(nurbsReader);
+				if(!surface.hasClampedKnotVectors()) {
+					surface.repairKnotVectors();
+				}
 				setSurface(surface);
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, e + "\n" + ex.getMessage(), "Loading Error", WARNING_MESSAGE);
