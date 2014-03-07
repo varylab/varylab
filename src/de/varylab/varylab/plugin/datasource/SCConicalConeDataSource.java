@@ -28,7 +28,6 @@ import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.numericalMethods.util.Arrays;
-import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.type.ConicalNormal;
 import de.varylab.varylab.utilities.MathUtility;
 
@@ -39,7 +38,8 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 	private static double[]
 		e4 = {0,0,0,1};
 	private SceneGraphComponent
-		coneRoot = new SceneGraphComponent();
+		cone01 = new SceneGraphComponent(),
+		cone02 = new SceneGraphComponent();
 	
 	public SCConicalConeDataSource() {
 		Appearance coneAppearance = new Appearance();
@@ -49,9 +49,8 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.DIFFUSE_COLOR, new Color(60, 140, 200));
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COLOR, Color.RED);
 		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COEFFICIENT, 1.0);
-		coneRoot.setAppearance(coneAppearance);
-		SceneGraphComponent cone01 = new SceneGraphComponent();
-		SceneGraphComponent cone02 = new SceneGraphComponent();
+		cone01.setAppearance(coneAppearance);
+		cone02.setAppearance(coneAppearance);
 		cone01.setGeometry(coneGeometry);
 		cone02.setGeometry(coneGeometry);
 		MatrixBuilder mb01 = MatrixBuilder.euclidean();
@@ -61,22 +60,22 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 		mb02.translate(0, 0, -1);
 		mb01.assignTo(cone01);
 		mb02.assignTo(cone02);
-		coneRoot.addChild(cone01);
-		coneRoot.addChild(cone02);
 	}
 	
 	
-	private class SCConicalConesAdapter extends AbstractAdapter<SceneGraphNode> {
+	private class SCConicalConesAdapter01 extends AbstractAdapter<SceneGraphNode> {
 
-		public SCConicalConesAdapter() {
+		public SCConicalConesAdapter01() {
 			super(SceneGraphNode.class, true, false);
 		}
-
 		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nc) {
-			return nc.equals(VVertex.class);
+			return Vertex.class.isAssignableFrom(nc);
 		}
-		
+		@Override
+		public String toString() {
+			return "Vertex Cones 01";
+		}
 		@Override
 		public <
 			V extends Vertex<V, E, F>, 
@@ -86,49 +85,115 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 			if (HalfEdgeUtils.isBoundaryVertex(v)) {
 				return null;
 			}
-			E refEdge = null;
-			for (E e : HalfEdgeUtils.incomingEdges(v)) {
-				if (e.getLeftFace() != null) {
-					refEdge = e;
-					break;
-				}
-			}
-			F refFace = refEdge.getLeftFace();
-			double[] vPoint = a.getD(Position4d.class, v);
-			double[] diagX = calculateDiagonalIntersection(refFace, a);
-			double[] fNormal = a.getD(Normal.class, refFace);
-			double[] conicalNormal = a.getD(ConicalNormal.class, v);
-			double[] dir = Rn.projectOntoComplement(null, conicalNormal, fNormal);
-			double len = Rn.euclideanNorm(Rn.subtract(null, diagX, vPoint));
-			Rn.setToLength(dir, dir, len);
-			
-			conicalNormal = Arrays.resize(conicalNormal, 4);
-			dir = Arrays.resize(dir, 4);
-			Matrix T = getConeMatrix(vPoint, conicalNormal, dir);
-			SceneGraphComponent c = new SceneGraphComponent();
-			c.addChild(coneRoot);
-			T.assignTo(c);
-			return c;
+			SceneGraphComponent root = createConeRootAtVertex(v, a);
+			root.addChild(cone01);
+			return root;
 		}
-		
+
+	}
+	
+	private class SCConicalConesAdapter02 extends AbstractAdapter<SceneGraphNode> {
+
+		public SCConicalConesAdapter02() {
+			super(SceneGraphNode.class, true, false);
+		}
+		@Override
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nc) {
+			return Vertex.class.isAssignableFrom(nc);
+		}
+		@Override
+		public String toString() {
+			return "Vertex Cones 02";
+		}
+		@Override
 		public <
 			V extends Vertex<V, E, F>, 
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>
-		> double[] calculateDiagonalIntersection(F f, AdapterSet a) {
-			E e1 = f.getBoundaryEdge();
-			E e2 = e1.getNextEdge();
-			E e3 = e2.getNextEdge();
-			E e4 = e3.getNextEdge();
-			double[] N = Arrays.resize(a.getD(Normal.class, f), 4);
-			double[] p1 = a.getD(Position4d.class, e1);
-			double[] p2 = a.getD(Position4d.class, e2);
-			double[] p3 = a.getD(Position4d.class, e3);
-			double[] p4 = a.getD(Position4d.class, e4);
-			double[] r = MathUtility.getDiagonalIntersection(N, p1, p2, p3, p4);
-			return Pn.dehomogenize(r, r);
+		> SceneGraphNode getV(V v, AdapterSet a) {
+			if (HalfEdgeUtils.isBoundaryVertex(v)) {
+				return null;
+			}
+			SceneGraphComponent root = createConeRootAtVertex(v, a);
+			root.addChild(cone02);
+			return root;
 		}
+
+	}
+	
+	private class SCConicalDiagonalIntersectionAdapter extends AbstractAdapter<SceneGraphNode> {
+
+		public SCConicalDiagonalIntersectionAdapter() {
+			super(SceneGraphNode.class, true, false);
+		}
+		@Override
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nc) {
+			return Face.class.isAssignableFrom(nc);
+		}
+		@Override
+		public String toString() {
+			return "Vertex Cones Diagonal Intersections";
+		}
+		@Override
+		public <
+			V extends Vertex<V, E, F>, 
+			E extends Edge<V, E, F>, 
+			F extends Face<V, E, F>
+		> SceneGraphNode getF(F f, AdapterSet a) {
+			double[] diagX = calculateDiagonalIntersection(f, a);
+			SceneGraphComponent c = new SceneGraphComponent();
+			c.setGeometry(Primitives.point(diagX));
+			return c;
+		}
+
+	}
+	
+	
+	protected <
+		F extends Face<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		V extends Vertex<V, E, F>
+	> SceneGraphComponent createConeRootAtVertex(V v, AdapterSet a) {
+		E refEdge = null;
+		for (E e : HalfEdgeUtils.incomingEdges(v)) {
+			if (e.getLeftFace() != null) {
+				refEdge = e;
+				break;
+			}
+		}
+		F refFace = refEdge.getLeftFace();
+		double[] vPoint = a.getD(Position4d.class, v);
+		double[] diagX = calculateDiagonalIntersection(refFace, a);
+		double[] fNormal = a.getD(Normal.class, refFace);
+		double[] conicalNormal = a.getD(ConicalNormal.class, v);
+		double[] dir = Rn.projectOntoComplement(null, conicalNormal, fNormal);
+		double len = Rn.euclideanNorm(Rn.subtract(null, diagX, vPoint));
+		Rn.setToLength(dir, dir, len);
 		
+		conicalNormal = Arrays.resize(conicalNormal, 4);
+		dir = Arrays.resize(dir, 4);
+		Matrix T = getConeMatrix(vPoint, conicalNormal, dir);
+		SceneGraphComponent c = new SceneGraphComponent();
+		T.assignTo(c);
+		return c;
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> double[] calculateDiagonalIntersection(F f, AdapterSet a) {
+		E e1 = f.getBoundaryEdge();
+		E e2 = e1.getNextEdge();
+		E e3 = e2.getNextEdge();
+		E e4 = e3.getNextEdge();
+		double[] N = Arrays.resize(a.getD(Normal.class, f), 4);
+		double[] p1 = a.getD(Position4d.class, e1.getStartVertex());
+		double[] p2 = a.getD(Position4d.class, e2.getStartVertex());
+		double[] p3 = a.getD(Position4d.class, e3.getStartVertex());
+		double[] p4 = a.getD(Position4d.class, e4.getStartVertex());
+		double[] r = MathUtility.getDiagonalIntersection(N, p1, p2, p3, p4);
+		return Pn.dehomogenize(r, r);
 	}
 	
 	public static Matrix getConeMatrix(double[] apex, double[] normal, double[] dir) {
@@ -175,7 +240,7 @@ public class SCConicalConeDataSource extends Plugin implements DataSourceProvide
 	
 	@Override
 	public AdapterSet getDataSources() {
-		return new AdapterSet(new SCConicalConesAdapter());
+		return new AdapterSet(new SCConicalConesAdapter01(), new SCConicalConesAdapter02(), new SCConicalDiagonalIntersectionAdapter());
 	}
 
 }
