@@ -66,7 +66,6 @@ import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
-import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
@@ -1266,6 +1265,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		curvatureLinesPanel.immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",curvatureLinesPanel.immediateCalculationBox.isSelected()));
 	}
 
+	@SuppressWarnings("unused")
 	private void addUmbilicalPoints(double[][] umbillicPoints, HalfedgeLayer layer) {
 		PointSetFactory psfu = new PointSetFactory();
 	

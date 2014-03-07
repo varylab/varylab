@@ -42,6 +42,7 @@ public class GeodesicVertexSelection extends AlgorithmPlugin {
 		hif.setSelection(hes);
 	}
 	
+	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Selection;
 	}
@@ -51,10 +52,12 @@ public class GeodesicVertexSelection extends AlgorithmPlugin {
 		return "Geodesic Vertex";
 	}
 	
+	@Override
 	public double getPriority() {
 		return 1.0;
 	}
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo();
 		info.icon = ImageHook.getIcon("geoSel.png",16,16);

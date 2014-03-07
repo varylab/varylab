@@ -808,9 +808,9 @@ public class IntegralCurve {
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
 					System.out.println("all points:");
 					System.out.println("orientation = " + Arrays.toString(intObj.getOrientation()) + " orientation = " + secondOrientation);
-					for (double[] p : intObj.getPoints()) {
+//					for (double[] p : intObj.getPoints()) {
 		//				System.out.println(Arrays.toString(p));
-					}
+//					}
 					return intObj;
 				}
 				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, curveType);
@@ -943,9 +943,9 @@ public class IntegralCurve {
 					pointList = setIntoDomain(pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
 //					logger.info("the lines");
-					for (double[] p : intObj.getPoints()) {
+//					for (double[] p : intObj.getPoints()) {
 //						logger.info(Arrays.toString(p));
-					}
+//					}
 					return intObj;
 				}
 				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, curveType);
@@ -1215,10 +1215,9 @@ public class IntegralCurve {
 //		logger.info("in curveLine");
 //		logger.info("firstVectorField = " + firstVectorField);
 //		logger.info("start point = " + Arrays.toString(startPoint));
-		for (LineSegment ls : currentSegments) {
+//		for (LineSegment ls : currentSegments) {
 //			logger.info(ls.toString());
-			
-		}
+//		}
 		
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
 		currentLine.setDescription((firstVectorField?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");

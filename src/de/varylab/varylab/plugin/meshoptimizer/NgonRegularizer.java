@@ -38,6 +38,7 @@ public class NgonRegularizer extends VarylabOptimizerPlugin {
 		return info;
 	}
 	
+	@Override
 	public JPanel getOptionPanel() {
 		return panel;
 	};
