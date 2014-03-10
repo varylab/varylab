@@ -335,6 +335,7 @@ public class FaceSetGenerator {
 //		for (IntersectionPoint ip : intersectionPoints) {
 //			log.info(ip.getParentHP().toString());
 //		}
+
 		logger.info("list of all points and its nbrs");
 		for (IntersectionPoint p : points) {
 			logger.info("point = " + Arrays.toString(p.getPoint()));
@@ -343,8 +344,11 @@ public class FaceSetGenerator {
 				System.out.println(Arrays.toString(ip.getPoint()));
 			}
 		}
+		
 		return points;
 	}
+	
+	
 	
 	
 	/*
@@ -448,17 +452,41 @@ public class FaceSetGenerator {
 	}
 	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, IntersectionPoint current){
+		if(current.getPoint()[0] == 0.6945708202006533 && current.getPoint()[1] == 0.5248006433647975){
+			logger.info(" ");
+			if(previous != null){
+				logger.info("prev = " + Arrays.toString(previous.getPoint()));
+			} else {
+				logger.info("prev == null");
+			}
+			
+			logger.info("special point");
+			logger.info("unused nbrs");
+			for (IntersectionPoint ip : current.getUnusedNbrs()) {
+				logger.info(" " + Arrays.toString(ip.getPoint()));
+			}
+			logger.info("all nbrs");
+			for (IntersectionPoint ip : current.getNbrs()) {
+				logger.info(" " + Arrays.toString(ip.getPoint()));
+			}
+			if(previous != null){
+				logger.info("next = " + Arrays.toString(getNextNbrLocal(previous, current).getPoint()));
+			} else {
+				logger.info("unusedNbrs.getLast() = " + Arrays.toString(current.getUnusedNbrs().getLast().getPoint()));
+			}
+			
+		}
 		if(ns.getClosingDir() == ClosingDir.nonClosed){
 			IntersectionPoint next = null;
 			if(previous == null){
-				logger.info("previous == null");
+//				logger.info("previous == null");
 				next = current.getUnusedNbrs().pollLast();
-				logger.info("next = " + Arrays.toString(next.getPoint()));
+//				logger.info("next = " + Arrays.toString(next.getPoint()));
 				next.setPrevious(current);
 			} else {
-				logger.info("previous != null");
+//				logger.info("previous != null");
 				next = getNextNbrLocal(previous, current);
-				logger.info("next = " + Arrays.toString(next.getPoint()));
+//				logger.info("next = " + Arrays.toString(next.getPoint()));
 				current.getUnusedNbrs().remove(next);				
 				next.setPrevious(current);
 			}
@@ -588,7 +616,7 @@ public class FaceSetGenerator {
 			else{
 				uniqueFaceVerts.add(ip);
 			}
-			logger.info(Arrays.toString(uniqueFaceVerts.getLast().getPoint()));
+//			logger.info(Arrays.toString(uniqueFaceVerts.getLast().getPoint()));
 		}
 		return uniqueFaceVerts;
 	}
@@ -779,18 +807,75 @@ public class FaceSetGenerator {
 			if(ori.getLast() == ori.getFirst() && ori.size() > 1){
 				ori.pollLast();
 			}
+			ori = removeMultiplePoints(ori);
 			ori.add(ori.getFirst());
 			ip.setNbrs(ori);
 		}
+//		localNbrs = removeDoublePoint(localNbrs);
 		logger.info("oriented nbrs of ");
 		for (IntersectionPoint ip : localNbrs) {
+			logger.info(" ");
 			logger.info("point = " + Arrays.toString(ip.getPoint()));
+//			logger.info("ohne remove");
 			for (IntersectionPoint nbr : ip.getNbrs()) {
 				logger.info(Arrays.toString(nbr.getPoint()));
 			}
+//			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
+//			logger.info("mit remove");
+//			for (IntersectionPoint nbr : ip.getNbrs()) {
+//				logger.info(Arrays.toString(nbr.getPoint()));
+//			}
 		}
 		logger.info("ENDE");
 		return localNbrs;
+	}
+	
+	private static LinkedList<IntersectionPoint> removeDoublePoint(LinkedList<IntersectionPoint> points){
+		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
+		IntersectionPoint prev = null;
+		for (IntersectionPoint ip: points) {
+//			if(prev != null && !(prev.getPoint()[0] == ip.getPoint()[0] && prev.getPoint()[1]  == ip.getPoint()[1])){
+			if(prev == null || !Arrays.equals(prev.getPoint(), ip.getPoint())){
+				newPoints.add(ip);
+				
+			} else {
+				logger.info("REMOVE  " + Arrays.toString(ip.getPoint()));
+			}
+			prev = ip;
+		}
+		return newPoints;
+	}
+	
+	
+	private static LinkedList<IntersectionPoint> removeMultiplePoints(LinkedList<IntersectionPoint> points){
+		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
+		int index = 0;
+		for (IntersectionPoint ip: points) {
+			LinkedList<IntersectionPoint> restList = getRestList(points, index);
+			boolean isContained = false;
+			for (IntersectionPoint ipRest : restList) {
+				if(Arrays.equals(ip.getPoint(), ipRest.getPoint())){
+					isContained = true;
+				}
+			}
+			if(!isContained){
+				newPoints.add(ip);
+			}
+			index++;
+		}
+		return newPoints;
+	}
+	
+	private static LinkedList<IntersectionPoint> getRestList(LinkedList<IntersectionPoint> list, int index){
+		LinkedList<IntersectionPoint> restList = new LinkedList<IntersectionPoint>();
+		int count = 0;
+		for (IntersectionPoint ip : list) {
+			if(count > index){
+				restList.add(ip);
+			}
+			count++;
+		}
+		return restList;
 	}
 	
 	private boolean isValidBoundaryFaceVertex(IntersectionPoint ip){
@@ -865,9 +950,10 @@ public class FaceSetGenerator {
 		for (IntersectionPoint ip : points) {
 			while(!ip.getUnusedNbrs().isEmpty()){
 				if(!isClosedBoundaryPoint(ip)){
-					faceIndexTest ++;
+					
 					LinkedList<IntersectionPoint> facePoints = getAllFaceVertices(ip);
 					logger.info("Face index = " + faceIndexTest);
+					faceIndexTest ++;
 					for (IntersectionPoint iP : facePoints) {
 						logger.info(Arrays.toString(iP.getPoint()));
 					}
