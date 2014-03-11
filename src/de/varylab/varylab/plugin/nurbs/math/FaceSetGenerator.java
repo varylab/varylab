@@ -39,6 +39,13 @@ public class FaceSetGenerator {
 	
 	
 	public FaceSetGenerator(NURBSSurface surface, double d, LinkedList<IntersectionPoint> ipl) {
+		// only debug
+		logger.info("All Intersections");
+		for (IntersectionPoint ip : ipl) {
+			logger.info(Arrays.toString(ip.getPoint()));
+		}
+		logger.info(" ");
+		//end debug
 		ipList = ipl;
 		dilation = d;
 		ns = surface;
@@ -782,7 +789,7 @@ public class FaceSetGenerator {
 					for (IntersectionPoint nonOrientedNbr : allNbrs) {
 						double[] first = orientedList.getLast().getPoint();
 						double[] middle = ip.getPoint();
-						double[] last = nonOrientedNbr.getPoint();;
+						double[] last = nonOrientedNbr.getPoint();
 						double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
 						double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
 						if(first != last && allNbrs.size() > 1){
@@ -794,6 +801,9 @@ public class FaceSetGenerator {
 					}
 				}
 				lastOrientedPoint = orientedList.getLast();
+//				if(!Arrays.equals(next.getPoint(), lastOrientedPoint.getPoint())){
+//					orientedList.add(next);
+//				}
 				orientedList.add(next);
 			}
 			IntersectionPoint before = null;

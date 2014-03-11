@@ -11,10 +11,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import com.itextpdf.text.log.SysoLogger;
+
 import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
 import de.varylab.varylab.plugin.nurbs.TreeSegmentComparator;
@@ -28,7 +29,51 @@ import de.varylab.varylab.plugin.nurbs.type.PartitionComparator;
 public class LineSegmentIntersection {
 		
 	private static Logger logger = Logger.getLogger(LineSegmentIntersection.class.getName());
-
+	
+	private static LinkedList<LineSegment> clone(LinkedList<LineSegment> segList){
+		LinkedList<LineSegment> clone = new LinkedList<LineSegment>();
+		for (LineSegment ls : segList) {
+			clone.add(ls);
+		}
+		return clone;
+	}
+	
+	private static boolean containsIntersectionPoint(LinkedList<IntersectionPoint> ipList, IntersectionPoint point){
+		for (IntersectionPoint ip : ipList) {
+			if(Arrays.equals(ip.getPoint(), point.getPoint())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static LinkedList<IntersectionPoint> BruteForce(LinkedList<LineSegment> segments){
+		LinkedList<IntersectionPoint> ipList = new LinkedList<IntersectionPoint>();
+		LinkedList<LineSegment> restList = clone(segments);
+		for (LineSegment ls1 : segments) {
+			restList.removeFirst();
+			for (LineSegment ls2 : restList) {
+				if(twoSegmentIntersection(ls1, ls2) && ls1.getCurveIndex() != ls2.getCurveIndex()){
+					double[] p = IntegralCurve.intersectionPoint(ls1, ls2);
+					System.out.println("p = " + Arrays.toString(p));
+					System.out.println("ls1 = " + ls1.toString());
+					System.out.println("ls2 = " + ls2.toString());
+					IntersectionPoint ip = new IntersectionPoint();
+					ip.setPoint(p);
+					if(!containsIntersectionPoint(ipList, ip)){
+						LinkedList<LineSegment> intersectingSegments = new LinkedList<>();
+						intersectingSegments.add(ls1);
+						intersectingSegments.add(ls2);
+						ip.setIntersectingSegments(intersectingSegments);
+						ipList.add(ip);
+					}
+				}
+			}
+		}
+		
+		return ipList;
+	}
+	
 		public static LinkedList<LineSegment> preSelection(double[] U, double[] V, LinkedList<LineSegment> segList){
 			double u0 = U[0];
 			double u1 = U[U.length - 1];
@@ -710,11 +755,5 @@ public class LineSegmentIntersection {
 		}
 		return false;
 	}
-	
 
-	
-	
-	public static void main(String[] args){
-			
-	}
 }
