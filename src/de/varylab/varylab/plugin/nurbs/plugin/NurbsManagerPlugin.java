@@ -783,8 +783,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				if(singularities == null) {
 					computeUmbilicalPoints();
 				}
-				List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
-				
+				LinkedList<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
+//				curveIndex++;
+//				curveIndex++;
+				curveIndex = currentLines.getLast().getCurveIndex() + 1;
+
 				curvesModel.addAll(currentLines);
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
@@ -814,14 +817,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				logger.info("Double Time: " + (lastTimeDouble - firstTimeDouble));
 				double firstTimeBentley = System.currentTimeMillis();
 				double dilation = 1000000000.0;
+				
+//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BruteForce(U, V, allSegments, dilation);
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments, dilation);
-	//			LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BruteForce(allSegments);
 				logger.info("\n");
 				logger.info("NURBS manager plugin all intersections");
-				System.out.println("NURBS manager plugin all intersections");
 				for (IntersectionPoint ip : intersections) {
 					logger.info(ip.toString());
-					System.out.println(ip.toString());
 				}
 				FaceSetGenerator gfs = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
 				double lastTimeBentley = System.currentTimeMillis();

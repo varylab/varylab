@@ -782,11 +782,11 @@ public class IntegralCurve {
 		double[] ori = orientation;
 		LineSegment seg = new LineSegment();
 	
-		while (!nearBy && counter < 5000) {
+		while (!nearBy && counter < 10000) {
 
 			counter++;
-			if(counter == 5000){
-				logger.info("termination after 5000 steps");
+			if(counter == 10000){
+				logger.info("termination after 10000 steps");
 			}
 			double[] last = pointList.getLast().clone();
 			double[] sumA = new double[2];
@@ -806,8 +806,6 @@ public class IntegralCurve {
 				if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
 					pointList = setIntoDomain(pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-					System.out.println("all points:");
-					System.out.println("orientation = " + Arrays.toString(intObj.getOrientation()) + " orientation = " + secondOrientation);
 //					for (double[] p : intObj.getPoints()) {
 		//				System.out.println(Arrays.toString(p));
 //					}

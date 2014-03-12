@@ -206,7 +206,13 @@ public class IntersectionPoint {
 
 	@Override
 	public String toString() {
-		return "IntersectionPoint [point=" + Arrays.toString(point) + "]";
+		String str = new String();
+		str += "IntersectionPoint [point=" + Arrays.toString(point) + "] , curve indices = ";
+		for (LineSegment ls : intersectingSegments) {
+			str += ls.getCurveIndex() + " , ";
+		}
+//		return "IntersectionPoint [point=" + Arrays.toString(point) + "] , curve indices = " + cur;
+		return str;
 	}
 
 }

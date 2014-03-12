@@ -40,13 +40,114 @@ public class LineSegmentIntersection {
 	private static boolean containsIntersectionPoint(LinkedList<IntersectionPoint> ipList, IntersectionPoint point){
 		for (IntersectionPoint ip : ipList) {
 			if(Arrays.equals(ip.getPoint(), point.getPoint())){
+				System.out.println("point " + Arrays.toString(point.getPoint()) + " is in the list");
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static LinkedList<IntersectionPoint> BruteForce(LinkedList<LineSegment> segments){
+	protected static Set<RPoint2D> intersectionsNaive(Set<RLineSegment2D> segments) {
+	     RLineSegment2D[] array = segments.toArray(new RLineSegment2D[segments.size()]);
+	     Set<RPoint2D> intersections = new HashSet<RPoint2D>();
+	     for(int i = 0; i < array.length-1; i++) {
+	         for(int j = i+1; j < array.length; j++) {
+	             RPoint2D p = array[i].intersection(array[j]);
+	             if(p == null) continue;
+	             intersections.add(p);
+	         }
+	     }
+	     return intersections;
+	}
+	
+	protected static Map<RPoint2D, Set<RLineSegment2D>> intersectionsNaive1(Set<RLineSegment2D> segments) {
+		Map<RPoint2D, Set<RLineSegment2D>> intersectionMap = new HashMap<RPoint2D, Set<RLineSegment2D>>();
+	     RLineSegment2D[] array = segments.toArray(new RLineSegment2D[segments.size()]);
+	     for(int i = 0; i < array.length-1; i++) {
+	         for(int j = i+1; j < array.length; j++) {
+	             RPoint2D p = array[i].intersection(array[j]);
+	             if(p == null || array[i].curveIndex == array[j].curveIndex) continue;
+	             Set<RLineSegment2D> segs = new HashSet<RLineSegment2D>();
+	             segs.add(array[i]);
+	             segs.add(array[j]);
+	             intersectionMap.put(p, segs);
+	         }
+	     }
+	     return intersectionMap;
+	}
+	
+	public static LinkedList<IntersectionPoint> BruteForce(double[] U, double[] V, LinkedList<LineSegment> segments, double dilation){
+		double u0 = U[0];
+		double u1 = U[U.length - 1];
+		double v0 = V[0];
+		double v1 = V[V.length - 1];
+		Set<RLineSegment2D> RSegments = new HashSet<RLineSegment2D>();
+		Map<RLineSegment2D, LineSegment> inverseMap = new HashMap<RLineSegment2D, LineSegment>();
+		
+		int segmentCounter = 0;
+		for (LineSegment ls : segments) {	
+			segmentCounter++;
+
+			long p1X = (long)(ls.getSegment()[0][0] * dilation);
+			long p1Y = (long)(ls.getSegment()[0][1] * dilation);
+			long p2X = (long)(ls.getSegment()[1][0] * dilation);
+			long p2Y = (long)(ls.getSegment()[1][1] * dilation);
+			
+			RPoint2D p1 = new RPoint2D(p1X, p1Y);
+			RPoint2D p2 = new RPoint2D(p2X, p2Y);
+			
+			RLineSegment2D rSeg = new RLineSegment2D(p1, p2, ls.getCurveIndex(), ls.getIndexOnCurve());
+			if(p1.isLeftOf(p2) || (!p1.isLeftOf(p2) && !p1.isRightOf(p2) && p1.isBelow(p2))){
+				
+			}
+			else{
+				rSeg = new RLineSegment2D(p2, p1,  ls.getCurveIndex(), ls.getIndexOnCurve());
+			}
+			inverseMap.put(rSeg, ls);
+			RSegments.add(rSeg);
+			
+		}
+		logger.info("# segments = " + segmentCounter);
+		logger.info("START TO COMPUTE INTERSECTIONS");
+		LinkedList<IntersectionPoint> intersectionPoints = new LinkedList<IntersectionPoint>();
+		Map<RPoint2D, Set<RLineSegment2D>> intersections = intersectionsNaive1(RSegments);
+		for(RPoint2D point : intersections.keySet()){
+			LinkedList<LineSegment> segList = new LinkedList<LineSegment>();
+			for (RLineSegment2D lS2D : intersections.get(point)) {
+				segList.add(inverseMap.get(lS2D));
+			}
+			IntersectionPoint ip = new IntersectionPoint();
+			double x = point.x.doubleValue() / dilation;
+			double y = point.y.doubleValue() / dilation;
+			ip.setPoint(new double[2]);
+			ip.getPoint()[0] = x;
+			ip.getPoint()[1] = y;
+			double[] Point = ip.getPoint();
+			if(Point[0] < u0){
+				Point[0] = u0;
+			}
+			else if(Point[0] > u1){
+				Point[0] = u1;
+			}
+			else if(Point[1] < v0){
+				Point[1] = v0;
+			}
+			else if(Point[1] > v1){
+				Point[1] = v1;
+			}
+			ip.setPoint(Point);
+			ip.setIntersectingSegments(segList);
+			double[] result = ip.getPoint();
+			logger.info("double[] result = ip.getPoint();" + Arrays.toString(result));
+			if(!containsIntersectionPoint(intersectionPoints, ip)){
+				intersectionPoints.add(ip);
+				
+			}
+		}
+		return intersectionPoints;
+	}
+	
+	public static LinkedList<IntersectionPoint> BruteForce1(LinkedList<LineSegment> segments){
 		LinkedList<IntersectionPoint> ipList = new LinkedList<IntersectionPoint>();
 		LinkedList<LineSegment> restList = clone(segments);
 		for (LineSegment ls1 : segments) {
@@ -172,6 +273,7 @@ public class LineSegmentIntersection {
 			
 			RLineSegment2D rSeg = new RLineSegment2D(p1, p2, ls.getCurveIndex(), ls.getIndexOnCurve());
 			if(p1.isLeftOf(p2) || (!p1.isLeftOf(p2) && !p1.isRightOf(p2) && p1.isBelow(p2))){
+				
 			}
 			else{
 				rSeg = new RLineSegment2D(p2, p1,  ls.getCurveIndex(), ls.getIndexOnCurve());

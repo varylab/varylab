@@ -817,7 +817,7 @@ public class FaceSetGenerator {
 			if(ori.getLast() == ori.getFirst() && ori.size() > 1){
 				ori.pollLast();
 			}
-			ori = removeMultiplePoints(ori);
+//			ori = removeMultiplePoints(ori);
 			ori.add(ori.getFirst());
 			ip.setNbrs(ori);
 		}
@@ -827,14 +827,14 @@ public class FaceSetGenerator {
 			logger.info(" ");
 			logger.info("point = " + Arrays.toString(ip.getPoint()));
 //			logger.info("ohne remove");
-			for (IntersectionPoint nbr : ip.getNbrs()) {
-				logger.info(Arrays.toString(nbr.getPoint()));
-			}
-//			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
-//			logger.info("mit remove");
 //			for (IntersectionPoint nbr : ip.getNbrs()) {
 //				logger.info(Arrays.toString(nbr.getPoint()));
 //			}
+//			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
+			logger.info("mit remove");
+			for (IntersectionPoint nbr : ip.getNbrs()) {
+				logger.info(Arrays.toString(nbr.getPoint()));
+			}
 		}
 		logger.info("ENDE");
 		return localNbrs;
@@ -931,9 +931,10 @@ public class FaceSetGenerator {
 			}
 			if(!isClosedBoundaryPoint(oriNbr)){
 				points.add(oriNbr);
-				logger.info("all starting points " + Arrays.toString(oriNbr.getPoint()));
+				logger.info("all starting points " + oriNbr.toString());
 			}
 		}
+		logger.info("intersections size = " + orientedNbrs.size());
 		double[][] verts = new double[validVerts.size()][2];
 		LinkedList<int[]> faceVerts = new LinkedList<int[]>();
 		int c = 0;
