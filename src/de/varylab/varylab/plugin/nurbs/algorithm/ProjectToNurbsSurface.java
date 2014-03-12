@@ -107,7 +107,7 @@ public class ProjectToNurbsSurface extends AlgorithmDialogPlugin {
 			getCurrentJob().fireJobProgress((double)(i++)/n);
 		}
 		hi.update();
-		NurbsUVAdapter uvAdapter = new NurbsUVAdapter(targetSurface, indexMap); //put onto layer
+		//NurbsUVAdapter uvAdapter = new NurbsUVAdapter(targetSurface, indexMap); //put onto layer
 	}
 
 }

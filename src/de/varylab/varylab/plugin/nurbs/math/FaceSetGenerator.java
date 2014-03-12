@@ -840,6 +840,7 @@ public class FaceSetGenerator {
 		return localNbrs;
 	}
 	
+	@SuppressWarnings("unused")
 	private static LinkedList<IntersectionPoint> removeDoublePoint(LinkedList<IntersectionPoint> points){
 		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
 		IntersectionPoint prev = null;

@@ -11,11 +11,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import com.itextpdf.text.log.SysoLogger;
-
 import compgeom.RLineSegment2D;
 import compgeom.RPoint2D;
 import compgeom.algorithms.BentleyOttmann;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.EventPointSegmentList;
 import de.varylab.varylab.plugin.nurbs.TreeSegmentComparator;
