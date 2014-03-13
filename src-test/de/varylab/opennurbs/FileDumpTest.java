@@ -18,6 +18,7 @@ public class FileDumpTest {
 		File file = chooser.getSelectedFile();
 		
 		ONX_Model model = Rhino3dmReader.readFile(file.getPath());
+		model.dump();
 		ArrayList<ONX_Model_Object> m_object_table = model.get_object_table();
 		
 		for(ONX_Model_Object mo : m_object_table) {

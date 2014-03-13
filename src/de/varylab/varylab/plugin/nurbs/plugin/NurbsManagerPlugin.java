@@ -90,6 +90,11 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.opennurbs.ONX_Model;
+import de.varylab.opennurbs.ON_ArcCurve;
+import de.varylab.opennurbs.ON_Curve;
+import de.varylab.opennurbs.ON_LineCurve;
+import de.varylab.opennurbs.ON_NurbsCurve;
+import de.varylab.opennurbs.ON_PolylineCurve;
 import de.varylab.opennurbs.Rhino3dmReader;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
@@ -102,6 +107,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface;
+import de.varylab.varylab.plugin.nurbs.algorithm.UVUnroll;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
@@ -325,6 +331,25 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 							hif.addLayer(newLayer);
 						}
 					}
+					List<ON_Curve> curves = OpenNurbsUtility.getCurves(model);
+					for(ON_Curve curve : curves) {
+						// TODO: Put different object onto different layers
+						if(curve instanceof ON_PolylineCurve) {
+							ON_PolylineCurve plc = (ON_PolylineCurve) curve;
+							OpenNurbsUtility.addPolylineCurve(plc, hif.get(new VHDS()), hif.getAdapters());
+						} else if(curve instanceof ON_ArcCurve) {
+							ON_ArcCurve ac = (ON_ArcCurve) curve;
+							OpenNurbsUtility.addArcCurve(ac, hif.get(new VHDS()), hif.getAdapters());
+						} else if(curve instanceof ON_LineCurve) {
+							ON_LineCurve ac = (ON_LineCurve) curve;
+							OpenNurbsUtility.addLineCurve(ac, hif.get(new VHDS()), hif.getAdapters());
+						} else if(curve instanceof ON_NurbsCurve) {
+							ON_NurbsCurve ac = (ON_NurbsCurve) curve;
+							OpenNurbsUtility.addNurbsCurve(ac, hif.get(new VHDS()), hif.getAdapters());
+						}
+					}
+					model.dispose();
+					hif.update();
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -748,6 +773,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			Object source = e.getSource();
 			if(source == goButton) {
 				List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
+				if(startingPointsUV.size() == 0) {
+					return;
+				}
 				logger.info("ALL STARTING POINTS");
 				for (double[] sp : startingPointsUV) {
 					logger.info(Arrays.toString(sp));
@@ -841,8 +869,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //				writeToFile(fS);
 			
 //				hel.addTemporaryGeometry(fS.getIndexedFaceSet());
+				hif.addLayer(hel); //add and activate
 				hel.set(fs.getIndexedFaceSet());
-				hif.addLayer(hel);
 				hif.update();
 			} else if(source == symConjBox || source == symConjCurvatureBox) {
 				if(symConjBox.isSelected()) {
@@ -952,18 +980,19 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		public void dataChanged(HalfedgeLayer layer) {
 			updateActiveNurbsSurface(layer);
 			layer.addTemporaryGeometry(integralCurvesRoot);
-			if(curvesModel == null) {
+//			if(curvesModel == null) {
 				if(layers2models.containsKey(layer)) {
 					curvesModel = layers2models.get(layer);
 					curvesModel.clear();
-				} else {
-					curvesModel = new ListSelectRemoveTableModel<PolygonalLine>("Initial Point", new PolygonalLinePrinter());
-					curvesModel.addTableModelListener(this);
-					layers2models.put(layer,curvesModel);
-				}
-			} else {
-				curvesModel.clear();
-			}
+				} 
+//				else {
+//					curvesModel = new ListSelectRemoveTableModel<PolygonalLine>("Initial Point", new PolygonalLinePrinter());
+//					curvesModel.addTableModelListener(this);
+//					layers2models.put(layer,curvesModel);
+//				}
+//			} else {
+//				curvesModel.clear();
+//			}
 			curvesModel.fireTableDataChanged();
 		}
 
@@ -999,9 +1028,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 		@Override
 		public void layerCreated(HalfedgeLayer layer) {
-			ListSelectRemoveTableModel<PolygonalLine> newModel = new ListSelectRemoveTableModel<PolygonalLine>("Initial Point", new PolygonalLinePrinter());
-			newModel.addTableModelListener(this);
-			layers2models.put(layer,newModel);
+			if(!layers2models.containsKey(layer)) {
+				ListSelectRemoveTableModel<PolygonalLine> newModel = new ListSelectRemoveTableModel<PolygonalLine>("Polygonal line", new PolygonalLinePrinter());
+				newModel.addTableModelListener(this);
+				layers2models.put(layer,newModel);
+			}
+			
 		}
 
 
@@ -1275,6 +1307,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.getPlugin(ProjectToNurbsSurface.class);
 		c.getPlugin(VertexEditorPlugin.class);
 		c.getPlugin(QuadMeshGenerator.class);
+		c.getPlugin(UVUnroll.class);
 	}
 	
 	@Override

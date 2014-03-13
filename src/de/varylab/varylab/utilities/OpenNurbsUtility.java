@@ -1,16 +1,29 @@
 package de.varylab.varylab.utilities;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.varylab.opennurbs.ONX_Model;
 import de.varylab.opennurbs.ONX_Model_Object;
+import de.varylab.opennurbs.ON_3dPoint;
 import de.varylab.opennurbs.ON_4dPoint;
+import de.varylab.opennurbs.ON_ArcCurve;
 import de.varylab.opennurbs.ON_Brep;
+import de.varylab.opennurbs.ON_Curve;
 import de.varylab.opennurbs.ON_Geometry;
+import de.varylab.opennurbs.ON_Interval;
+import de.varylab.opennurbs.ON_LineCurve;
+import de.varylab.opennurbs.ON_NurbsCurve;
 import de.varylab.opennurbs.ON_NurbsSurface;
 import de.varylab.opennurbs.ON_Object;
+import de.varylab.opennurbs.ON_PolylineCurve;
 import de.varylab.opennurbs.ON_Surface;
+import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
 public class OpenNurbsUtility {
@@ -34,6 +47,31 @@ public class OpenNurbsUtility {
 			}
 		}
 		return nsurfaces;
+	}
+	
+	public static List<ON_Curve> getCurves(ONX_Model model) {
+		List<ON_Curve> curves = new LinkedList<ON_Curve>();
+		for(ONX_Model_Object mo : model.get_object_table()) {
+			ON_Object object = mo.get_object();
+			if(object instanceof ON_Curve) {
+				ON_Curve curve = (ON_Curve)object;
+				if(curve instanceof ON_PolylineCurve) {
+//					System.out.println(curve);
+					curves.add(curve);
+				} else if(curve instanceof ON_ArcCurve) {
+//					System.out.println(curve);
+					curves.add(curve);
+				} else if(curve instanceof ON_LineCurve){
+					curves.add(curve);
+				} else if(curve instanceof ON_NurbsCurve){
+					curves.add(curve);
+				} else {
+					System.err.println("No wrapper for " + curve.getObjectType() + " yet.");
+				}
+
+			}
+		}
+		return curves;
 	}
 
 	private static NURBSSurface ONtoVarylabNurbsSurface(ON_NurbsSurface nsurf) {
@@ -76,4 +114,88 @@ public class OpenNurbsUtility {
 		return new NURBSSurface(uKnot, vKnot, cv, nsurf.Degree(0), nsurf.Degree(1));
 	}
 
+	public static void addPolylineCurve(
+			ON_PolylineCurve plc, 
+			VHDS vhds,
+			AdapterSet adapters) {
+//		ON_Polyline pline = plc.get_pline();
+		double[] domain  = plc.get_t();
+		List<VVertex> verts = new LinkedList<VVertex>();
+		for(int i = 0; i < plc.PointCount(); ++i) {
+			VVertex v = vhds.addNewVertex();
+			verts.add(v);
+			ON_3dPoint pt = new ON_3dPoint(-1L);
+			plc.evPoint(domain[i], pt);
+			adapters.set(Position.class, v, pt.getCoordinates());
+		}
+		addPolygon(vhds, verts);
+	}
+	
+	public static void addLineCurve(
+			ON_LineCurve lc, 
+			VHDS vhds,
+			AdapterSet adapters) {
+		double min = lc.Domain().Min();
+		double max = lc.Domain().Max();
+		List<VVertex> verts = new LinkedList<VVertex>();
+		VVertex start = vhds.addNewVertex();
+		verts.add(start);
+		ON_3dPoint pt = new ON_3dPoint(-1L);
+		lc.evPoint(min, pt);
+		adapters.set(Position.class, start, pt.getCoordinates());
+		VVertex target = vhds.addNewVertex();
+		verts.add(target);
+		lc.evPoint(max, pt);
+		adapters.set(Position.class, target, pt.getCoordinates());
+		addPolygon(vhds, verts);
+	}
+
+	private static void addPolygon(VHDS vhds, List<VVertex> verts) {
+		Iterator<VVertex> it = verts.iterator();
+		VVertex v1 = it.next();
+		VVertex v2 = v1;
+		while(it.hasNext()) {
+			v1 = v2;
+			v2 = it.next();
+			VEdge
+				e1 = vhds.addNewEdge(),
+				e2 = vhds.addNewEdge();
+			e1.setIsPositive(true);
+			e1.linkOppositeEdge(e2);
+			e1.linkNextEdge(e2);
+			e2.linkNextEdge(e1);
+			e1.setTargetVertex(v1);
+			e2.setTargetVertex(v2);
+		}
+	}
+
+	public static void addArcCurve(ON_ArcCurve ac, VHDS vhds, AdapterSet adapters) {
+		ON_Interval domain  = ac.Domain();
+		List<VVertex> verts = new LinkedList<VVertex>();
+		int n = 40;
+		double step = (domain.Max()-domain.Min())/n;
+		for(int i = 0; i <= n; ++i) {
+			VVertex v = vhds.addNewVertex();
+			verts.add(v);
+			ON_3dPoint pt = new ON_3dPoint(-1L);
+			ac.evPoint(domain.Min() + i*step , pt);
+			adapters.set(Position.class, v, pt.getCoordinates());
+		}
+		addPolygon(vhds, verts);
+	}
+
+	public static void addNurbsCurve(ON_NurbsCurve nc, VHDS vhds, AdapterSet adapters) {
+		ON_Interval domain  = nc.Domain();
+		List<VVertex> verts = new LinkedList<VVertex>();
+		int n = 40;
+		double step = (domain.Max()-domain.Min())/n;
+		for(int i = 0; i <= n; ++i) {
+			VVertex v = vhds.addNewVertex();
+			verts.add(v);
+			ON_3dPoint pt = new ON_3dPoint(-1L);
+			nc.evPoint(domain.Min() + i*step , pt);
+			adapters.set(Position.class, v, pt.getCoordinates());
+		}
+		addPolygon(vhds, verts);
+	}
 }

@@ -238,7 +238,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), e, "Remeshing error", JOptionPane.ERROR_MESSAGE);JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), e, "Remeshing error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(shrinkPanel), e, "Remeshing error", JOptionPane.ERROR_MESSAGE);
 			}
 		};
 		EventQueue.invokeLater(r);
@@ -329,7 +329,14 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			TriangleLattice<VVertex, VEdge, VFace, VHDS> lattice = new TriangleLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox);
 			lattice.setTexInvTransform(Rn.times(null,texInvMatrix.getEntry(3,3),new double[]{texInvMatrix.getEntry(0, 0), texInvMatrix.getEntry(0, 1), texInvMatrix.getEntry(1, 0), texInvMatrix.getEntry(1, 1)}));
 			remesher.setLattice(lattice);
-			remesh = remesher.remesh(surface, a); 
+			try {
+				remesh = remesher.remesh(surface, a);
+			} catch (RemeshingException e) {
+				for (VVertex v : surface.getVertices()) {
+					texInvMatrix.transformVector(v.getT());
+				}
+				throw e;
+			}
 			remeshPosMap.clear();
 			for (VVertex v : remesh.getVertices()) {
 				texInvMatrix.transformVector(v.getP());
@@ -339,7 +346,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			for (VVertex v : surface.getVertices()) {
 				texInvMatrix.transformVector(v.getT());
 			}
-			if(!isExpertMode()) {
+			if (!isExpertMode()) {
 				hcp.setNoUndo(remesh);
 			} else {
 				hcp.set(remesh);
@@ -355,7 +362,14 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			QuadLattice<VVertex, VEdge, VFace, VHDS> lattice = new QuadLattice<VVertex, VEdge, VFace, VHDS>(remesh, a, bbox);
 			lattice.setTexInvTransform(Rn.times(null,texInvMatrix.getEntry(3,3),new double[]{texInvMatrix.getEntry(0, 0), texInvMatrix.getEntry(0, 1), texInvMatrix.getEntry(1, 0), texInvMatrix.getEntry(1, 1)}));			
 			remesher.setLattice(lattice);
-			remesh = remesher.remesh(surface, a); 
+			try {
+				remesh = remesher.remesh(surface, a);
+			} catch (RemeshingException e) {
+				for (VVertex v : surface.getVertices()) {
+					texInvMatrix.transformVector(v.getT());
+				}
+				throw e;
+			}
 			for (VVertex v : remesh.getVertices()) {
 				texInvMatrix.transformVector(v.getP());
 				texInvMatrix.transformVector(v.getT());
