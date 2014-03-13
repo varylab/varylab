@@ -269,12 +269,24 @@ public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double[] poi
 	// the w's are the coefficients of the normalized curvature directions in the basis Su, Sv
 	Rn.times(w[0], 1 / Math.sqrt(Rn.innerProduct(e[0],e[0])), w[0]);
 	Rn.times(w[1], 1 / Math.sqrt(Rn.innerProduct(e[1],e[1])), w[1]);
+//	if(!isPosOriented(w[0], w[1])){
+//		Rn.times(w[1], -1, w[1]);
+//		Rn.times(e[1], -1, e[1]);
+//	}
 	
 	dG.setPrincipalDirections(w);
 	Rn.normalize(e[0], e[0]);
 	Rn.normalize(e[1], e[1]);
 	dG.setCurvatureDirections(e);
 	return dG;
+}
+
+private static boolean isPosOriented(double[] w1, double[] w2){
+	double det = w1[0] * w2[1] - w2[0] * w1[1];
+	if(det < 0){
+		return false;
+	}
+	return true;
 }
 
 public static void main(String[] args){
