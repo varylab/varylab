@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.affineminimal;
 
 
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -18,6 +19,12 @@ public class AffineMinimalOptimizerPlugin extends VarylabOptimizerPlugin {
 	@Override
 	public String getName() {
 		return "Affine Minimal Functional Energy";
+	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		c.getPlugin(DirectingPlanesDataSource.class);
 	}
 
 }
