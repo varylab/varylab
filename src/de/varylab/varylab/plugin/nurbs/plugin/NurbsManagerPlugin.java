@@ -95,7 +95,7 @@ import de.varylab.opennurbs.ON_Curve;
 import de.varylab.opennurbs.ON_LineCurve;
 import de.varylab.opennurbs.ON_NurbsCurve;
 import de.varylab.opennurbs.ON_PolylineCurve;
-import de.varylab.opennurbs.Rhino3dmReader;
+import de.varylab.opennurbs.OpenNurbsIO;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.io.NurbsIO;
@@ -254,34 +254,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
-//					logger.info("HALLLLOOOO");
 					logger.info("original surface " + surface.toString());
-//					double[][][] cm = surface.getControlMesh();
-//					for (int i = 0; i < cm.length; i++) {
-//						for (int j = 0; j < cm[0].length; j++) {
-//							if(cm[i][j][0] != 0.0 || cm[i][j][1] != 0.0){
-//								cm[i][j][0] = cm[i][j][0] * 1.4;
-//								cm[i][j][1] = cm[i][j][1] * 0.4;
-//							}
-//						}
-//					}
-//					NURBSSurface[] split1 = surface.splitInTheMiddle(false);
-					
-//					NURBSSurface[] split1 = surface.splitAtKnot1(false, 0.0);
-//					surface = split1[1];
-//					NURBSSurface[] split2 = surface.splitAtKnot1(false, 573.4675668352676);
-//					surface = split2[0];
-					
-//					surface = surface.SurfaceKnotInsertion(true, 1.5);
-					
-	
-//					double[] p1 = surface.getSurfacePoint(2.0, 0.0);
-//					System.err.println("point 1 = " + Arrays.toString(p1));
-//					surface = surface.SurfaceKnotInsertion(true, 2.0);
-//					double[] p2 = surface.getSurfacePoint(2.0, 0.0);
-//					System.err.println("point 2 = " + Arrays.toString(p2));
-					
-//					surface = surface.SurfaceKnotInsertion(false, 0.5, 1);
 					double[] U = surface.getUKnotVector();
 					logger.info("u0 = " + U[0] + "um = " + U[U.length - 1]);
 					double[] V = surface.getVKnotVector();
@@ -300,22 +273,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					logger.info("\n");
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
 					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-//					logger.info("The NURBS surface to copy:");
-//					logger.info(surface.toReadableInputString());
-//					logger.info("The NURBS surface to string:");
-//					logger.info(surface.toString());
 					int dialogOk = JOptionPane.showConfirmDialog(
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
 						NurbsSurfaceUtility.addNurbsMesh(activeNurbsSurface, hif.getActiveLayer(),npp.getU(),npp.getV());
 //						double[][] umbilicalPoints = computeUmbilicalPoints();
-//						
 //						if(umbilicalPoints.length>0){
 //							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
 //						}
 					}
 				} else if(file.getName().toLowerCase().endsWith(".3dm")) {
-					ONX_Model model = Rhino3dmReader.readFile(file.getPath());
+					ONX_Model model = OpenNurbsIO.readFile(file.getPath());
+					model.dump();
 					List<NURBSSurface> nsurfaces = OpenNurbsUtility.getNurbsSurfaces(model);
 					int i = 1;
 					for(NURBSSurface surface : nsurfaces) {
@@ -435,7 +404,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			File file = chooser.getSelectedFile();
 
 			String name = file.getName().toLowerCase();
-			if (!name.endsWith(".obj")) {
+			if (!(name.endsWith(".obj") || name.endsWith(".3dm"))) {
 				file = new File(file.getAbsoluteFile() + ".obj");
 			}
 			if (file.exists()) {
@@ -446,7 +415,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					return;
 			}
 			try {
-				NurbsIO.writeOBJ(activeNurbsSurface,file);
+				if(name.endsWith(".obj")) {
+					NurbsIO.writeOBJ(activeNurbsSurface,file);	
+				} else if(name.endsWith(".3dm")) {
+					OpenNurbsUtility.write(activeNurbsSurface, file);
+				}
+				
 			} catch (final Exception ex) {
 				Runnable r = new Runnable() {
 					@Override

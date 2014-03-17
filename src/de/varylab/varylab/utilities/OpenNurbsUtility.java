@@ -1,16 +1,19 @@
 package de.varylab.varylab.utilities;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.varylab.opennurbs.ON;
 import de.varylab.opennurbs.ONX_Model;
 import de.varylab.opennurbs.ONX_Model_Object;
 import de.varylab.opennurbs.ON_3dPoint;
 import de.varylab.opennurbs.ON_4dPoint;
 import de.varylab.opennurbs.ON_ArcCurve;
+import de.varylab.opennurbs.ON_BinaryFile;
 import de.varylab.opennurbs.ON_Brep;
 import de.varylab.opennurbs.ON_Curve;
 import de.varylab.opennurbs.ON_Geometry;
@@ -21,6 +24,7 @@ import de.varylab.opennurbs.ON_NurbsSurface;
 import de.varylab.opennurbs.ON_Object;
 import de.varylab.opennurbs.ON_PolylineCurve;
 import de.varylab.opennurbs.ON_Surface;
+import de.varylab.opennurbs.OpenNurbsIO;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
@@ -32,8 +36,12 @@ public class OpenNurbsUtility {
 		List<NURBSSurface> nsurfaces = new LinkedList<NURBSSurface>();
 		for(ONX_Model_Object mo : model.get_object_table()) {
 			ON_Object object = mo.get_object();
-			if(object.isKindOfON_Geometry()) {
-				ON_Geometry geom = ON_Geometry.Cast(object);
+			if(object instanceof ON_Geometry) {
+				ON_Geometry geom = (ON_Geometry)object;
+				if(geom instanceof ON_NurbsSurface) {
+					nsurfaces.add(ONtoVarylabNurbsSurface((ON_NurbsSurface)geom));
+					continue;
+				}
 				if(geom.hasBrepForm()) {
 					ON_Brep brep = geom.brepForm(null);
 					ON_Surface[] surfaces = brep.getS();
@@ -197,5 +205,40 @@ public class OpenNurbsUtility {
 			adapters.set(Position.class, v, pt.getCoordinates());
 		}
 		addPolygon(vhds, verts);
+	}
+
+	public static void write(NURBSSurface surf, File file) {
+		ON_NurbsSurface on_surface = new ON_NurbsSurface(-1L);
+		on_surface.init(3, true, surf.getUDegree()+1, surf.getVDegree() + 1, surf.getNumUPoints(), surf.getNumVPoints());
+		double[][][] cv = surf.getControlMesh();
+		ON_4dPoint pt = new ON_4dPoint();
+		for (int i = 0; i < surf.getNumUPoints(); i++) {
+			for (int j = 0; j < surf.getNumVPoints(); j++) {
+				pt.init(cv[i][j]);
+				on_surface.setCV(i, j, pt);
+			}
+		}
+		double[] uKnot = surf.getUKnotVector();
+		double[] vKnot = surf.getVKnotVector();
+		for (int i = 1; i < uKnot.length-1; i++) {
+			on_surface.SetKnot(0, i-1, uKnot[i]);
+		}
+		for (int i = 1; i < vKnot.length-1; i++) {
+			on_surface.SetKnot(1, i-1, vKnot[i]);
+		}
+		on_surface.Dump();
+		on_surface.CVCount(0);
+		on_surface.Order(0);
+		for(int i = 0; i < on_surface.KnotCount(0); ++i) {
+			System.out.println(on_surface.Knot(0, i));
+		}
+		try {
+			ON_BinaryFile bfile = new ON_BinaryFile(-1L);
+			bfile.init(ON.ArchiveMode.WRITE3DM, file.getPath());
+			OpenNurbsIO.ON_WriteOneObjectArchive(bfile, 5, on_surface);
+		} catch (Exception e1) {
+			System.err.println("Could not write to file " + file);
+			e1.printStackTrace();
+		}
 	}
 }

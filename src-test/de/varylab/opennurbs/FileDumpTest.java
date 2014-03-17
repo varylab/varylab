@@ -17,7 +17,7 @@ public class FileDumpTest {
 		if (result != JFileChooser.APPROVE_OPTION) return;
 		File file = chooser.getSelectedFile();
 		
-		ONX_Model model = Rhino3dmReader.readFile(file.getPath());
+		ONX_Model model = OpenNurbsIO.readFile(file.getPath());
 		model.dump();
 		ArrayList<ONX_Model_Object> m_object_table = model.get_object_table();
 		
