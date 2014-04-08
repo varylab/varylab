@@ -858,6 +858,7 @@ public class FaceSetGenerator {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private static LinkedList<IntersectionPoint> removeMultiplePoints(LinkedList<IntersectionPoint> points){
 		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
 		int index = 0;
