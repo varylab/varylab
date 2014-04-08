@@ -55,6 +55,8 @@ public class RVLUtility {
 		iff.setFaceCount(numFaces);
 		iff.setVertexCoordinates(verts);
 		iff.setFaceIndices(faces);
+		iff.setGenerateFaceNormals(true);
+		iff.setGenerateEdgesFromFaces(true);
 		iff.update();
 		return iff.getIndexedFaceSet();
 	}

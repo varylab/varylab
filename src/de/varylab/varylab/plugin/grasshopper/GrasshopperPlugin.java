@@ -73,8 +73,10 @@ public class GrasshopperPlugin extends Plugin {
 		@Override
 		public void run() {
 			InputStream in = null;
+			OutputStream out = null;
 			try {
 				in = socket.getInputStream();
+				out = socket.getOutputStream();
 			} catch (IOException e) {
 				log.warning("could not receive grashopper data:" + e);
 				return;
@@ -83,24 +85,28 @@ public class GrasshopperPlugin extends Plugin {
 			LineNumberReader lineReader = new LineNumberReader(inReader);
 			try {
 				String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-				String data = lineReader.readLine();
-				if (data.startsWith(UTF8_BOM)) {
-					data = data.substring(1);
+				String cmd = lineReader.readLine();
+				if (cmd.startsWith(UTF8_BOM)) {
+					cmd = cmd.substring(1);
 				}
-				if (data.startsWith("COMMAND GEOMETRY")) {
-					String layerName = data.split(" ")[2];
-					VHDS hds = null;
-					if (layerName.equals("_selected_")) {
-						hds = hif.get(new VHDS());
-					} else {
-						log.warning("layer selection not yet implemented");
-					}
-					OutputStream out = socket.getOutputStream();
-					writeHDSAsMesh(hds, out);
-				} else {
-					String xml = xmlHeader + data;
-					OutputStream out = socket.getOutputStream();
-					doOptimization(xml, out);
+				switch (cmd) {
+					case "COMMAND SEND MESH":
+						String data = lineReader.readLine();
+						String xml = xmlHeader + data;
+						receiveGeometry(xml);
+						socket.close();
+						break;
+					case "COMMAND RECEIVE MESH":
+						VHDS hds = hif.get(new VHDS());
+						writeHDSAsMesh(hds, out);
+						socket.close();
+						break;
+					case "COMMAND OPTIMIZE MESH":
+					case "COMMAND OPTIMIZE LINESET":
+						data = lineReader.readLine();
+						xml = xmlHeader + data;
+						doOptimization(xml, out);
+						break;
 				}
 			} catch (Exception e) {
 				log.warning("error transferring data: " + e);
@@ -115,8 +121,6 @@ public class GrasshopperPlugin extends Plugin {
 			OutputStreamWriter outWriter = new OutputStreamWriter(out);
 			outWriter.write(xml + "\r\n");
 			outWriter.flush();
-			outWriter.close();
-			out.close();
 		}
 		
 		public void writeHDSAsMesh(VHDS hds, OutputStream out) throws Exception {
@@ -127,8 +131,6 @@ public class GrasshopperPlugin extends Plugin {
 			OutputStreamWriter outWriter = new OutputStreamWriter(out);
 			outWriter.write(xml + "\r\n");
 			outWriter.flush();
-			outWriter.close();
-			out.close();
 		}
 		
 		private void storeSelection() {
@@ -155,6 +157,39 @@ public class GrasshopperPlugin extends Plugin {
 			}
 			getLayer().setSelection(result);
 		}
+		
+		public void receiveGeometry(String xml) {
+			storeSelection();
+			StringReader xmlReader = new StringReader(xml);
+			String startXML = xml.substring(0, 100);
+			final AtomicBoolean isMesh = new AtomicBoolean(true);
+			if (startXML.contains("RVLMesh")) {
+				try {
+					RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
+					getLayer().set(RVLUtility.toIndexedFaceSet(mesh));
+					log.info("mesh: " + mesh);
+					isMesh.set(true);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper mesh: " + e + "\n" + startXML + "...");
+				}
+			} else 
+			if (startXML.contains("RVLLineSet")){
+				try {
+					RVLLineSet lineSet = RVLLineSetFactory.loadRVLLineSet(xmlReader);
+					VHDS hds = RVLUtility.toHDS(lineSet);
+					getLayer().set(hds);
+					log.info("line set: " + lineSet);
+					isMesh.set(false);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper line set: " + e + "\n" + startXML + "...");
+				}
+			} else {
+				log.warning("data type not recognized: " + startXML +"...");
+				return;
+			}
+			restoreSelection();
+		}
+		
 		
 		public void doOptimization(String xml, final OutputStream out) throws IOException {
 			storeSelection();
@@ -183,7 +218,6 @@ public class GrasshopperPlugin extends Plugin {
 				}
 			} else {
 				log.warning("data type not recognized: " + startXML +"...");
-				out.close();
 				return;
 			}
 			restoreSelection();
@@ -208,9 +242,11 @@ public class GrasshopperPlugin extends Plugin {
 								} else {
 									writeHDSAsLineSet(hds, out);
 								}
+								out.flush();
+								out.close();
 							} catch (Exception e) {
 								log.warning("error writing response: " + e);
-							}							
+							}
 						}
 					};
 					EventQueue.invokeLater(queuedWoker);
@@ -221,6 +257,7 @@ public class GrasshopperPlugin extends Plugin {
 					try {
 						OutputStreamWriter outWriter = new OutputStreamWriter(out);
 						outWriter.write("Optimization failed: " + e);
+						out.flush();
 						out.close();
 					} catch (IOException e2) {
 						log.warning("error writing response: " + e2);
@@ -232,6 +269,7 @@ public class GrasshopperPlugin extends Plugin {
 					try {
 						OutputStreamWriter outWriter = new OutputStreamWriter(out);
 						outWriter.write("Optimization cancelled by user.");
+						out.flush();
 						out.close();
 					} catch (IOException e2) {
 						log.warning("error writing response: " + e2);
