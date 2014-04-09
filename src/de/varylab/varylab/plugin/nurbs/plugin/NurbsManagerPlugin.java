@@ -284,7 +284,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					}
 				} else if(file.getName().toLowerCase().endsWith(".3dm")) {
 					ONX_Model model = OpenNurbsIO.readFile(file.getPath());
-					model.dump();
 					List<NURBSSurface> nsurfaces = OpenNurbsUtility.getNurbsSurfaces(model);
 					int i = 1;
 					for(NURBSSurface surface : nsurfaces) {

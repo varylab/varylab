@@ -66,13 +66,15 @@ public class CircumcircleCurvatureOptimizer extends VarylabOptimizerPlugin {
 		aSet.addAll(curvatureDatasource.getDataSources());
 		double maxK = -Double.MAX_VALUE;
 		double meanK = 0;
+		int i = 0;
 		for (VEdge e : hds.getEdges()) {
 			Double k = aSet.get(CircumcircleCurvature.class, e, Double.class);
 			if (k == null) continue; // boundary or odd valence
-			maxK = k > maxK ? k : maxK;
+			++i;
+			maxK = (k > maxK) ? k : maxK;
 			meanK += k;
 		}
-		meanK /= hds.numEdges();
+		meanK /= i;
 		ProtocolValue maxValue = new ProtocolValue(maxK, "Maximum Circumcircle Curvature", maxKId);
 		ProtocolValue meanValue = new ProtocolValue(meanK, "Mean Circumcircle Curvature", meanKId);
 		maxValue.setColor(Color.RED);

@@ -502,8 +502,10 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hcp = c.getPlugin(HalfedgeInterface.class);
+		c.getPlugin(DomainCutPlugin.class);
 		contentAppearance = c.getPlugin(ContentAppearance.class);
 		jobQueuePlugin = c.getPlugin(JobQueuePlugin.class);
+		
 		createLayout();
 		connectGUIListeners();
 	}

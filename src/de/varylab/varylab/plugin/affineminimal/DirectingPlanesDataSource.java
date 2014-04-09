@@ -11,7 +11,6 @@ import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphNode;
-import de.jreality.shader.CommonAttributes;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
@@ -37,14 +36,6 @@ public class DirectingPlanesDataSource extends Plugin implements DataSourceProvi
 		plane = new SceneGraphComponent("Directing plane");
 	
 	public DirectingPlanesDataSource() {
-		Appearance coneAppearance = new Appearance();
-		coneAppearance.setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		coneAppearance.setAttribute(CommonAttributes.EDGE_DRAW, false);
-		coneAppearance.setAttribute(CommonAttributes.FACE_DRAW, true);
-//		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.DIFFUSE_COLOR, new Color(60, 140, 200));
-//		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COLOR, Color.RED);
-//		coneAppearance.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SPECULAR_COEFFICIENT, 1.0);
-		plane.setAppearance(coneAppearance);
 		plane.setGeometry(planeGeometry);
 	}
 	

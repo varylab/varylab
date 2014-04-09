@@ -9,12 +9,12 @@ import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.HalfedgePreferencePage;
+import de.jtem.halfedgetools.plugin.MarqueeSelectionPlugin;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.halfedgetools.plugin.visualizers.AngleDefectVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
-import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.halfedgetools.plugin.widget.ViewSwitchWidget;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
@@ -79,7 +79,7 @@ public class VaryLabGridshells extends VarylabStartupDefinition {
 		instances.addAll(HalfedgePluginFactory.createDataVisualizationPlugins());
 		instances.addAll(HalfedgePluginFactory.createEditorModePlugins());
 		classes.add(AlgorithmDropdownToolbar.class);
-		classes.add(MarqueeWidget.class);
+		classes.add(MarqueeSelectionPlugin.class);
 		classes.add(ViewSwitchWidget.class);
 		classes.add(ContextMenuWidget.class);
 		

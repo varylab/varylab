@@ -72,6 +72,7 @@ public class ProjectToNurbsSurface extends AlgorithmDialogPlugin {
 			throw new RuntimeException("No nurbs surfaces on any layer to project onto.");
 		}
 		nurbsLayerButtons.getElements().nextElement().setSelected(true);
+		panel.revalidate();
 	}
 	
 	@Override

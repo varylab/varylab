@@ -7,8 +7,8 @@ import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.job.JobMonitorPlugin;
 import de.jreality.plugin.job.JobsTestPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
+import de.jtem.halfedgetools.plugin.MarqueeSelectionPlugin;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
-import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.varylab.plugin.VarylabMain;
@@ -56,7 +56,7 @@ public class VaryLabExperimental extends VarylabStartupDefinition {
 		classes.add(IterationProtocolPanel.class);
 		addOptimizationPlugins(classes);
 		instances.addAll(HalfedgePluginFactory.createEditorModePlugins());
-		classes.add(MarqueeWidget.class);
+		classes.add(MarqueeSelectionPlugin.class);
 		classes.add(ContextMenuWidget.class);
 		
 		classes.add(JobMonitorPlugin.class);

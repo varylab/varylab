@@ -46,9 +46,15 @@ public class OpenNurbsUtility {
 					ON_Brep brep = geom.brepForm(null);
 					ON_Surface[] surfaces = brep.getS();
 					for (int i = 0; i < surfaces.length; i++) {
-						ON_NurbsSurface nsurf = ON_NurbsSurface.Cast(surfaces[i]);
-						if(nsurf != null) {
+						if(surfaces[i] instanceof ON_NurbsSurface) {
+							ON_NurbsSurface nsurf = (ON_NurbsSurface)surfaces[i];
 							nsurfaces.add(ONtoVarylabNurbsSurface(nsurf));
+						} else if(surfaces[i].HasNurbForm()){
+							ON_NurbsSurface nsurf = new ON_NurbsSurface(-1L);
+							surfaces[i].GetNurbForm(nsurf);
+							nsurfaces.add(ONtoVarylabNurbsSurface(nsurf));
+						} else {
+							System.err.println("ON_Surface of type " + surfaces[i].getObjectType() + " not yet implemented.");
 						}
 					}
 				}
@@ -208,8 +214,7 @@ public class OpenNurbsUtility {
 	}
 
 	public static void write(NURBSSurface surf, File file) {
-		ON_NurbsSurface on_surface = new ON_NurbsSurface(-1L);
-		on_surface.init(3, true, surf.getUDegree()+1, surf.getVDegree() + 1, surf.getNumUPoints(), surf.getNumVPoints());
+		ON_NurbsSurface on_surface = new ON_NurbsSurface(3, true, surf.getUDegree()+1, surf.getVDegree() + 1, surf.getNumUPoints(), surf.getNumVPoints());
 		double[][][] cv = surf.getControlMesh();
 		ON_4dPoint pt = new ON_4dPoint();
 		for (int i = 0; i < surf.getNumUPoints(); i++) {
@@ -226,12 +231,8 @@ public class OpenNurbsUtility {
 		for (int i = 1; i < vKnot.length-1; i++) {
 			on_surface.SetKnot(1, i-1, vKnot[i]);
 		}
-		on_surface.Dump();
 		on_surface.CVCount(0);
 		on_surface.Order(0);
-		for(int i = 0; i < on_surface.KnotCount(0); ++i) {
-			System.out.println(on_surface.Knot(0, i));
-		}
 		try {
 			ON_BinaryFile bfile = new ON_BinaryFile(-1L);
 			bfile.init(ON.ArchiveMode.WRITE3DM, file.getPath());

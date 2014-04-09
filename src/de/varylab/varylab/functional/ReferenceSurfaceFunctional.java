@@ -58,12 +58,7 @@ implements Functional<V, E, F> {
 			return;
 		}
 		if(E != null || G != null) {
-			double[] vpos = new double[3];
-			for(V v: hds.getVertices()) {
-				FunctionalUtils.getPosition(v, x, vpos);
-				double[] pt = getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
-				closestPointMap.put(v, pt);
-			}
+			computeClosestPointMap(hds, x);
 		}
 		if (E != null) {
 			E.set(evaluate(hds, x));
@@ -72,6 +67,16 @@ implements Functional<V, E, F> {
 			evaluateGradient(hds, x, G);
 		}
 		closestPointMap.clear();
+	}
+
+	private <HDS extends HalfEdgeDataStructure<V, E, F>> void computeClosestPointMap(
+			HDS hds, DomainValue x) {
+		double[] vpos = new double[3];
+		for(V v: hds.getVertices()) {
+			FunctionalUtils.getPosition(v, x, vpos);
+			double[] pt = getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
+			closestPointMap.put(v, pt);
+		}
 	}
 
 	@Override
@@ -97,9 +102,12 @@ implements Functional<V, E, F> {
 	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
 		double result = 0.0;
 		for(V v : hds.getVertices()) {
+			double[] vpos = FunctionalUtils.getPosition(v, x, null);
 			double[] pt = closestPointMap.get(v);
-			double[] vpos = new double[3];
-			FunctionalUtils.getPosition(v, x, vpos);
+			if(pt == null) {
+				pt = getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
+				closestPointMap.put(v, pt);
+			}
 			result += Rn.euclideanNormSquared(Rn.subtract(null, vpos, pt));
 		}
 		return result;

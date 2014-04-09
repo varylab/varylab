@@ -57,7 +57,7 @@ public class LatticeRemesher <
 		LinkedList<V> corners = TextureUtility.findCorners(surf, a);
 		
 		if(!lattice.checkQuantization(corners,a)) {
-			throw new RemeshingException("\n\nPolygon in texture coordinates does not\nhave quantized edge directions.\nConsider generating quantized coordinates using\nthe Discrete Conformal Parametrization plugin.");
+			throw new RemeshingException("\nPolygon in texture coordinates does not\nhave quantized edge directions.\nConsider generating quantized coordinates using\nthe Discrete Conformal Parametrization plugin.");
 		}
 		// find lines with slopes close to the slopes of the edges
 		LinkedList<LatticeLine2D<V, E, F, HDS>> lines = lattice.findLatticeLines(corners, a, cornersOnLattice);
@@ -65,7 +65,7 @@ public class LatticeRemesher <
 		
 		LatticePolygon2D<V, E, F, HDS> polygon = lattice.findLatticePolygon(lines, a, addNewVertices);
 		
-		LinkedList<E> edges = lattice.createInducedPolygon(polygon,addNewVertices);
+		LinkedList<E> edges = lattice.createInducedPolygon(polygon, addNewVertices);
 //		SceneGraphComponent child2 = new SceneGraphComponent();
 //		child2.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child2);

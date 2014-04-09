@@ -46,6 +46,11 @@ public class HyperbolicNet {
 		initialWeight = weight;
 	} 
 	
+	public HyperbolicNet(VHDS hds, AdapterSet as) {
+		this.hds = hds;
+		this.as.addAll(as);
+	}
+
 	private void propagateWeights() {
 		HashSet<VFace> facesDone = new HashSet<VFace>();
 		HashMap<VFace,VEdge> edgeForPreviousQMap = new HashMap<VFace,VEdge>();

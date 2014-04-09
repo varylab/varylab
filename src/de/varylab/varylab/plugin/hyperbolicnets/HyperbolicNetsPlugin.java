@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -38,6 +39,9 @@ public class HyperbolicNetsPlugin extends ShrinkPanelPlugin implements ActionLis
 		vSpinner = new JSpinner(vModel),
 		wSpinner = new JSpinner(wModel);
 	
+	private JCheckBox
+		bilinearBox = new JCheckBox("Bilinear");
+	
 	private HalfedgeInterface 
 		hif = null;
 	
@@ -58,6 +62,7 @@ public class HyperbolicNetsPlugin extends ShrinkPanelPlugin implements ActionLis
 			lc = LayoutFactory.createLeftConstraint();
 		
 		shrinkPanel.add(hyperboloidPatchButton,rc);
+		shrinkPanel.add(bilinearBox,rc);
 		shrinkPanel.add(new JLabel("u"),lc);
 		shrinkPanel.add(uSpinner,rc);
 		shrinkPanel.add(new JLabel("v"),lc);
@@ -93,10 +98,17 @@ public class HyperbolicNetsPlugin extends ShrinkPanelPlugin implements ActionLis
 		
 		VHDS hds = hif.get(new VHDS());
 		AdapterSet as = hif.getAdapters();
-		HyperbolicNet hypNet = new HyperbolicNet(hds, as, wModel.getNumber().doubleValue());
-		hypNet.setULines(uModel.getNumber().intValue());
-		hypNet.setVLines(vModel.getNumber().intValue());
-		patchComponent.addChild(hypNet.getComponent());
+		if(!bilinearBox.isSelected()) {
+			HyperbolicNet hypNet = new HyperbolicNet(hds, as, wModel.getNumber().doubleValue());
+			hypNet.setULines(uModel.getNumber().intValue());
+			hypNet.setVLines(vModel.getNumber().intValue());
+			patchComponent.addChild(hypNet.getComponent());
+		} else {
+			HyperbolicNet hypNet = new HyperbolicNet(hds, as);
+			hypNet.setULines(uModel.getNumber().intValue());
+			hypNet.setVLines(vModel.getNumber().intValue());
+			patchComponent.addChild(hypNet.getComponent());
+		}
 		hif.addTemporaryGeometry(patchComponent);
 	}
 	
