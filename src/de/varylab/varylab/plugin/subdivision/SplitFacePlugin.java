@@ -1,9 +1,7 @@
 package de.varylab.varylab.plugin.subdivision;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -33,8 +31,8 @@ public class SplitFacePlugin extends AlgorithmPlugin {
 			AdapterSet a, 
 			HalfedgeInterface hcp) 
 	{
-		Set<F> faces = hcp.getSelection().getFaces(hds);
-		HashSet<V> vertices = new HashSet<V>(hcp.getSelection().getVertices(hds));
+		List<F> faces = hcp.getSelection().getFaces(hds);
+		List<V> vertices = hcp.getSelection().getVertices(hds);
 
 		for(F f : faces) {
 			List<V> vf = HalfEdgeUtils.boundaryVertices(f);

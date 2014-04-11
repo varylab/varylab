@@ -2,7 +2,7 @@ package de.varylab.varylab.plugin.editor;
 
 import java.awt.event.InputEvent;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -25,7 +25,7 @@ public class EdgeCreatorPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		Set<V> selectedVerts = hif.getSelection().getVertices(hds);
+		List<V> selectedVerts = hif.getSelection().getVertices(hds);
 		
 		if(selectedVerts.size() ==  2) {
 			Iterator<V> it = selectedVerts.iterator();

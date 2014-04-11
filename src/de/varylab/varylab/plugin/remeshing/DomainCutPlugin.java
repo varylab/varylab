@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -57,7 +58,7 @@ public class DomainCutPlugin extends ShrinkPanelPlugin implements ActionListener
 		
 		if(cutButton == s) {
 			VHDS hds = hif.get(new VHDS());
-			Set<VVertex> vSet = hif.getSelection().getVertices(hds);
+			List<VVertex> vSet = hif.getSelection().getVertices(hds);
 			if (vSet.isEmpty()) {
 				Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 				JOptionPane.showMessageDialog(w, "Please select vertices:\n - one vertex to define direction cut\n - two to define cut along line");

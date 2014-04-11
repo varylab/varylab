@@ -1,6 +1,6 @@
 package de.varylab.varylab.plugin.topology;
 
-import java.util.Set;
+import java.util.List;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -41,7 +41,7 @@ public class CollapseToNeighborPlugin extends AlgorithmPlugin{
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		HalfedgeSelection selection = hi.getSelection();
-		Set<V> vertices = selection.getVertices(hds);
+		List<V> vertices = selection.getVertices(hds);
 		
 		for(V v : vertices) {
 			E inEdge = null;

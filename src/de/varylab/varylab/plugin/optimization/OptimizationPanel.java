@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -250,7 +249,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 	
 	public List<Constraint> createConstraints(VHDS hds) {
 		List<Constraint> result = new LinkedList<Constraint>();
-		Set<VVertex> fixedVerts = hif.getSelection().getVertices(hds);
+		List<VVertex> fixedVerts = hif.getSelection().getVertices(hds);
 		FixingConstraint fixConstraint = new FixingConstraint(
 			fixedVerts,
 			fixSelectionXChecker.isSelected(),

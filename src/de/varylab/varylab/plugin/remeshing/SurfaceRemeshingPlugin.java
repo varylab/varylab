@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -301,7 +302,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		}
 		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, new AdapterSet(new VTexturePositionPosition3dAdapter()), 10, false);
 		HalfedgeSelection sel = hcp.getSelection();
-		Set<VVertex> featureSet = sel.getVertices(surface);
+		Set<VVertex> featureSet = new TreeSet<VVertex>(sel.getVertices(surface));
 		featureSet.retainAll(HalfEdgeUtils.boundaryVertices(surface));
 		
 		AppearanceInspector ai = contentAppearance.getAppearanceInspector();

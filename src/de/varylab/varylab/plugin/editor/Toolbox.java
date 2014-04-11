@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 
@@ -81,7 +82,7 @@ public class Toolbox extends ShrinkPanelPlugin implements ActionListener {
 		double scale = oldTrafo[15];
 		if (smoothCombButton == src) {
 			VHDS hds = hif.get(new VHDS());
-			Set<VVertex> selectedVerts = hif.getSelection().getVertices(hds);
+			Set<VVertex> selectedVerts = new TreeSet<VVertex>(hif.getSelection().getVertices(hds));
 			if(selectedVerts.size() == 0) {
 				selectedVerts.addAll(hds.getVertices());
 			}

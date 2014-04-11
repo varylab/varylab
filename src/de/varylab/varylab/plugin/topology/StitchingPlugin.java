@@ -1,7 +1,7 @@
 package de.varylab.varylab.plugin.topology;
 
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -33,7 +33,7 @@ public class StitchingPlugin extends AlgorithmPlugin{
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		HalfedgeSelection selection = hi.getSelection();
-		Set<V> vertices = selection.getVertices(hds);
+		List<V> vertices = selection.getVertices(hds);
 		if(vertices.size() != 2) {
 			return;
 		}
