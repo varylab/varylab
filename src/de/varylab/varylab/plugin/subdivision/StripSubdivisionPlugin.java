@@ -2,7 +2,7 @@ package de.varylab.varylab.plugin.subdivision;
 
 import java.awt.event.InputEvent;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -35,7 +35,7 @@ public class StripSubdivisionPlugin extends AlgorithmPlugin {
 		AdapterSet a, 
 		HalfedgeInterface hcp)  
 	{
-		List<E> edges = hcp.getSelection().getEdges(hds);
+		Set<E> edges = hcp.getSelection().getEdges(hds);
 		for(E e : edges) {
 			if(e.isPositive()) {
 				subdivideStrip1D(e, a);

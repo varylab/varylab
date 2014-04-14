@@ -8,9 +8,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.utilities.SelectionUtility;
@@ -39,7 +39,7 @@ public class StripSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		HalfedgeSelection hes = hif.getSelection();
+		Selection hes = hif.getSelection();
 		LinkedList<F> stripFaces = new LinkedList<F>();
 		LinkedList<E> stripEdges = new LinkedList<E>();
 		for(E e : hes.getEdges(hds)) {

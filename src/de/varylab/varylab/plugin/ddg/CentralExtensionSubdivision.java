@@ -13,9 +13,9 @@ import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.varylab.varylab.utilities.GeometryUtility;
 
 public class CentralExtensionSubdivision extends AlgorithmPlugin {
@@ -50,7 +50,7 @@ public class CentralExtensionSubdivision extends AlgorithmPlugin {
 			hds, 
 			hds2, 
 			a, 
-			new HalfedgeSelection(), 
+			new Selection(), 
 			false,
 			false, 
 			false,

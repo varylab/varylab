@@ -33,9 +33,9 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.SelectionAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.plugin.SelectionListener;
 import de.jtem.halfedgetools.plugin.VisualizersManager;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.SelectionListener;
 import de.jtem.halfedgetools.util.NodeComparator;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -195,9 +195,9 @@ public class NodePropertyEditor extends ShrinkPanelPlugin implements ListSelecti
 	
 	
 	@Override
-	public void selectionChanged(HalfedgeSelection s, HalfedgeInterface hif) {
+	public void selectionChanged(Selection s, HalfedgeInterface hif) {
 		selectedNodes.clear();
-		selectedNodes.addAll(s.getNodes());
+		selectedNodes.addAll(s);
 		DefaultListModel<Node<?,?,?>> model = new DefaultListModel<>();
 		for (Node<?,?,?> n : selectedNodes) {
 			model.addElement(n);

@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -21,7 +20,7 @@ import de.jreality.plugin.basic.View;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -58,7 +57,7 @@ public class DomainCutPlugin extends ShrinkPanelPlugin implements ActionListener
 		
 		if(cutButton == s) {
 			VHDS hds = hif.get(new VHDS());
-			List<VVertex> vSet = hif.getSelection().getVertices(hds);
+			Set<VVertex> vSet = hif.getSelection().getVertices(hds);
 			if (vSet.isEmpty()) {
 				Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 				JOptionPane.showMessageDialog(w, "Please select vertices:\n - one vertex to define direction cut\n - two to define cut along line");
@@ -86,7 +85,7 @@ public class DomainCutPlugin extends ShrinkPanelPlugin implements ActionListener
 			TextureUtility.createIntersectionVertices(segment, 1E-8, hds, a, result, segmentBox.isSelected());
 			LinkedList<VVertex> orderedResult = new LinkedList<VVertex>(result);
 			Collections.sort(orderedResult,new SegmentComparator(Rn.subtract(null, p2, p1), a));
-			HalfedgeSelection cutSelection = new HalfedgeSelection();
+			Selection cutSelection = new Selection();
 			cutSelection.addAll(result);
 			VVertex v1 = null;
 			for (Iterator<VVertex> it = orderedResult.iterator(); it.hasNext();) {

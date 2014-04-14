@@ -27,7 +27,7 @@ import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.varylab.halfedge.VHDS;
@@ -52,8 +52,8 @@ public class GrasshopperPlugin extends Plugin {
 		layer = null;
 	protected static final int 
 		SERVER_PORT = 6789;
-	private HalfedgeSelection
-		selection = new HalfedgeSelection();
+	private Selection
+		selection = new Selection();
 		
 	private class ComponentClient extends Thread {
 			
@@ -134,12 +134,12 @@ public class GrasshopperPlugin extends Plugin {
 		}
 		
 		private void storeSelection() {
-			selection = new HalfedgeSelection(getLayer().getSelection());
+			selection = new Selection(getLayer().getSelection());
 		}
 		
 		private void restoreSelection() {
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
-			HalfedgeSelection result = new HalfedgeSelection();
+			Selection result = new Selection();
 			for (Face<?,?,?> f : selection.getFaces()) {
 				if (f.getIndex() < hds.numFaces()) {
 					result.add(hds.getFace(f.getIndex()));

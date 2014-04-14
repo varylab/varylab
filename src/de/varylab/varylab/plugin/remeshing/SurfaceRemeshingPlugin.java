@@ -51,9 +51,9 @@ import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -274,7 +274,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 
 	private void liftMesh() {
 		remesh = hcp.get(new VHDS());
-		HalfedgeSelection selection = hcp.getSelection();
+		Selection selection = hcp.getSelection();
 		AdapterSet adapters = new AdapterSet(hcp.getAdapters());
 		RemeshingUtility.alignRemeshBoundary(remesh, surface, adapters);
 		NurbsUVAdapter nurbsUVAdapter = hcp.getActiveAdapters().query(NurbsUVAdapter.class);
@@ -301,7 +301,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			throw new RemeshingException("Surface has no texture coordinates.");
 		}
 		surfaceKD = new KdTree<VVertex, VEdge, VFace>(surface, new AdapterSet(new VTexturePositionPosition3dAdapter()), 10, false);
-		HalfedgeSelection sel = hcp.getSelection();
+		Selection sel = hcp.getSelection();
 		Set<VVertex> featureSet = new TreeSet<VVertex>(sel.getVertices(surface));
 		featureSet.retainAll(HalfEdgeUtils.boundaryVertices(surface));
 		
@@ -407,7 +407,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			} else {
 				hcp.set(remesh);
 			}
-			HalfedgeSelection selection = hcp.getSelection();
+			Selection selection = hcp.getSelection();
 			for(VVertex v : remesh.getVertices()) {
 				if(localQuadRemesher.isTextureVertex(v) || HalfEdgeUtils.isBoundaryVertex(v)) {
 					selection.add(v);

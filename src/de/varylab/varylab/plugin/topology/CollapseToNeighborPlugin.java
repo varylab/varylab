@@ -1,6 +1,6 @@
 package de.varylab.varylab.plugin.topology;
 
-import java.util.List;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -10,9 +10,9 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.icon.ImageHook;
 
@@ -40,8 +40,8 @@ public class CollapseToNeighborPlugin extends AlgorithmPlugin{
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		HalfedgeSelection selection = hi.getSelection();
-		List<V> vertices = selection.getVertices(hds);
+		Selection selection = hi.getSelection();
+		Set<V> vertices = selection.getVertices(hds);
 		
 		for(V v : vertices) {
 			E inEdge = null;

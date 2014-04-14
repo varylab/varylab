@@ -27,9 +27,9 @@ import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements ChangeListener {
@@ -55,7 +55,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		noEdgeCollapseChecker = new JCheckBox("no edge collapse"),
 		boundaryOnlyChecker = new JCheckBox("Boundary only");
 	
-	private HalfedgeSelection 
+	private Selection 
 		oldSelection = null;
 	
 	private double[][] distances = null;
@@ -162,7 +162,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		double distance = distanceModel.getNumber().doubleValue();
 		identificationMap.clear();
 		infoLabel.setText("");
-		HalfedgeSelection identifySel = new HalfedgeSelection();
+		Selection identifySel = new Selection();
 //		KdTree<V, E, F> kdtree = new KdTree<V, E, F>(hds, a, 5, false);
 //		for(V v : hds.getVertices()) {
 //			if(boundaryOnlyChecker.isSelected() && !HalfEdgeUtils.isBoundaryVertex(v)) {
@@ -208,8 +208,8 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 									continue;
 								}
 							}
-							identifySel.setSelected(v, true);
-							identifySel.setSelected(w, true);
+							identifySel.add(v);
+							identifySel.add(w);
 							if((identificationMap.containsKey(v) && identificationMap.get(v) != w) ||
 									(identificationMap.containsKey(w) && identificationMap.get(w) != v)){
 								infoLabel.setText("identification impossible - not unique");
@@ -217,8 +217,8 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 							}
 							identificationMap.put(w, v);
 							identificationMap.put(v, w);
-							identifySel.setSelected(v, true);
-							identifySel.setSelected(w, true);
+							identifySel.add(v);
+							identifySel.add(w);
 						}
 					}
 				}

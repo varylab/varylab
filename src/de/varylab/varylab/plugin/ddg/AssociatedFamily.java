@@ -32,7 +32,7 @@ import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -77,7 +77,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		fixingPoints = new double[3][]; 
 	private int[]
 	    fixingIndices = new int[3];
-	private HalfedgeSelection
+	private Selection
 		sel = null;
 	private Random
 		rnd = new Random();
@@ -138,7 +138,7 @@ public class AssociatedFamily extends ShrinkPanelPlugin implements ActionListene
 		fixingPoints[1] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[1]));
 		fixingPoints[2] = aSet.getD(Position3d.class, surface.getVertex(fixingIndices[2]));
 		
-		sel = new HalfedgeSelection();
+		sel = new Selection();
 		for (int i : fixingIndices) {
 			sel.add(surface.getVertex(i));
 		}

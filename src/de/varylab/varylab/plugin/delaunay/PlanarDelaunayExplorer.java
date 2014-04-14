@@ -46,9 +46,9 @@ import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.plugin.SelectionListener;
 import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.SelectionListener;
 import de.jtem.halfedgetools.util.GeometryUtility;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -534,7 +534,7 @@ public class PlanarDelaunayExplorer extends ShrinkPanelPlugin implements ActionL
 	}
 
 	@Override
-	public void selectionChanged(HalfedgeSelection s, HalfedgeInterface hif) {
+	public void selectionChanged(Selection s, HalfedgeInterface hif) {
 		Set<Face<?,?,?>> selectedFaces = s.getFaces();
 		if(circlesBox.isSelected()) {
 			for(Face<?,?,?> f : hif.get().getFaces()) {

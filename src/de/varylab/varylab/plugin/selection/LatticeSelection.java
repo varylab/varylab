@@ -11,9 +11,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.icon.ImageHook;
@@ -43,7 +43,7 @@ public class LatticeSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		HalfedgeSelection hes = hif.getSelection();
+		Selection hes = hif.getSelection();
 		Set<V> all = new HashSet<V>();
 		for(V v : hif.getSelection().getVertices(hds)) {
 			all.addAll(selectSublattice(v));

@@ -3,7 +3,7 @@ package de.varylab.varylab.plugin.topology;
 import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryVertex;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -11,9 +11,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 
 public class StitchCutPathPlugin extends AlgorithmPlugin{
 
@@ -34,9 +34,9 @@ public class StitchCutPathPlugin extends AlgorithmPlugin{
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		HalfedgeSelection selection = hi.getSelection();
-		List<V> vSel = selection.getVertices(hds);
-		List<E> eSel = selection.getEdges(hds);
+		Selection selection = hi.getSelection();
+		Set<V> vSel = selection.getVertices(hds);
+		Set<E> eSel = selection.getEdges(hds);
 		
 		if (vSel.size() != 2 || eSel.size() == 0) {
 			throw new RuntimeException("Please select two boundary vertices to identify and a boundary edge on the stitch path.");

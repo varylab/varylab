@@ -25,9 +25,9 @@ import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class CollapseTrianglesPlugin extends AlgorithmDialogPlugin implements ChangeListener {
@@ -48,7 +48,7 @@ public class CollapseTrianglesPlugin extends AlgorithmDialogPlugin implements Ch
 		infoLabel = new JLabel("Vertex pairs found:"),
 		minLabel = new JLabel("Minimal triangle area:");
 
-	private HalfedgeSelection 
+	private Selection 
 		oldSelection = null;
 	
 	public CollapseTrianglesPlugin() {
@@ -131,7 +131,7 @@ public class CollapseTrianglesPlugin extends AlgorithmDialogPlugin implements Ch
 		double distance = areaModel.getNumber().doubleValue();
 		collapseSet.clear();
 		infoLabel.setText("");
-		HalfedgeSelection identifySel = new HalfedgeSelection();
+		Selection identifySel = new Selection();
 		for(F f : hds.getFaces()) {
 			Double area = a.get(Area.class, f, Double.class);
 			if(area < distance) {

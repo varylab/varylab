@@ -1,16 +1,16 @@
 package de.varylab.varylab.plugin.nurbs.algorithm;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -33,12 +33,15 @@ public class ProjectToNurbsSurface extends AlgorithmDialogPlugin {
 	
 	private List<NURBSSurface>
 		nurbsSurfaces = new LinkedList<NURBSSurface>();
-	
-	private ButtonGroup
-		nurbsLayerButtons = new ButtonGroup();
+	private JList<HalfedgeLayer>
+		nurbsLayerList = new JList<HalfedgeLayer>();
+	private JScrollPane
+		nurbsLayerScroller = new JScrollPane(nurbsLayerList);
 	
 	public ProjectToNurbsSurface() {
-		panel.setLayout(new GridLayout(0,1));
+		panel.setLayout(new GridLayout());
+		panel.add(nurbsLayerScroller);
+		nurbsLayerScroller.setPreferredSize(new Dimension(150, 100));
 	}
 	
 	@Override
@@ -58,20 +61,20 @@ public class ProjectToNurbsSurface extends AlgorithmDialogPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		panel.removeAll();
+		nurbsSurfaces.clear();
+		DefaultListModel<HalfedgeLayer> layerModel = new DefaultListModel<HalfedgeLayer>();
 		for(HalfedgeLayer layer : hi.getAllLayers()) {
 			NurbsUVAdapter uvAdapter = layer.getVolatileAdapters().query(NurbsUVAdapter.class);
 			if(uvAdapter != null) {
 				nurbsSurfaces.add(uvAdapter.getSurface());
-				JRadioButton jrb = new JRadioButton(layer.getName());
-				panel.add(jrb);
-				nurbsLayerButtons.add(jrb);
+				layerModel.addElement(layer);
 			}
 		}
 		if(nurbsSurfaces.isEmpty()) {
 			throw new RuntimeException("No nurbs surfaces on any layer to project onto.");
 		}
-		nurbsLayerButtons.getElements().nextElement().setSelected(true);
+		nurbsLayerList.setModel(layerModel);
+		nurbsLayerList.setSelectedIndex(0);
 		panel.revalidate();
 	}
 	
@@ -87,14 +90,7 @@ public class ProjectToNurbsSurface extends AlgorithmDialogPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		int i = 0;
-		for (Enumeration<AbstractButton> buttons = nurbsLayerButtons.getElements(); buttons.hasMoreElements();) {
-			AbstractButton button = buttons.nextElement();
-			if (button.isSelected()) {
-				break;
-			}
-			++i;
-		}
+		int i = nurbsLayerList.getSelectedIndex();
 		NURBSSurface targetSurface = nurbsSurfaces.get(i);
 		Map<Integer, double[]> indexMap = new HashMap<Integer, double[]>();
 		i = 0;
