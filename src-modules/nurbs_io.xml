@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>jf65dg46mjs6kgy6</id>
+		<name>Nurbs import</name>
+		<revision>1</revision>
+		<category>Import</category>
+	</manifest>
+	<description>
+		Plugin to import and export an obj nurbs-surface. 
+	</description>
+	<plugin class="de.varylab.varylab.plugin.nurbs.plugin.NurbsIOPlugin"/>
+	
+</module>

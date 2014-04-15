@@ -4,28 +4,20 @@ import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static java.awt.GridBagConstraints.BOTH;
-import static javax.swing.JFileChooser.FILES_ONLY;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
-import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,29 +26,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.filechooser.FileFilter;
 
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -75,33 +58,22 @@ import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
-import de.jreality.util.NativePathUtility;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
-import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
-import de.varylab.opennurbs.ONX_Model;
-import de.varylab.opennurbs.ON_ArcCurve;
-import de.varylab.opennurbs.ON_Curve;
-import de.varylab.opennurbs.ON_LineCurve;
-import de.varylab.opennurbs.ON_NurbsCurve;
-import de.varylab.opennurbs.ON_PolylineCurve;
-import de.varylab.opennurbs.OpenNurbsIO;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
-import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
-import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
@@ -119,12 +91,10 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
-import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
-import de.varylab.varylab.utilities.OpenNurbsUtility;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
@@ -133,12 +103,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private HalfedgeInterface 
 		hif = null;
 
-	private JFileChooser 
-		chooser = new JFileChooser();
-	
-//	private ConjugateLinesPanel
-//		conjugateLinesPanel = new ConjugateLinesPanel();
-	
 	private GeodesicPanel
 		geodesicPanel = new GeodesicPanel();
 	
@@ -147,14 +111,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 	private PointDistancePanel
 		pointDistancePanel = new PointDistancePanel();
-	
-	private JButton
-		exportButton = new JButton(new ExportAction()),
-		importButton = new JButton(new ImportAction());
-	
-	private JToolBar
-		surfaceToolbar = new JToolBar();
-	
+
 	private int 
 		curveIndex = 1;
 	
@@ -171,20 +128,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		
-		configureFileChooser();
-		importButton.setToolTipText("Load Nurbs surface");
-		
+
 		JPanel tablePanel = new JPanel();
 		tablePanel.setLayout(new GridLayout());
 		
-		surfaceToolbar.add(new JLabel("NURBS surface"));
-		surfaceToolbar.add(importButton);
-		surfaceToolbar.add(exportButton);
-		exportButton.setEnabled(false);
-		surfaceToolbar.setFloatable(false);
-		
-		c.weighty = 0.0;
-		shrinkPanel.add(surfaceToolbar, c);
+
 		c.weighty = 1.0;
 		shrinkPanel.add(tablePanel, c);
 		c.weighty = 0.0;
@@ -195,244 +143,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		shrinkPanel.add(pointDistancePanel, c);
 	}
 
-	private void configureFileChooser() {
-		chooser.setAcceptAllFileFilterUsed(false);
-		chooser.setFileSelectionMode(FILES_ONLY);
-		chooser.setMultiSelectionEnabled(false);
-		chooser.addChoosableFileFilter(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(".obj");
-			}
 
-			@Override
-			public String getDescription() {
-				return "Wavefront OBJ (*.obj)";
-			}
-			
-			@Override
-			public String toString() {
-				return getDescription();
-			}
-		});
-		chooser.addChoosableFileFilter(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(".3dm");
-			}
-
-			@Override
-			public String getDescription() {
-				return "OpenNurbs 3dm (*.3dm)";
-			}
-			
-			@Override
-			public String toString() {
-				return getDescription();
-			}
-		});
-	}	
-	
-	private class ImportAction extends AbstractAction {
-		
-		private static final long 
-			serialVersionUID = 1L;
-
-		public ImportAction() {
-			putValue(SMALL_ICON, ImageHook.getIcon("folder.png"));
-			putValue(NAME, "Import");
-			putValue(SHORT_DESCRIPTION, "Import");
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-			chooser.setDialogTitle("Import Into Layer");
-			int result = chooser.showOpenDialog(w);
-			if (result != JFileChooser.APPROVE_OPTION) return;
-			File file = chooser.getSelectedFile();
-			try {
-				if (file.getName().toLowerCase().endsWith(".obj")) {
-					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
-					logger.info("original surface " + surface.toString());
-					double[] U = surface.getUKnotVector();
-					logger.info("u0 = " + U[0] + "um = " + U[U.length - 1]);
-					double[] V = surface.getVKnotVector();
-					logger.info("v0 = " + V[0] + "vn = " + V[V.length - 1]);
-					
-					if(surface.getClosingDir() == ClosingDir.uClosed){
-						logger.info("surface.isClosedUDir()");
-					}
-					if(surface.getClosingDir() == ClosingDir.vClosed){
-						logger.info("surface.isClosedVDir()");
-					}
-					surface.setName(file.getName());
-					activeNurbsSurface = surface;
-					logger.info("THE NEW SURFACE");
-					logger.info(activeNurbsSurface.toObj());
-					logger.info("\n");
-					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
-					NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-					int dialogOk = JOptionPane.showConfirmDialog(
-						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
-					if(dialogOk == JOptionPane.OK_OPTION) {
-						NurbsSurfaceUtility.addNurbsMesh(activeNurbsSurface, hif.getActiveLayer(),npp.getU(),npp.getV());
-//						double[][] umbilicalPoints = computeUmbilicalPoints();
-//						if(umbilicalPoints.length>0){
-//							addUmbilicalPoints(umbilicalPoints,hif.getActiveLayer());
-//						}
-					}
-				} else if(file.getName().toLowerCase().endsWith(".3dm")) {
-					ONX_Model model = OpenNurbsIO.readFile(file.getPath());
-					List<NURBSSurface> nsurfaces = OpenNurbsUtility.getNurbsSurfaces(model);
-					int i = 1;
-					for(NURBSSurface surface : nsurfaces) {
-						if(!surface.hasClampedKnotVectors()) {
-							surface.repairKnotVectors();
-						}
-						NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-						int dialogOk = JOptionPane.showConfirmDialog(w, npp, getPluginInfo().name, OK_CANCEL_OPTION, PLAIN_MESSAGE );
-						if(dialogOk == JOptionPane.OK_OPTION) {
-							HalfedgeLayer newLayer = new HalfedgeLayer(hif);
-							newLayer.setName(file.getName() + " surface " + i++);
-							NurbsSurfaceUtility.addNurbsMesh(surface,newLayer,npp.getU(),npp.getV());
-							hif.addLayer(newLayer);
-						}
-					}
-					List<ON_Curve> curves = OpenNurbsUtility.getCurves(model);
-					for(ON_Curve curve : curves) {
-						// TODO: Put different object onto different layers
-						if(curve instanceof ON_PolylineCurve) {
-							ON_PolylineCurve plc = (ON_PolylineCurve) curve;
-							OpenNurbsUtility.addPolylineCurve(plc, hif.get(new VHDS()), hif.getAdapters());
-						} else if(curve instanceof ON_ArcCurve) {
-							ON_ArcCurve ac = (ON_ArcCurve) curve;
-							OpenNurbsUtility.addArcCurve(ac, hif.get(new VHDS()), hif.getAdapters());
-						} else if(curve instanceof ON_LineCurve) {
-							ON_LineCurve ac = (ON_LineCurve) curve;
-							OpenNurbsUtility.addLineCurve(ac, hif.get(new VHDS()), hif.getAdapters());
-						} else if(curve instanceof ON_NurbsCurve) {
-							ON_NurbsCurve ac = (ON_NurbsCurve) curve;
-							OpenNurbsUtility.addNurbsCurve(ac, hif.get(new VHDS()), hif.getAdapters());
-						}
-					}
-					model.dispose();
-					hif.update();
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
-			}
-//			updateStates();
-		}
-		
-		private class NurbsParameterPanel extends JPanel {
-			
-			private static final long serialVersionUID = 1L;
-
-			private SpinnerNumberModel
-				uModel = new SpinnerNumberModel(11,0,Integer.MAX_VALUE,2),
-				vModel = new SpinnerNumberModel(11,0,Integer.MAX_VALUE,2);
-			
-			private JSpinner
-				uSpinner = new JSpinner(uModel),
-				vSpinner = new JSpinner(vModel);
-			
-			private JPanel
-				infoPanel = new JPanel(),
-				paramPanel = new JPanel();
-	
-			public NurbsParameterPanel(NURBSSurface surf) {
-				super(new GridBagLayout());
-				GridBagConstraints rc = LayoutFactory.createRightConstraint();
-				
-				add(new JLabel("Surface info"),rc);
-				
-				infoPanel.setLayout(new GridLayout(4, 1));
-				infoPanel.add(new JLabel("u-Degree: " + surf.getUDegree())); 
-				infoPanel.add(new JLabel("u-Knots:  " + surf.getUKnotVector().length));
-				infoPanel.add(new JLabel("v-Degree: " + surf.getVDegree())); 
-				infoPanel.add(new JLabel("v-Knots:  " + surf.getVKnotVector().length));
-				
-				add(infoPanel,rc);
-				
-				add(new JSeparator(SwingConstants.HORIZONTAL),rc);
-				
-				add(new JLabel("Parameters:"),rc);
-				
-				paramPanel.setLayout(new GridLayout(2,2));
-				uModel.setValue(2*surf.getNumUPoints());
-				paramPanel.add(new JLabel("u-Lines")); 
-				paramPanel.add(uSpinner);
-				vModel.setValue(2*surf.getNumVPoints());
-				paramPanel.add(new JLabel("v-Lines")); 
-				paramPanel.add(vSpinner);
-				
-				add(paramPanel,rc);
-			}
-			
-			public int getU() {
-				return uModel.getNumber().intValue();
-			}
-			
-			public int getV() {
-				return vModel.getNumber().intValue();
-			}
-		}
-	}
-	
-	
-	private class ExportAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ExportAction() {
-			putValue(NAME, "Export");
-			putValue(SMALL_ICON, ImageHook.getIcon("disk.png"));
-			putValue(SHORT_DESCRIPTION, "Export NURBS Surface");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			final Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-			chooser.setDialogTitle("Export Layer Geometry");
-			chooser.setPreferredSize(new Dimension(800, 700));
-			int result = chooser.showSaveDialog(w);
-			if (result != JFileChooser.APPROVE_OPTION)
-				return;
-			File file = chooser.getSelectedFile();
-
-			String name = file.getName().toLowerCase();
-			if (!(name.endsWith(".obj") || name.endsWith(".3dm"))) {
-				file = new File(file.getAbsoluteFile() + ".obj");
-			}
-			if (file.exists()) {
-				int result2 = JOptionPane.showConfirmDialog(w,
-						"File " + file.getName() + " exists. Overwrite?",
-						"Overwrite?", JOptionPane.YES_NO_OPTION);
-				if (result2 != JOptionPane.YES_OPTION)
-					return;
-			}
-			try {
-				if(name.endsWith(".obj")) {
-					NurbsIO.writeOBJ(activeNurbsSurface,file);	
-				} else if(name.endsWith(".3dm")) {
-					OpenNurbsUtility.write(activeNurbsSurface, file);
-				}
-				
-			} catch (final Exception ex) {
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
-						JOptionPane.showMessageDialog(w, ex.getMessage(), ex
-								.getClass().getSimpleName(), ERROR_MESSAGE);
-					}
-				};
-				EventQueue.invokeLater(r);
-			}
-		}
-	}
-	
 	private class GeodesicPanel extends ShrinkPanel implements ActionListener{
 		
 		private static final long 
@@ -1275,6 +986,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		hif.addAdapter(new NurbsWeightAdapter(), true);
 		pointSelectionPlugin  = c.getPlugin(PointSelectionPlugin.class);
 		pointSelectionPlugin.addPointSelectionListener(curvatureLinesPanel);
+		c.getPlugin(NurbsIOPlugin.class);
 		c.getPlugin(ExtractControlMesh.class);
 		c.getPlugin(NurbsSurfaceFromMesh.class);
 		c.getPlugin(ProjectToNurbsSurface.class);
@@ -1296,8 +1008,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	@Override
 	public void storeStates(Controller c) throws Exception {
 		super.storeStates(c);
-		String chooserDir = chooser.getCurrentDirectory().getAbsolutePath();
-		c.storeProperty(getClass(), "importExportLocation", chooserDir);
 		c.storeProperty(getClass(), "calculateMaxCurve", curvatureLinesPanel.maxCurvatureBox.isSelected());
 		c.storeProperty(getClass(), "calculateMinCurve", curvatureLinesPanel.minCurvatureBox.isSelected());
 		c.storeProperty(getClass(), "immediateCurveCalculation", curvatureLinesPanel.immediateCalculationBox.isSelected());
@@ -1306,12 +1016,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	@Override
 	public void restoreStates(Controller c) throws Exception {
 		super.restoreStates(c);
-		String chooserDir = System.getProperty("user.dir");
-		chooserDir = c.getProperty(getClass(), "importExportLocation", chooserDir);
-		File chooserDirFile = new File(chooserDir);
-		if (chooserDirFile.exists()) {
-			chooser.setCurrentDirectory(chooserDirFile);
-		}
 		curvatureLinesPanel.maxCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMaxCurve",curvatureLinesPanel.maxCurvatureBox.isSelected()));
 		curvatureLinesPanel.minCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMinCurve",curvatureLinesPanel.minCurvatureBox.isSelected()));
 		curvatureLinesPanel.immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",curvatureLinesPanel.immediateCalculationBox.isSelected()));
@@ -1358,12 +1062,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			activeNurbsSurface = null;
 		}
 		singularities = null;
-		exportButton.setEnabled(nurbsUVAdapter != null);
-
 	}
 	
 	private double[][] computeUmbilicalPoints() {
 		AdapterSet as = hif.getAdapters();
+		as.addAll(hif.getActiveAdapters());
 		VHDS hds = hif.get(new VHDS());
 		singularities = activeNurbsSurface.findUmbilics(hds, as);
 		double[][] uu = new double[singularities.size()][];
@@ -1391,19 +1094,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		return activeNurbsSurface;
 	}
 	
-	@Override
-	public void mainUIChanged(String uiClass) {
-		super.mainUIChanged(uiClass);
-		SwingUtilities.updateComponentTreeUI(chooser);
-	}
+//	@Override
+//	public void mainUIChanged(String uiClass) {
+//		super.mainUIChanged(uiClass);
+//		SwingUtilities.updateComponentTreeUI(chooser);
+//	}
 	
 	public static void main(String[] args) {
-		NativePathUtility.set("native");
-		try {
-			System.loadLibrary("jopennurbs");
-		} catch (UnsatisfiedLinkError e) {
-			logger.severe("Could not find libjopennurbs in natives path.");
-		}
 		JRViewer v = new JRViewer();
 		v.addContentUI();
 		v.addBasicUI();
