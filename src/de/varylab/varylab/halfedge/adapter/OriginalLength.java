@@ -1,6 +1,6 @@
 package de.varylab.varylab.halfedge.adapter;
 
-import de.jreality.math.Rn;
+import de.jreality.math.Pn;
 import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VHDS;
@@ -16,7 +16,7 @@ public class OriginalLength implements Length<VEdge> {
 		for(VEdge e: hds.getEdges()) {
 			VVertex s = e.getStartVertex();
 			VVertex t = e.getTargetVertex();
-			el[e.getIndex()] = Rn.euclideanDistance(s.getP(), t.getP());
+			el[e.getIndex()] = Pn.distanceBetween(s.getP(), t.getP(), Pn.EUCLIDEAN);
 		}
 	}
 	

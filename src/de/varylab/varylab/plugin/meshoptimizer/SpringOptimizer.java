@@ -7,7 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -24,6 +26,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.SpringFunctional;
+import de.varylab.varylab.functional.adapter.FaceAverageLengthAdapter;
 import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
@@ -32,7 +35,9 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.AdaptedEdgeWeightFunction;
 import de.varylab.varylab.halfedge.adapter.ConstantLengthAdapter;
 import de.varylab.varylab.halfedge.adapter.ConstantWeight;
+import de.varylab.varylab.halfedge.adapter.DiscreteLengthAdapter;
 import de.varylab.varylab.halfedge.adapter.LengthRangeAdapter;
+import de.varylab.varylab.halfedge.adapter.RoundingMode;
 import de.varylab.varylab.halfedge.adapter.OriginalLength;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
@@ -40,6 +45,8 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeListener, ActionListener { 
 	
 	private final String AVERAGE = "average";
+	
+	private final String FACE_AVERAGE = "face average";
 
 	private final String ORIGINAL = "original";
 
@@ -47,24 +54,33 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 	
 	private final String RANGE = "range";
 	
+	private final String DISCRETE = "discrete";
+	
 	private JPanel
 		panel = new JPanel();
+	
+	private JButton
+		updateButton = new JButton("update");
 	
 	private SpinnerNumberModel
 		minLengthModel = new SpinnerNumberModel(1.0,0.,100.,.1),
 		maxLengthModel = new SpinnerNumberModel(1.0,0.,100.,.1),
+		stepsModel = new SpinnerNumberModel(5, 1, 100, 1),
 		springModel = new SpinnerNumberModel(1.,0.,100.,1.);
 	
 	private JSpinner
 		minLengthSpinner = new JSpinner(minLengthModel),
 		maxLengthSpinner = new JSpinner(maxLengthModel),
+		stepsSpinner = new JSpinner(stepsModel),
 		springSpinner = new JSpinner(springModel);
 	
 	private JRadioButton 
+		faceAverageButton = new JRadioButton("F-avg."),
 		averageButton = new JRadioButton("avg."),
 		originalButton = new JRadioButton("orig."),
 		constantButton = new JRadioButton("const."),
-		rangeButton = new JRadioButton("range");
+		rangeButton = new JRadioButton("range"),
+		discreteButton = new JRadioButton("discr.");
 	
 	private ButtonGroup
 		edgeLengthGroup = new ButtonGroup();
@@ -77,11 +93,14 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 			la, new ConstantWeight(1, true),false);
 
 	private JCheckBox
-		updateLength = new JCheckBox("update"),
-		diagonalsBox = new JCheckBox("diagonals");
+		updateLength = new JCheckBox("c-update"),
+		diagonalsBox = new JCheckBox("diag's");
 
 	private HalfedgeInterface hif;
 
+	private JComboBox
+		modeCombo = new JComboBox(RoundingMode.values());
+	
 	public SpringOptimizer() {
 		GridBagConstraints c1 = new GridBagConstraints();
 		c1.insets = new Insets(1,1,1,1);
@@ -100,20 +119,28 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		c1.weightx = 2.0;
 		panel.add(diagonalsBox, c1);
 		c2.weightx = 2.0;
-		panel.add(updateLength ,c2);
+		updateLength.setToolTipText("continously update target lengths");
+		panel.add(updateLength ,c1);
+		c2.weightx = 1.0;
+		panel.add(updateButton ,c2);
 		
 		c2.weightx = 1.0;
 		c1.weightx = 1.0;
 		panel.add(constantButton,c1);
 		panel.add(averageButton,c1);
+		panel.add(faceAverageButton,c2);
 		originalButton.setSelected(true);
 		panel.add(originalButton,c1);
-		panel.add(rangeButton,c2);
+		panel.add(rangeButton,c1);
+		panel.add(discreteButton,c1);
+		panel.add(modeCombo,c2);
 		
 		panel.add(new JLabel("Length"),c1);
 		panel.add(minLengthSpinner,c1);
-		panel.add(maxLengthSpinner,c2);
+		panel.add(maxLengthSpinner,c1);
+		panel.add(stepsSpinner, c2);
 		maxLengthSpinner.setEnabled(rangeButton.isSelected());
+		stepsSpinner.setEnabled(discreteButton.isSelected());
 		
 		panel.add(new JLabel("Strength"),c1);
 		panel.add(springSpinner,c2);
@@ -121,6 +148,11 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		edgeLengthGroup.add(averageButton);
 		averageButton.setActionCommand(AVERAGE);
 		averageButton.addActionListener(this);
+		
+		edgeLengthGroup.add(faceAverageButton);
+		faceAverageButton.setActionCommand(FACE_AVERAGE);
+		faceAverageButton.addActionListener(this);
+		
 		
 		edgeLengthGroup.add(originalButton);
 		originalButton.setActionCommand(ORIGINAL);
@@ -134,9 +166,19 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		rangeButton.setActionCommand(RANGE);
 		rangeButton.addActionListener(this);
 		
+		edgeLengthGroup.add(rangeButton);
+		rangeButton.setActionCommand(RANGE);
+		rangeButton.addActionListener(this);
+		
+		edgeLengthGroup.add(discreteButton);
+		discreteButton.setActionCommand(DISCRETE);
+		discreteButton.addActionListener(this);
+		
 		minLengthSpinner.addChangeListener(this);
 		maxLengthSpinner.addChangeListener(this);
 		springSpinner.addChangeListener(this);
+		
+		updateButton.addActionListener(this);
 	}
 	
 	@Override
@@ -176,6 +218,14 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 				lmax = maxLengthModel.getNumber().doubleValue();
 			AdapterSet aSet = hif.getAdapters();
 			functional.setLength(new LengthRangeAdapter(lmin, lmax, aSet));
+		} else if(st == DISCRETE) {
+			double
+				lmin = minLengthModel.getNumber().doubleValue(),
+				lmax = maxLengthModel.getNumber().doubleValue();
+			int steps = stepsModel.getNumber().intValue();
+			functional.setLength(new DiscreteLengthAdapter(lmin, lmax, steps, RoundingMode.values()[modeCombo.getSelectedIndex()], hds));
+		} else if(st == FACE_AVERAGE) {
+			functional.setLength(new FaceAverageLengthAdapter(hds, RoundingMode.values()[modeCombo.getSelectedIndex()]));
 		}
 	}
 
@@ -245,11 +295,17 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		if(rangeButton == src) {
 			maxLengthSpinner.setEnabled(true);
 			maxLengthSpinner.setValue(minLengthModel.getNumber().doubleValue());
+		} else if(discreteButton == src) {
+			maxLengthSpinner.setEnabled(true);
+			stepsSpinner.setEnabled(true);
 		} else if(
 				constantButton == src ||
 				originalButton == src ||
 				averageButton == src) {
 			maxLengthSpinner.setEnabled(false);
+			stepsSpinner.setEnabled(false);
+		} else if(updateButton == src) {
+			updateLength(hif.get(new VHDS()));
 		}
 	}
 }
