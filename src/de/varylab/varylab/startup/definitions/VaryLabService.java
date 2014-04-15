@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.job.JobMonitorPlugin;
+import de.jreality.plugin.job.JobMonitorTooBar;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Geometry;
 import de.jreality.scene.SceneGraphComponent;
@@ -122,6 +123,7 @@ public class VaryLabService extends VarylabStartupDefinition {
 		classes.add(VarylabMain.class);
 		classes.add(ConsolePlugin.class);
 		classes.add(JobMonitorPlugin.class);
+		classes.add(JobMonitorTooBar.class);
 		
 		// load custom classes
 		for (String className : pluginClassNames) {

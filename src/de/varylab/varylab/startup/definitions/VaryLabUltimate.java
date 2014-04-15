@@ -5,6 +5,7 @@ import java.util.Set;
 
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.basic.Inspector;
+import de.jreality.plugin.job.JobMonitorTooBar;
 import de.jreality.plugin.scripting.PythonConsole;
 import de.jreality.plugin.scripting.PythonToolsManager;
 import de.jreality.plugin.scripting.gui.NumberSpinnerGUI;
@@ -216,6 +217,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(PythonConsole.class);
 		pSet.add(Inspector.class);
 		pSet.add(GrasshopperPlugin.class);
+		pSet.add(JobMonitorTooBar.class);
 		
 		//Wanda facade
 		pSet.add(ExplodePlugin.class);

@@ -98,8 +98,8 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 
 	private HalfedgeInterface hif;
 
-	private JComboBox
-		modeCombo = new JComboBox(RoundingMode.values());
+	private JComboBox<RoundingMode>
+		modeCombo = new JComboBox<>(RoundingMode.values());
 	
 	public SpringOptimizer() {
 		GridBagConstraints c1 = new GridBagConstraints();

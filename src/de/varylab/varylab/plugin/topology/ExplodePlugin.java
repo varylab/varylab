@@ -20,7 +20,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 
-public class ExplodePlugin extends AlgorithmPlugin{
+public class ExplodePlugin extends AlgorithmPlugin {
 
 	private class ReferencePointAdapter extends AbstractAdapter<double[]> {
 
@@ -31,7 +31,9 @@ public class ExplodePlugin extends AlgorithmPlugin{
 		}
 
 		@Override
-		public boolean canAccept(Class nodeClass) {
+		public <
+			N extends Node<?, ?, ?>
+		> boolean canAccept(Class<N> nodeClass) {
 			return Vertex.class.isAssignableFrom(nodeClass);
 		}
 

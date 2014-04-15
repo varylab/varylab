@@ -11,6 +11,7 @@ import de.jreality.plugin.basic.InfoOverlayPlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewToolBar;
 import de.jreality.plugin.content.ContentAppearance;
+import de.jreality.plugin.job.JobMonitorTooBar;
 import de.jreality.plugin.menu.BackgroundColor;
 import de.jreality.ui.AppearanceInspector;
 import de.jreality.ui.TextureInspector;
@@ -98,8 +99,10 @@ public class VarylabMain extends Plugin {
 		InfoOverlayPlugin iol = c.getPlugin(InfoOverlayPlugin.class);
 		iol.getInfoOverlay().setVisible(false);
 		ViewToolBar toolbar = c.getPlugin(ViewToolBar.class);
-		toolbar.setFloatable(false);
+		JobMonitorTooBar jobToolbar = c.getPlugin(JobMonitorTooBar.class);
 		AlgorithmDropdownToolbar algoToolbar = c.getPlugin(AlgorithmDropdownToolbar.class);
+		jobToolbar.setFloatable(false);
+		toolbar.setFloatable(false);
 		algoToolbar.setFloatable(false);
 	}
 	
