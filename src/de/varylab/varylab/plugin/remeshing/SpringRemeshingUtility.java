@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -36,7 +37,8 @@ import de.varylab.varylab.optimization.tao.TaoHessian;
 
 public class SpringRemeshingUtility {
 
-	
+	private static Logger
+		log = Logger.getLogger(SpringRemeshingUtility.class.getName());
 	
 	private static class ConstantLengthAdapter <
 		V extends Vertex<V, E, F>,
@@ -146,8 +148,10 @@ public class SpringRemeshingUtility {
 		Collection<V> corners,
 		AdapterSet a
 	) {
+		log.fine("start straightening boundary");
 		WeightFunction<E> texWeights = new TextureWeightAdapter<V, E, F>(a);
 		Map<E, Double> boundaryWeights = new HashMap<E, Double>();
+		log.fine("filling weights map");
 		for (E e : polygonEdges) {
 			double w = texWeights.getWeight(e);
 			boundaryWeights.put(e, w);
@@ -156,8 +160,8 @@ public class SpringRemeshingUtility {
 		
 		WeightFunction<E> weights = new MapWeightAdapter<V, E, F>(0.0, boundaryWeights);
 		Length<E> lengths = new ConstantLengthAdapter<V, E, F>(0.0);
-		SpringFunctional<V, E, F>	
-			fun = new SpringFunctional<V, E, F>(lengths, weights, false);
+		SpringFunctional<V, E, F> fun = new SpringFunctional<V, E, F>(lengths, weights, false);
+		log.fine("optimization");
 		optimize(
 			fun, 
 			lattice.getHDS(), 
@@ -166,6 +170,7 @@ public class SpringRemeshingUtility {
 			false,
 			a
 		);
+		log.fine("done");
 	}
 
 	
@@ -182,6 +187,7 @@ public class SpringRemeshingUtility {
 		boolean innerBd,
 		AdapterSet a
 	) {
+		log.fine("start optimization");
 		int dim = hds.numVertices() * 3;
 		FixingConstraint<V, E, F, HDS> fixConstraint = new FixingConstraint<V, E, F, HDS>(
 			fixedVerts,
@@ -191,6 +197,7 @@ public class SpringRemeshingUtility {
 		);
 		double acc = Math.pow(10, -6);
 		int maxIter = 100;
+		log.fine("initializing Tao");
 		Tao.Initialize();
 		SpringOptimizableTao<V, E, F, HDS> opt = new SpringOptimizableTao<V, E, F, HDS>(
 			hds, 
@@ -199,6 +206,7 @@ public class SpringRemeshingUtility {
 		);
 		
 		Vec x = new Vec(dim);
+		log.fine("set initial solutioin");
 		for (V v : hds.getVertices()) {
 			double[] p = a.getD(Position3d.class, v);
 			x.setValue(v.getIndex() * 3 + 0, p[0], InsertMode.INSERT_VALUES);
@@ -212,13 +220,15 @@ public class SpringRemeshingUtility {
 		optimizer.setGradientTolerances(acc, acc, 0);
 		optimizer.setMaximumIterates(maxIter);
 		optimizer.setTolerances(0.0, 0.0, 0.0, 0.0);
+		log.fine("solving");
 		optimizer.solve();
 		
 		GetSolutionStatusResult stat = optimizer.getSolutionStatus();
 		String status = stat.toString().replace("getSolutionStatus : ", "");
-		System.out.println("optimization status ------------------------------------");
-		System.out.println(status);
+		log.info("optimization status ------------------------------------");
+		log.info(status);
 		
+		log.fine("writing vertex positions"); 
 		for (V v : hds.getVertices()) {
 			int i = v.getIndex() * 3;
 			double[] p = {0,0,0};
@@ -227,6 +237,7 @@ public class SpringRemeshingUtility {
 			p[2] = x.getValue(i + 2);
 			a.set(Position.class, v, p);
 		}
+		log.fine("optimization done");
 	}
 	
 	

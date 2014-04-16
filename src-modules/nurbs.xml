@@ -5,13 +5,14 @@
 >
 	<manifest>
 		<id>jf65dg46mjs6kgy6</id>
-		<name>Nurbs import</name>
+		<name>NURBS Surface Tools</name>
 		<revision>1</revision>
 		<category>Import</category>
 	</manifest>
 	<description>
-		Plugin to import and export an obj nurbs-surface. 
+		Plug-ins to work with NURBS surfaces
 	</description>
 	<plugin class="de.varylab.varylab.plugin.nurbs.plugin.NurbsIOPlugin"/>
+	<plugin class="de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface"/>
 	
 </module>

@@ -70,6 +70,9 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 
 public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionListener {
 
+	private Logger
+		log = Logger.getLogger(SurfaceRemeshingPlugin.class.getName());
+	
 	private enum Pattern {
 		Triangles,
 		Quads,
@@ -218,6 +221,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 						liftMesh();
 					}
 				} catch(Exception re) {
+					log.warning("remeshing failed: " + re);
 					showExceptionDialog(re);
 					fireJobFailed(re);
 					return;
@@ -296,6 +300,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		remeshPosMap.clear();
 		newOldFaceMap.clear();
 		surface = hcp.get(surface);
+		log.fine("start remeshing surface: " + surface);
 		AdapterSet a = hcp.getAdapters();
 		if (surface.getVertex(0).getT() == null) {
 			throw new RemeshingException("Surface has no texture coordinates.");
@@ -322,6 +327,7 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 															 relaxInteriorBox.isSelected()
 		);
 		remesh = new VHDS();
+		log.fine("using method " + getPattern());
 		switch (getPattern()) {
 		case Triangles:
 			TriangleRemeshingUtility.createRectangularTriangleMesh(remesh, bbox);
@@ -332,7 +338,9 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 			remesher.setLattice(lattice);
 			try {
 				remesh = remesher.remesh(surface, a);
-			} catch (RemeshingException e) {
+			} catch (Throwable e) {
+				log.fine("error: " + e);
+				log.fine("reverting texture transform");
 				for (VVertex v : surface.getVertices()) {
 					texInvMatrix.transformVector(v.getT());
 				}
