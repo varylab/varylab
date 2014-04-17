@@ -62,7 +62,6 @@ import de.varylab.varylab.plugin.generator.TschebyscheffSphereGenerator;
 import de.varylab.varylab.plugin.grasshopper.GrasshopperPlugin;
 import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicNetsPlugin;
 import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicPatchVisualizer;
-import de.varylab.varylab.plugin.io.OBJExportPlugin;
 import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
@@ -201,8 +200,6 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		
 		pSet.add(SurfaceRemeshingPlugin.class);
 		pSet.add(DiscreteConformalPlugin.class);
-		
-		pSet.add(OBJExportPlugin.class);
 		
 		pSet.add(NurbsManagerPlugin.class);
 		pSet.add(NodePropertyEditor.class);
