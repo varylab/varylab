@@ -9,15 +9,20 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.icon.ImageHook;
 import de.varylab.varylab.utilities.SelectionUtility;
 
 public class GeodesicSelection extends AlgorithmPlugin {
 
+	private final Integer
+		CHANNEL_GEODESIC_EDGES = 234234;
+	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Selection;
@@ -45,8 +50,8 @@ public class GeodesicSelection extends AlgorithmPlugin {
 		for(E e : hif.getSelection().getEdges(hds)) {
 			all.addAll(SelectionUtility.selectGeodesic(e));
 		}
-		hes.addAll(all);
-		hif.setSelection(hes);
+		hes.addAll(all, CHANNEL_GEODESIC_EDGES);
+		hif.addSelection(hes);
 	}
 
 	@Override
@@ -55,4 +60,12 @@ public class GeodesicSelection extends AlgorithmPlugin {
 		info.icon = ImageHook.getIcon("geoSel.png",16,16);
 		return info;
 	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		SelectionInterface sif = c.getPlugin(SelectionInterface.class);
+		sif.registerChannelName(CHANNEL_GEODESIC_EDGES, "Geodesic Edges");
+	}
+	
 }
