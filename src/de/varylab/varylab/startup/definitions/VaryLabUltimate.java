@@ -24,6 +24,7 @@ import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
+import de.varylab.discreteconformal.plugin.DomainVisualisationPlugin;
 import de.varylab.discreteconformal.plugin.visualizer.FlippedTriangles;
 import de.varylab.discreteconformal.plugin.visualizer.IndexMedialGraph;
 import de.varylab.varylab.VaryLab;
@@ -91,10 +92,13 @@ import de.varylab.varylab.plugin.meshoptimizer.WillmoreOptimizer;
 import de.varylab.varylab.plugin.nodeeditor.NodePropertyEditor;
 import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.optimization.OptimizationPanel;
+import de.varylab.varylab.plugin.remeshing.DomainLineCutPlugin;
+import de.varylab.varylab.plugin.remeshing.DomainSegmentCutPlugin;
 import de.varylab.varylab.plugin.remeshing.FitTexturePlugin;
 import de.varylab.varylab.plugin.remeshing.SurfaceRemeshingPlugin;
 import de.varylab.varylab.plugin.remeshing.TextureGeometryGenerator;
 import de.varylab.varylab.plugin.selection.BoundaryEarsSelection;
+import de.varylab.varylab.plugin.selection.ConnectedComponentSelection;
 import de.varylab.varylab.plugin.selection.GeodesicSelection;
 import de.varylab.varylab.plugin.selection.GeodesicVertexSelection;
 import de.varylab.varylab.plugin.selection.LatticeSelection;
@@ -158,7 +162,17 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(VarylabMain.class);
 		
 		instances.addAll(HalfedgePluginFactory.createPlugins());
+		
 		instances.addAll(ConformalLab.createConformalPlugins());
+		
+		for(Plugin p : instances) {
+			if(p instanceof DomainVisualisationPlugin) {
+				instances.remove(p);
+				DomainVisualisationPlugin dvp = new DomainVisualisationPlugin(new IdentifyVerticesPlugin(true), new DomainSegmentCutPlugin(), new DomainLineCutPlugin());
+				instances.add(dvp);
+				break;
+			}
+		}
 		
 		addGeneratorPlugins(pSet);
 		addOptimizationPlugins(pSet);
@@ -169,7 +183,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(HalfedgeInterface.class);
 		pSet.add(OptimizationPanel.class);
 		pSet.add(VertexEditorPlugin.class);
-		pSet.add(IdentifyVerticesPlugin.class);
+		instances.add(new IdentifyVerticesPlugin(false));
 		pSet.add(TrivialConnectionPlugin.class);
 		
 		pSet.add(HeightFieldEditor.class);
@@ -195,6 +209,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(RemoveGeodesicPlugin.class);
 		pSet.add(GeodesicSelection.class);
 		pSet.add(GeodesicVertexSelection.class);
+		pSet.add(ConnectedComponentSelection.class);
 		pSet.add(NGonSelection.class);
 		pSet.add(LatticeSelection.class);
 		pSet.add(StripSelection.class);

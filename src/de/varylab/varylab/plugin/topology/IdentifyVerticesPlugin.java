@@ -24,7 +24,9 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Length;
+import de.jtem.halfedgetools.adapter.type.LengthTex;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -55,6 +57,9 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		noEdgeCollapseChecker = new JCheckBox("no edge collapse"),
 		boundaryOnlyChecker = new JCheckBox("Boundary only");
 	
+	private boolean
+		useTextureCoordinates = false;
+	
 	private Selection 
 		oldSelection = null;
 	
@@ -65,6 +70,11 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 	private double minDistance;
 
 	public IdentifyVerticesPlugin() {
+		this(true);
+	}
+	
+	public IdentifyVerticesPlugin(boolean useTextureCoordinates) {
+		this.useTextureCoordinates = useTextureCoordinates;
 		panel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc1 = new GridBagConstraints();
@@ -103,7 +113,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		if(calculateAndShowIdentification(hds, hif, da)) {
+		if(calculateAndShowIdentification(hds, hif)) {
 			HashSet<Vertex<?,?,?>> alreadyMerged = new HashSet<Vertex<?,?,?>>();
 			for(Vertex<?,?,?> v : identificationMap.keySet()) {
 				if(alreadyMerged.contains(v)) {
@@ -149,8 +159,7 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		TypedAdapterSet<double[]> a = hcp.getAdapters().querySet(double[].class);
-		calculateAndShowIdentification(hcp.get(), hcp, a);
+		calculateAndShowIdentification(hcp.get(), hcp);
 	}
 
 	private <
@@ -158,39 +167,11 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> boolean calculateAndShowIdentification(HDS hds, HalfedgeInterface hif, TypedAdapterSet<double[]> a) {
+	> boolean calculateAndShowIdentification(HDS hds, HalfedgeInterface hif) {
 		double distance = distanceModel.getNumber().doubleValue();
 		identificationMap.clear();
 		infoLabel.setText("");
 		Selection identifySel = new Selection();
-//		KdTree<V, E, F> kdtree = new KdTree<V, E, F>(hds, a, 5, false);
-//		for(V v : hds.getVertices()) {
-//			if(boundaryOnlyChecker.isSelected() && !HalfEdgeUtils.isBoundaryVertex(v)) {
-//				continue;
-//			}
-//			double[] hv = a.get(Position3d.class, v);
-//			for(V near : kdtree.collectKNearest(hv, 3)) {
-//				double[] nearP = a.get(Position3d.class, near);
-//				double dist = kdtree.distance2(nearP, hv);
-//				if(near != v && (dist <= distance)) {
-//					if(noEdgeCollapseChecker.isSelected()) {
-//						if(HalfEdgeUtils.findEdgeBetweenVertices((V)v, (V)near) != null) {
-//							continue;
-//						}
-//					}
-//					identifySel.setSelected(v, true);
-//					identifySel.setSelected((Vertex<?,?,?>)near, true);
-//					if((identificationMap.containsKey(v) && identificationMap.get(v) != near) ||
-//							(identificationMap.containsKey(near) && identificationMap.get(near) != v)) {
-//						infoLabel.setText("identification impossible - not unique");
-//						return false;
-//					}
-//					identificationMap.put((Vertex<?, ?, ?>) near, v);
-//					identificationMap.put(v, (Vertex<?, ?, ?>) near);
-//				}
-//			}
-//		}
-//		} else {
 			List<V> vertices = hds.getVertices();
 			for(V v : vertices) {
 				if(boundaryOnlyChecker.isSelected() && !HalfEdgeUtils.isBoundaryVertex(v)) {
@@ -241,19 +222,28 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		minEdgeLength = Double.POSITIVE_INFINITY;
 		minDistance = Double.POSITIVE_INFINITY;
 		for(E e : hds.getPositiveEdges()) {
-			Double length = a.get(Length.class, e, Double.class);
+			Double length = useTextureCoordinates?a.get(LengthTex.class, e, Double.class):a.get(Length.class, e, Double.class);
 			if(length < minEdgeLength) {
 				minEdgeLength = length;
 			}
 		}
 		for(int i = 0; i < hds.numVertices(); ++i) {
+			if(boundaryOnlyChecker.isSelected() && !HalfEdgeUtils.isBoundaryVertex(hds.getVertex(i))) {
+				continue;
+			}
 			for(int j = 0; j < i; ++j) {
+
 				if(j == 0) {
 					distances[i] = new double[i];			
 				}
+				if(boundaryOnlyChecker.isSelected() && !HalfEdgeUtils.isBoundaryVertex(hds.getVertex(j))) {
+					continue;
+				}
 				double[] 
-						pi = a.getD(Position3d.class, hds.getVertex(i)),
-						pj = a.getD(Position3d.class, hds.getVertex(j));
+						pi = useTextureCoordinates?
+								a.getD(Position3d.class, hds.getVertex(i)):a.getD(TexturePosition3d.class, hds.getVertex(i)),
+						pj = useTextureCoordinates?
+								a.getD(Position3d.class, hds.getVertex(j)):a.getD(TexturePosition3d.class, hds.getVertex(j));
 				distances[i][j] = Rn.euclideanDistance(pi, pj);
 				if(distances[i][j] < minDistance) {
 					minDistance = distances[i][j];
@@ -263,4 +253,5 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 		minLengthLabel.setText(Double.toString(minEdgeLength));
 		minDistanceLabel.setText(Double.toString(minDistance));
 	}
+
 }

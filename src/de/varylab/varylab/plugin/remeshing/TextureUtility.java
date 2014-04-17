@@ -3,7 +3,9 @@ package de.varylab.varylab.plugin.remeshing;
 import static de.jtem.halfedgetools.util.GeometryUtility.isOnSegment;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -22,7 +24,9 @@ import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.util.GeometryUtility;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 public class TextureUtility {
 
@@ -80,6 +84,84 @@ public class TextureUtility {
 				result.add(newVertex);
 			}
 		}
+	}
+	
+	private static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Selection cut(HDS hds, Set<V> vSet, AdapterSet a, boolean segmentOnly) {
+		double[][] segment = new double[2][];
+		
+		Iterator<V> selectedIterator = vSet.iterator();;
+		V start = selectedIterator.next();
+		double[] p1 = a.getD(TexturePosition2d.class, start);
+		segment[0] = new double[]{p1[0], p1[1], 1};
+		V target = selectedIterator.next();
+		double[] p2 = a.getD(TexturePosition2d.class, target);
+		segment[1] = new double[]{p2[0], p2[1], 1}; 
+		Set<V> result = new HashSet<V>();
+		result.add(start);
+		result.add(target);
+		TextureUtility.createIntersectionVertices(segment, 1E-8, hds, a, result, segmentOnly);
+		LinkedList<V> orderedResult = new LinkedList<V>(result);
+		Collections.sort(orderedResult, new SegmentComparator<V,E,F>(Rn.subtract(null, p2, p1), a));
+		Selection cutSelection = new Selection();
+		cutSelection.addAll(result);
+		V v1 = null;
+		for (Iterator<V> it = orderedResult.iterator(); it.hasNext();) {
+			if(v1 == null) {
+				v1 = it.next();
+			}
+			if(it.hasNext()) {
+				V v2 = it.next();
+				@SuppressWarnings("unchecked")
+				F f = HalfEdgeUtilsExtra.findCommonFace(v1,v2);
+				if(f != null) {
+					cutSelection.add(RemeshingUtility.splitFaceAt(f, v1, v2));
+				}
+				v1 = v2;
+			}
+		}
+		return cutSelection;
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Selection cutSegment(HDS hds, Set<V> vSet, AdapterSet a) {
+		return cut(hds,vSet,a,true);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Selection cutLine(HDS hds, Set<V> vSet, AdapterSet a) {
+		return cut(hds,vSet,a, false);
+	}
+	
+	private static class SegmentComparator<V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>> implements Comparator<V> {
+
+		double[] v = new double[]{1.0, 0.0};
+		AdapterSet as = null;
+		
+		public SegmentComparator(double[] v, AdapterSet as) {
+			this.v = Rn.normalize(null, v);
+			this.as = as;
+		}
+
+		@Override
+		public int compare(V o1, V o2) {
+			double[] t1 = as.getD(TexturePosition2d.class, o1);
+			double[] t2 = as.getD(TexturePosition2d.class, o2);
+			return Double.compare(Rn.innerProduct(v, t1), Rn.innerProduct(v, t2)); 
+		}
+
 	}
 	
 	public static <
