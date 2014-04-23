@@ -88,8 +88,8 @@ public abstract class VarylabStartupDefinition {
 		NativePathUtility.set("native");
 		Image appIcon = SplashImageHook.getImage("icon_256.png");
 		JRViewer.setApplicationIcon(appIcon);
-		JPopupMenu.setDefaultLightWeightPopupEnabled(true);
-		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(true);
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		View.setIcon(SplashImageHook.getIcon("icon_16.png"));
 		View.setIconList(StaticSetup.getMainIconList());
 		View.setTitle(getApplicationName());		

@@ -11,6 +11,7 @@ import de.jreality.plugin.basic.InfoOverlayPlugin;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewToolBar;
 import de.jreality.plugin.content.ContentAppearance;
+import de.jreality.plugin.content.ContentTools;
 import de.jreality.plugin.job.JobMonitorTooBar;
 import de.jreality.plugin.menu.BackgroundColor;
 import de.jreality.ui.AppearanceInspector;
@@ -34,6 +35,7 @@ public class VarylabMain extends Plugin {
 	@Override
 	public void install(final Controller c) throws Exception {
 		super.install(c);
+		configureJReality(c);
 		configureHalfedgeInterface(c);
 		hideInfoOverlayWorkaround(c);
 		firstStartCofig(c);
@@ -104,6 +106,10 @@ public class VarylabMain extends Plugin {
 		jobToolbar.setFloatable(false);
 		toolbar.setFloatable(false);
 		algoToolbar.setFloatable(false);
+	}
+	
+	protected void configureJReality(Controller c) {
+		c.getPlugin(ContentTools.class).setRotateAnimationEnabled(false);
 	}
 	
 }

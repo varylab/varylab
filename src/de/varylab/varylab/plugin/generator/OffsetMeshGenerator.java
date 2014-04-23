@@ -133,7 +133,6 @@ public class OffsetMeshGenerator extends AlgorithmDialogPlugin implements Change
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		super.executeBeforeDialog(hds, a, hi);
 		this.offsetLayer = new HalfedgeLayer(hi);
 		this.offsetLayer.setName("Offset Mesh");
 		this.baseHDS = hds;
