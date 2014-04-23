@@ -383,6 +383,9 @@
 				<attribute name="Implementation-Title" value="VaryLab[Service]"/>
 				<attribute name="Implementation-Version" value="${version}"/>
 				<attribute name="Implementation-URL" value="http://www.varylab.com/"/>
+				<attribute name="Permissions" value="all-permissions"/>
+        		<attribute name="Codebase" value="*.varylab.com *.math.tu-berlin.de"/>
+        		<attribute name="Application-Name" value="VaryLab"/>
 			</manifest>
 		</jar>
 		<signjar alias="${signAlias}" jar="${jarpath}" keystore="${keystore}" storepass="${signStorepass}"/>

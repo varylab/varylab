@@ -258,24 +258,28 @@ public class VaryLabService extends VarylabStartupDefinition {
 		List<String> models = new LinkedList<String>();
 		if (args.length >= 3) {
 			String modelURLs = args[2];
-			for (String url : modelURLs.split(" ")) {
-				if (url.trim().isEmpty()) continue;
-				models.add(url.trim());
+			if (!modelURLs.equals("-")) {
+				for (String url : modelURLs.split(" ")) {
+					if (url.trim().isEmpty()) continue;
+					models.add(url.trim());
+				}
 			}
 		}
 		
 		Map<String, String> jarPlugins = new HashMap<String, String>();
 		if (args.length >= 4) {
 			String pluginURLs = args[3];
-			String[] idAndJars = pluginURLs.split(" ");
-			if (idAndJars.length % 2 != 0) {
-				log.warning("illegal jar plugin parameter");
-			}
-			for (int i = 0; i < idAndJars.length / 2; i++) {
-				String id = idAndJars[i * 2 + 0].trim();
-				String url = idAndJars[i * 2 + 1].trim();
-				if (url.trim().isEmpty()) continue;
-				jarPlugins.put(id, url);
+			if (!pluginURLs.equals("-")) {
+				String[] idAndJars = pluginURLs.split(" ");
+				if (idAndJars.length % 2 != 0) {
+					log.warning("illegal jar plugin parameter");
+				}
+				for (int i = 0; i < idAndJars.length / 2; i++) {
+					String id = idAndJars[i * 2 + 0].trim();
+					String url = idAndJars[i * 2 + 1].trim();
+					if (url.trim().isEmpty()) continue;
+					jarPlugins.put(id, url);
+				}
 			}
 		}
 		

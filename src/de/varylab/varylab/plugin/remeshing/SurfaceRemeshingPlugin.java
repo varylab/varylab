@@ -60,7 +60,6 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
-import de.varylab.discreteconformal.plugin.DomainVisualisationPlugin;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
@@ -68,7 +67,6 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
-import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 
 public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionListener {
 
@@ -515,13 +513,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		c.getPlugin(DomainLineCutPlugin.class);
 		c.getPlugin(DomainSegmentCutPlugin.class);
-		DomainVisualisationPlugin dvp = c.getPlugin(DomainVisualisationPlugin.class);
-		dvp.getDomainViewer().getController().getPlugin(IdentifyVerticesPlugin.class);
-		dvp.getDomainViewer().getController().getPlugin(DomainLineCutPlugin.class);
-		dvp.getDomainViewer().getController().getPlugin(DomainSegmentCutPlugin.class);
 		contentAppearance = c.getPlugin(ContentAppearance.class);
 		jobQueuePlugin = c.getPlugin(JobQueuePlugin.class);
-		
 		createLayout();
 		connectGUIListeners();
 	}
