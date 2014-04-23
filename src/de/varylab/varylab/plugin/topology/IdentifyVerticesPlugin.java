@@ -241,9 +241,9 @@ public class IdentifyVerticesPlugin extends AlgorithmDialogPlugin implements Cha
 				}
 				double[] 
 						pi = useTextureCoordinates?
-								a.getD(Position3d.class, hds.getVertex(i)):a.getD(TexturePosition3d.class, hds.getVertex(i)),
+								a.getD(TexturePosition3d.class, hds.getVertex(i)):a.getD(Position3d.class, hds.getVertex(i)),
 						pj = useTextureCoordinates?
-								a.getD(Position3d.class, hds.getVertex(j)):a.getD(TexturePosition3d.class, hds.getVertex(j));
+								a.getD(TexturePosition3d.class, hds.getVertex(j)):a.getD(Position3d.class, hds.getVertex(j));
 				distances[i][j] = Rn.euclideanDistance(pi, pj);
 				if(distances[i][j] < minDistance) {
 					minDistance = distances[i][j];
