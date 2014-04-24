@@ -75,6 +75,9 @@ public class LatticeSelection extends AlgorithmPlugin {
 					continue;
 				}
 				V tv = e.getOppositeEdge().getNextEdge().getTargetVertex();
+//				if (HalfEdgeUtils.isBoundaryVertex(tv)) {
+//					continue;
+//				}
 				queue.add(tv);
 			}
 			sl.add(av);
