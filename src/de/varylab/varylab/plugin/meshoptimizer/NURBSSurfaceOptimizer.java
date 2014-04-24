@@ -154,6 +154,8 @@ public class NURBSSurfaceOptimizer extends VarylabOptimizerPlugin implements Act
 	private void setSurface(NURBSSurface S) {
 		this.activeSurface = S;
 		surfaceFactory.setSurface(S);
+		surfaceFactory.setGenerateEdgesFromFaces(true);
+		surfaceFactory.setGenerateFaceNormals(true);
 		surfaceFactory.update();
 		refSurfaceLayer.set(surfaceFactory.getGeometry());
 		String infoText = "Surface: ";
