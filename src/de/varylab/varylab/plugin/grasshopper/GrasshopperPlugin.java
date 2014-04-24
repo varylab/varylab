@@ -101,6 +101,11 @@ public class GrasshopperPlugin extends Plugin {
 						writeHDSAsMesh(hds, out);
 						socket.close();
 						break;
+					case "COMMAND RECEIVE LINESET":
+						hds = hif.get(new VHDS());
+						writeHDSAsLineSet(hds, out);
+						socket.close();
+						break;	
 					case "COMMAND OPTIMIZE MESH":
 					case "COMMAND OPTIMIZE LINESET":
 						data = lineReader.readLine();
