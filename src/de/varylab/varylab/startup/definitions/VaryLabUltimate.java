@@ -33,6 +33,7 @@ import de.varylab.varylab.plugin.affineminimal.AffineMinimalOptimizerPlugin;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
+import de.varylab.varylab.plugin.datasource.FaceEdgeLengthMean;
 import de.varylab.varylab.plugin.datasource.GeodesicCircumcircleCurvature;
 import de.varylab.varylab.plugin.datasource.GeodesicCurvature;
 import de.varylab.varylab.plugin.datasource.IncircleCrossRatio;
@@ -277,6 +278,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(EdgeNormalTorsion.class);
 		pSet.add(Conicality.class);
 		pSet.add(HyperbolicNetsPlugin.class);
+		pSet.add(FaceEdgeLengthMean.class);
 	}
 
 

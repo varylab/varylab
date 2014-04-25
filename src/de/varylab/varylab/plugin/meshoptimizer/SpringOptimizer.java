@@ -44,17 +44,13 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeListener, ActionListener { 
 	
-	private final String AVERAGE = "average";
-	
-	private final String FACE_AVERAGE = "face average";
-
-	private final String ORIGINAL = "original";
-
-	private final String CONSTANT = "constant";
-	
-	private final String RANGE = "range";
-	
-	private final String DISCRETE = "discrete";
+	private final String 
+		AVERAGE = "average",
+		FACE_AVERAGE = "face average",
+		ORIGINAL = "original",
+		CONSTANT = "constant",
+		RANGE = "range",
+		DISCRETE = "discrete";
 	
 	private JPanel
 		panel = new JPanel();
@@ -193,9 +189,11 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 	}
 
 	private void updateLength(VHDS hds) {
-		String st = edgeLengthGroup.getSelection().getActionCommand();
-		if(st == AVERAGE) {
-			double l = 0.0;
+		double l = 0.0, lmin = 0.0, lmax = 0.0;
+		RoundingMode roundingMode;
+		Length<VEdge> length = null;
+		switch (edgeLengthGroup.getSelection().getActionCommand()) {
+		case AVERAGE:
 			for (VEdge e : hds.getPositiveEdges()) {
 				double[] s = e.getStartVertex().getP();
 				double[] t = e.getTargetVertex().getP();
@@ -203,30 +201,37 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 			}
 			l /= hds.numEdges() / 2.0;
 			minLengthModel.setValue(l);
-			functional.setLength(new ConstantLengthAdapter(l));
 			maxLengthSpinner.setEnabled(false);
-		} else if(st == CONSTANT) {
-			double l = minLengthModel.getNumber().doubleValue();
-			functional.setLength(new ConstantLengthAdapter(l));
+			length = new ConstantLengthAdapter(l);
+			break;
+		case CONSTANT:
+			l = minLengthModel.getNumber().doubleValue();
 			maxLengthSpinner.setEnabled(false);
-		} else if(st == ORIGINAL) {
-			functional.setLength(new OriginalLength(hds));
+			length = new ConstantLengthAdapter(l);
+			break;
+		case ORIGINAL:
 			maxLengthSpinner.setEnabled(false);
-		} else if(st == RANGE) {
-			double
-				lmin = minLengthModel.getNumber().doubleValue(),
-				lmax = maxLengthModel.getNumber().doubleValue();
+			length = new OriginalLength(hds);
+			break;
+		case RANGE:
+			lmin = minLengthModel.getNumber().doubleValue();
+			lmax = maxLengthModel.getNumber().doubleValue();
 			AdapterSet aSet = hif.getAdapters();
-			functional.setLength(new LengthRangeAdapter(lmin, lmax, aSet));
-		} else if(st == DISCRETE) {
-			double
-				lmin = minLengthModel.getNumber().doubleValue(),
-				lmax = maxLengthModel.getNumber().doubleValue();
+			length = new LengthRangeAdapter(lmin, lmax, aSet);
+			break;
+		case DISCRETE:
+			lmin = minLengthModel.getNumber().doubleValue();
+			lmax = maxLengthModel.getNumber().doubleValue();
 			int steps = stepsModel.getNumber().intValue();
-			functional.setLength(new DiscreteLengthAdapter(lmin, lmax, steps, RoundingMode.values()[modeCombo.getSelectedIndex()], hds));
-		} else if(st == FACE_AVERAGE) {
-			functional.setLength(new FaceAverageLengthAdapter(hds, RoundingMode.values()[modeCombo.getSelectedIndex()]));
+			roundingMode = (RoundingMode)modeCombo.getSelectedItem();
+			length = new DiscreteLengthAdapter(lmin, lmax, steps, roundingMode, hds);
+			break;
+		case FACE_AVERAGE:
+			roundingMode = (RoundingMode)modeCombo.getSelectedItem();
+			length = new FaceAverageLengthAdapter(hds, roundingMode);
+			break;
 		}
+		functional.setLength(length);
 	}
 
 	@Override
