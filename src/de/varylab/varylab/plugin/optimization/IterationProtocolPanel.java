@@ -15,6 +15,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYTitleAnnotation;
 import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -59,7 +61,7 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		axisIndexMap = new HashMap<Long, Integer>();
 	private ValueAxis 
 		domainAxis = new NumberAxis();
-	private DecimalFormat
+	private NumberFormat
 		rangeFormat = new DecimalFormat("0.0E0");
 	private SamplingXYLineRenderer
 		plotRenderer = new SamplingXYLineRenderer();
@@ -161,7 +163,7 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 			int index = getPlotAxisIndex(pId, vId);
 			System.out.println("index of " + v.getName() + ": " + index);
 			String name = v.getName();
-			NumberAxis axis = new NumberAxis(name);
+			NumberAxis axis = new LogarithmicAxis(name);
 			axis.setNumberFormatOverride(rangeFormat);
 			axis.setLabelPaint(v.getColor());
 			subPlot.setRangeAxis(index, axis);
