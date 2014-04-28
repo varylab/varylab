@@ -78,7 +78,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 		Quads,
 		TrianglesQuantized,
 		QuadsQuantized,
-		QuadsSingularities;
+		QuadsSingularities,
+		TrianglesSingularities;
 		
 		@Override
 		public String toString() {
@@ -89,6 +90,8 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				return "Boundary Aligned Triangles";
 			case QuadsSingularities:
 				return "Quads With Singularities";
+			case TrianglesSingularities:
+				return "Triangles With Singularities";
 			default:
 				return super.toString();
 			}
@@ -422,6 +425,9 @@ public class SurfaceRemeshingPlugin extends ShrinkPanelPlugin implements ActionL
 				}
 			}
 			hcp.setSelection(selection);
+			return;
+		}
+		case TrianglesSingularities: {
 			
 			return;
 		}
