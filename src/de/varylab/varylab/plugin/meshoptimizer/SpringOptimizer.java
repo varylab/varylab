@@ -26,7 +26,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.varylab.varylab.functional.SpringFunctional;
-import de.varylab.varylab.functional.adapter.FaceAverageLengthAdapter;
+import de.varylab.varylab.functional.adapter.FaceLengthAdapter;
 import de.varylab.varylab.functional.adapter.Length;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
@@ -71,7 +71,7 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 		springSpinner = new JSpinner(springModel);
 	
 	private JRadioButton 
-		faceAverageButton = new JRadioButton("F-avg."),
+		faceAverageButton = new JRadioButton("F-const."),
 		averageButton = new JRadioButton("avg."),
 		originalButton = new JRadioButton("orig."),
 		constantButton = new JRadioButton("const."),
@@ -228,7 +228,7 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 			break;
 		case FACE_AVERAGE:
 			roundingMode = (RoundingMode)modeCombo.getSelectedItem();
-			length = new FaceAverageLengthAdapter(hds, roundingMode);
+			length = new FaceLengthAdapter(hds, roundingMode);
 			break;
 		}
 		functional.setLength(length);

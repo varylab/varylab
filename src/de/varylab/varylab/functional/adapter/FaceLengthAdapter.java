@@ -10,12 +10,12 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.adapter.RoundingMode;
 
-public class FaceAverageLengthAdapter implements Length<VEdge> {
+public class FaceLengthAdapter implements Length<VEdge> {
 	
 	Map<VFace, Double>
 		faceLengthMap = new HashMap<>();
 	
-	public FaceAverageLengthAdapter(VHDS hds, RoundingMode roundingMode) {
+	public FaceLengthAdapter(VHDS hds, RoundingMode roundingMode) {
 		int nEdges = 0;
 		for(VFace f : hds.getFaces()) {
 			nEdges = 0;
