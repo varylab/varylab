@@ -128,7 +128,7 @@ public class RVLUtility {
 	}
 	
 	
-	public static VHDS toHDS(RVLLineSet lineSet) {
+	public static VHDS toHDS(RVLLineSet lineSet, boolean join) {
 		VHDS hds = new VHDS();
 		AdapterSet a = AdapterSet.createGenericAdapters();
 		a.add(new VPositionAdapter());
@@ -141,46 +141,47 @@ public class RVLUtility {
 			vMap.put(v.getID(), vv);
 			idMap.put(vv, v.getID());
 		}
-		
-		// clean multiple vertices by range checks and grouping
-		double EPS = 1E-5;
-		KdTree<VVertex, VEdge, VFace> kd = new KdTree<VVertex, VEdge, VFace>(hds, a, 10, true);
-		List<Set<VVertex>> vertexGroups = new ArrayList<Set<VVertex>>();
-		Set<VVertex> grouped = new HashSet<VVertex>();
-		for (VVertex v : hds.getVertices()) {
-			if (grouped.contains(v)) continue;
-			double[] pos = a.getD(Position3d.class, v);
-			int counter = 1;
-			Set<VVertex> group = new TreeSet<VVertex>(new NodeIndexComparator<VVertex>());
-			vertexGroups.add(group);
-			grouped.add(v);
-			group.add(v);
-			boolean allAtSameLocation = true;
-			while (allAtSameLocation) {
-				allAtSameLocation = true;
-				Collection<VVertex> nearest = kd.collectKNearest(pos, counter++);
-				for (VVertex vn : nearest) {
-					double[] posNear = a.getD(Position3d.class, vn);
-					double dist = Rn.euclideanDistance(pos, posNear);
-					if (dist < EPS) {
-						group.add(vn);
-						grouped.add(vn);
-					} else {
-						allAtSameLocation = false;
+		if (join) {
+			// clean multiple vertices by range checks and grouping
+			double EPS = 1E-5;
+			KdTree<VVertex, VEdge, VFace> kd = new KdTree<VVertex, VEdge, VFace>(hds, a, 10, true);
+			List<Set<VVertex>> vertexGroups = new ArrayList<Set<VVertex>>();
+			Set<VVertex> grouped = new HashSet<VVertex>();
+			for (VVertex v : hds.getVertices()) {
+				if (grouped.contains(v)) continue;
+				double[] pos = a.getD(Position3d.class, v);
+				int counter = 1;
+				Set<VVertex> group = new TreeSet<VVertex>(new NodeIndexComparator<VVertex>());
+				vertexGroups.add(group);
+				grouped.add(v);
+				group.add(v);
+				boolean allAtSameLocation = true;
+				while (allAtSameLocation) {
+					allAtSameLocation = true;
+					Collection<VVertex> nearest = kd.collectKNearest(pos, counter++);
+					for (VVertex vn : nearest) {
+						double[] posNear = a.getD(Position3d.class, vn);
+						double dist = Rn.euclideanDistance(pos, posNear);
+						if (dist < EPS) {
+							group.add(vn);
+							grouped.add(vn);
+						} else {
+							allAtSameLocation = false;
+						}
+					}
+					if (!allAtSameLocation || group.size() == hds.numVertices()) {
+						break;
 					}
 				}
-				if (!allAtSameLocation || group.size() == hds.numVertices()) {
-					break;
-				}
 			}
-		}
-		for (Set<VVertex> group : vertexGroups) {
-			VVertex ref = group.iterator().next();
-			for (VVertex v : group) {
-				int id = idMap.get(v);
-				vMap.put(id, ref);
-				if (v != ref) {
-					hds.removeVertex(v);
+			for (Set<VVertex> group : vertexGroups) {
+				VVertex ref = group.iterator().next();
+				for (VVertex v : group) {
+					int id = idMap.get(v);
+					vMap.put(id, ref);
+					if (v != ref) {
+						hds.removeVertex(v);
+					}
 				}
 			}
 		}

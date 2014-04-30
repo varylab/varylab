@@ -91,27 +91,40 @@ public class GrasshopperPlugin extends Plugin {
 				}
 				switch (cmd) {
 					case "COMMAND SEND MESH":
-						String data = lineReader.readLine();
+					case "COMMAND SEND LINESET":{
+						String data = "";
+						String line = "";
+						while ((line = lineReader.readLine()) != null) {
+							data += line;
+						}
 						String xml = xmlHeader + data;
-						receiveGeometry(xml);
+						receiveGeometry(xml, false);								
 						socket.close();
-						break;
-					case "COMMAND RECEIVE MESH":
+					}
+					break;
+					case "COMMAND RECEIVE MESH": {
 						VHDS hds = hif.get(new VHDS());
 						writeHDSAsMesh(hds, out);
 						socket.close();
-						break;
-					case "COMMAND RECEIVE LINESET":
-						hds = hif.get(new VHDS());
+					}
+					break;
+					case "COMMAND RECEIVE LINESET": {
+						VHDS hds = hif.get(new VHDS());
 						writeHDSAsLineSet(hds, out);
 						socket.close();
-						break;	
+					}
+					break;
 					case "COMMAND OPTIMIZE MESH":
-					case "COMMAND OPTIMIZE LINESET":
-						data = lineReader.readLine();
-						xml = xmlHeader + data;
+					case "COMMAND OPTIMIZE LINESET": {
+						String data = "";
+						String line = "";
+						while ((line = lineReader.readLine()) != null) {
+							data += line;
+						}
+						String xml = xmlHeader + data;
 						doOptimization(xml, out);
-						break;
+					}
+					break;
 				}
 			} catch (Exception e) {
 				log.warning("error transferring data: " + e);
@@ -163,17 +176,15 @@ public class GrasshopperPlugin extends Plugin {
 			getLayer().setSelection(result);
 		}
 		
-		public void receiveGeometry(String xml) {
+		public void receiveGeometry(String xml, boolean joinLineSet) {
 			storeSelection();
 			StringReader xmlReader = new StringReader(xml);
 			String startXML = xml.substring(0, 100);
-			final AtomicBoolean isMesh = new AtomicBoolean(true);
 			if (startXML.contains("RVLMesh")) {
 				try {
 					RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
 					getLayer().set(RVLUtility.toIndexedFaceSet(mesh));
 					log.info("mesh: " + mesh);
-					isMesh.set(true);
 				} catch (Exception e) {
 					log.warning("could not parse grasshopper mesh: " + e + "\n" + startXML + "...");
 				}
@@ -181,10 +192,9 @@ public class GrasshopperPlugin extends Plugin {
 			if (startXML.contains("RVLLineSet")){
 				try {
 					RVLLineSet lineSet = RVLLineSetFactory.loadRVLLineSet(xmlReader);
-					VHDS hds = RVLUtility.toHDS(lineSet);
+					VHDS hds = RVLUtility.toHDS(lineSet, joinLineSet);
 					getLayer().set(hds);
 					log.info("line set: " + lineSet);
-					isMesh.set(false);
 				} catch (Exception e) {
 					log.warning("could not parse grasshopper line set: " + e + "\n" + startXML + "...");
 				}
@@ -214,7 +224,7 @@ public class GrasshopperPlugin extends Plugin {
 			if (startXML.contains("RVLLineSet")){
 				try {
 					RVLLineSet lineSet = RVLLineSetFactory.loadRVLLineSet(xmlReader);
-					VHDS hds = RVLUtility.toHDS(lineSet);
+					VHDS hds = RVLUtility.toHDS(lineSet, true);
 					getLayer().set(hds);
 					log.info("line set: " + lineSet);
 					isMesh.set(false);
