@@ -5,12 +5,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jreality.geometry.IndexedFaceSetFactory;
+import de.jreality.scene.IndexedFaceSet;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.varylab.opennurbs.ON;
 import de.varylab.opennurbs.ONX_Model;
 import de.varylab.opennurbs.ONX_Model_Object;
 import de.varylab.opennurbs.ON_3dPoint;
+import de.varylab.opennurbs.ON_3dPointArray;
 import de.varylab.opennurbs.ON_4dPoint;
 import de.varylab.opennurbs.ON_ArcCurve;
 import de.varylab.opennurbs.ON_BinaryFile;
@@ -19,6 +22,8 @@ import de.varylab.opennurbs.ON_Curve;
 import de.varylab.opennurbs.ON_Geometry;
 import de.varylab.opennurbs.ON_Interval;
 import de.varylab.opennurbs.ON_LineCurve;
+import de.varylab.opennurbs.ON_Mesh;
+import de.varylab.opennurbs.ON_MeshFace;
 import de.varylab.opennurbs.ON_NurbsCurve;
 import de.varylab.opennurbs.ON_NurbsSurface;
 import de.varylab.opennurbs.ON_Object;
@@ -241,5 +246,62 @@ public class OpenNurbsUtility {
 			System.err.println("Could not write to file " + file);
 			e1.printStackTrace();
 		}
+	}
+
+	public static List<IndexedFaceSet> getMeshes(ONX_Model model) {
+		List<IndexedFaceSet> meshes = new LinkedList<>();
+		for(ONX_Model_Object mo : model.get_object_table()) {
+			ON_Object object = mo.get_object();
+			if(object instanceof ON_Mesh) {
+				ON_Mesh geom = (ON_Mesh)object;
+				meshes.add(ONMeshtoIndexedFaceSet(geom));
+					continue;
+			}
+		}
+		return meshes;
+	}
+
+	private static IndexedFaceSet ONMeshtoIndexedFaceSet(ON_Mesh mesh) {
+		IndexedFaceSetFactory ifsf = new IndexedFaceSetFactory();
+		double[][] coords = ON_3dPointArrayToDoubleArrayArray(mesh.DoublePrecisionVertices());
+		ifsf.setVertexCount(coords.length);
+		ifsf.setVertexCoordinates(coords);
+		int[][] faces = ON_MeshFacesToIntArrayArray(mesh.getF());
+		ifsf.setFaceCount(faces.length);
+		ifsf.setFaceIndices(faces);
+		ifsf.setGenerateEdgesFromFaces(true);
+		ifsf.setGenerateFaceNormals(true);
+		ifsf.update();
+		return ifsf.getIndexedFaceSet();
+	}
+
+	private static int[][] ON_MeshFacesToIntArrayArray(ON_MeshFace[] f) {
+		int[][] faces = new int[f.length][];
+		for (int i = 0; i < faces.length; i++) {
+			faces[i] = ON_MeshFaceToIntArray(f[i]);
+		}
+		return faces;
+	}
+
+	private static int[] ON_MeshFaceToIntArray(ON_MeshFace onMeshFace) {
+		int[] vi = onMeshFace.getVi();
+		if(vi[2] == vi[3]) { //triangle
+			return new int[] {vi[0], vi[1], vi[2]};
+		} else { //quad
+			return vi;
+		}
+	}
+
+	private static double[][] ON_3dPointArrayToDoubleArrayArray(ON_3dPointArray onPoints) {
+		double[][] points = new double[onPoints.Count()][];
+		for (int i = 0; i < points.length; i++) {
+			points[i] = ON_3dPointToDoubleArray(onPoints.At(i));
+		}
+		return points;
+	}
+
+	private static double[] ON_3dPointToDoubleArray(ON_3dPoint pt) {
+		double[] coords = {pt.getX(), pt.getY(), pt.getZ(), 1.0};
+		return coords;
 	}
 }

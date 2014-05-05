@@ -150,4 +150,9 @@ public class NurbsSurfaceUtility {
 		return points;
 	}
 
+
+	public static void addNurbsMesh(NURBSSurface surface, HalfedgeLayer newLayer) {
+		addNurbsMesh(surface, newLayer, surface.getNumUPoints()*2, surface.getNumVPoints()*2);
+	}
+
 }

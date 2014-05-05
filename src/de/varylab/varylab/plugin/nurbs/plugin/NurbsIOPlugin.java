@@ -31,10 +31,13 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.IndexedFaceSet;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -45,6 +48,7 @@ import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.opennurbs.ONX_Model;
 import de.varylab.opennurbs.ON_ArcCurve;
 import de.varylab.opennurbs.ON_Curve;
@@ -60,7 +64,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 
-public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener {
+public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
 
 	private static Logger logger = Logger.getLogger(NurbsIOPlugin.class.getName());
 	
@@ -80,6 +84,17 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	private boolean 
 		jOpenNurbs = true;
 
+	private SpinnerNumberModel
+		uModel = new SpinnerNumberModel(10, 0, 100, 5),
+		vModel = new SpinnerNumberModel(10, 0, 100, 5);
+	
+	private JSpinner
+		uSpinner = new JSpinner(uModel),
+		vSpinner = new JSpinner(vModel);
+	
+	private ShrinkPanel
+		infoPanel = new ShrinkPanel("Mesh parameters");
+
 	public NurbsIOPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = BOTH;
@@ -96,6 +111,25 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		shrinkPanel.add(exportButton,c);
 		exportButton.setEnabled(false);
+
+		uModel.setMinimum(2);
+		vModel.setMinimum(2);
+		uModel.setMaximum(Integer.MAX_VALUE);
+		vModel.setMaximum(Integer.MAX_VALUE);
+
+		infoPanel.setLayout(new GridBagLayout());
+		uSpinner.addChangeListener(this);
+		vSpinner.addChangeListener(this);
+		c.gridwidth = 1;
+		infoPanel.add(new JLabel("u-lines"),c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		infoPanel.add(uSpinner,c);
+		c.gridwidth = 1;
+		infoPanel.add(new JLabel("v-lines"),c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		infoPanel.add(vSpinner,c);
+		infoPanel.setShrinked(true);
+		shrinkPanel.add(infoPanel,c);
 	}
 	
 	private void configureFileChooser() {
@@ -181,6 +215,8 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
 						NurbsSurfaceUtility.addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
+						uModel.setValue(npp.getU());
+						vModel.setValue(npp.getV());
 					}
 				} else if(jOpenNurbs && file.getName().toLowerCase().endsWith(".3dm")) {
 					ONX_Model model = OpenNurbsIO.readFile(file.getPath());
@@ -190,14 +226,12 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						if(!surface.hasClampedKnotVectors()) {
 							surface.repairKnotVectors();
 						}
-						NurbsParameterPanel npp = new NurbsParameterPanel(surface);
-						int dialogOk = JOptionPane.showConfirmDialog(w, npp, getPluginInfo().name, OK_CANCEL_OPTION, PLAIN_MESSAGE );
-						if(dialogOk == JOptionPane.OK_OPTION) {
-							HalfedgeLayer newLayer = new HalfedgeLayer(hif);
-							newLayer.setName(file.getName() + " surface " + i++);
-							NurbsSurfaceUtility.addNurbsMesh(surface,newLayer,npp.getU(),npp.getV());
-							hif.addLayer(newLayer);
-						}
+
+						HalfedgeLayer newLayer = new HalfedgeLayer(hif);
+						newLayer.setName(file.getName() + " surface " + i++);
+						NurbsSurfaceUtility.addNurbsMesh(surface,newLayer);
+						hif.addLayer(newLayer);
+
 					}
 					List<ON_Curve> curves = OpenNurbsUtility.getCurves(model);
 					for(ON_Curve curve : curves) {
@@ -215,6 +249,13 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 							ON_NurbsCurve ac = (ON_NurbsCurve) curve;
 							OpenNurbsUtility.addNurbsCurve(ac, hif.get(new VHDS()), hif.getAdapters());
 						}
+					}
+					List<IndexedFaceSet> meshes = OpenNurbsUtility.getMeshes(model);
+					for(IndexedFaceSet mesh : meshes) {
+						HalfedgeLayer newLayer = new HalfedgeLayer(hif);
+						newLayer.setName(file.getName() + " mesh " + i++);
+						newLayer.set(mesh);
+						hif.addLayer(newLayer);
 					}
 					model.dispose();
 					hif.update();
@@ -260,10 +301,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 				add(new JLabel("Parameters:"),rc);
 				
 				paramPanel.setLayout(new GridLayout(2,2));
-				uModel.setValue(2*surf.getNumUPoints());
+				uModel.setValue(Math.min(2*surf.getNumUPoints(),100));
 				paramPanel.add(new JLabel("u-Lines")); 
 				paramPanel.add(uSpinner);
-				vModel.setValue(2*surf.getNumVPoints());
+				vModel.setValue(Math.min(2*surf.getNumVPoints(),100));
 				paramPanel.add(new JLabel("v-Lines")); 
 				paramPanel.add(vSpinner);
 				
@@ -422,4 +463,12 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	public void withJOpenNurbs(boolean jOpenNurbsEnabled) {
 		this.jOpenNurbs = jOpenNurbsEnabled;
 	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if(activeNurbsAdapter != null) {
+			NurbsSurfaceUtility.addNurbsMesh(activeNurbsAdapter.getSurface(), hif.getActiveLayer(),uModel.getNumber().intValue(),vModel.getNumber().intValue());
+		}
+	}
+	
 }
