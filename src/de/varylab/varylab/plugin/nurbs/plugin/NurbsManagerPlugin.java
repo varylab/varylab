@@ -79,6 +79,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface;
+import de.varylab.varylab.plugin.nurbs.algorithm.SplitInTheMiddle;
 import de.varylab.varylab.plugin.nurbs.algorithm.UVUnroll;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
@@ -490,14 +491,14 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				else if(symConjCurvatureBox.isSelected()){
 					symDir = SymmetricDir.CURVATURE;
 				}	
-				
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField());
 				if(singularities == null) {
-					computeUmbilicalPoints();
+					
+//					computeUmbilicalPoints();
 				}
+				
 				LinkedList<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
-//				curveIndex++;
-//				curveIndex++;
+
 				curveIndex = currentLines.getLast().getCurveIndex() + 1;
 
 				curvesModel.addAll(currentLines);
@@ -993,6 +994,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.getPlugin(VertexEditorPlugin.class);
 		c.getPlugin(QuadMeshGenerator.class);
 		c.getPlugin(UVUnroll.class);
+		c.getPlugin(SplitInTheMiddle.class);
 	}
 	
 	@Override
