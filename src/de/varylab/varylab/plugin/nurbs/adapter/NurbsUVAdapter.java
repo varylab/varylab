@@ -18,11 +18,14 @@ public class NurbsUVAdapter extends AbstractAdapter<double[]> {
 	Map<Integer,double[]>
 		indexUVMap = null;
 	NURBSSurface ns = null;	
+	
+	private MeshParameters 
+		meshParameters = null;
 		
-		
-	public NurbsUVAdapter(NURBSSurface ns, Map<Integer,double[]> indexMap) {
+	public NurbsUVAdapter(NURBSSurface ns, Map<Integer,double[]> indexMap, int uLines, int vLines) {
 		super(double[].class,true,false);
 		indexUVMap = new HashMap<Integer, double[]>(indexMap);
+		meshParameters = new MeshParameters(uLines, vLines);
 		this.ns = ns;
 	}
 	
@@ -44,7 +47,32 @@ public class NurbsUVAdapter extends AbstractAdapter<double[]> {
 		return ns;
 	}
 
-	public void setSurface(NURBSSurface ns) {
-		this.ns = ns;
+	public int getULineCount() {
+		return meshParameters.getNumULines();
 	}
+	
+	public int getVLineCount() {
+		return meshParameters.getNumVLines();
+	}
+	
+	private class MeshParameters {
+		
+		private int 
+			numULines = 10,
+			numVLines = 10;
+
+		public MeshParameters(int u, int v) {
+			numULines = u;
+			numVLines = v;
+		}
+		
+		public int getNumULines() {
+			return numULines;
+		}
+
+		public int getNumVLines() {
+			return numVLines;
+		}
+	}
+	
 }

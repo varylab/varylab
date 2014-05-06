@@ -73,7 +73,7 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 	}
 	
 	public NurbsUVAdapter getUVAdapter() {
-		NurbsUVAdapter nurbsUVAdapter = new NurbsUVAdapter(surface,indexUVMap);
+		NurbsUVAdapter nurbsUVAdapter = new NurbsUVAdapter(surface,indexUVMap, getULineCount(), getVLineCount());
 		return nurbsUVAdapter;
 	}
 	

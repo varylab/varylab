@@ -437,6 +437,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			nurbsUVAdapter = layer.getActiveAdapters().query(NurbsUVAdapter.class);
 		}
 		activeNurbsAdapter = nurbsUVAdapter;
+		if(activeNurbsAdapter != null) {
+			uSpinner.setValue(activeNurbsAdapter.getULineCount());
+			vSpinner.setValue(activeNurbsAdapter.getVLineCount());
+		}
 		exportButton.setEnabled(activeNurbsAdapter != null);
 	}
 	
