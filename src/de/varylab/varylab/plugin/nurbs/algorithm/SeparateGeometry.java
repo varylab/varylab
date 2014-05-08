@@ -1,4 +1,4 @@
-package de.varylab.varylab.plugin;
+package de.varylab.varylab.plugin.nurbs.algorithm;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -23,7 +23,7 @@ public class SeparateGeometry extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		int i = hds.numVertices();
+//		int i = hds.numVertices();
 		
 		// TODO Auto-generated method stub
 

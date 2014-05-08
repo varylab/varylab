@@ -91,7 +91,7 @@ public class SplitInTheMiddle extends AlgorithmDialogPlugin {
 		NURBSSurface targetSurface = nurbsSurfaces.get(i);
 //		Map<Integer, double[]> indexMap = new HashMap<Integer, double[]>();
 		i = 0;
-		int n = hds.numVertices();
+//		int n = hds.numVertices();
 		boolean dir = false;
 		if(uSplit.isSelected()){
 			dir = true;
