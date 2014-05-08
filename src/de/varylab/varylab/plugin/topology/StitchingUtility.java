@@ -81,25 +81,9 @@ public class StitchingUtility {
 		double[] p2 = a.getD(Position3d.class, v2);
 		double[] newCoords = Rn.linearCombination(null, .5, p1, .5, p2);
 		V newV = TopologyAlgorithms.collapseEdge(splitE);
+		TopologyAlgorithms.removeDigonsAt(newV);
 		a.set(Position.class, newV, newCoords);
-		removeDigons(newV);
 		return true;		
-	}
-	
-	private static <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void removeDigons(V v) {
-		for(E e : HalfEdgeUtils.incomingEdges(v)) {
-			if(e.getNextEdge() == e.getPreviousEdge()) {
-				E eo = e.getOppositeEdge();
-				eo.linkOppositeEdge(e.getNextEdge().getOppositeEdge());
-				eo.getHalfEdgeDataStructure().removeEdge(e.getNextEdge());
-				eo.getHalfEdgeDataStructure().removeEdge(e);
-			}
-		}
 	}
 	
 	// Returns a list of incoming edges of v1 resp. v2, such that the left faces
