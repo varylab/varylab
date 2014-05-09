@@ -61,7 +61,6 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
-import de.varylab.varylab.plugin.nurbs.math.NurbsDeformationTools;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 

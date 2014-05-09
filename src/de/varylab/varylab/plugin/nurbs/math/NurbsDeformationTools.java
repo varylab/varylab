@@ -1,10 +1,5 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
-import java.util.Arrays;
-
-import org.antlr.runtime.LegacyCommonTokenStream;
-import org.netlib.util.doubleW;
-
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
