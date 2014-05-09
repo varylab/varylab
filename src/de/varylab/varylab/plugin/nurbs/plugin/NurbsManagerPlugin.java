@@ -77,9 +77,12 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
+import de.varylab.varylab.plugin.nurbs.algorithm.LinearDeformation;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface;
+import de.varylab.varylab.plugin.nurbs.algorithm.SplitAtEdge;
 import de.varylab.varylab.plugin.nurbs.algorithm.SplitInTheMiddle;
+import de.varylab.varylab.plugin.nurbs.algorithm.StretchXYZ;
 import de.varylab.varylab.plugin.nurbs.algorithm.UVUnroll;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
@@ -995,6 +998,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.getPlugin(QuadMeshGenerator.class);
 		c.getPlugin(UVUnroll.class);
 		c.getPlugin(SplitInTheMiddle.class);
+		c.getPlugin(SplitAtEdge.class);
+		c.getPlugin(StretchXYZ.class);
+		c.getPlugin(LinearDeformation.class);
 	}
 	
 	@Override

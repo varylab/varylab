@@ -50,7 +50,6 @@ public class NurbsSurfaceUtility {
 	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n, double[] point){
 		LinkedList<double[]> points = new LinkedList<double[]>();
 		if(PointProjectionSurfaceOfRevolution.isSurfaceOfRevolutionUDir(ns)){
-			logger.info("HALLLLLOOOOOOOOO");
 			double[] V = ns.getVKnotVector();
 			double v0 = V[0];
 			double vm = V[V.length - 1];

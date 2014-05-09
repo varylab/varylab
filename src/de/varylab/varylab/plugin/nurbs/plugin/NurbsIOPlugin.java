@@ -194,10 +194,14 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
-					NURBSSurface[] surfs= NurbsDeformationTools.splitInTheMiddle(surface, false);
-					surface = surfs[0];
-					NurbsDeformationTools.stretch(surface, 1.0, 0.2, 1.8);
-					NurbsDeformationTools.conicDeformation(surface, 0.8);
+//					NURBSSurface[] surfs= NurbsDeformationTools.splitInTheMiddle(surface, false);
+//					surface = surfs[0];
+//					System.out.println("before");
+//					System.out.println(surface.toString());
+//					surface = NurbsDeformationTools.stretch(surface, 1.0, 0.2, 1.8);
+//					System.out.println("after");
+//					System.out.println(surface.toString());
+//					NurbsDeformationTools.conicDeformation(surface, 0.8);
 					logger.info("original surface " + surface.toString());
 					double[] U = surface.getUKnotVector();
 					logger.info("u0 = " + U[0] + "um = " + U[U.length - 1]);
