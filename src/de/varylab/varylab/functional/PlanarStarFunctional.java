@@ -85,4 +85,9 @@ public class PlanarStarFunctional <
 	public void setScale(double s) {
 		scale = s;
 	}
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

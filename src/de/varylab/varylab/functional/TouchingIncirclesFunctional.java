@@ -1490,4 +1490,8 @@ public class TouchingIncirclesFunctional implements Functional<VVertex, VEdge, V
 		return null;
 	}
 	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

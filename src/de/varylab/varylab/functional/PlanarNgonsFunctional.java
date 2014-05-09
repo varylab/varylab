@@ -98,4 +98,8 @@ public class PlanarNgonsFunctional <
 		this.weight = weightFunction;
 	}
 	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

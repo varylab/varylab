@@ -145,5 +145,8 @@ public class CircumcircleCurvatureFunctional<
 		this.adapters = adapters;
 	}
 
-
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

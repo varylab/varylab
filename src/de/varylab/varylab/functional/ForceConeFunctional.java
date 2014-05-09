@@ -465,5 +465,9 @@ public class ForceConeFunctional <
 	public void setVertexTerm(int vertexTerm) {
 		this.vertexTerm = vertexTerm;
 	}
-	
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

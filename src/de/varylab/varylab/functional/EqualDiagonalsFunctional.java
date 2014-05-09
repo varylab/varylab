@@ -96,4 +96,8 @@ implements Functional<V, E, F> {
 		return false;
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

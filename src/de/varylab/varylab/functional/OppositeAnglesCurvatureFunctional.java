@@ -146,5 +146,8 @@ public class OppositeAnglesCurvatureFunctional<
 		return false;
 	}
 
-
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

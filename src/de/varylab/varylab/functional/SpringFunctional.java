@@ -235,4 +235,8 @@ public class SpringFunctional<
 		
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

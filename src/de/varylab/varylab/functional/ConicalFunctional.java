@@ -158,5 +158,8 @@ public class ConicalFunctional<
 		return false;
 	}
 
-
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

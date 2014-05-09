@@ -80,5 +80,9 @@ public class EdgeLengthEqualizerFunctional <
     public boolean hasHessian() {
     	return false;
     }
-	
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

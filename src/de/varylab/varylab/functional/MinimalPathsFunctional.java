@@ -64,4 +64,8 @@ public class MinimalPathsFunctional <
     	return false;
     }
 	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

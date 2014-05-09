@@ -146,5 +146,8 @@ public class CircularFunctional<
 		return false;
 	}
 
-
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

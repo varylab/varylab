@@ -1405,4 +1405,8 @@ public class TouchingIncirclesFunctionalTan2 implements Functional<VVertex, VEdg
 		return null;
 	}
 	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

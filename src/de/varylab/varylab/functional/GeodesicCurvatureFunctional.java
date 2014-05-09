@@ -92,5 +92,9 @@ public class GeodesicCurvatureFunctional <
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int[][] getNonZeroPattern(HDS hds) {return null;}
-	
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

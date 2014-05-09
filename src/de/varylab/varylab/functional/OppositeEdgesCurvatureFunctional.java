@@ -144,4 +144,8 @@ public class OppositeEdgesCurvatureFunctional<
 		this.adapters = adapters;
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

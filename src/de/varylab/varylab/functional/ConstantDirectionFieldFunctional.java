@@ -100,4 +100,9 @@ public class ConstantDirectionFieldFunctional<
 	public void setDirection(double[] dir) {
 		Rn.times(this.dir, strength, Rn.normalize(null, dir));
 	}
+	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

@@ -70,4 +70,9 @@ public class InflateFunctional implements Functional<VVertex, VEdge, VFace> {
 		return null;
 	}
 	
+	@Override
+	public boolean hasGradient() {
+		return false;
+	}
+	
 }

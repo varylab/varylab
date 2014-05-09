@@ -128,4 +128,9 @@ public class DiagonalDistanceFunctional <
 	public void setWeight(VolumeWeight<F> weight) {
 		this.weight = weight;
 	}
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

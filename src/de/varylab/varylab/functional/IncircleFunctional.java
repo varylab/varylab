@@ -108,5 +108,9 @@ public class IncircleFunctional implements Functional<VVertex, VEdge, VFace> {
 	>> int[][] getNonZeroPattern(HDS hds) {
 		return null;
 	}
-	
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

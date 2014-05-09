@@ -226,5 +226,9 @@ public class MeanEdgeLengthFunctional <
     	return true;
     }
     
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 	
 }

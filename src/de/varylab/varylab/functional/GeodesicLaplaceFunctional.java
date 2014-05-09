@@ -153,4 +153,8 @@ public class GeodesicLaplaceFunctional<
 	}
 
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

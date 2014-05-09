@@ -129,4 +129,9 @@ class AffineMinimalFunctional implements Functional<VVertex, VEdge, VFace> {
 		}
 		return oe;
 	}
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

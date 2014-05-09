@@ -357,5 +357,9 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 		FunctionalUtils.addVectorToGradient(G, 3*j, Rn.negate(null, dj));
 		FunctionalUtils.addVectorToGradient(G, 3*k, Rn.negate(null, dk));
 	}
-	
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}	
 }

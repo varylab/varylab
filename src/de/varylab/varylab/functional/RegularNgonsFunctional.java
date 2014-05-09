@@ -142,4 +142,9 @@ public class RegularNgonsFunctional<
 		sizesList.add(i);
 	}
 
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

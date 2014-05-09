@@ -25,7 +25,7 @@ public class EdgeNormalTorsionAdapter extends AbstractAdapter<Double> {
 			v2 = e.getTargetVertex();
 		double[] 	n1 = a.getD(Normal.class, v1),
 					n2 = a.getD(Normal.class,v2);
-		return Rn.euclideanAngle(n1, n2);
+		return 180*Rn.euclideanAngle(n1, n2)/Math.PI;
 	}
 	
 	@Override
@@ -35,7 +35,12 @@ public class EdgeNormalTorsionAdapter extends AbstractAdapter<Double> {
 
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-		return nodeClass.isAssignableFrom(Edge.class);
+		return Edge.class.isAssignableFrom(nodeClass);
+	}
+	
+	@Override
+	public String toString() {
+		return "Edge normal torsion";
 	}
 
 }

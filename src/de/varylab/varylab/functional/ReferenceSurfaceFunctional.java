@@ -246,4 +246,8 @@ implements Functional<V, E, F> {
 		return kdtree;
 	}
 	
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

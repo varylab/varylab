@@ -109,4 +109,8 @@ public class NURBSReferenceSurfaceFunctional<V extends Vertex<V, E, F>, E extend
 
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

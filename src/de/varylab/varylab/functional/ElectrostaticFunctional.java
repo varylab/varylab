@@ -95,4 +95,8 @@ public class ElectrostaticFunctional<
 		return false;
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
 }

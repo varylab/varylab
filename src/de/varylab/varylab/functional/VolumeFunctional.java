@@ -130,5 +130,9 @@ public class VolumeFunctional <
 	}
 	
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
     
 }
