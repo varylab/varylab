@@ -98,6 +98,7 @@ public class SplitAtEdge extends AlgorithmPlugin {
 //		hif.update();
 	}
 	
+	@Override
 	public String getCategory() {
 		return "NURBS";
 	}
