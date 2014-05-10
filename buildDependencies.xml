@@ -62,10 +62,10 @@
 	</target>
 	
 	<target name="discrete conformal lab">
-		<ant antfile="build.xml" dir="../DiscreteConformalLab" target="clean"/>
-		<ant antfile="build.xml" dir="../DiscreteConformalLab" target="release"/>
+		<ant antfile="build.xml" dir="../ConformalLab" target="clean"/>
+		<ant antfile="build.xml" dir="../ConformalLab" target="release"/>
 		<copy todir="lib/conformallab">
-			<fileset dir="../DiscreteConformalLab/release/${date}" includes="DiscreteConformalLab.jar"/>
+			<fileset dir="../ConformalLab/release/${date}" includes="DiscreteConformalLab.jar"/>
 		</copy>
 	</target>
 	
