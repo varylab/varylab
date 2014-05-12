@@ -1,4 +1,5 @@
 /bin
-/VaryLab*.xml
+/Vary*.xml
+/Grashopper*.xml
 /custom.properties
 /logcustom.properties
