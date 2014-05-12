@@ -193,20 +193,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
-//					NURBSSurface[] surfs= NurbsDeformationTools.splitInTheMiddle(surface, false);
-//					surface = surfs[0];
-//					System.out.println("before");
-//					System.out.println(surface.toString());
-//					surface = NurbsDeformationTools.stretch(surface, 1.0, 0.2, 1.8);
-//					System.out.println("after");
-//					System.out.println(surface.toString());
-//					NurbsDeformationTools.conicDeformation(surface, 0.8);
-					logger.info("original surface " + surface.toString());
-					double[] U = surface.getUKnotVector();
-					logger.info("u0 = " + U[0] + "um = " + U[U.length - 1]);
-					double[] V = surface.getVKnotVector();
-					logger.info("v0 = " + V[0] + "vn = " + V[V.length - 1]);
-					
+					System.out.println("surface to String");
+					System.out.println(surface.toString());
+					System.out.println("surface to obj");
+					System.out.println(surface.toObj());
 					if(surface.getClosingDir() == ClosingDir.uClosed){
 						logger.info("surface.isClosedUDir()");
 					}
@@ -214,7 +204,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						logger.info("surface.isClosedVDir()");
 					}
 					surface.setName(file.getName());
-					logger.info("THE NEW SURFACE");
 					logger.info(surface.toObj());
 					logger.info("\n");
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");

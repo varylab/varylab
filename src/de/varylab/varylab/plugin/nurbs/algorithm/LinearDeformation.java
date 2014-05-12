@@ -153,6 +153,8 @@ public class LinearDeformation extends AlgorithmDialogPlugin {
 		double deformFactor = deformSpinnerModel.getNumber().doubleValue();
 		
 		NURBSSurface deform = NurbsDeformationTools.deform(targetSurface, vec, dir, deformFactor);
+		System.out.println("DEFORM");
+		System.out.println(deform.toObj());
 		System.out.println("letzt endlich");
 		System.out.println(deform.toString());
 		HalfedgeLayer hel = new HalfedgeLayer(hi);

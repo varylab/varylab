@@ -321,27 +321,6 @@ public class FaceSetGenerator {
 			iP1.setNbrs(nbrs);
 			points.add(iP1);
 		}
-//		log.info("CHECK      !!!!!!!!!!!!!!!!!!!!!!!!!");
-//		points = orientedNbrs(points);
-//		double check = -1.570796326794897;
-//		int point = 0;
-//		for (HalfedgePoint hp : points) {
-//			log.info("hp = " + Arrays.toString(hp.getPoint().getPoint()));
-//			if(hpContainsIndex(hp, check)){
-//				point++;
-//				log.info(point+". HP");
-//				log.info("point = " + Arrays.toString(hp.getPoint().getPoint()));
-//				log.info("nbrs");
-//				for (IntersectionPoint ip : hp.getNbrs()) {
-//					log.info(Arrays.toString(ip.getPoint()));
-//				}
-//			}
-//		}
-		
-//		log.info("FIRST CHECK");
-//		for (IntersectionPoint ip : intersectionPoints) {
-//			log.info(ip.getParentHP().toString());
-//		}
 
 		logger.info("list of all points and its nbrs");
 		for (IntersectionPoint p : points) {
@@ -738,88 +717,128 @@ public class FaceSetGenerator {
 		return true;
 	}
 	
+////	public  LinkedList<IntersectionPoint> makeOrientedNbrs (){
+////		for (IntersectionPoint ip : localNbrs) {
+////			LinkedList<IntersectionPoint> orientedList = new LinkedList<IntersectionPoint>();
+////			LinkedList<IntersectionPoint> allNbrs = new LinkedList<IntersectionPoint>();
+////			
+////			for (IntersectionPoint nbrs : ip.getNbrs()) {
+////				if(nbrs.getPoint() != null){
+////					allNbrs.add(nbrs);
+////				}
+////			}
+////			orientedList.add(allNbrs.getFirst());
+////			int bound = allNbrs.size();
+////			IntersectionPoint lastOrientedPoint = orientedList.getLast();
+////			boolean sameNbr = false;
+////			while(orientedList.size() < bound){
+////				double angle = Double.MAX_VALUE;
+////				boolean leftOrientation = false;
+////				IntersectionPoint next = new IntersectionPoint();
+////				IntersectionPoint before = allNbrs.getFirst();
+////				if(orientedList.getLast() == lastOrientedPoint && orientedList.size() > 1){
+////					sameNbr = true;
+////				}
+////				boolean firstPoint = true;
+////				for (IntersectionPoint nonOrientedNbr : allNbrs) {
+////					if(orientedList.getLast() == before && before == nonOrientedNbr && firstPoint == false && !sameNbr){
+////						next = nonOrientedNbr;
+////						angle = 0;
+////						leftOrientation = true;
+////						sameNbr = true;
+////					}
+////					firstPoint = false;
+////					before = nonOrientedNbr;
+////					double[] first = orientedList.getLast().getPoint();
+////					double[] middle = ip.getPoint();
+////					double[] last = nonOrientedNbr.getPoint();
+////					double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
+////					double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
+////					if(first != last && allNbrs.size() > 1 && LineSegmentIntersection.orientation(first, middle, last)){
+////						leftOrientation = true;
+////						if(angle > Math.acos(Rn.innerProduct(a, b))){
+////							angle = Math.acos(Rn.innerProduct(a, b));
+////							next = nonOrientedNbr;
+////						}
+////					}
+////				}
+////				if(!leftOrientation){
+////					angle = Double.MIN_VALUE;
+////
+////					for (IntersectionPoint nonOrientedNbr : allNbrs) {
+////						double[] first = orientedList.getLast().getPoint();
+////						double[] middle = ip.getPoint();
+////						double[] last = nonOrientedNbr.getPoint();
+////						double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
+////						double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
+////						if(first != last && allNbrs.size() > 1){
+////							if(angle < Math.acos(Rn.innerProduct(a, b))){
+////								angle = Math.acos(Rn.innerProduct(a, b));
+////								next = nonOrientedNbr;
+////							}
+////						}
+////					}
+////				}
+////				lastOrientedPoint = orientedList.getLast();
+//////				if(!Arrays.equals(next.getPoint(), lastOrientedPoint.getPoint())){
+//////					orientedList.add(next);
+//////				}
+////				orientedList.add(next);
+////			}
+////			IntersectionPoint before = null;
+////			LinkedList<IntersectionPoint> ori = new LinkedList<IntersectionPoint>();
+////			for (IntersectionPoint orientedNbr : orientedList) {
+////				if(before != orientedNbr){
+////					ori.add(orientedNbr);
+////				}
+////				before = ip;
+////			}
+////			if(ori.getLast() == ori.getFirst() && ori.size() > 1){
+////				ori.pollLast();
+////			}
+//////			ori = removeMultiplePoints(ori);
+////			ori.add(ori.getFirst());
+////			ip.setNbrs(ori);
+////		}
+//////		localNbrs = removeDoublePoint(localNbrs);
+////		logger.info("oriented nbrs of ");
+////		for (IntersectionPoint ip : localNbrs) {
+////			logger.info(" ");
+////			logger.info("point = " + Arrays.toString(ip.getPoint()));
+//////			logger.info("ohne remove");
+//////			for (IntersectionPoint nbr : ip.getNbrs()) {
+//////				logger.info(Arrays.toString(nbr.getPoint()));
+//////			}
+////			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
+////			logger.info("mit remove");
+////			for (IntersectionPoint nbr : ip.getNbrs()) {
+////				logger.info(Arrays.toString(nbr.getPoint()));
+////			}
+////		}
+////		logger.info("ENDE");
+////		return localNbrs;
+////	}
+//	
+////	public double det(double[] vec1, double[] vec2){
+////		return vec1[0] * vec2[1] - vec1[1] * vec2[0];
+////	}
+////	
+////	public IntersectionPoint getNextOrientedNbr(IntersectionPoint ip, IntersectionPoint curr, List<IntersectionPoint> Nbrs){
+////		IntersectionPoint next = new IntersectionPoint();
+////		double[] vec1 = Rn.subtract(null, curr.getPoint(), ip.getPoint());
+////		for (IntersectionPoint nbr : Nbrs) {
+////			if(){
+////				
+////			}
+////		}
+////		return null;
+////	}
+	
 	public  LinkedList<IntersectionPoint> makeOrientedNbrs (){
 		for (IntersectionPoint ip : localNbrs) {
-			LinkedList<IntersectionPoint> orientedList = new LinkedList<IntersectionPoint>();
-			LinkedList<IntersectionPoint> allNbrs = new LinkedList<IntersectionPoint>();
-			
-			for (IntersectionPoint nbrs : ip.getNbrs()) {
-				if(nbrs.getPoint() != null){
-					allNbrs.add(nbrs);
-				}
-			}
-			orientedList.add(allNbrs.getFirst());
-			int bound = allNbrs.size();
-			IntersectionPoint lastOrientedPoint = orientedList.getLast();
-			boolean sameNbr = false;
-			while(orientedList.size() < bound){
-				double angle = Double.MAX_VALUE;
-				boolean leftOrientation = false;
-				IntersectionPoint next = new IntersectionPoint();
-				IntersectionPoint before = allNbrs.getFirst();
-				if(orientedList.getLast() == lastOrientedPoint && orientedList.size() > 1){
-					sameNbr = true;
-				}
-				boolean firstPoint = true;
-				for (IntersectionPoint nonOrientedNbr : allNbrs) {
-					if(orientedList.getLast() == before && before == nonOrientedNbr && firstPoint == false && !sameNbr){
-						next = nonOrientedNbr;
-						angle = 0;
-						leftOrientation = true;
-						sameNbr = true;
-					}
-					firstPoint = false;
-					before = nonOrientedNbr;
-					double[] first = orientedList.getLast().getPoint();
-					double[] middle = ip.getPoint();
-					double[] last = nonOrientedNbr.getPoint();
-					double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
-					double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
-					if(first != last && allNbrs.size() > 1 && LineSegmentIntersection.orientation(first, middle, last)){
-						leftOrientation = true;
-						if(angle > Math.acos(Rn.innerProduct(a, b))){
-							angle = Math.acos(Rn.innerProduct(a, b));
-							next = nonOrientedNbr;
-						}
-					}
-				}
-				if(!leftOrientation){
-					angle = Double.MIN_VALUE;
-
-					for (IntersectionPoint nonOrientedNbr : allNbrs) {
-						double[] first = orientedList.getLast().getPoint();
-						double[] middle = ip.getPoint();
-						double[] last = nonOrientedNbr.getPoint();
-						double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
-						double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
-						if(first != last && allNbrs.size() > 1){
-							if(angle < Math.acos(Rn.innerProduct(a, b))){
-								angle = Math.acos(Rn.innerProduct(a, b));
-								next = nonOrientedNbr;
-							}
-						}
-					}
-				}
-				lastOrientedPoint = orientedList.getLast();
-//				if(!Arrays.equals(next.getPoint(), lastOrientedPoint.getPoint())){
-//					orientedList.add(next);
-//				}
-				orientedList.add(next);
-			}
-			IntersectionPoint before = null;
-			LinkedList<IntersectionPoint> ori = new LinkedList<IntersectionPoint>();
-			for (IntersectionPoint orientedNbr : orientedList) {
-				if(before != orientedNbr){
-					ori.add(orientedNbr);
-				}
-				before = ip;
-			}
-			if(ori.getLast() == ori.getFirst() && ori.size() > 1){
-				ori.pollLast();
-			}
-//			ori = removeMultiplePoints(ori);
-			ori.add(ori.getFirst());
-			ip.setNbrs(ori);
+			LinkedList<IntersectionPoint> orientedNbrs = new LinkedList<>();
+			IntersectionPoint curr = ip.getNbrs().getFirst();
+			orientedNbrs.add(curr);
 		}
 //		localNbrs = removeDoublePoint(localNbrs);
 		logger.info("oriented nbrs of ");
@@ -830,7 +849,7 @@ public class FaceSetGenerator {
 //			for (IntersectionPoint nbr : ip.getNbrs()) {
 //				logger.info(Arrays.toString(nbr.getPoint()));
 //			}
-//			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
+			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
 			logger.info("mit remove");
 			for (IntersectionPoint nbr : ip.getNbrs()) {
 				logger.info(Arrays.toString(nbr.getPoint()));
