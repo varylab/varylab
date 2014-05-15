@@ -34,18 +34,9 @@ public class FaceSetGenerator {
 	private NURBSSurface ns;
 	LinkedList<IntersectionPoint> ipList;
 	List<double[]> boundaryVerts;
-	LinkedList<IntersectionPoint> localNbrs = null;
-	LinkedList<IntersectionPoint> orientedNbrs = null;
-	
+
 	
 	public FaceSetGenerator(NURBSSurface surface, double d, LinkedList<IntersectionPoint> ipl) {
-		// only debug
-		logger.info("All Intersections");
-		for (IntersectionPoint ip : ipl) {
-			logger.info(Arrays.toString(ip.getPoint()));
-		}
-		logger.info(" ");
-		//end debug
 		ipList = ipl;
 		dilation = d;
 		ns = surface;
@@ -68,35 +59,16 @@ public class FaceSetGenerator {
 	}
 	
 	
-	
-	public LinkedList<IntersectionPoint> getLocalNbrs() {
-		if(localNbrs == null){
-			localNbrs = findAllLocalNbrs();
+
+	public void determineOrientedNbrs(){
+		for (IntersectionPoint ip : ipList) {
+			System.out.println("the point");
+			for (IntersectionPoint nbr : ip.getNbrs()) {
+				System.out.println(nbr.toString());
+			}
+			ip.makeOrientedNbrs();
 		}
-		return localNbrs;
 	}
-
-
-
-	public void setLocalNbrs(LinkedList<IntersectionPoint> localNbrs) {
-		this.localNbrs = localNbrs;
-	}
-
-
-
-	public LinkedList<IntersectionPoint> getOrientedNbrs() {
-		if(orientedNbrs == null){
-			orientedNbrs = makeOrientedNbrs();
-		}
-		return orientedNbrs;
-	}
-
-
-
-	public void setOrientedNbrs(LinkedList<IntersectionPoint> orientedNbrs) {
-		this.orientedNbrs = orientedNbrs;
-	}
-
 
 
 	private static LinkedList<Integer> getIndexListFromIntersectionPoint(IntersectionPoint iP){
@@ -109,8 +81,7 @@ public class FaceSetGenerator {
 		return indexList;
 	}
 	
-	
-	
+		
 	private static boolean getCyclicFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
 		boolean cyclic = false;
 		for (LineSegment ls : iP.getIntersectingSegments()) {
@@ -186,34 +157,9 @@ public class FaceSetGenerator {
 		return false;
 	}
 	
-
-//	private boolean pointsHaveCurveIndexAndInSameDomain(IntersectionPoint ip1, IntersectionPoint ip2, int curveIndex){
-//		if(ip1.getIndexList().contains(curveIndex) && ip2.getIndexList().contains(curveIndex)){
-//			int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip1, curveIndex);
-//			int shiftedIndex2 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip2, curveIndex);
-//			if(shiftedIndex1 == shiftedIndex2){
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-//	@SuppressWarnings("unused")
-//	private boolean pointsHaveCurveIndexAndInSameDomain(IntersectionPoint ip1, IntersectionPoint ip2, int curveIndex){
-//		if(ip1.getIndexList().contains(curveIndex) && ip2.getIndexList().contains(curveIndex)){
-//			int shiftedIndex1 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip1, curveIndex);
-//			int shiftedIndex2 = getShiftedIndexFromIntersectionPointAndCurveIndex(ip2, curveIndex);
-//			if(shiftedIndex1 == shiftedIndex2){
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
 	
-	
-	public LinkedList<IntersectionPoint> findAllLocalNbrs(){
-		LinkedList<IntersectionPoint> points = new LinkedList<IntersectionPoint>();
+	public void determineLocalNbrs(){
+//		LinkedList<IntersectionPoint> points = new LinkedList<IntersectionPoint>();
 		logger.info("Boundary ");
 	
 		for (Double value : ns.getBoundaryValuesPastIntersection(dilation)) {
@@ -319,91 +265,18 @@ public class FaceSetGenerator {
 				}
 			}
 			iP1.setNbrs(nbrs);
-			points.add(iP1);
 		}
 
 		logger.info("list of all points and its nbrs");
-		for (IntersectionPoint p : points) {
+		for (IntersectionPoint p : ipList) {
 			logger.info("point = " + Arrays.toString(p.getPoint()));
 			logger.info("nbrs");
 			for (IntersectionPoint ip : p.getNbrs()) {
 				System.out.println(Arrays.toString(ip.getPoint()));
 			}
 		}
-		
-		return points;
 	}
 	
-	
-	
-	
-	/*
-	 * 
-	 */
-	
-//	private LinkedList<IntersectionPoint>  allAjacentNbrs(NURBSSurface ns, HalfedgePoint point , LinkedList<HalfedgePoint> halfedgePoints){
-//		LinkedList<IntersectionPoint> allAjacentNbrs = new LinkedList<IntersectionPoint>();
-//		LinkedList<HalfedgePoint> allNbrs = new LinkedList<HalfedgePoint>();
-//		IntersectionPoint firstIP = point.getUnusedNbrs().getLast();
-//		HalfedgePoint first = firstIP.getParentHP();
-//		allNbrs.add(point);
-//		allAjacentNbrs.add(point.getPoint());
-//		allNbrs.add(first);
-//		allAjacentNbrs.add(first.getPoint());
-//		IntersectionPoint before = point.getPoint();
-//		HalfedgePoint bP = point;
-//		
-//		// remove the start direction from unused nbrs
-//		
-//		LinkedList<IntersectionPoint> removedStartDirectionFirst = new LinkedList<IntersectionPoint>();
-//		for (IntersectionPoint ip : bP.getUnusedNbrs()) {
-//			if(ip.getParentHP() != first){
-//				removedStartDirectionFirst.add(ip);
-//			}
-//		}
-//		bP.setUnusedNbrs(removedStartDirectionFirst);
-//		
-//		while(point != allNbrs.getLast()){
-//			IntersectionPoint next = getNextNbr(ns, before, allNbrs.getLast());
-//			before = allAjacentNbrs.getLast();
-//			bP = before.getParentHP();
-//			
-//			LinkedList<IntersectionPoint> removedStartDirection = new LinkedList<IntersectionPoint>();
-//			for (IntersectionPoint ip : bP.getUnusedNbrs()) {
-//				// debug
-//				if(ip.getParentHP() != next.getParentHP()){
-//					removedStartDirection.add(ip);
-//				}
-//				// end debug
-//			}
-//			bP.setUnusedNbrs(removedStartDirection);
-//			
-//			allAjacentNbrs.add(next);
-////			if(next.getParentHP() == null){
-////				log.info("NEXT");
-////				log.info(Arrays.toString(next.getPoint()));
-////				PointSetFactory psf = new PointSetFactory();
-////				psf.setVertexCount(1);
-////				psf.setVertexCoordinates(next.getPoint());
-////				psf.update();
-////				SceneGraphComponent sgc = new SceneGraphComponent("geodesic segment");
-////				SceneGraphComponent minCurveComp = new SceneGraphComponent("Geodesic Segment");
-////				sgc.addChild(minCurveComp);
-////				sgc.setGeometry(psf.getGeometry());
-////				Appearance labelAp = new Appearance();
-////				sgc.setAppearance(labelAp);
-////				DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
-////				DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
-////				pointShader.setDiffuseColor(Color.magenta);
-////				hif.getActiveLayer().addTemporaryGeometry(sgc);
-////				
-////			}
-//			HalfedgePoint hP = next.getParentHP();
-//			allNbrs.add(hP);
-//		}
-//		allAjacentNbrs.pollLast();
-//		return allAjacentNbrs;
-//	}
 	
 	
 	/*
@@ -607,36 +480,7 @@ public class FaceSetGenerator {
 		return uniqueFaceVerts;
 	}
 	
-//	public LinkedList<IntersectionPoint>  getAllFaceVertices(IntersectionPoint p){
-//		LinkedList<IntersectionPoint> allFaceVerts = new LinkedList<IntersectionPoint>();
-//		IntersectionPoint previous = null;
-//		allFaceVerts.add(p);
-//		boolean first = true;
-//		while(first || p != allFaceVerts.getLast()){
-//			first = false;
-//			IntersectionPoint current = getNextNbr(previous, allFaceVerts.getLast());
-//			previous = current.getPrevious();
-////			if(current.getClosedBoundary(ns, dilation) != ClosedBoundary.interior){
-////				current = getUniqueClosedBoundryPoint(current);
-////			}
-//			allFaceVerts.add(current);
-//		}
-//		allFaceVerts.pollLast();
-//		logger.info("all face verts");
-//		LinkedList<IntersectionPoint> uniqueFaceVerts = new LinkedList<IntersectionPoint>();
-//		for (IntersectionPoint ip : allFaceVerts) {
-//			ClosedBoundary cb = ip.getClosedBoundary(ns, dilation);
-//			if(cb == ClosedBoundary.right || cb == ClosedBoundary.upper){
-//				uniqueFaceVerts.add(getOppositePoint(ip));
-//			}
-//			else{
-//				uniqueFaceVerts.add(ip);
-//			}
-//			logger.info(Arrays.toString(uniqueFaceVerts.getLast().getPoint()));
-//		}
-//		return uniqueFaceVerts;
-//	}
-	
+
 	private IntersectionPoint getOppositePoint(IntersectionPoint ip){
 		if(ip.getOpposite() == null){
 			if(ip.getClosedBoundary(ns, dilation) == ClosedBoundary.interior){
@@ -717,205 +561,9 @@ public class FaceSetGenerator {
 		return true;
 	}
 	
-////	public  LinkedList<IntersectionPoint> makeOrientedNbrs (){
-////		for (IntersectionPoint ip : localNbrs) {
-////			LinkedList<IntersectionPoint> orientedList = new LinkedList<IntersectionPoint>();
-////			LinkedList<IntersectionPoint> allNbrs = new LinkedList<IntersectionPoint>();
-////			
-////			for (IntersectionPoint nbrs : ip.getNbrs()) {
-////				if(nbrs.getPoint() != null){
-////					allNbrs.add(nbrs);
-////				}
-////			}
-////			orientedList.add(allNbrs.getFirst());
-////			int bound = allNbrs.size();
-////			IntersectionPoint lastOrientedPoint = orientedList.getLast();
-////			boolean sameNbr = false;
-////			while(orientedList.size() < bound){
-////				double angle = Double.MAX_VALUE;
-////				boolean leftOrientation = false;
-////				IntersectionPoint next = new IntersectionPoint();
-////				IntersectionPoint before = allNbrs.getFirst();
-////				if(orientedList.getLast() == lastOrientedPoint && orientedList.size() > 1){
-////					sameNbr = true;
-////				}
-////				boolean firstPoint = true;
-////				for (IntersectionPoint nonOrientedNbr : allNbrs) {
-////					if(orientedList.getLast() == before && before == nonOrientedNbr && firstPoint == false && !sameNbr){
-////						next = nonOrientedNbr;
-////						angle = 0;
-////						leftOrientation = true;
-////						sameNbr = true;
-////					}
-////					firstPoint = false;
-////					before = nonOrientedNbr;
-////					double[] first = orientedList.getLast().getPoint();
-////					double[] middle = ip.getPoint();
-////					double[] last = nonOrientedNbr.getPoint();
-////					double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
-////					double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
-////					if(first != last && allNbrs.size() > 1 && LineSegmentIntersection.orientation(first, middle, last)){
-////						leftOrientation = true;
-////						if(angle > Math.acos(Rn.innerProduct(a, b))){
-////							angle = Math.acos(Rn.innerProduct(a, b));
-////							next = nonOrientedNbr;
-////						}
-////					}
-////				}
-////				if(!leftOrientation){
-////					angle = Double.MIN_VALUE;
-////
-////					for (IntersectionPoint nonOrientedNbr : allNbrs) {
-////						double[] first = orientedList.getLast().getPoint();
-////						double[] middle = ip.getPoint();
-////						double[] last = nonOrientedNbr.getPoint();
-////						double[] a = Rn.normalize(null, Rn.subtract(null, first, middle));
-////						double[] b = Rn.normalize(null, Rn.subtract(null, last, middle));
-////						if(first != last && allNbrs.size() > 1){
-////							if(angle < Math.acos(Rn.innerProduct(a, b))){
-////								angle = Math.acos(Rn.innerProduct(a, b));
-////								next = nonOrientedNbr;
-////							}
-////						}
-////					}
-////				}
-////				lastOrientedPoint = orientedList.getLast();
-//////				if(!Arrays.equals(next.getPoint(), lastOrientedPoint.getPoint())){
-//////					orientedList.add(next);
-//////				}
-////				orientedList.add(next);
-////			}
-////			IntersectionPoint before = null;
-////			LinkedList<IntersectionPoint> ori = new LinkedList<IntersectionPoint>();
-////			for (IntersectionPoint orientedNbr : orientedList) {
-////				if(before != orientedNbr){
-////					ori.add(orientedNbr);
-////				}
-////				before = ip;
-////			}
-////			if(ori.getLast() == ori.getFirst() && ori.size() > 1){
-////				ori.pollLast();
-////			}
-//////			ori = removeMultiplePoints(ori);
-////			ori.add(ori.getFirst());
-////			ip.setNbrs(ori);
-////		}
-//////		localNbrs = removeDoublePoint(localNbrs);
-////		logger.info("oriented nbrs of ");
-////		for (IntersectionPoint ip : localNbrs) {
-////			logger.info(" ");
-////			logger.info("point = " + Arrays.toString(ip.getPoint()));
-//////			logger.info("ohne remove");
-//////			for (IntersectionPoint nbr : ip.getNbrs()) {
-//////				logger.info(Arrays.toString(nbr.getPoint()));
-//////			}
-////			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
-////			logger.info("mit remove");
-////			for (IntersectionPoint nbr : ip.getNbrs()) {
-////				logger.info(Arrays.toString(nbr.getPoint()));
-////			}
-////		}
-////		logger.info("ENDE");
-////		return localNbrs;
-////	}
-//	
-////	public double det(double[] vec1, double[] vec2){
-////		return vec1[0] * vec2[1] - vec1[1] * vec2[0];
-////	}
-////	
-////	public IntersectionPoint getNextOrientedNbr(IntersectionPoint ip, IntersectionPoint curr, List<IntersectionPoint> Nbrs){
-////		IntersectionPoint next = new IntersectionPoint();
-////		double[] vec1 = Rn.subtract(null, curr.getPoint(), ip.getPoint());
-////		for (IntersectionPoint nbr : Nbrs) {
-////			if(){
-////				
-////			}
-////		}
-////		return null;
-////	}
 	
-	public  LinkedList<IntersectionPoint> makeOrientedNbrs (){
-		for (IntersectionPoint ip : localNbrs) {
-			LinkedList<IntersectionPoint> orientedNbrs = new LinkedList<>();
-			IntersectionPoint curr = ip.getNbrs().getFirst();
-			orientedNbrs.add(curr);
-		}
-//		localNbrs = removeDoublePoint(localNbrs);
-		logger.info("oriented nbrs of ");
-		for (IntersectionPoint ip : localNbrs) {
-			logger.info(" ");
-			logger.info("point = " + Arrays.toString(ip.getPoint()));
-//			logger.info("ohne remove");
-//			for (IntersectionPoint nbr : ip.getNbrs()) {
-//				logger.info(Arrays.toString(nbr.getPoint()));
-//			}
-			ip.setNbrs(removeDoublePoint(ip.getNbrs()));
-			logger.info("mit remove");
-			for (IntersectionPoint nbr : ip.getNbrs()) {
-				logger.info(Arrays.toString(nbr.getPoint()));
-			}
-		}
-		logger.info("ENDE");
-		return localNbrs;
-	}
-	
-	@SuppressWarnings("unused")
-	private static LinkedList<IntersectionPoint> removeDoublePoint(LinkedList<IntersectionPoint> points){
-		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
-		IntersectionPoint prev = null;
-		for (IntersectionPoint ip: points) {
-//			if(prev != null && !(prev.getPoint()[0] == ip.getPoint()[0] && prev.getPoint()[1]  == ip.getPoint()[1])){
-			if(prev == null || !Arrays.equals(prev.getPoint(), ip.getPoint())){
-				newPoints.add(ip);
-				
-			} else {
-				logger.info("REMOVE  " + Arrays.toString(ip.getPoint()));
-			}
-			prev = ip;
-		}
-		return newPoints;
-	}
-	
-	
-	@SuppressWarnings("unused")
-	private static LinkedList<IntersectionPoint> removeMultiplePoints(LinkedList<IntersectionPoint> points){
-		LinkedList<IntersectionPoint> newPoints = new LinkedList<IntersectionPoint>();
-		int index = 0;
-		for (IntersectionPoint ip: points) {
-			LinkedList<IntersectionPoint> restList = getRestList(points, index);
-			boolean isContained = false;
-			for (IntersectionPoint ipRest : restList) {
-				if(Arrays.equals(ip.getPoint(), ipRest.getPoint())){
-					isContained = true;
-				}
-			}
-			if(!isContained){
-				newPoints.add(ip);
-			}
-			index++;
-		}
-		return newPoints;
-	}
-	
-	private static LinkedList<IntersectionPoint> getRestList(LinkedList<IntersectionPoint> list, int index){
-		LinkedList<IntersectionPoint> restList = new LinkedList<IntersectionPoint>();
-		int count = 0;
-		for (IntersectionPoint ip : list) {
-			if(count > index){
-				restList.add(ip);
-			}
-			count++;
-		}
-		return restList;
-	}
 	
 	private boolean isValidBoundaryFaceVertex(IntersectionPoint ip){
-//		if(!isClosedBoundaryPoint(hp.getIntersectionPoint())){
-//			System.err.println("no closed boundary point");
-//		}
-//		else if(!isFaceVertex(hp.getIntersectionPoint())){
-//			System.err.println("no closed boundary point");
-//		}
 		ClosedBoundary cb = ip.getClosedBoundary(ns, dilation);
 		if(isFaceVertex(ip) && (cb == ClosedBoundary.left || cb == ClosedBoundary.lower)){
 			return true;
@@ -923,7 +571,7 @@ public class FaceSetGenerator {
 		return false;
 	}
 	
-	private boolean isValidHalfEdgePoint(IntersectionPoint ip){
+	private boolean isValidIntersectionPoint(IntersectionPoint ip){
 		if(isClosedBoundaryPoint(ip) && !isValidBoundaryFaceVertex(ip)){
 			return false;
 		}
@@ -935,26 +583,23 @@ public class FaceSetGenerator {
 		FaceSet fS = new FaceSet();
 		List<IntersectionPoint> points = new LinkedList<IntersectionPoint>();
 		List<IntersectionPoint> validVerts = new LinkedList<IntersectionPoint>();
-		localNbrs = getLocalNbrs();
-		orientedNbrs = getOrientedNbrs();
+		determineLocalNbrs();
+		determineOrientedNbrs();
 		logger.info("ALL USE#D POINTS");
 
 		logger.info("boundary values " + ns.getBoundaryValuesPastIntersection(dilation));
 		logger.info("closind direction " + ns.getClosingDir());
 		logger.info("closed boundary values " + Arrays.toString(ns.getClosedBoundaryValuesPastIntersection(dilation)));
-		for (IntersectionPoint oriNbr : orientedNbrs) {
-//			log.info("ip " + Arrays.toString(hp.getIntersectionPoint().getPoint()) + " getClosedBoundary " + hp.getIntersectionPoint().getClosedBoundary(ns, dilation));
-//			if(!isClosedBoundaryPoint(hp.getIntersectionPoint())){
-			if(isValidHalfEdgePoint(oriNbr)){
+		for (IntersectionPoint oriNbr : ipList) {
+			if(isValidIntersectionPoint(oriNbr)){
 				validVerts.add(oriNbr);
-//				logger.info("all starting points " + Arrays.toString(oriNbr.getPoint()));
 			}
 			if(!isClosedBoundaryPoint(oriNbr)){
 				points.add(oriNbr);
 				logger.info("all starting points " + oriNbr.toString());
 			}
 		}
-		logger.info("intersections size = " + orientedNbrs.size());
+		logger.info("intersections size = " + ipList.size());
 		double[][] verts = new double[validVerts.size()][2];
 		LinkedList<int[]> faceVerts = new LinkedList<int[]>();
 		int c = 0;

@@ -500,10 +500,10 @@ public class GenerateFaceSetTest {
 		
 		LinkedList<IntersectionPoint> intersections = getCombinatoricCaseUClosed();
 		double dilation = 1000000000.0;
-		FaceSetGenerator gfs = new FaceSetGenerator(openSpindle, dilation, intersections);
-		gfs.setLocalNbrs(intersections);
-		gfs.setOrientedNbrs(intersections);
-		FaceSet fs =  gfs.createFaceSet();
+		FaceSetGenerator fsg = new FaceSetGenerator(openSpindle, dilation, intersections);
+		fsg.determineLocalNbrs();
+		fsg.determineOrientedNbrs();
+		FaceSet fs =  fsg.createFaceSet();
 		int[] face0 = {0, 4, 5, 1};
 		int[]face1 = {0, 3, 4};
 		int[]face2 = {1, 5, 9, 10, 6, 2};
@@ -521,6 +521,10 @@ public class GenerateFaceSetTest {
 		Assert.assertArrayEquals(face6, fs.getFaces()[6]);
 		Assert.assertArrayEquals(face7, fs.getFaces()[7]);
 	}
+	
+	
+	
+
 
 	
 }

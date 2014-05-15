@@ -541,11 +541,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				for (IntersectionPoint ip : intersections) {
 					logger.info(ip.toString());
 				}
-				FaceSetGenerator gfs = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
+				FaceSetGenerator fsg = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
 				double lastTimeBentley = System.currentTimeMillis();
 				logger.info("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
-				FaceSet fs = gfs.createFaceSet();
+				FaceSet fs = fsg.createFaceSet();
 				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];
 					activeNurbsSurface.getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);

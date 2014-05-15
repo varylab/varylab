@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
+import java.util.Arrays;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
@@ -343,6 +345,27 @@ public class NurbsDeformationTools {
 		deformNs.setControlMesh(cmDeform);
 		System.out.println(deformNs.toString());
 		return deformNs;
+		
+	}
+	
+	public static double[] getMiddle(double[] a, double[] b){
+		return Rn.times(null, 0.5, Rn.add(null, a, b));
+	}
+	
+	public static double[] rot(double[] vec, double angle){
+		double[] rot = new double[2];
+		rot[0] = Math.cos(angle) * vec[0] - Math.sin(angle) * vec[1];
+		rot[1] = Math.sin(angle) * vec[0] + Math.cos(angle) * vec[1];
+		return rot;
+	}
+	
+	
+	public static void main(String[] args){
+		double angle = -2.0 * Math.PI / 3.0;
+		double[] vec = {0,1};
+		double[] rot = rot(vec, angle);
+		System.out.println(Arrays.toString(rot));
+		System.out.println("middle = " + Arrays.toString(getMiddle(vec, rot)));
 		
 	}
 }
