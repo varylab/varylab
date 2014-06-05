@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedgetools.functional.DomainValue;
+import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.functional.Gradient;
+import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.jpetsc.Mat;
 import de.jtem.jpetsc.PETSc;
 import de.jtem.jpetsc.Vec;
@@ -16,20 +20,19 @@ import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.optimization.tao.TaoDomainValue;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
 import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
 import de.varylab.varylab.optimization.tao.TaoUtility;
 
-public class VaryLabFunctional {
+public class VaryLabFunctional implements Functional<VVertex, VEdge, VFace> {
 
 	private List<Functional<VVertex, VEdge, VFace>>
 		funList = null;
 	private Map<Functional<?, ?, ?>, Double> 
 		coeffs = null;
 	private TaoEnergy 
-		E2 = null;
+		E2 = new TaoEnergy();
 	private TaoGradient 
 		G2 = null;
 	private TaoHessian
@@ -46,32 +49,33 @@ public class VaryLabFunctional {
 	
 	public void initializeTaoVectors(VHDS hds) {
 		int dim = getDimension(hds);
-		E2 = new TaoEnergy();
-		Vec gVec = new Vec(dim);
-		G2 = new TaoGradient(gVec);
+		if (hasGradient()) {
+			Vec gVec = new Vec(dim);
+			G2 = new TaoGradient(gVec);
+		}
+		if (hasHessian()) {
+			int[] taonzp = TaoUtility.getPETScNonZeros(hds, this);
+			Mat hMat = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, taonzp);
+			H2 = new TaoHessian(hMat);
+		}
 	}
 	
 	
-	public void evaluate(VHDS hds, TaoDomainValue x, TaoEnergy E, TaoGradient G, TaoHessian H) {
-		int dim = getDimension(hds);
+	public <
+		HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>
+	>  void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
 		if (E != null) E.setZero();
 		if (G != null) G.setZero();
-		if (H != null) {
-			H.setZero();
-			if (H2 == null) {
-				int[] taonzp = TaoUtility.getPETScNonZeros(hds, this);
-				Mat hMat = Mat.createSeqAIJ(dim, dim, PETSc.PETSC_DEFAULT, taonzp);
-				H2 = new TaoHessian(hMat);
-			}
-		}
+		if (H != null) H.setZero();
 		for (Functional<VVertex, VEdge, VFace> fun : funList) {
 			Double coeff = coeffs.get(fun);
 			if (coeff == null || coeff == 0.0) continue;
-			E2.setZero();
-			G2.setZero();
 			TaoEnergy ener = E == null ? null : E2;
 			TaoGradient grad = G == null ? null : G2;
 			TaoHessian hess = H == null ? null : H2;
+			if (ener != null) ener.setZero();
+			if (grad != null) grad.setZero();
+			if (hess != null) hess.setZero();
 			fun.evaluate(hds, x, ener, grad, hess);
 			if (ener != null) {
 				E.add(coeff * ener.get());
@@ -122,6 +126,14 @@ public class VaryLabFunctional {
 		return patArr;
 	}
 	
+	
+	public boolean hasGradient() {
+		boolean hasGradient = true;
+		for (Functional<VVertex, VEdge, VFace> fun : funList) {
+			hasGradient &= fun.hasGradient();
+		}
+		return hasGradient;
+	}
 	
 	public boolean hasHessian() {
 		boolean hasHessian = true;
