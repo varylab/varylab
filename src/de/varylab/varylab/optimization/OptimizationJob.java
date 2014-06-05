@@ -87,7 +87,7 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 			case KT:
 				Mat H = null;
 				if (!functional.hasHessian()) {
-					log.warning("using finite difference for Hessian calculation, this can be very slow.");
+					log.warning("using finite differences for Hessian calculation, this can be very slow.");
 					H = new Mat(dim, dim);
 				} else {
 					int[] nnz = TaoUtility.getPETScNonZeros(hds, functional);
