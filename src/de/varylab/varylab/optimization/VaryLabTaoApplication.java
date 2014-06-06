@@ -2,6 +2,7 @@ package de.varylab.varylab.optimization;
 
 import static de.jtem.halfedgetools.functional.FunctionalUtils.calculateFDGradient;
 import static de.jtem.halfedgetools.functional.FunctionalUtils.calculateFDHessian;
+import static de.varylab.varylab.plugin.smoothing.LaplacianSmoothing.smoothCombinatorially;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +23,6 @@ import de.varylab.varylab.optimization.tao.TaoDomainValue;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
 import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
-import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess {
 
@@ -51,10 +51,6 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 		}
 	}
 
-	private void applySmoothing(DomainValue x) {
-		LaplacianSmoothing.smoothCombinatorially(hds, new AdapterSet(new VertexDomainValueAdapter(x)), true);
-	}
-
 	@Override
 	public double evaluateObjectiveAndGradient(Vec x, Vec g) {
 		TaoDomainValue u = new TaoDomainValue(x);
@@ -69,7 +65,10 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 			applyConstraints(u, G, null);
 		}
 		g.assemble();
-		if(smoothing) applySmoothing(u);
+		if(smoothing) {
+			AdapterSet a = new AdapterSet(new VertexDomainValueAdapter(u));
+			smoothCombinatorially(hds, a, true);
+		}
 		return E.get();
 	}
 
