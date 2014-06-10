@@ -94,6 +94,9 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	
 	private ShrinkPanel
 		infoPanel = new ShrinkPanel("Mesh parameters");
+	
+	private boolean
+		loading = false;
 
 	public NurbsIOPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -185,6 +188,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			loading = true;
 			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			chooser.setDialogTitle("Import Into Layer");
 			int result = chooser.showOpenDialog(w);
@@ -214,6 +218,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
 						NurbsSurfaceUtility.addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
+
 						uModel.setValue(npp.getU());
 						vModel.setValue(npp.getV());
 					}
@@ -262,7 +267,9 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+				loading = false;
 			}
+			loading = false;
 		}
 		
 		private class NurbsParameterPanel extends JPanel {
@@ -469,7 +476,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(activeNurbsAdapter != null) {
+		if(!loading && (activeNurbsAdapter != null)) {
 			NurbsSurfaceUtility.addNurbsMesh(activeNurbsAdapter.getSurface(), hif.getActiveLayer(),uModel.getNumber().intValue(),vModel.getNumber().intValue());
 		}
 	}
