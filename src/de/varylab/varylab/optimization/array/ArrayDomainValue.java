@@ -2,6 +2,7 @@ package de.varylab.varylab.optimization.array;
 
 import java.util.Arrays;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedgetools.functional.DomainValue;
 
 public class ArrayDomainValue implements DomainValue {
@@ -26,6 +27,11 @@ public class ArrayDomainValue implements DomainValue {
 	@Override
 	public void add(int i, double value) {
 		vec[i] += value;
+	}
+	
+	@Override
+	public void add(double coeff, DomainValue x) {
+		Rn.add(vec, vec, ((ArrayDomainValue)x).vec);
 	}
 
 	@Override

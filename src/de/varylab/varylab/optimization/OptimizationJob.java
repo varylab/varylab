@@ -5,6 +5,7 @@ import static de.jtem.jpetsc.PETSc.PETSC_DEFAULT;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jpetsc.Mat;
@@ -20,6 +21,8 @@ import de.varylab.varylab.optimization.util.PetscTaoUtility;
 
 public class OptimizationJob extends AbstractOptimizationJob implements TaoMonitor {
 
+	private Logger
+		log = Logger.getLogger(OptimizationJob.class.getName());
 	private VHDS
 		hds = null;
 	private HalfedgeLayer
@@ -76,22 +79,23 @@ public class OptimizationJob extends AbstractOptimizationJob implements TaoMonit
 			x.setValue(v.getIndex() * 3 + 2, P[2] / P[3], INSERT_VALUES);
 		}
 		app.setInitialSolutionVec(x);
-		if (functional.hasHessian()) {
-			int[] nnz = TaoUtility.getPETScNonZeros(hds, functional);
-			Mat H = Mat.createSeqAIJ(dim, dim, PETSC_DEFAULT, nnz);
-			H.assemble();
-			app.setHessianMat(H, H);
-		} else {
-			switch (method) {
+		switch (method) {
 			case NLS:
 			case NTR:
 			case GPCG:
 			case BQPIP:
 			case KT:
-				throw new RuntimeException("Cannot use method " + method.getName() + " without Hessian matrix");
+				Mat H = null;
+				if (!functional.hasHessian()) {
+					log.warning("using finite differences for Hessian calculation, this can be very slow.");
+					H = new Mat(dim, dim);
+				} else {
+					int[] nnz = TaoUtility.getPETScNonZeros(hds, functional);
+					H = Mat.createSeqAIJ(dim, dim, PETSC_DEFAULT, nnz);
+				}
+				H.assemble();
+				app.setHessianMat(H, H);
 			default:
-				break;
-			}
 		}
 		app.setSmoothingEnabled(smoothingEnabled);
 		app.setConstraints(costraints);

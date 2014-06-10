@@ -20,6 +20,13 @@ public class TaoDomainValue implements DomainValue {
 	public void add(int i, double value) {
 		u.add(i, value);
 	}
+	
+	@Override
+	public void add(double coeff, DomainValue x) {
+		for (int i = 0; i < u.getSize(); i++) {
+			u.add(i, x.get(i));
+		}
+	}
 
 	@Override
 	public void set(int i, double value) {
