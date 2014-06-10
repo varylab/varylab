@@ -1,5 +1,9 @@
 package de.varylab.varylab.optimization;
 
+import static de.jtem.halfedgetools.functional.FunctionalUtils.calculateFDGradient;
+import static de.jtem.halfedgetools.functional.FunctionalUtils.calculateFDHessian;
+import static de.varylab.varylab.plugin.smoothing.LaplacianSmoothing.smoothCombinatorially;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +23,6 @@ import de.varylab.varylab.optimization.tao.TaoDomainValue;
 import de.varylab.varylab.optimization.tao.TaoEnergy;
 import de.varylab.varylab.optimization.tao.TaoGradient;
 import de.varylab.varylab.optimization.tao.TaoHessian;
-import de.varylab.varylab.plugin.smoothing.LaplacianSmoothing;
 
 public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCombinedObjectiveAndGrad, TaoAppAddHess {
 
@@ -48,30 +51,38 @@ public class VaryLabTaoApplication extends TaoApplication implements TaoAppAddCo
 		}
 	}
 
-	private void applySmoothing(DomainValue x) {
-		LaplacianSmoothing.smoothCombinatorially(hds, new AdapterSet(new VertexDomainValueAdapter(x)), true);
-	}
-
-	
 	@Override
 	public double evaluateObjectiveAndGradient(Vec x, Vec g) {
 		TaoDomainValue u = new TaoDomainValue(x);
 		TaoGradient G = new TaoGradient(g);
 		TaoEnergy E = new TaoEnergy();
-		fun.evaluate(hds, u, E, G, null);
-		applyConstraints(u, G, null);
-		if(smoothing) applySmoothing(u);
+		if (fun.hasGradient()) {
+			fun.evaluate(hds, u, E, G, null);
+			applyConstraints(u, G, null);
+		} else {
+			fun.evaluate(hds, u, E, null, null);
+			calculateFDGradient(hds, fun, getDomainDimension(), u, G, 1E-5);
+			applyConstraints(u, G, null);
+		}
 		g.assemble();
+		if(smoothing) {
+			AdapterSet a = new AdapterSet(new VertexDomainValueAdapter(u));
+			smoothCombinatorially(hds, a, true);
+		}
 		return E.get();
 	}
 
 	@Override
-	public PreconditionerType evaluateHessian(Vec x, Mat H, Mat Hpre) {
+	public PreconditionerType evaluateHessian(Vec x, Mat h, Mat hpre) {
 		TaoDomainValue u = new TaoDomainValue(x);
-		TaoHessian taoHess = new TaoHessian(H);
-		fun.evaluate(hds, u, null, null, taoHess);
-		applyConstraints(u, null, taoHess);
-		H.assemble();
+		TaoHessian H = new TaoHessian(h);
+		if (fun.hasHessian()) {
+			fun.evaluate(hds, u, null, null, H);
+		} else {
+			calculateFDHessian(hds, fun, getDomainDimension(), u, H, 1E-2);
+		}
+		applyConstraints(u, null, H);
+		h.assemble();
 		return PreconditionerType.SAME_NONZERO_PATTERN;
 	}
 

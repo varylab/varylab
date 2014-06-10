@@ -28,7 +28,6 @@ public class LineSegment {
 		segment = s;
 		indexOnCurve = iOC;
 		curveIndex = cI;
-//		shiftedIndex = cI;
 	}
 	
 	public static enum PointStatus {

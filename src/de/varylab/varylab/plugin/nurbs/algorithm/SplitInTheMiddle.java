@@ -4,10 +4,12 @@ package de.varylab.varylab.plugin.nurbs.algorithm;
 import java.awt.GridLayout;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -98,6 +100,8 @@ public class SplitInTheMiddle extends AlgorithmDialogPlugin {
 			dir = true;
 		}
 		NURBSSurface[] surfs = NurbsDeformationTools.splitInTheMiddle(targetSurface, dir);
+		System.out.println("splitInTheMiddle");
+		System.out.println(surfs[0].toObj());
 		HalfedgeLayer hel1 = new HalfedgeLayer(hi);
 		hel1.setName("surface 1");
 		HalfedgeLayer hel2 = new HalfedgeLayer(hi);

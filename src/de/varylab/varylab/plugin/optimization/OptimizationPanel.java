@@ -97,7 +97,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		fixZChecker = new JCheckBox("Z"),
 		tangentialConstraintChecker = new JCheckBox("Tangential"),
 		smoothGradientChecker = new JCheckBox("Smooth Gradient"),
-		smoothSurfaceChecker = new JCheckBox("SmoothSurface"); 
+		smoothSurfaceChecker = new JCheckBox("SmoothSurface"),
+		updateGeometryChecker = new JCheckBox("Live Geometry Updates");
 	
 	private SpinnerNumberModel
 		accuracyModel = new SpinnerNumberModel(-8, -20, -1, -1),
@@ -149,7 +150,8 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		shrinkPanel.add(new JLabel("Iterations"), gbc1);
 		shrinkPanel.add(maxIterationSpinner, gbc2);
 		shrinkPanel.add(new JLabel("Method"), gbc1);
-		shrinkPanel.add(methodCombo, gbc2);		
+		shrinkPanel.add(methodCombo, gbc2);	
+		shrinkPanel.add(updateGeometryChecker, gbc2);
 		
 		shrinkPanel.add(buttonPanel, gbc2);
 		buttonPanel.setLayout(new GridLayout(1, 2, 2, 2));
@@ -226,6 +228,10 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 				protocol.add(op.getIterationProtocol(solution, job.getHDS()));
 			}
 			protocolPanel.appendIterationProtocol(protocol);
+		}
+		if (updateGeometryChecker.isSelected()) {
+			CoordinateArrayAdapter a = new CoordinateArrayAdapter(solution, 1.0);
+			job.getSourceLayer().updateGeometryNoUndo(a);
 		}
 	}
 	
