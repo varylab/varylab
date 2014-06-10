@@ -2,22 +2,16 @@ package de.varylab.varylab.plugin.nurbs;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
-import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.GluedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.FaceVertex;
+import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint.GluedBoundary;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
-import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
-import de.varylab.varylab.plugin.nurbs.math.CurveType;
 import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
-import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.startup.StaticSetup;
 
 public class FaceSetGenratorTest {

@@ -91,12 +91,16 @@ public class RodDistanceFunctional implements Functional<VVertex, VEdge, VFace> 
 	}
 
 	@Override
-	public int getDimension(HalfEdgeDataStructure hds) {
+	public <
+		HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>
+	> int getDimension(HDS hds) {
 		return 3*hds.numVertices();
 	}
-
+	
 	@Override
-	public int[][] getNonZeroPattern(HalfEdgeDataStructure hds) {
+	public <
+		HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>
+	> int[][] getNonZeroPattern(HDS hds) {
 		return null;
 	}
 
