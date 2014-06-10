@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -321,15 +322,15 @@ public class NurbsIO {
 			for (int i = 0; i < U.length; i++) {
 				U[i] = surfKnotU.get(i);
 			}
-//			System.out.println("U  = " + Arrays.toString(U));
+			System.out.println("U  = " + Arrays.toString(U));
 			for (int i = 0; i < V.length; i++) {
 				V[i] = surfKnotV.get(i);
 			}
-//			System.out.println("V  = " + Arrays.toString(V));
+			System.out.println("V  = " + Arrays.toString(V));
 			int p = d[1];
-//			System.out.println("p = " + p);
+			System.out.println("p = " + p);
 			int q = d[0];
-//			System.out.println("q = "+ q);
+			System.out.println("q = "+ q);
 			int n = U.length - p - 1;
 			int m = V.length - q - 1;
 			double[][][] controlMesh = new double[n][m][4];

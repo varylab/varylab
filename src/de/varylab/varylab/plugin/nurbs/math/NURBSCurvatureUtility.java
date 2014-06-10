@@ -246,11 +246,6 @@ public class NURBSCurvatureUtility {
 			w[1][0] = 0;
 			w[1][1] = 1;
 		}
-		// only TEST
-		// logger.info("call getEigenvector");
-		// w[0] = getEigenvector(W, lambda);
-		// w[1] = getEigenvector(W, my);
-		// end TEST
 		double[][] e = new double[2][3];
 		Rn.add(e[0], Rn.times(null, w[0][0], SKL[1][0]),
 				Rn.times(null, w[0][1], SKL[0][1]));
@@ -260,10 +255,16 @@ public class NURBSCurvatureUtility {
 		// in the basis Su, Sv
 		Rn.times(w[0], 1 / Math.sqrt(Rn.innerProduct(e[0], e[0])), w[0]);
 		Rn.times(w[1], 1 / Math.sqrt(Rn.innerProduct(e[1], e[1])), w[1]);
-		// if(!isPosOriented(w[0], w[1])){
-		// Rn.times(w[1], -1, w[1]);
-		// Rn.times(e[1], -1, e[1]);
-		// }
+		if(!isPosOriented(w[0], w[1])){
+			Rn.times(w[0], -1, w[0]);
+			Rn.times(e[0], -1, e[0]);
+		 }
+	
+//		if(w[0][0] * w[1][1] - w[1][0] * w[0][1] < 0){
+////			System.out.println("flip to orientation");
+//			Rn.times(w[0], -1, w[0]);
+//			Rn.times(e[0], -1, e[0]);
+//		}
 
 		dG.setPrincipalDirections(w);
 		Rn.normalize(e[0], e[0]);
@@ -272,7 +273,6 @@ public class NURBSCurvatureUtility {
 		return dG;
 	}
 
-	@SuppressWarnings("unused")
 	private static boolean isPosOriented(double[] w1, double[] w2) {
 		double det = w1[0] * w2[1] - w2[0] * w1[1];
 		if (det < 0) {

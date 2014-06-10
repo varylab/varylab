@@ -25,14 +25,12 @@ public class IntegralCurve {
 	private double u0, um, v0, vn;
 	private ClosingDir closingDirection = null;
 	List<LineSegment> boundary;
-	double[] prevW1 = null;
-	double[] prevW2 = null;
 	double[][] basis;
 	private double tol;
 	private CurveType curveType = CurveType.CURVATURE;
-//	private double angle = 1000000;
 	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
 	private double[] vecField = null;
+	
 	
 	
 	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance, SymmetricDir sd, double[] vf){
@@ -68,7 +66,7 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-	public double[] getSymConjDirSurfaceOfRevolution(double[] p) {
+	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
 		double[] dir = {1,1};
 		if(!ns.isSurfaceOfRevolution()){
 			return dir;
@@ -81,8 +79,6 @@ public class IntegralCurve {
 			double K = ci.getGaussCurvature();
 			if(K >= 0){
 				dir[0] = Math.sqrt(n / l);
-//				logger.info("Math.sqrt(n / l) = " + dir[0]);
-//				basis = ci.getPrincipalDirections();
 				return dir;
 				
 			}
@@ -105,6 +101,9 @@ public class IntegralCurve {
 	
 	public double[] getSymConjDirWRTCuvatureDirection(double[] point) {
 	double[] dir = {1,1};
+	if(ns.isSurfaceOfRevolution()){
+		return getSymConjDirSurfaceOfRevolution(point);
+	}
 	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
 	double[] w1 = ci.getPrincipalDirections()[0];
 	double[] w2 = ci.getPrincipalDirections()[1];
@@ -112,14 +111,6 @@ public class IntegralCurve {
 		if(K > 0){
 			double k1 = ci.getMinCurvature();
 			double k2 = ci.getMaxCurvature();
-		if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-			flip(w1);
-		}
-		prevW1 = w1;
-		if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-			flip(w2);
-		}
-		prevW2 = w2;
 		double theta;
 		if(k2 == 0){
 			theta = Math.PI / 2.;
@@ -163,14 +154,6 @@ public class IntegralCurve {
 			else{
 				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
 			}
-			if(prevW1 != null && Rn.innerProduct(prevW1, w1) < 0){
-				flip(w1);
-			}
-			prevW1 = w1;
-			if(prevW2 != null && Rn.innerProduct(prevW2, w2) < 0){
-				flip(w2);
-			}
-			prevW2 = w2;
 			double theta;
 			if(k2 == 0){
 				theta = Math.PI / 2.;
@@ -243,12 +226,7 @@ public class IntegralCurve {
 	private double[] getConjugateVecField(double[] p, boolean conj) {
 		double[] vec = vecField;
 		if(symDir == SymmetricDir.CURVATURE){
-//			if(ns.isSurfaceOfRevolution()){
-//				vec = getSymConjDirSurfaceOfRevolution(p);
-//			}
-//			else{
 				vec = getSymConjDirWRTCuvatureDirection(p);
-//			}
 		}
 		else if(symDir == SymmetricDir.DIRECTION){
 			vec = getSymConjDirWRTDirection(p);
@@ -266,15 +244,6 @@ public class IntegralCurve {
 			return vec;
 		}
 	}
-	
-//	private double[] getConjugateVecFieldWRTCurvatureDirection(double[] p, boolean conj) {
-//		double[] vec = getSymmetricConjugateDirectionWRTCurvatureDirection(p);
-//		if(conj){
-//				return getConj(vec, p);
-//		}else{
-//			return vec;
-//		}
-//	}
 	
 	public boolean pointIsInU(double[] point){
 		if(point[0] < u0 || point[0] > um){
@@ -303,16 +272,12 @@ public class IntegralCurve {
 		}
 		if(closingDirection == ClosingDir.uClosed){
 			if(point[1] > vn || point[1] < v0){
-//				logger.info("in pointIsOutsideOfExtendedDomain uClosed, this means: point[1] > vn || point[1] < v0)");
-//				logger.info("and point[1] = " + point[1]);
 				return true;
 			}
 			return false;
 		}
 		if(closingDirection == ClosingDir.vClosed){
 			if(point[0] > um || point[0] < u0){
-//				logger.info("in pointIsOutsideOfExtendedDomain vClosed, this means: point[0] > um || point[0] < u0");
-//				logger.info("and point[0] = " + point[0]);
 				return true;
 			}
 			return false;
@@ -413,10 +378,6 @@ public class IntegralCurve {
 	}
 	
 	private double[] boundaryIntersection(LineSegment seg, List<LineSegment> boundary){
-//		logger.info("in boundary intersection the boundary:");
-//		for (LineSegment ls : boundary) {
-//			logger.info(ls.toString());
-//		}
 		double minDist = Double.MAX_VALUE;
 		double[] intersection = null;
 		for (LineSegment lS : boundary) {
@@ -734,31 +695,18 @@ public class IntegralCurve {
 		return null;
 	}
 	
-//	private double[] getVecFieldWRTCurvaturDirection(double[] p, boolean firstVecField, VecFieldCondition vfc){
-//		if(vfc == VecFieldCondition.conjugate){
-//			return getConjugateVecFieldWRTCurvatureDirection(p, firstVecField);
-//		}
-//		if(vfc == VecFieldCondition.curvature){
-//			return getMaxMinCurv(p, firstVecField);
-//		}
-//		return null;
-//	}
-	
-	
 	
 	public IntObjects rungeKutta(double[] startPoint, boolean secondOrientation, boolean firstVectorField, List<double[]> singularities, double minSigularityDistance) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
-	//	double[] b = { 0, 0.5, 0.75, 1 };
-	//	double[][] A =	{{0,0,0,0,0,0,0},{1/5.,0,0,0,0,0,0},{3/40.,9/40.,0,0,0,0,0},{44/45.,-56/15.,32/9.,0,0,0,0},{19372/6561.,-25360/2187.,64448/6561.,-212/729.,0,0,0},{9017/3168.,-355/33.,46732/5247.,49/176.,-5103/18656.,0,0},{35/384.,	0, 500/1113., 125/192., -2187/6784., 11/84.,0}};
-	//	double[] c1 = {35/384., 0, 500/1113., 125/192., -2187/6784., 11/84.,	0 };
-	//	double[] c2 = {5179/57600., 0, 7571/16695., 393/640.,	-92097/339200., 187/2100., 1/40.};
-	// double[] b = { 0,1/5., 3/10.,4/5.,8/9.,1,1 };
+//		double[][] A =	{{0,0,0,0,0,0,0},{1/5.,0,0,0,0,0,0},{3/40.,9/40.,0,0,0,0,0},{44/45.,-56/15.,32/9.,0,0,0,0},{19372/6561.,-25360/2187.,64448/6561.,-212/729.,0,0,0},{9017/3168.,-355/33.,46732/5247.,49/176.,-5103/18656.,0,0},{35/384.,	0, 500/1113., 125/192., -2187/6784., 11/84.,0}};
+//		double[] c1 = {35/384., 0, 500/1113., 125/192., -2187/6784., 11/84.,	0 };
+//		double[] c2 = {5179/57600., 0, 7571/16695., 393/640.,	-92097/339200., 187/2100., 1/40.};
+//	 	double[] b = { 0,1/5., 3/10.,4/5.,8/9.,1,1 };
+//		System.out.println("START IN RUNGE KUTTA");
 		double tau;
 		double etha;
-		prevW1 = null;
-		prevW2 = null;
 		int counter = 0;
 		double[] initialValue = startPoint.clone();
 		LinkedList<double[]> pointList = new LinkedList<double[]>();
@@ -771,9 +719,7 @@ public class IntegralCurve {
 		double[] orientation = new double[2];
 		if (!secondOrientation) {
 			orientation = getVecField(initialValue, firstVectorField, curveType);
-			
 		} else {
-			
 			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, curveType));
 		}
 		boolean nearBy = false;
@@ -782,7 +728,6 @@ public class IntegralCurve {
 		LineSegment seg = new LineSegment();
 	
 		while (!nearBy && counter < 10000) {
-
 			counter++;
 			if(counter == 10000){
 				logger.info("termination after 10000 steps");
@@ -805,15 +750,11 @@ public class IntegralCurve {
 				if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
 					pointList = setIntoDomain(pointList);
 					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//					for (double[] p : intObj.getPoints()) {
-		//				System.out.println(Arrays.toString(p));
-//					}
 					return intObj;
 				}
 				k[l] = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, curveType);
 				k[l] = getContinuousNormalizedVectorField(orientation, k[l]);		
 			}
-			
 			double[] Phi1 = new double[2];
 			double[] Phi2 = new double[2];
 			for (int l = 0; l < c1.length; l++) {
@@ -823,7 +764,6 @@ public class IntegralCurve {
 			tau = Rn.euclideanNorm(Rn.subtract(null, Phi2, Phi1));
 			etha = Rn.euclideanNorm(last) + 1;
 			if(tau <= tol * etha){
-//				logger.info("nicht nachregeln");
 				double[] next = new double[2];
 				Rn.add(next, last, Rn.times(null, h, Phi1));
 				if(terminationConditionForPoints(next, pointList, boundary)){
@@ -837,22 +777,14 @@ public class IntegralCurve {
 					pointList.add(next);
 				}
 			}
-//			else{
-//				double hOld = h;
-//				h = h * Math.sqrt(tol * etha / tau);
-//				if(h > maxDist){
-//					h = hOld;
-//				}
-//			}
 			if ((tau <= tol * etha / 2 || tau >= tol * etha)) {
-	//			logger.info("nachregeln");
-				double hOld = h;
+				double[] next = new double[2];
+				Rn.add(next, last, Rn.times(null, h, Phi1));
 				h = h * (tol * etha / tau);
 				if(h > maxDist){
-					h = hOld;
+					h = maxDist;
 				}
 			}
-			
 			if(pointList.size() == 2){
 				vec1 = Rn.subtract(null, pointList.getLast(), pointList.getFirst());
 			}
@@ -921,6 +853,7 @@ public class IntegralCurve {
 				logger.info("termination after 2000 steps");
 			}
 	//		logger.info("THE POINT " + Arrays.toString(pointList.getLast()));
+			System.out.println("h = " + h);
 			double[] last = pointList.getLast().clone();
 			double[] sumA = new double[2];
 			double[][] k = new double[c1.length][2];
@@ -976,7 +909,6 @@ public class IntegralCurve {
 				}
 			}
 			if ((tau <= tol * etha / 2 || tau >= tol * etha)) {
-	//			logger.info("nachregeln");
 				double hOld = h;
 				h = h * (tol * etha / tau);
 				if(h > maxDist){
@@ -991,8 +923,6 @@ public class IntegralCurve {
 				double[][] lastSegment = new double[2][2];
 				lastSegment[1] = pointList.pollLast();
 				lastSegment[0] = pointList.getLast();
-	//			lastSegment[1] = getPointInOriginalDomain(pointList.pollLast().clone());
-	//			lastSegment[0] = getPointInOriginalDomain(pointList.getLast().clone());
 				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
 				seg.setSegment(lastSegment);
 				dist = distLineSegmentPoint(startPoint, seg);
@@ -1026,129 +956,18 @@ public class IntegralCurve {
 
 
 	
-//	private IntObjects rungeKuttaFixedStep(double[] startPoint, boolean secondOrientation, boolean firstVectorField, List<double[]> singularities, double minSigularityDistance) {
-//		int counter = 0;
-//		double[] initialValue = startPoint.clone();
-//		LinkedList<double[]> pointList = new LinkedList<double[]>();
-//		double h = Math.max(um - u0, vn - v0) / 500.;
-//		double [] vec1 = new double[2];
-//		double [] vec2 = new double[2];
-//		boolean closed = false;
-//		pointList.add(initialValue);
-//		double[] orientation = new double[2];
-//		if (!secondOrientation) {
-////			orientation = getConjugateVecField(initialValue, firstVectorField);
-//			orientation = getVecField(initialValue, firstVectorField, vfc);
-//		} else {
-//			orientation = Rn.times(null, -1, getVecField(initialValue, firstVectorField, vfc));
-//		}
-//		boolean nearBy = false;
-//		double dist;
-//		double[] ori = orientation;
-//		LineSegment seg = new LineSegment();
-//	
-//		while (!nearBy && counter < 2000) {
-//			counter++;
-//			if(counter == 2000){
-//				logger.info("termination after 2000 steps");
-//			}
-//			logger.info("THE POINT " + Arrays.toString(pointList.getLast()));
-//			double[] k1 = new double[2];
-//			double[] k2 = new double[2];
-//			double[] k3 = new double[2];
-//			double[] last = pointList.getLast().clone();
-//			double[] vectorfieldPoint = new double[2];
-//			// the current point is in the extended domain!!!
-//			k1 = getVecField(getPointInOriginalDomain(last), firstVectorField, vfc);
-//			k1 = getContinuousNormalizedVectorField(orientation, k1);		
-//			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.5 * h, k1));
-//			
-//			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
-//				pointList = setIntoDomain(pointList);
-//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//				return intObj;
-//			}
-//			
-//			k2 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
-//			k2 = getContinuousNormalizedVectorField(orientation, k2);	
-//			Rn.add(vectorfieldPoint, last, Rn.times(null, 0.75 * h, k2));
-//			
-//			if(terminationConditionForVectorfieldPoints(vectorfieldPoint, pointList, boundary)){
-//				pointList = setIntoDomain(pointList);
-//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//				return intObj;
-//			}
-//			k3 = getVecField(getPointInOriginalDomain(vectorfieldPoint), firstVectorField, vfc);
-//			k3 = getContinuousNormalizedVectorField(orientation, k3);
-//			
-//			double[] next = Rn.add(null, last, Rn.times(null, h, Rn.add(null, Rn.times(null, 2.0 / 9.0, k1), Rn.add(null, Rn.times(null, 1.0 / 3.0, k2), Rn.times(null, 4.0 / 9.0, k3)))));
-////			double[] next = Rn.add(null, last, Rn.times(null, h, k1));
-//			if(terminationConditionForPoints(next, pointList, boundary)){
-//				pointList = setIntoDomain(pointList);
-//				IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//				return intObj;
-//			}
-//			Rn.subtract(orientation, next, pointList.getLast());
-//			pointList.add(next);
-//			
-//			if(pointList.size() == 2){
-//				vec1 = Rn.subtract(null, pointList.getLast(), pointList.getFirst());
-//			}
-//			if(pointList.size() > 2){
-//				double[][] lastSegment = new double[2][2];
-//				lastSegment[1] = pointList.pollLast();
-//				lastSegment[0] = pointList.getLast();
-//				vec2 = Rn.subtract(null, lastSegment[1], lastSegment[0]);
-//				seg.setSegment(lastSegment);
-//				dist = distLineSegmentPoint(startPoint, seg);
-//				if(Rn.innerProduct(vec1, vec2) < 0){
-//					closed = true;
-//				}
-//				if(dist < minSigularityDistance && closed){
-//					nearBy = true;
-//					logger.info("closed");
-//					pointList = setIntoDomain(pointList);
-//					IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-//					return intObj;
-//				}
-//				else{
-//					pointList.add(lastSegment[1]);
-//				}
-//			}
-//			
-//		}
-////		logger.info("u.size() " + pointList.size());
-//		pointList = setIntoDomain(pointList);
-//		IntObjects intObj = new IntObjects(pointList, ori, nearBy, firstVectorField);
-////		logger.info("letzter Punkt:"+Arrays.toString(intObj.getPoints().getLast()));
-//		return intObj;
-//	}
-	
-	
-
-	
 	private ValidSegment isValidSegemnt(double[][] seg, int rightShift, int upShift){
 		ValidSegment vs = new ValidSegment();
 		vs.setValid(false);
 		if (seg[0][0] == u0 && seg[1][0] == um){
-//			logger.info("leftShift");
-//			logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 			rightShift--;
 		} else if (seg[0][0] == um && seg[1][0] == u0){
-//			logger.info("rightShift");
-//			logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 			rightShift++;
 		} else if (seg[0][1] == v0 && seg[1][1] == vn){
-//			logger.info("downShift");
-//			logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 			upShift--;
 		} else if (seg[0][1] == vn && seg[1][1] == v0){
-//			logger.info("upShift");
-//			logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 			upShift++;
 		} else if (seg[0][0] == seg[1][0] && seg[0][1] == seg[1][1]){
-//			logger.info("not valid segment w.r.t. equal endpoints");
-//			logger.info("seg = " + Arrays.toString(seg[0]) + " " + Arrays.toString(seg[1]));
 		} else {
 			vs.setValid(true);
 		}
@@ -1199,7 +1018,10 @@ public class IntegralCurve {
 					ls.setCyclic(cyclic);
 					ls.setRightShift(rightShift);
 					ls.setUpShift(upShift);
-					currentSegments.add(ls);
+					if(seg[0][0] != seg[1][0] && seg[1][0] != seg[1][1]){
+						currentSegments.add(ls);
+					}
+					
 					firstcurvePoint = secondCurvePoint;
 				}
 				else{
@@ -1208,14 +1030,6 @@ public class IntegralCurve {
 				}
 			}
 		}
-//		logger.info();
-//		logger.info("in curveLine");
-//		logger.info("firstVectorField = " + firstVectorField);
-//		logger.info("start point = " + Arrays.toString(startPoint));
-//		for (LineSegment ls : currentSegments) {
-//			logger.info(ls.toString());
-//		}
-		
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
 		currentLine.setDescription((firstVectorField?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
 		segments.add(currentLine);
@@ -1225,11 +1039,13 @@ public class IntegralCurve {
 	
 	
 	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, List<double[]> startingPointsUV) {
+		System.out.println();
+		System.out.println("computeIntegralLines");
+		System.out.println();
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
 					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, singularityNeighbourhood);
-					
 				}
 				if (secondVectorField){
 					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, singularityNeighbourhood);

@@ -1,5 +1,7 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
+import java.util.Arrays;
+
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
@@ -198,11 +200,29 @@ public class NurbsDeformationTools {
 		return p3D;
 	}
 	
+	public static double[] getFirst3Comp(double[] p){
+		double[] p3D = new double[3];
+		p3D[0] = p[0];
+		p3D[1] = p[1];
+		p3D[2] = p[2];
+		return p3D;
+	}
+	
 	public static double[][][] get3DControlMesh(double[][][]cm){
 		double[][][] cm3D = new double[cm.length][cm[0].length][3];
 		for (int i = 0; i < cm3D.length; i++) {
 			for (int j = 0; j < cm3D[0].length; j++) {
 				cm3D[i][j] = get3DPoint(cm[i][j]);
+			}
+		}
+		return cm3D;
+	}
+	
+	public static double[][][] get3CompControlMesh(double[][][]cm){
+		double[][][] cm3D = new double[cm.length][cm[0].length][3];
+		for (int i = 0; i < cm3D.length; i++) {
+			for (int j = 0; j < cm3D[0].length; j++) {
+				cm3D[i][j] = getFirst3Comp(cm[i][j]);
 			}
 		}
 		return cm3D;
@@ -255,6 +275,42 @@ public class NurbsDeformationTools {
 	 * @param deformFactor
 	 * @return
 	 */
+//	public static NURBSSurface deform(NURBSSurface ns, double[] vec, double[] dir, double deformFactor){
+//		System.out.println(ns.toString());
+//		NURBSSurface deformNs = new NURBSSurface();
+//		deformNs.setUDegree(ns.getUDegree());
+//		deformNs.setVDegree(ns.getVDegree());
+//		deformNs.setUKnotVector(ns.getUKnotVector());
+//		deformNs.setVKnotVector(ns.getVKnotVector());
+//		double[][][] cm = ns.getControlMesh();
+//		double[][][] cm3D = get3CompControlMesh(ns.getControlMesh());
+//		double[][][] cmDeform = new double[cm3D.length][cm3D[0].length][4];
+//		double[] orth = Rn.normalize(null, getOrthComplement(vec, dir));
+//		double[] MinMax = getMinMaxValueWRTVector(ns, vec);
+//		double dist = MinMax[1] - MinMax[0];
+//		for (int i = 0; i < cm3D.length; i++) {
+//			for (int j = 0; j < cm3D[0].length; j++) {
+//				double[] proj = projectOntoVector(cm3D[i][j], vec);
+//				double[] vecFromAxis = Rn.subtract(null, cm3D[i][j], proj);
+//				double pos = getOrientedLength(proj, vec) - MinMax[0];
+//				double currFactor = (deformFactor - 1) * pos / dist + 1;
+//				double[] projOrth = projectOntoVector(vecFromAxis, orth);
+//				double[] orthCompl = getOrthComplement(orth, vecFromAxis);
+//				Rn.times(projOrth, currFactor, projOrth);				
+//				Rn.add(cm3D[i][j], orthCompl, projOrth);
+//				Rn.add(cm3D[i][j], cm3D[i][j], proj);
+//				cmDeform[i][j][0] = cm3D[i][j][0];
+//				cmDeform[i][j][1] = cm3D[i][j][1];
+//				cmDeform[i][j][2] = cm3D[i][j][2];
+//				cmDeform[i][j][3] = cm[i][j][3];
+//			}
+//		}
+//		deformNs.setControlMesh(cmDeform);
+//		System.out.println(deformNs.toString());
+//		return deformNs;
+//		
+//	}
+	
 	public static NURBSSurface deform(NURBSSurface ns, double[] vec, double[] dir, double deformFactor){
 		System.out.println(ns.toString());
 		NURBSSurface deformNs = new NURBSSurface();
@@ -263,31 +319,53 @@ public class NurbsDeformationTools {
 		deformNs.setUKnotVector(ns.getUKnotVector());
 		deformNs.setVKnotVector(ns.getVKnotVector());
 		double[][][] cm = ns.getControlMesh();
-		double[][][] cm3D = get3DControlMesh(ns.getControlMesh());
-		double[][][] cmDeform = new double[cm3D.length][cm3D[0].length][4];
+//		double[][][] cm3D = get3CompControlMesh(ns.getControlMesh());
+		double[][][] cmDeform = new double[cm.length][cm[0].length][4];
 		double[] orth = Rn.normalize(null, getOrthComplement(vec, dir));
 		double[] MinMax = getMinMaxValueWRTVector(ns, vec);
 		double dist = MinMax[1] - MinMax[0];
-		for (int i = 0; i < cm3D.length; i++) {
-			for (int j = 0; j < cm3D[0].length; j++) {
-				double[] proj = projectOntoVector(cm3D[i][j], vec);
-				double[] vecFromAxis = Rn.subtract(null, cm3D[i][j], proj);
+		for (int i = 0; i < cm.length; i++) {
+			for (int j = 0; j < cm[0].length; j++) {
+				double[] coords = get3DPoint(cm[i][j]);
+				double[] proj = projectOntoVector(coords, vec);
+				double[] vecFromAxis = Rn.subtract(null, coords, proj);
 				double pos = getOrientedLength(proj, vec) - MinMax[0];
 				double currFactor = (deformFactor - 1) * pos / dist + 1;
 				double[] projOrth = projectOntoVector(vecFromAxis, orth);
 				double[] orthCompl = getOrthComplement(orth, vecFromAxis);
 				Rn.times(projOrth, currFactor, projOrth);				
-				Rn.add(cm3D[i][j], orthCompl, projOrth);
-				Rn.add(cm3D[i][j], cm3D[i][j], proj);
-				cmDeform[i][j][0] = cm3D[i][j][0];
-				cmDeform[i][j][1] = cm3D[i][j][1];
-				cmDeform[i][j][2] = cm3D[i][j][2];
+				Rn.add(coords, orthCompl, projOrth);
+				Rn.add(coords, coords, proj);
+				cmDeform[i][j][0] = coords[0] * cm[i][j][3];
+				cmDeform[i][j][1] = coords[1] * cm[i][j][3];
+				cmDeform[i][j][2] = coords[2] * cm[i][j][3];
 				cmDeform[i][j][3] = cm[i][j][3];
 			}
 		}
 		deformNs.setControlMesh(cmDeform);
 		System.out.println(deformNs.toString());
 		return deformNs;
+		
+	}
+	
+	public static double[] getMiddle(double[] a, double[] b){
+		return Rn.times(null, 0.5, Rn.add(null, a, b));
+	}
+	
+	public static double[] rot(double[] vec, double angle){
+		double[] rot = new double[2];
+		rot[0] = Math.cos(angle) * vec[0] - Math.sin(angle) * vec[1];
+		rot[1] = Math.sin(angle) * vec[0] + Math.cos(angle) * vec[1];
+		return rot;
+	}
+	
+	
+	public static void main(String[] args){
+		double angle = -2.0 * Math.PI / 3.0;
+		double[] vec = {0,1};
+		double[] rot = rot(vec, angle);
+		System.out.println(Arrays.toString(rot));
+		System.out.println("middle = " + Arrays.toString(getMiddle(vec, rot)));
 		
 	}
 }

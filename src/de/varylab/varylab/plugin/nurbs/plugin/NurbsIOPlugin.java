@@ -94,6 +94,9 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	
 	private ShrinkPanel
 		infoPanel = new ShrinkPanel("Mesh parameters");
+	
+	private boolean
+		loading = false;
 
 	public NurbsIOPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -185,6 +188,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			loading = true;
 			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			chooser.setDialogTitle("Import Into Layer");
 			int result = chooser.showOpenDialog(w);
@@ -193,20 +197,12 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
-//					NURBSSurface[] surfs= NurbsDeformationTools.splitInTheMiddle(surface, false);
-//					surface = surfs[0];
-//					System.out.println("before");
-//					System.out.println(surface.toString());
-//					surface = NurbsDeformationTools.stretch(surface, 1.0, 0.2, 1.8);
-//					System.out.println("after");
-//					System.out.println(surface.toString());
-//					NurbsDeformationTools.conicDeformation(surface, 0.8);
-					logger.info("original surface " + surface.toString());
-					double[] U = surface.getUKnotVector();
-					logger.info("u0 = " + U[0] + "um = " + U[U.length - 1]);
-					double[] V = surface.getVKnotVector();
-					logger.info("v0 = " + V[0] + "vn = " + V[V.length - 1]);
-					
+					System.out.println("surface to String");
+					System.out.println(surface.toString());
+					System.out.println("surface to obj");
+					System.out.println(surface.toObj());
+					System.out.println("surface to code");
+					System.out.println(surface.toReadableInputString());
 					if(surface.getClosingDir() == ClosingDir.uClosed){
 						logger.info("surface.isClosedUDir()");
 					}
@@ -214,7 +210,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						logger.info("surface.isClosedVDir()");
 					}
 					surface.setName(file.getName());
-					logger.info("THE NEW SURFACE");
 					logger.info(surface.toObj());
 					logger.info("\n");
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : ImageHook.getIcon("folder.png");
@@ -223,6 +218,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						w, npp, getPluginInfo().name, OK_CANCEL_OPTION,	PLAIN_MESSAGE, icon);
 					if(dialogOk == JOptionPane.OK_OPTION) {
 						NurbsSurfaceUtility.addNurbsMesh(surface, hif.getActiveLayer(),npp.getU(),npp.getV());
+
 						uModel.setValue(npp.getU());
 						vModel.setValue(npp.getV());
 					}
@@ -271,7 +267,9 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+				loading = false;
 			}
+			loading = false;
 		}
 		
 		private class NurbsParameterPanel extends JPanel {
@@ -478,7 +476,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(activeNurbsAdapter != null) {
+		if(!loading && (activeNurbsAdapter != null)) {
 			NurbsSurfaceUtility.addNurbsMesh(activeNurbsAdapter.getSurface(), hif.getActiveLayer(),uModel.getNumber().intValue(),vModel.getNumber().intValue());
 		}
 	}

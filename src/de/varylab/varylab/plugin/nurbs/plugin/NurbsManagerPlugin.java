@@ -302,7 +302,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			serialVersionUID = 1L;
 		
 		private SpinnerNumberModel
-			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
+			tolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
 			nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 			vecFieldModel = new SpinnerNumberModel(10, 0, 180, 1),
 			beginLineModel = new SpinnerNumberModel(0, 0, 4000, 1),
@@ -532,20 +532,23 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				double lastTimeDouble = System.currentTimeMillis();
 				logger.info("Double Time: " + (lastTimeDouble - firstTimeDouble));
 				double firstTimeBentley = System.currentTimeMillis();
-				double dilation = 1000000000.0;
+//				double dilation = 1000000000.0;
 				
 //				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BruteForce(U, V, allSegments, dilation);
-				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments, dilation);
+				
+		//		LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments, dilation);
+				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments);
 				logger.info("\n");
 				logger.info("NURBS manager plugin all intersections");
 				for (IntersectionPoint ip : intersections) {
 					logger.info(ip.toString());
 				}
-				FaceSetGenerator gfs = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
+		//		FaceSetGenerator fsg = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
+				FaceSetGenerator fsg = new FaceSetGenerator(activeNurbsSurface, intersections);
 				double lastTimeBentley = System.currentTimeMillis();
 				logger.info("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 				allSegments.clear();
-				FaceSet fs = gfs.createFaceSet();
+				FaceSet fs = fsg.createFaceSet();
 				for (int i = 0; i < fs.getVerts().length; i++) {
 					double[] S = new double[4];
 					activeNurbsSurface.getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);
