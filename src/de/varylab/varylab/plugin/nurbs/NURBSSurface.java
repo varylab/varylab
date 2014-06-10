@@ -57,10 +57,8 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		private double[][][] controlMesh;
 		private int p, q;
 		private String name = "Nurbs Surface";
-		private LinkedList<Double> closedBoundaryValues = null;
 		private LinkedList<Double> boundaryValues = null;
-		private double[] closedBoundaryValuesPastIntersection = null;
-		private Set<Double> boundaryValuesPastIntersection = null;
+		private double[] closedBoundaryValues = null;
 
 //		private List<double[]> umbilics = new LinkedList<double[]>();
 		
@@ -184,22 +182,25 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return revDir;
 		}
 		
-		public Set<Double> getBoundaryValuesPastIntersection(double dilation){
-			if(boundaryValuesPastIntersection == null){
-				boundaryValuesPastIntersection = determineBoundaryValuesPastIntersection(dilation);
-			}
-			return boundaryValuesPastIntersection;
-		}
 		
-		public double[] getClosedBoundaryValuesPastIntersection(double dilation){
+		public double[] getGluedBoundaryValues(){
 			if(getClosingDir() == ClosingDir.nonClosed){
 				return null;
 			}
-			if(closedBoundaryValuesPastIntersection == null){
-				closedBoundaryValuesPastIntersection = determineClosedBoundaryValuesPastIntersection(dilation);
+			else if(getClosingDir() == ClosingDir.uClosed){
+				closedBoundaryValues = new double[2];
+				closedBoundaryValues[0] = U[0];
+				closedBoundaryValues[1] = U[U.length - 1];
 			}
-			return closedBoundaryValuesPastIntersection;
+			else if(getClosingDir() == ClosingDir.vClosed){
+				closedBoundaryValues = new double[2];
+				closedBoundaryValues[0] = V[0];
+				closedBoundaryValues[1] = V[V.length - 1];
+			}
+			return closedBoundaryValues;
 		}
+		
+		
 		
 
 		public LinkedList<Double> getBoundaryValues() {
@@ -209,12 +210,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return boundaryValues;
 		}
 		
-		public LinkedList<Double> getClosedBoundValues(){
-			if(closedBoundaryValues == null){
-				closedBoundaryValues = determineClosedBoundaryValues();
-			}
-			return closedBoundaryValues;
-		}
 
 		public void setBoundaryValues(LinkedList<Double> boundaryValues) {
 			this.boundaryValues = boundaryValues;
@@ -353,20 +348,25 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		}
 		
 		
+		
 		public boolean isClosedBoundaryPoint(double[] point){
-			if(getClosingDir() != ClosingDir.nonClosed){
-				List<Double> closingValues = getClosedBoundValues();
-				for (Double value : closingValues) {
-					if(getClosingDir() == ClosingDir.uClosed){
-						if(point[0] == value){
-							return true;
-						}
-					} else {
-						if(point[1] == value){
-							return true;
-						}
-					}
+			if(getClosingDir() == ClosingDir.uClosed){
+				if(point[0] == U[0] || point[0] == U[U.length - 1]){
+					return true;
 				}
+				else return false;
+			}
+			if(getClosingDir() == ClosingDir.vClosed){
+				if(point[1] == V[0] || point[1] == V[V.length - 1]){
+					return true;
+				}
+				else return false;
+			}
+			if(getClosingDir() == ClosingDir.uvClosed){
+				if(point[0] == U[0] || point[0] == U[U.length - 1] || point[1] == V[0] || point[1] == V[V.length - 1]){
+					return true;
+				}
+				else return false;
 			}
 			return false;
 		}
@@ -437,32 +437,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 		public String getName() {
 			return name;
-		}
-		
-		
-		public static boolean twoSegmentIntersection(double[][] seg1, double[][] seg2){
-			double[] p1 = seg1[0];
-			double[] p2 = seg1[1]; 
-			double[] p3 = seg2[0]; 
-			double[] p4 = seg2[1];
-			double lengthSeg1 = Rn.euclideanDistance(p1, p2);
-			double lengthSeg2 = Rn.euclideanDistance(p3, p4);
-			double[] p2MinusP1 = Rn.add(null, p2, Rn.times(null, -1, p1));
-			double[] q2 = Rn.add(null, p2, Rn.times(null, lengthSeg1 / 100, p2MinusP1));	
-			double[] q1 = Rn.add(null, p1, Rn.times(null, lengthSeg1 / -100, p2MinusP1));
-			double[] p4MinusP3 = Rn.add(null, p4, Rn.times(null, -1, p3));
-			double[] q4 = Rn.add(null, p4, Rn.times(null, lengthSeg2 / 100, p4MinusP3));	
-			double[] q3 = Rn.add(null, p3, Rn.times(null, lengthSeg2 / -100, p4MinusP3));
-			
-			if(LineSegmentIntersection.counterClockWiseOrder(q1, q3, q4) == LineSegmentIntersection.counterClockWiseOrder(q2, q3, q4)){
-				return false;
-			}
-			else if(LineSegmentIntersection.counterClockWiseOrder(q1, q2, q3) == LineSegmentIntersection.counterClockWiseOrder(q1, q2, q4)){
-				return false;
-			}
-			else{
-				return true;
-			}	
 		}
 		
 		
@@ -1301,38 +1275,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 				}
 				
 			}
-			
-//			for (int i = 0; i < controlMesh.length; i++) {
-//				if(i == 0){
-//					str = str + "{{{";
-//				}
-//				else if(i == controlMesh.length - 1){
-//					str = str + "}}};";
-//				}
-//				else{
-//					for (int j = 0; j < controlMesh[0].length; j++) {
-//						if(j == 0){
-//							str = str + "{{";
-//						}
-//						else if(j == controlMesh[0].length - 1){
-//							str = str + "}}," + "\n";
-//						}
-//						else{
-//							for (int k = 0; k < controlMesh[0][0].length; k++) {
-//								if(k == 0){
-//								//	str = str + "{";
-//								}
-//								else if(k == controlMesh[0][0].length - 1){
-//								//	str = str + "}";
-//								}
-//								else{}
-//							}
-//							//str = str + "}}," + "\n";
-//						}
-//					}
-//				}
-//			}
-			
 			return str;
 			
 		}
@@ -1482,74 +1424,27 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			return boundaryValues;
 		}
 		
-		public double[] determineClosedBoundaryValuesPastIntersection(double dilation){
-			ClosingDir original = getClosingDir();
-			setClosingDir(ClosingDir.nonClosed);
-			List<LineSegment> boundList = getBoundarySegments();
-			LinkedList<IntersectionPoint> ipList = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, boundList, dilation);
-//			setBoundaryValues(null);
-			setClosingDir(original);
-			Set<Double> closedSet = new HashSet<Double>();
-//			LinkedList<Double> resultList = new LinkedList<Double>();
-			setClosingDir(original);
-			if(original == ClosingDir.uClosed){
-				for (IntersectionPoint ip : ipList) {
-					closedSet.add(ip.getPoint()[0]);
-				}
-			}
-			if(original == ClosingDir.vClosed){
-				for (IntersectionPoint ip : ipList) {
-					closedSet.add(ip.getPoint()[1]);
-				}
-			}
-			if(original == ClosingDir.nonClosed){
+		
+		public double[] determineGluedBoundary(){
+			double[] gluedBoundValues = new double[2];
+			if(getClosingDir() == ClosingDir.nonClosed){
 				return null;
 			}
-			double[] closedBoundValues = new double[2];
-			int i = 0;
-			for (double d : closedSet) {
-				closedBoundValues[i] = d;
-				i++;
-				
+			else{
+				if(getClosingDir() == ClosingDir.uClosed){
+					gluedBoundValues[0] = U[0];
+					gluedBoundValues[1] = U[U.length - 1];
+				}
+				else{
+					gluedBoundValues[0] = V[0];
+					gluedBoundValues[1] = V[V.length - 1];
+				}
 			}
-			if(closedBoundValues[0] > closedBoundValues[1]){
-				double swap = closedBoundValues[0];
-				closedBoundValues[0] = closedBoundValues[1];
-				closedBoundValues[1] = swap;
-			}
-			return closedBoundValues;
-			
+			return gluedBoundValues;
 		}
 		
 		
-		public Set<Double> determineBoundaryValuesPastIntersection(double dilation){
-			ClosingDir original = getClosingDir();
-			setClosingDir(ClosingDir.nonClosed);
-			List<LineSegment> boundList = getBoundarySegments();
-			LinkedList<IntersectionPoint> ipList = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, boundList, dilation);
-			setBoundaryValues(null);
-			setClosingDir(original);
-			Set<Double> resultSet = new HashSet<Double>();
-//			LinkedList<Double> resultList = new LinkedList<Double>();
-			setClosingDir(original);
-			if(original == ClosingDir.uClosed){
-				for (IntersectionPoint ip : ipList) {
-					resultSet.add(ip.getPoint()[1]);
-				}
-			}
-			if(original == ClosingDir.vClosed){
-				for (IntersectionPoint ip : ipList) {
-					resultSet.add(ip.getPoint()[0]);
-				}
-			}
-			if(original == ClosingDir.nonClosed){
-				for (IntersectionPoint ip : ipList) {
-					resultSet.add(ip.getPoint()[0]);
-					resultSet.add(ip.getPoint()[1]);
-				}
-			}
-			return resultSet;
-		}
+		
 		
 	//	TODO: Why does this method need hds and as?
 	public LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {

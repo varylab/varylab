@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
@@ -16,14 +15,13 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 
 public class IntersectionPoint {
 	
-	private static Logger logger = Logger.getLogger(IntersectionPoint.class.getName());
 	
-	public enum ClosedBoundary {left, right, upper, lower, interior};
+	public enum GluedBoundary {left, right, upper, lower, interior};
 	public enum FaceVertex {faceVertex, noFaceVertex};
 	private double[] point = null;
 	private double sameIndexDist;
 	private LinkedList<LineSegment> intersectingSegments;
-	private ClosedBoundary closedBoundary = null;
+	private GluedBoundary gluedBoundary = null;
 	private FaceVertex faceVertex = null;
 	private LinkedList<Integer> indexList = null;
 	private LinkedList<IntersectionPoint> nbrs;
@@ -62,29 +60,23 @@ public class IntersectionPoint {
 		}
 		return ct;
 	}
-
-
-
-
-	public Boolean isBoundaryPoint(List<Double> boundaryValues){
-		if(boundaryPoint == null){
-			double[] point = getPoint();
-			for (Double value : boundaryValues) {
-				if(point[0] == value || point[1] == value){
-					logger.info("point " + Arrays.toString(point) + " is a boundary point");
-					return true;
-				}
+	
+	
+	
+	public boolean containsIndex(int index){
+		for (LineSegment ls : getIntersectingSegments()) {
+			if(ls.getCurveIndex() == index){
+				return true;
 			}
-			logger.info("point [" + point[0] + ", " + point[1] +"] is NOT a boundary point");
-			return false;
 		}
-		else{
-			return boundaryPoint;
-		}
-		
+		return false;
 	}
-	
-	
+
+	public Boolean isBoundaryPoint(){
+		return boundaryPoint;
+	}
+
+
 
 	public void setBoundaryPoint(boolean boundaryPoint) {
 		this.boundaryPoint = boundaryPoint;
@@ -95,41 +87,42 @@ public class IntersectionPoint {
 
 
 
-	public ClosedBoundary getClosedBoundary(NURBSSurface ns, double dilation){
-		if(closedBoundary == null){
+	
+	public GluedBoundary getGluedBoundary(NURBSSurface ns){
+		if(gluedBoundary == null){
 			if(ns.getClosingDir() == ClosingDir.uClosed){
-				double [] bound  = ns.getClosedBoundaryValuesPastIntersection(dilation);
+				double [] bound  = ns.getGluedBoundaryValues();
 				if(getPoint()[0] == bound[0]){
-					closedBoundary = ClosedBoundary.left;
+					gluedBoundary = GluedBoundary.left;
 				}
 				else if(getPoint()[0] == bound[1]){
-					closedBoundary = ClosedBoundary.right;
+					gluedBoundary = GluedBoundary.right;
 				}
 				else{
-					closedBoundary = ClosedBoundary.interior;
+					gluedBoundary = GluedBoundary.interior;
 				}
 			}
 			else if(ns.getClosingDir() == ClosingDir.vClosed){
-				double [] bound  = ns.getClosedBoundaryValuesPastIntersection(dilation);
+				double [] bound  = ns.getGluedBoundaryValues();
 				if(getPoint()[1] == bound[0]){
-					closedBoundary = ClosedBoundary.lower;
+					gluedBoundary = GluedBoundary.lower;
 				}
 				else if(getPoint()[1] == bound[1]){
-					closedBoundary = ClosedBoundary.upper;
+					gluedBoundary = GluedBoundary.upper;
 				}
 				else{
-					closedBoundary = ClosedBoundary.interior;
+					gluedBoundary = GluedBoundary.interior;
 				}
 			}
 			else{
-				closedBoundary = ClosedBoundary.interior;
+				gluedBoundary = GluedBoundary.interior;
 			}
 		}
-		return closedBoundary;
+		return gluedBoundary;
 	}
 	
-	public void setClosedBoundary(ClosedBoundary cb){
-		closedBoundary = cb;
+	public void setGluedBoundary(GluedBoundary cb){
+		gluedBoundary = cb;
 	}
 
 
@@ -202,8 +195,8 @@ public class IntersectionPoint {
 		this.previous = previous;
 	}
 
-	public ClosedBoundary getClosedBoundary() {
-		return closedBoundary;
+	public GluedBoundary getGluedBoundary() {
+		return gluedBoundary;
 	}
 
 	public double[] getPoint() {
@@ -287,10 +280,11 @@ public class IntersectionPoint {
 			orientedNbrs.add(first);
 			Collections.reverse(orientedNbrs);
 			setNbrs(orientedNbrs);
-		
 	}
 	
-	
+	public String toStringSimple(){
+		return "IntersectionPoint [point=" + Arrays.toString(point) + "]";
+	}
 	
 
 
@@ -301,7 +295,6 @@ public class IntersectionPoint {
 		for (LineSegment ls : intersectingSegments) {
 			str += ls.getCurveIndex() + " , ";
 		}
-//		return "IntersectionPoint [point=" + Arrays.toString(point) + "] , curve indices = " + cur;
 		return str;
 	}
 
