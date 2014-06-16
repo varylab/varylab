@@ -31,6 +31,7 @@ import de.varylab.varylab.VaryLab;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.affineminimal.AffineMinimalOptimizerPlugin;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
+import de.varylab.varylab.plugin.algorithm.topology.WatertightMesh;
 import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
 import de.varylab.varylab.plugin.datasource.FaceEdgeLengthMean;
@@ -69,6 +70,7 @@ import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConstantDirectionFieldPlugin;
+import de.varylab.varylab.plugin.meshoptimizer.DirichletEnergyOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer;
@@ -243,6 +245,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(SimpleRoofGenerator.class);
 		pSet.add(TschebyscheffSphereGenerator.class);
 		pSet.add(OffsetMeshGenerator.class);
+		pSet.add(WatertightMesh.class);
 	}
 
 
@@ -314,6 +317,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(NgonRegularizer.class);
 		pSet.add(AffineMinimalOptimizerPlugin.class);
 		pSet.add(SCConicalConeDataSource.class);
+		pSet.add(DirichletEnergyOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(Set<Class<? extends Plugin>> pSet) {
