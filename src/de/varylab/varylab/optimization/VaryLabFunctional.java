@@ -61,6 +61,7 @@ public class VaryLabFunctional implements Functional<VVertex, VEdge, VFace> {
 	}
 	
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>
 	>  void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H) {
@@ -89,10 +90,12 @@ public class VaryLabFunctional implements Functional<VVertex, VEdge, VFace> {
 		}
 	}
 
+	@Override
 	public <HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>> int getDimension(HDS hds) {
 		return hds.numVertices() * 3;
 	}
 
+	@Override
 	public <HDS extends HalfEdgeDataStructure<VVertex, VEdge, VFace>> int[][] getNonZeroPattern(HDS hds) {
 		int dim = getDimension(hds);
 		if (funList.size() == 1) {
@@ -127,6 +130,7 @@ public class VaryLabFunctional implements Functional<VVertex, VEdge, VFace> {
 	}
 	
 	
+	@Override
 	public boolean hasGradient() {
 		boolean hasGradient = true;
 		for (Functional<VVertex, VEdge, VFace> fun : funList) {
@@ -135,6 +139,7 @@ public class VaryLabFunctional implements Functional<VVertex, VEdge, VFace> {
 		return hasGradient;
 	}
 	
+	@Override
 	public boolean hasHessian() {
 		boolean hasHessian = true;
 		for (Functional<VVertex, VEdge, VFace> fun : funList) {

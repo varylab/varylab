@@ -26,6 +26,7 @@ public class TaoHessian implements Hessian {
 	public void add(int i, int j, double value) {
 		H.setValue(i, j, value, ADD_VALUES);
 	}
+	@Override
 	public void add(double alpha, Hessian h) {
 		H.aXPY(alpha, ((TaoHessian)h).getMat(), SAME_NONZERO_PATTERN);
 	}
