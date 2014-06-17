@@ -1,11 +1,19 @@
 package de.varylab.varylab.plugin.algorithm.topology;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jtem.halfedge.Edge;
@@ -18,12 +26,29 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 
-public class WatertightMesh extends AlgorithmPlugin {
+public class WatertightMesh extends AlgorithmDialogPlugin {
 
-	private static double
-		threshold = 1E-8;
+	private JPanel
+		optionPanel = new JPanel();
+	private JLabel
+		thresholdLabel = new JLabel("Threshold");
+	private SpinnerNumberModel
+		thresholdModel = new SpinnerNumberModel(-8, -20, 0, 1);
+	private JSpinner
+		thresholdSpinner = new JSpinner(thresholdModel);
+	
+	public WatertightMesh() {
+		optionPanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1.0;
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		c.insets = new Insets(2, 2, 2, 2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		optionPanel.add(thresholdLabel, c);
+		optionPanel.add(thresholdSpinner, c);
+	}
 	
 	@Override
 	public String getAlgorithmName() {
@@ -34,6 +59,10 @@ public class WatertightMesh extends AlgorithmPlugin {
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Generator;
 	}
+	@Override
+	protected JPanel getDialogPanel() {
+		return optionPanel;
+	}
 
 	@Override
 	public <
@@ -41,7 +70,8 @@ public class WatertightMesh extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {
+		double threshold = Math.pow(10, thresholdModel.getNumber().doubleValue());
 		KdTree<V, E, F> kd = new KdTree<>(hds, a, 10, false);
 		Set<V> collected = new LinkedHashSet<>();
 		Map<V, List<V>> identMap = new LinkedHashMap<>();
