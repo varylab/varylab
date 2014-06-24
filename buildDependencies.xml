@@ -13,59 +13,69 @@
 		<echo>Please choose a dependency target to update.</echo>
 	</target>
 	
+	<property file="dependencies.properties"/>
+	
+	<!-- default values if not set in dependencies.prop --> 
+	<property name="jreality.dir" value="../jreality"/>
+	<property name="jrworkspace.dir" value="../jrworkspace"/>
+	<property name="halfedge.dir" value="../halfedge"/>
+	<property name="halfedgetools.dir" value="../halfedgetools"/>
+	<property name="conformallab.dir" value="../conformallab"/>
+	<property name="jopennurbs.dir" value="../jOpenNurbs"/>
+	
 	
 	<target name="all" depends="halfedgetools, jrworkspace, jreality, discrete conformal lab">
 		<echo>Update all supported dependencies</echo>
 	</target>
 	
 	<target name="halfedge">
-		<ant antfile="build.xml" dir="../halfedge" target="clean"/>
-		<ant antfile="build.xml" dir="../halfedge" target="release"/>
+		<ant antfile="build.xml" dir="${halfedge.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${halfedge.dir}" target="release"/>
 		<copy todir="lib/jtem">
-			<fileset dir="../halfedge/release" includes="halfedge.jar"/>
+			<fileset dir="${halfedge.dir}/release" includes="halfedge.jar"/>
 		</copy>
 	</target>	
 	
 	<target name="halfedgetools">
-		<ant antfile="build.xml" dir="../halfedgetools" target="clean"/>
-		<ant antfile="build.xml" dir="../halfedgetools" target="release"/>
+		<ant antfile="build.xml" dir="${halfedgetools.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${halfedgetools.dir}" target="release"/>
 		<copy todir="lib/jtem">
-			<fileset dir="../halfedgetools/release" includes="halfedgetools.jar"/>
+			<fileset dir="${halfedgetools.dir}/release" includes="halfedgetools.jar"/>
 		</copy>
 	</target>	
 	
 	<target name="jopennurbs">
-		<ant antfile="build.xml" dir="/home/thilosch/git/jOpenNurbs" target="clean"/>
-		<ant antfile="build.xml" dir="/home/thilosch/git/jOpenNurbs" target="release"/>
+		<ant antfile="build.xml" dir="${jopennurbs.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${jopennurbs.dir}" target="release"/>
 		<copy todir="lib/jopennurbs">
-			<fileset dir="/home/thilosch/git/jOpenNurbs/release" includes="jopennurbs.jar"/>
+			<fileset dir="${jopennurbs.dir}/release" includes="jopennurbs.jar"/>
 		</copy>
 		<copy todir="native/linux64">
-			<fileset dir="/home/thilosch/git/jOpenNurbs/native/linux64" includes="libjopennurbs.so"/>
+			<fileset dir="${jopennurbs.dir}/native/linux64" includes="libjopennurbs.so"/>
 		</copy>	
 	</target>
 
 	<target name="jrworkspace">
-		<ant antfile="build.xml" dir="../jrworkspace" target="clean"/>
-		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
+		<ant antfile="build.xml" dir="${jrworkspace.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${jrworkspace.dir}" target="jrworkspace"/>
 		<copy todir="lib/jtem">
-			<fileset dir="../jrworkspace/jar" includes="jrworkspace.jar"/>
+			<fileset dir="${jrworkspace.dir}/jar" includes="jrworkspace.jar"/>
 		</copy>
 	</target>
 	
 	<target name="jreality">
-		<ant antfile="build.xml" dir="../jreality" target="clean"/>
-		<ant antfile="build.xml" dir="../jreality" target="release-jar"/>
+		<ant antfile="build.xml" dir="${jreality.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${jreality.dir}" target="release-jar"/>
 		<copy todir="lib/jreality">
-			<fileset dir="../jreality/release" includes="jReality.jar"/>
+			<fileset dir="${jreality.dir}/release" includes="jReality.jar"/>
 		</copy>
 	</target>
 	
 	<target name="discrete conformal lab">
-		<ant antfile="build.xml" dir="../ConformalLab" target="clean"/>
-		<ant antfile="build.xml" dir="../ConformalLab" target="release"/>
+		<ant antfile="build.xml" dir="${conformallab.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${conformallab.dir}" target="release"/>
 		<copy todir="lib/conformallab">
-			<fileset dir="../ConformalLab/release/${date}" includes="DiscreteConformalLab.jar"/>
+			<fileset dir="${conformallab.dir}/release/${date}" includes="DiscreteConformalLab.jar"/>
 		</copy>
 	</target>
 	
