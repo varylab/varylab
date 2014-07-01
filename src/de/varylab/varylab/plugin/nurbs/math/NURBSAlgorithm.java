@@ -79,7 +79,7 @@ public class NURBSAlgorithm {
 	 * @return 
 	 */
 	public static int FindSpan(int n, int p, double u, double[] U) {
-		if (u == U[n + 1])
+		if (u >= U[n + 1])
 			return n;
 		int low = p;
 		int high = n + 1;

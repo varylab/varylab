@@ -2,7 +2,7 @@ package de.varylab.varylab.plugin.meshoptimizer;
 
 
 import de.jtem.halfedgetools.functional.Functional;
-import de.jtem.halfedgetools.functional.dirichlet.DirichletEnergyFunctional;
+import de.varylab.varylab.functional.DirichletEnergyFunctional;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;

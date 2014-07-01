@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.scene.IndexedFaceSet;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.varylab.opennurbs.ON;
@@ -27,13 +28,16 @@ import de.varylab.opennurbs.ON_MeshFace;
 import de.varylab.opennurbs.ON_NurbsCurve;
 import de.varylab.opennurbs.ON_NurbsSurface;
 import de.varylab.opennurbs.ON_Object;
+import de.varylab.opennurbs.ON_PlaneSurface;
 import de.varylab.opennurbs.ON_PolylineCurve;
 import de.varylab.opennurbs.ON_Surface;
 import de.varylab.opennurbs.OpenNurbsIO;
 import de.varylab.varylab.halfedge.VEdge;
+import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 
 public class OpenNurbsUtility {
 
@@ -54,6 +58,16 @@ public class OpenNurbsUtility {
 						if(surfaces[i] instanceof ON_NurbsSurface) {
 							ON_NurbsSurface nsurf = (ON_NurbsSurface)surfaces[i];
 							nsurfaces.add(ONtoVarylabNurbsSurface(nsurf));
+						} else if(surfaces[i] instanceof ON_PlaneSurface) {
+							ON_PlaneSurface ps = (ON_PlaneSurface) surfaces[i]; 
+							ON_Interval uInt = ps.Extents(0);
+							ON_Interval vInt = ps.Extents(1);
+							double[][][] cm = new double[2][2][3];
+							cm[0][0] = ps.PointAt(uInt.Min(), vInt.Min()).getCoordinates();
+							cm[0][1] = ps.PointAt(uInt.Min(), vInt.Max()).getCoordinates();
+							cm[1][0] = ps.PointAt(uInt.Max(), vInt.Min()).getCoordinates();
+							cm[1][1] = ps.PointAt(uInt.Max(), vInt.Max()).getCoordinates();
+							nsurfaces.add(new NURBSSurface(cm,1,1));
 						} else if(surfaces[i].HasNurbForm()){
 							ON_NurbsSurface nsurf = new ON_NurbsSurface(-1L);
 							surfaces[i].GetNurbForm(nsurf);
@@ -218,6 +232,21 @@ public class OpenNurbsUtility {
 		addPolygon(vhds, verts);
 	}
 
+	public static void addPlaneSurface(ON_PlaneSurface ps, VHDS vhds, AdapterSet adapters) {
+		ON_Interval uInt = ps.Extents(0);
+		ON_Interval vInt = ps.Extents(1);
+		VFace f = HalfEdgeUtils.addNGon(vhds, 4);
+		VEdge e = f.getBoundaryEdge();
+		VVertex v1 = e.getStartVertex();
+		VVertex v2 = e.getTargetVertex();
+		VVertex v3 = e.getNextEdge().getTargetVertex();
+		VVertex v4 = e.getPreviousEdge().getStartVertex();
+		adapters.set(Position.class, v1, ps.PointAt(uInt.Min(), vInt.Min()));
+		adapters.set(Position.class, v2, ps.PointAt(uInt.Min(), vInt.Max()));
+		adapters.set(Position.class, v3, ps.PointAt(uInt.Max(), vInt.Min()));
+		adapters.set(Position.class, v4, ps.PointAt(uInt.Max(), vInt.Max()));
+	}
+	
 	public static void write(NURBSSurface surf, File file) {
 		ON_NurbsSurface on_surface = new ON_NurbsSurface(3, true, surf.getUDegree()+1, surf.getVDegree() + 1, surf.getNumUPoints(), surf.getNumVPoints());
 		double[][][] cv = surf.getControlMesh();

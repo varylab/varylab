@@ -235,7 +235,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 						newLayer.setName(file.getName() + " surface " + i++);
 						NurbsSurfaceUtility.addNurbsMesh(surface,newLayer);
 						hif.addLayer(newLayer);
-
 					}
 					List<ON_Curve> curves = OpenNurbsUtility.getCurves(model);
 					for(ON_Curve curve : curves) {

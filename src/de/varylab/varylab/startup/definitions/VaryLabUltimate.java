@@ -66,6 +66,7 @@ import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicNetsPlugin;
 import de.varylab.varylab.plugin.hyperbolicnets.HyperbolicPatchVisualizer;
 import de.varylab.varylab.plugin.lnf.SubstanceLnFMenu;
 import de.varylab.varylab.plugin.meshoptimizer.ANetOptimizer;
+import de.varylab.varylab.plugin.meshoptimizer.BetaSquaredOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircularQuadOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.CircumcircleCurvatureOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.ConicalOptimizer;
@@ -318,6 +319,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(AffineMinimalOptimizerPlugin.class);
 		pSet.add(SCConicalConeDataSource.class);
 		pSet.add(DirichletEnergyOptimizer.class);
+		pSet.add(BetaSquaredOptimizer.class);
 	}
 	
 	private static void addLnFPlugins(Set<Class<? extends Plugin>> pSet) {

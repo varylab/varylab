@@ -60,6 +60,7 @@ import de.varylab.varylab.optimization.constraint.FixingConstraint;
 import de.varylab.varylab.optimization.constraint.SmoothGradientConstraint;
 import de.varylab.varylab.optimization.constraint.TangentialConstraint;
 import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
+import de.varylab.varylab.plugin.datasource.FunctionalGradient;
 
 public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListener, OptimizationListener {
 	
@@ -389,6 +390,7 @@ public class OptimizationPanel extends ShrinkPanelPlugin implements ActionListen
 		pluginsPanel = c.getPlugin(OptimizerPluginsPanel.class);
 		protocolPanel = c.getPlugin(IterationProtocolPanel.class);
 		jobQueue = c.getPlugin(JobQueuePlugin.class);
+		c.getPlugin(FunctionalGradient.class);
 	}
 	
 	@Override

@@ -2,15 +2,24 @@ package de.varylab.opennurbs;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 
+
 import de.jreality.util.NativePathUtility;
+import de.varylab.varylab.startup.StaticSetup;
 
 public class FileDumpTest {
+
+	static Logger logger = Logger.getLogger(FileDumpTest.class.getSimpleName());
 	
+    static {
+    	StaticSetup.initLogging();
+    }
+
 	public static void main(String[] args) {
-		NativePathUtility.set("native");
+		NativePathUtility.set("native");	
 		JFileChooser chooser = new JFileChooser();
 		chooser.setDialogTitle("Import Rhino 3dm File");
 		int result = chooser.showOpenDialog(null);
@@ -31,7 +40,7 @@ public class FileDumpTest {
 					ON_Brep brep = geom.brepForm(null);
 					ON_Surface[] surfaces = brep.getS();
 					for (int i = 0; i < surfaces.length; i++) {
-						System.out.println("Number of surfaces found: " + surfaces.length);
+						logger.info("Number of surfaces found: " + surfaces.length);
 						ON_NurbsSurface nsurf = ON_NurbsSurface.Cast(surfaces[i]);
 						if(nsurf != null) {
 //							System.out.println("\t\tNurbsSurface found!");
