@@ -11,11 +11,11 @@ import org.junit.Test;
 import de.jtem.halfedgetools.functional.FunctionalTest;
 import de.jtem.halfedgetools.functional.FunctionalTestData;
 import de.jtem.halfedgetools.functional.MyDomainValue;
-import de.jtem.halfedgetools.functional.dirichlet.DirichletEnergyFunctional;
 import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
 import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
+import de.varylab.varylab.functional.DirichletEnergyFunctional;
 
 public class DirichletEnergyFunctionalTest extends FunctionalTest<DefaultJRVertex, DefaultJREdge, DefaultJRFace> {
 

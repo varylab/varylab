@@ -37,7 +37,6 @@ import de.varylab.varylab.halfedge.VFace;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
-import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 
 public class OpenNurbsUtility {
 

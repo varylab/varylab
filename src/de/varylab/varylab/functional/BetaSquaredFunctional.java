@@ -49,6 +49,7 @@ public class BetaSquaredFunctional<V extends Vertex<V, E, F>, E extends Edge<V, 
 	}
 
 	// Calculate the energy of a given configuration
+	@SuppressWarnings("incomplete-switch")
 	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
 		double result = 0.0;
 		switch(mode) {

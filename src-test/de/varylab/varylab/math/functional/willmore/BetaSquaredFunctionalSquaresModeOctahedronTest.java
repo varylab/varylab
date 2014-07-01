@@ -26,10 +26,10 @@ public class BetaSquaredFunctionalSquaresModeOctahedronTest
 		DefaultJRHDS hds = new DefaultJRHDS();
 		FunctionalTestData.createCombinatorialOctahedron(hds);
 		Random random = new Random(123);
-		double[][] positions = new double[][]{
-				{2,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1.0},{0,0,-1}	
-		};
-		int i = 0;
+//		double[][] positions = new double[][]{
+//				{2,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1.0},{0,0,-1}	
+//		};
+//		int i = 0;
 		for (DefaultJRVertex v : hds.getVertices()) {
 //			v.position = positions[i++]; 
 			v.position = new double[] {random.nextDouble(), random.nextDouble(), random.nextDouble()};
