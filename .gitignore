@@ -3,3 +3,6 @@
 /Grashopper*.xml
 /custom.properties
 /logcustom.properties
+/build
+/release
+/release_service
