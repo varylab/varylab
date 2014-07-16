@@ -67,7 +67,8 @@
 	<classpathentry kind="lib" path="lib/substance/laf-plugin-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="lib/jopennurbs/jopennurbs.jar" sourcepath="/jOpenNurbs"/>
-	<classpathentry kind="lib" path="lib/xstream/xpp3.jar"/>
-	<classpathentry kind="lib" path="lib/xstream/xstream.jar"/>
+	<classpathentry kind="lib" path="lib/xstream/xpp3_min-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="lib/xstream/xstream-1.4.7.jar"/>
+	<classpathentry kind="lib" path="lib/xstream/xmlpull-1.1.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

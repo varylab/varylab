@@ -110,8 +110,9 @@
 	</path>
 
 	<path id="xstream.libraryclasspath">
-		<pathelement location="${lib}/xstream/xstream.jar"/>
-		<pathelement location="${lib}/xstream/xpp3.jar"/>
+		<pathelement location="${lib}/xstream/xstream-1.4.7.jar"/>
+		<pathelement location="${lib}/xstream/xpp3_min-1.1.4c.jar"/>
+		<pathelement location="${lib}/xstream/xmlpull-1.1.3.1.jar"/>
 	</path>
 
 	<path id="misc.libraryclasspath">
