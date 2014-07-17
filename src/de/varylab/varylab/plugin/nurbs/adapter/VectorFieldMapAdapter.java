@@ -19,6 +19,14 @@ public class VectorFieldMapAdapter extends AbstractAdapter<double[]>{
 	private String
 		name = "Vector Field";
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public VectorFieldMapAdapter() {
 		super(double[].class,true,true);
 	}
