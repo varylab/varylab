@@ -24,8 +24,6 @@
 	<classpathentry kind="lib" path="lib/conformallab/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/batik-util.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/DiscreteConformalLab.jar" sourcepath="/DiscreteConformalLab"/>
-	<classpathentry kind="lib" path="lib/conformallab/itext-xtra-5.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/conformallab/itextpdf-5.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/java2d.jar"/>
@@ -70,5 +68,8 @@
 	<classpathentry kind="lib" path="lib/xstream/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xstream/xstream-1.4.7.jar"/>
 	<classpathentry kind="lib" path="lib/xstream/xmlpull-1.1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-pdfa-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-xtra-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itextpdf-5.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
