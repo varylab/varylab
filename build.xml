@@ -61,9 +61,9 @@
 	</path>
 	
 	<path id="itext.libraryclasspath">
-		<pathelement location="${lib}/conformallab/itextpdf-5.5.0.jar"/>
-		<pathelement location="${lib}/conformallab/itext-xtra-5.5.0.jar"/>
-		<pathelement location="${lib}/conformallab/itext-pdfa-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itextpdf-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-xtra-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-pdfa-5.5.0.jar"/>
 	</path>
 
 	<path id="jfreechart.libraryclasspath">
@@ -82,7 +82,7 @@
 		<pathelement location="${lib}/jreality/janino.jar"/>
 		<pathelement location="${lib}/jreality/jterm.jar"/>
 		<pathelement location="${lib}/jreality/jython_console.jar"/>
-		<pathelement location="${lib}/jreality/jython-standalone-2.5.3.jar"/>
+		<pathelement location="${lib}/jreality/jython-standalone-2.5.4-rc1.jar"/>
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
 		<pathelement location="${lib}/jreality/hidapi-1.1.jar"/>
