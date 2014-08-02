@@ -14,6 +14,17 @@ import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+import javax.swing.LookAndFeel;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.fonts.FontPolicy;
+import org.pushingpixels.substance.api.fonts.FontSet;
+import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
+
+import de.varylab.varylab.plugin.lnf.TrebuchetFontSet;
 import de.varylab.varylab.startup.definitions.VaryLabUltimate;
 
 public class StaticSetup {
@@ -123,6 +134,26 @@ public class StaticSetup {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public static void installLookAndFeel() {
+		try {
+			LookAndFeel laf = new SubstanceGraphiteAquaLookAndFeel();
+			UIManager.setLookAndFeel(laf);
+			SubstanceLookAndFeel.setToUseConstantThemesOnDialogs(true);
+			JFrame.setDefaultLookAndFeelDecorated(true);
+			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
+			FontPolicy newFontPolicy = new FontPolicy() {
+				@Override
+				public FontSet getFontSet(String lafName, UIDefaults table) {
+//					return new TahomaFontSet(10);
+					return new TrebuchetFontSet(10);
+				}
+			};
+			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);
+		} catch (Exception e) {
+			log.warning("could not install substance look and feel: " + e);
 		}
 	}
 	
