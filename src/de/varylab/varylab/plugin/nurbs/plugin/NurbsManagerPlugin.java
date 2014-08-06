@@ -36,6 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -60,10 +62,12 @@ import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
+import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -71,11 +75,13 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.halfedge.VHDS;
+import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
+import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ComputeVectorFields;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.LinearDeformation;
@@ -85,6 +91,7 @@ import de.varylab.varylab.plugin.nurbs.algorithm.SplitAtEdge;
 import de.varylab.varylab.plugin.nurbs.algorithm.SplitInTheMiddle;
 import de.varylab.varylab.plugin.nurbs.algorithm.StretchXYZ;
 import de.varylab.varylab.plugin.nurbs.algorithm.UVUnroll;
+import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
 import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
@@ -96,6 +103,7 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurvesOriginal;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
+import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
@@ -125,6 +133,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private PointSelectionPlugin pointSelectionPlugin = null;
 
 	private NURBSSurface activeNurbsSurface;
+
+	private VisualizationInterface vif;
 
 	public NurbsManagerPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -297,7 +307,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 
 	
-	private class IntegralCurvesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener {
+	private class IntegralCurvesPanel extends ShrinkPanel implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener, ChangeListener {
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -326,6 +336,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 		
 		private JCheckBox
+			showVectorFieldBox = new JCheckBox("show"),	
 			immediateCalculationBox = new JCheckBox("Immediate"),
 			maxCurvatureBox = new JCheckBox("Max (cyan)"),
 			minCurvatureBox = new JCheckBox("Min (red)"),
@@ -356,7 +367,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			integralCurvesRoot = new SceneGraphComponent("Integral curves root");
 
 		private PolygonalLine activeCurve;
-		
+
+		private VectorFieldMapAdapter vfmax;
+
+		private VectorFieldMapAdapter vfmin;
+
 		private double[] getVecField(){
 			if(vecFieldSpinner.isEnabled()){
 				double grad = vecFieldModel.getNumber().doubleValue();
@@ -384,11 +399,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(new JLabel("Curve Type"),lc);
 			lc.gridwidth = 1;
 			add(curveCombo,rc);
-			lc.gridwidth = 2;
-			add(new JLabel("Vector Field (angle: 0° - 180°)"),lc);
 			lc.gridwidth = 1;
-			add(vecFieldSpinner, rc);
+			add(new JLabel("Vector Field (angle)"),lc);
+			lc.gridwidth = 1;
+			add(vecFieldSpinner, lc);
+			lc.gridwidth = 1;
+			add(showVectorFieldBox, rc);
+			showVectorFieldBox.addActionListener(this);
 			vecFieldSpinner.setEnabled(true);
+			vecFieldSpinner.addChangeListener(this);
 			lc.gridwidth = 2;
 			add(new JLabel("Runge-Kutta Tolerance Exp"), lc);
 			lc.gridwidth = 1;
@@ -580,7 +599,46 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				activeCurve.setBegin(beginLineModel.getNumber().intValue());
 				activeCurve.setEnd(endLineModel.getNumber().intValue());
 				resetIntegralCurvesComponent();
+			} else if(source == showVectorFieldBox) {
+				if(showVectorFieldBox.isSelected()) {
+					updateVectorfields();
+				} else {
+					removeVectorFields();
+				}
 			}
+			
+		}
+
+		private void removeVectorFields() {
+			hif.removeAdapter(vfmin);
+			hif.removeAdapter(vfmax);
+			vfmin = null;
+			vfmax = null;
+		}
+
+		private void updateVectorfields() {
+			if(vfmax == null) {
+				vfmax = new VectorFieldMapAdapter();
+				vfmax.setName("Symmetric Conjugate 1");
+			}
+			if(vfmin == null) {
+				vfmin = new VectorFieldMapAdapter();
+				vfmin.setName("Symmetric Conjugate 2");
+			}
+			NurbsUVAdapter nurbsAdapter = hif.getAdapters().query(NurbsUVAdapter.class);
+			if(nurbsAdapter != null) {
+				for(VVertex v : hif.get(new VHDS()).getVertices()) {
+					double[][] principleDirections = getDirections(nurbsAdapter.getSurface(), nurbsAdapter.getV(v, null), getVecField());
+					vfmax.setV(v,principleDirections[0],null);
+					vfmin.setV(v,principleDirections[1],null);
+					
+				}
+			} else {
+				throw new RuntimeException("No nurbs surface on active layer.");
+			}
+			hif.addLayerAdapter(vfmax, false);
+			hif.addLayerAdapter(vfmin, false);
+			vif.updateActiveVisualizations();
 		}
 
 
@@ -844,6 +902,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			
 		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if(e.getSource() == vecFieldSpinner) {
+				updateVectorfields();
+			}
+		}
 	}
 	
 	private class PointDistancePanel extends ShrinkPanel implements ActionListener{
@@ -994,6 +1059,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		hif.addAdapter(new NurbsWeightAdapter(), true);
 		pointSelectionPlugin  = c.getPlugin(PointSelectionPlugin.class);
 		pointSelectionPlugin.addPointSelectionListener(curvatureLinesPanel);
+		vif = c.getPlugin(VisualizationInterface.class);
 		c.getPlugin(NurbsIOPlugin.class);
 		c.getPlugin(ExtractControlMesh.class);
 		c.getPlugin(NurbsSurfaceFromMesh.class);
@@ -1119,5 +1185,44 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		v.addBasicUI();
 		v.registerPlugin(new NurbsManagerPlugin());
 		v.startup();
+	}
+	
+	private double[][] getDirections(NURBSSurface ns, double[] uv, double[] vecField) {
+		double[] givenDir = vecField;
+		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, uv);
+		double K = ci.getGaussCurvature();
+		double[][] dir = {{0,0,0},{0,0,0}};
+		if(K > 0){
+			double k1 = ci.getMinCurvature();
+			double k2 = ci.getMaxCurvature();
+			double[] e1 = ci.getCurvatureDirections()[0];
+			double[] e2 = ci.getCurvatureDirections()[1];
+			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
+			double delta = 0.;
+			if(Rn.innerProduct(v, e1) > 1){
+				delta = 0.;
+			}
+			else if(Rn.innerProduct(v, e1) < -1){
+				delta = Math.PI;
+			}
+			else{
+				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
+			}
+			double theta;
+			if(k2 == 0){
+				theta = Math.PI / 2.;
+			}
+			else{
+				double q = k1 / k2;
+				double p = Math.tan(delta) * (1 + q) / 2;
+				theta = Math.atan(p + Math.sqrt(p * p + q));
+			}
+			
+			dir[0] = Rn.linearCombination(null, Math.cos(theta), e1, Math.sin(theta),e2);
+			dir[1] = Rn.linearCombination(null, -k2*Math.sin(theta),e1, k1*Math.cos(theta),e2);
+			Rn.normalize(dir[0], dir[0]);
+			Rn.normalize(dir[1], dir[1]);
+		} 
+		return dir;
 	}
 }
