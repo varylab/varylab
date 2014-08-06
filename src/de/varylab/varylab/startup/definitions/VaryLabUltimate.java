@@ -24,7 +24,7 @@ import de.jtem.halfedgetools.plugin.visualizers.PositiveEdgeVisualizer;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.varylab.discreteconformal.ConformalLab;
 import de.varylab.discreteconformal.plugin.DiscreteConformalPlugin;
-import de.varylab.discreteconformal.plugin.DomainVisualisationPlugin;
+import de.varylab.discreteconformal.plugin.TextureSpaceViewer3D;
 import de.varylab.discreteconformal.plugin.visualizer.FlippedTriangles;
 import de.varylab.discreteconformal.plugin.visualizer.IndexMedialGraph;
 import de.varylab.varylab.VaryLab;
@@ -169,9 +169,9 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		instances.addAll(ConformalLab.createConformalPlugins());
 		
 		for(Plugin p : instances) {
-			if(p instanceof DomainVisualisationPlugin) {
+			if(p instanceof TextureSpaceViewer3D) {
 				instances.remove(p);
-				DomainVisualisationPlugin dvp = new DomainVisualisationPlugin(new IdentifyVerticesPlugin(true), new DomainSegmentCutPlugin(), new DomainLineCutPlugin());
+				TextureSpaceViewer3D dvp = new TextureSpaceViewer3D(new IdentifyVerticesPlugin(true), new DomainSegmentCutPlugin(), new DomainLineCutPlugin());
 				instances.add(dvp);
 				break;
 			}

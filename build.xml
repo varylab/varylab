@@ -57,9 +57,13 @@
 		<pathelement location="${lib}/conformallab/batik-awt-util.jar"/>
 		<pathelement location="${lib}/conformallab/batik-svggen.jar"/>
 		<pathelement location="${lib}/conformallab/batik-util.jar"/>
-		<pathelement location="${lib}/conformallab/itext-xtra-5.1.3.jar"/>
-		<pathelement location="${lib}/conformallab/itextpdf-5.1.3.jar"/>
 		<pathelement location="${lib}/conformallab/MTJOptimization.jar"/>
+	</path>
+	
+	<path id="itext.libraryclasspath">
+		<pathelement location="${lib}/itext/itextpdf-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-xtra-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-pdfa-5.5.0.jar"/>
 	</path>
 
 	<path id="jfreechart.libraryclasspath">
@@ -78,7 +82,7 @@
 		<pathelement location="${lib}/jreality/janino.jar"/>
 		<pathelement location="${lib}/jreality/jterm.jar"/>
 		<pathelement location="${lib}/jreality/jython_console.jar"/>
-		<pathelement location="${lib}/jreality/jython-standalone-2.5.3.jar"/>
+		<pathelement location="${lib}/jreality/jython-standalone-2.5.4-rc1.jar"/>
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
 		<pathelement location="${lib}/jreality/hidapi-1.1.jar"/>
@@ -138,6 +142,9 @@
 		<manifestclasspath property="manifest.conformallab.classpath" jarfile="${jarfile}">
 			<classpath refid="conformallab.libraryclasspath"/>
 		</manifestclasspath>
+		<manifestclasspath property="manifest.itext.classpath" jarfile="${jarfile}">
+			<classpath refid="itext.libraryclasspath"/>
+		</manifestclasspath>		
 		<manifestclasspath property="manifest.jfreechart.classpath" jarfile="${jarfile}">
 			<classpath refid="jfreechart.libraryclasspath"/>
 		</manifestclasspath>
@@ -161,6 +168,7 @@
 		</manifestclasspath>
 		<property name="manifest.classpath" value="
 			${manifest.conformallab.classpath}
+			${manifest.itext.classpath}
 			${manifest.jfreechart.classpath}
 			${manifest.jogamp.classpath}
 			${manifest.jreality.classpath}
@@ -185,6 +193,7 @@
 			<src path="${src}"/>
 			<src path="${src-resource}"/>
 			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="itext.libraryclasspath"/>
 			<classpath refid="jfreechart.libraryclasspath"/>
 			<classpath refid="jogamp.libraryclasspath"/>
 			<classpath refid="jopennurbs.libraryclasspath"/>
@@ -218,6 +227,7 @@
 			<src path="${src-test}"/>
 			<classpath path="${build}"/>
 			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="itext.libraryclasspath"/>
 			<classpath refid="jfreechart.libraryclasspath"/>
 			<classpath refid="jogamp.libraryclasspath"/>
 			<classpath refid="jreality.libraryclasspath"/>
@@ -235,6 +245,7 @@
 			<classpath path="${build}"/>
 			<classpath path="${build-test}"/>
 			<classpath refid="conformallab.libraryclasspath"/>
+			<classpath refid="itext.libraryclasspath"/>
 			<classpath refid="jfreechart.libraryclasspath"/>
 			<classpath refid="jogamp.libraryclasspath"/>
 			<classpath refid="jreality.libraryclasspath"/>

@@ -1,74 +1,59 @@
 <map>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_stepSize-1115936534172497249</string>
-    <double>1.0</double>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_useMenuItem-1</string>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_instant-5277820601613245405</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_minValue-1115936534172497249</string>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableDisplay7550984003696499819</string>
+    <string>V Grid</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_maxValue-5277820601613245405</string>
+    <double>100.0</double>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_value-5277820601613245405</string>
+    <int>52</int>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_minValue-5277820601613245405</string>
     <double>10.0</double>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_instant-5747214430125597348</string>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_instant7550984003696499819</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_name-1</string>
-    <string>Torus Halfedge</string>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_minValue7550984003696499819</string>
+    <double>10.0</double>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_guiPluginClass-5747214430125597348</string>
-    <string>de.jreality.plugin.scripting.gui.NumberSpinnerGUI</string>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_isInteger7550984003696499819</string>
+    <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableValue7550984003696499819</string>
+    <int>25</int>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableDisplay-5277820601613245405</string>
+    <string>U Grid</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_maxValue7550984003696499819</string>
+    <double>100.0</double>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableValue-5277820601613245405</string>
+    <int>52</int>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_showSlider-5277820601613245405</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de_jreality_plugin_scripting_PythonScriptTool_menuPath-1</string>
     <string>Python Tools</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonToolsManager_toolName</string>
-    <string>Torus Halfedge</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_isInteger-1115936534172497249</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_value-5747214430125597348</string>
-    <int>25</int>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_stepSize-5747214430125597348</string>
-    <double>1.0</double>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableDisplay-1115936534172497249</string>
-    <string>U Grid</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_maxValue-5747214430125597348</string>
-    <double>100.0</double>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_guiIdList-1</string>
-    <linked-list>
-      <long>-1115936534172497249</long>
-      <long>-5747214430125597348</long>
-    </linked-list>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_instant-1115936534172497249</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_useFileLink-1</string>
-    <boolean>false</boolean>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableValue-5747214430125597348</string>
-    <int>25</int>
   </entry>
   <entry>
     <string>de_jreality_plugin_scripting_PythonScriptTool_icon-1</string>
@@ -342,89 +327,100 @@
     </javax.swing.ImageIcon>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_PythonToolsManager_toolId</string>
-    <long>-1</long>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_guiPluginClass-1115936534172497249</string>
-    <string>de.jreality.plugin.scripting.gui.NumberSpinnerGUI</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonToolsManager_toolIcon</string>
-    <javax.swing.ImageIcon reference="../../entry[18]/javax.swing.ImageIcon"/>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_isInteger-5747214430125597348</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_value-1115936534172497249</string>
-    <int>47</int>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableName-5747214430125597348</string>
-    <string>v</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_PythonScriptTool_sourceCode-1</string>
-    <string>from de.jreality.plugin import JRViewerUtility
-from de.jreality.geometry import Primitives
-from de.jtem.halfedgetools.plugin import HalfedgeInterface
-
-content = JRViewerUtility.getContentPlugin(C);
-content.setContent(Primitives.torus(0.4, 0.2, u, v));
-
-H = C.getPlugin(HalfedgeInterface);
-
-hds = H.get();
-H.clearSelection();
-
-s = H.getSelection();
-for i in range(0, 150):
-    s.setSelected(hds.getFace(i), True);
-H.setSelection(s);
-
-delAlgo = H.getAlgorithm(&quot;Remove Face&quot;);
-delAlgo.execute();</string>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_showSlider-1115936534172497249</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
     <string>de_jreality_plugin_scripting_PythonScriptTool_fileLink-1</string>
     <null/>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_minValue-5747214430125597348</string>
-    <double>10.0</double>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_value7550984003696499819</string>
+    <int>25</int>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableName-1115936534172497249</string>
-    <string>u</string>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_name-1</string>
+    <string>Torus Halfedge</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_useMenuItem-1</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de_jreality_plugin_scripting_PythonScriptTool_useToolItem-1</string>
     <boolean>true</boolean>
   </entry>
   <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_isInteger-5277820601613245405</string>
+    <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_stepSize7550984003696499819</string>
+    <double>1.0</double>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableName-5277820601613245405</string>
+    <string>u</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_showSlider7550984003696499819</string>
+    <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonToolsManager_toolIcon</string>
+    <javax.swing.ImageIcon reference="../../entry[15]/javax.swing.ImageIcon"/>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_guiPluginClass-5277820601613245405</string>
+    <string>de.jreality.plugin.scripting.gui.NumberSpinnerGUI</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonToolsManager_toolId</string>
+    <long>-1</long>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_stepSize-5277820601613245405</string>
+    <double>1.0</double>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_guiPluginClass7550984003696499819</string>
+    <string>de.jreality.plugin.scripting.gui.NumberSpinnerGUI</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableName7550984003696499819</string>
+    <string>v</string>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_guiIdList-1</string>
+    <linked-list>
+      <long>-5277820601613245405</long>
+      <long>7550984003696499819</long>
+    </linked-list>
+  </entry>
+  <entry>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_useFileLink-1</string>
+    <boolean>false</boolean>
+  </entry>
+  <entry>
     <string>de_jreality_plugin_scripting_PythonScriptTool_useGUI-1</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableDisplay-5747214430125597348</string>
-    <string>V Grid</string>
+    <string>de_jreality_plugin_scripting_PythonScriptTool_sourceCode-1</string>
+    <string>from de.jreality.geometry import Primitives
+from de.jtem.halfedgetools.plugin import HalfedgeInterface
+from de.jtem.halfedgetools.selection import Selection
+
+H = C.getPlugin(HalfedgeInterface);
+H.set(Primitives.torus(0.4, 0.2, u, v))
+hds = H.get();
+
+s = Selection()
+for i in range(0, 150):
+    s.add(hds.getFace(i));
+H.setSelection(s);
+
+delAlgo = H.getAlgorithm(&quot;Remove Face&quot;);
+delAlgo.execute();</string>
   </entry>
   <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_maxValue-1115936534172497249</string>
-    <double>100.0</double>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI_showSlider-5747214430125597348</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
-    <string>de_jreality_plugin_scripting_gui_NumberSpinnerGUI$NumberGUI_variableValue-1115936534172497249</string>
-    <int>47</int>
+    <string>de_jreality_plugin_scripting_PythonToolsManager_toolName</string>
+    <string>Torus Halfedge</string>
   </entry>
 </map>
