@@ -9,17 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
-import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-
-import org.pushingpixels.substance.api.SubstanceLookAndFeel;
-import org.pushingpixels.substance.api.fonts.FontPolicy;
-import org.pushingpixels.substance.api.fonts.FontSet;
-import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
@@ -40,7 +31,6 @@ import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 import de.jtem.jrworkspace.plugin.simplecontroller.StartupChain;
 import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
-import de.varylab.varylab.plugin.lnf.TahomaFontSet;
 
 public abstract class VarylabStartupDefinition {
 
@@ -48,7 +38,7 @@ public abstract class VarylabStartupDefinition {
 		splash = null;
 	private JRViewer 
 		v = null;
-	private Logger
+	private static Logger
 		log = Logger.getLogger(VarylabStartupDefinition.class.getName());
 	
 	public abstract void getPlugins(Set<Class<? extends Plugin>> classes, Set<Plugin> instances);
@@ -62,25 +52,6 @@ public abstract class VarylabStartupDefinition {
 			splash = new VarylabSplashScreen();
 		}
 		return splash;
-	}
-	
-	private void installLookAndFeel() {
-		try {
-			LookAndFeel laf = new SubstanceGraphiteAquaLookAndFeel();
-			UIManager.setLookAndFeel(laf);
-			SubstanceLookAndFeel.setToUseConstantThemesOnDialogs(true);
-			JFrame.setDefaultLookAndFeelDecorated(true);
-			UIManager.put(SubstanceLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
-			FontPolicy newFontPolicy = new FontPolicy() {
-				@Override
-				public FontSet getFontSet(String lafName, UIDefaults table) {
-					return new TahomaFontSet(10);
-				}
-			};
-			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);
-		} catch (Exception e) {
-			log.warning("could not install substance look and feel: " + e);
-		}
 	}
 	
 	private void staticInit() {
@@ -124,7 +95,7 @@ public abstract class VarylabStartupDefinition {
 			@Override
 			public void run() {
 				splash.setStatus("install substance look and feel...");
-				installLookAndFeel();
+				StaticSetup.installLookAndFeel();
 			}
 		};
 		Runnable jobInitViewer = new Runnable() {

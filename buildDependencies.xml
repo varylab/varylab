@@ -22,6 +22,7 @@
 	<property name="halfedgetools.dir" value="../halfedgetools"/>
 	<property name="conformallab.dir" value="../conformallab"/>
 	<property name="jopennurbs.dir" value="../jOpenNurbs"/>
+	<property name="java2d.dir" value="../java2d"/>
 	
 	
 	<target name="all" depends="halfedgetools, jrworkspace, jreality, discrete conformal lab">
@@ -76,6 +77,14 @@
 		<ant antfile="build.xml" dir="${conformallab.dir}" target="release"/>
 		<copy todir="lib/conformallab">
 			<fileset dir="${conformallab.dir}/release/${date}" includes="DiscreteConformalLab.jar"/>
+		</copy>
+	</target>
+	
+	<target name="java2d">
+		<ant antfile="build.xml" dir="${java2d.dir}" target="clean"/>
+		<ant antfile="build.xml" dir="${java2d.dir}" target="release"/>
+		<copy todir="lib/jtem">
+			<fileset dir="${java2d.dir}/release" includes="java2d.jar"/>
 		</copy>
 	</target>
 	
