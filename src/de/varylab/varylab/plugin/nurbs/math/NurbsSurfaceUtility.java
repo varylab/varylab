@@ -148,6 +148,57 @@ public class NurbsSurfaceUtility {
 		}
 		return points;
 	}
+	
+	
+	public static double computeA3(double x1, double x2, double y1, double y2){
+		return ((y2 / x2 - 1) * (x1 - 1) / (x2 - 1) - y1 / x1 + 1) / ((x1 - 1) * (x2 * x2 - 1) / (x2 - 1) - (x1 * x1 -1));
+	}
+	
+	public static double computeA2(double x1, double y1, double a3){
+		return (y1 / x1 - (x1 * x1 - 1) * a3 - 1) / (x1 - 1);
+	}
+	
+	public static double computeA1(double a2, double a3){
+		return 1 - a2 - a3;
+	}
+	
+	public static double getPolynomialValue(double a1, double a2, double a3, double t){
+		return a3 * t * t * t + a2 * t * t + a1 * t;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistList(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
+			double[] point, double dist, double x1, double x2, double y1, double y2, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double a3 = computeA3(x1, x2, y1, y2);
+		double a2 = computeA2(x1, y1, a3);
+		double a1 = computeA1(a2, a3);
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			double t = (double)i / (double)numberOfPoints;
+			currDist = getPolynomialValue(a1, a2, a3, t) * dist;
+			if(uDir){
+				if(up){
+					double[] next = {point[0] + currDist, point[1]};
+					distPoints.add(next);
+				}
+				if(down){
+					double[] next = {point[0] - currDist, point[1]};
+					distPoints.add(next);
+				}
+			}
+			if(vDir){
+				if(up){
+					double[] next = {point[0], point[1] + currDist};
+					distPoints.add(next);
+				}
+				if(down){
+					double[] next = {point[0], point[1] - currDist};
+					distPoints.add(next);
+				}
+			}
+		}
+		return distPoints;
+	}
 
 
 	public static void addNurbsMesh(NURBSSurface surface, HalfedgeLayer newLayer) {

@@ -321,6 +321,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		private JButton 
 		    intersectionsButton = new JButton("Discretize!"),
+		    deleteButton = new JButton("Delete All Curves"),
 			goButton = new JButton("Go"),
 			cutLineButton = new JButton("Cut Line");
 			
@@ -451,6 +452,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 			integralCurvesRoot.setAppearance(app);
 			
+			deleteButton.addActionListener(this);
+			add(deleteButton, rc);
 			intersectionsButton.addActionListener(this);
 			add(intersectionsButton,rc);
 		}
@@ -497,7 +500,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				}	
 				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField());
 				if(singularities == null) {
-					
 //					computeUmbilicalPoints();
 				}
 				
@@ -508,6 +510,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				curvesModel.addAll(currentLines);
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
+			} else if(source == deleteButton) {
+				curvesModel.clear();
+				hif.clearSelection();
+				curvesModel.fireTableDataChanged();
 			} else if(source == intersectionsButton) {
 				// default patch
 				LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
@@ -515,7 +521,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					allSegments.addAll(pl.getpLine());
 				}
 				int shiftedIndex = allSegments.size();
-//				List<LineSegment> boundarySegments = activeNurbsSurface.getBoundarySegments();
 				List<LineSegment> completeDomainBoundarySegments = activeNurbsSurface.getCompleteDomainBoundarySegments();
 				
 				double[] U = activeNurbsSurface.getUKnotVector();
@@ -529,22 +534,15 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				allSegments.addAll(completeDomainBoundarySegments);			
 				allSegments = LineSegmentIntersection.preSelection(U, V, allSegments);
 				double firstTimeDouble = System.currentTimeMillis();
-//				LinkedList<IntersectionPoint> intersec = LineSegmentIntersection.findIntersections(allSegments);
 				double lastTimeDouble = System.currentTimeMillis();
 				logger.info("Double Time: " + (lastTimeDouble - firstTimeDouble));
 				double firstTimeBentley = System.currentTimeMillis();
-//				double dilation = 1000000000.0;
-				
-//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BruteForce(U, V, allSegments, dilation);
-				
-		//		LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments, dilation);
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(U, V, allSegments);
 				logger.info("\n");
 				logger.info("NURBS manager plugin all intersections");
 				for (IntersectionPoint ip : intersections) {
 					logger.info(ip.toString());
 				}
-		//		FaceSetGenerator fsg = new FaceSetGenerator(activeNurbsSurface, dilation, intersections);
 				FaceSetGenerator fsg = new FaceSetGenerator(activeNurbsSurface, intersections);
 				double lastTimeBentley = System.currentTimeMillis();
 				logger.info("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
@@ -560,7 +558,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				hel.setName("Curvature Geometry");
 //				writeToFile(fS);
 			
-//				hel.addTemporaryGeometry(fS.getIndexedFaceSet());
 				hif.addLayer(hel); //add and activate
 				hel.set(fs.getIndexedFaceSet());
 				hif.update();
@@ -574,9 +571,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					symConjBox.setEnabled(true);
 				}
 			} else if(source == cutLineButton){
-//				int begin = beginLineModel.getNumber().intValue();
-//				int end = endLineModel.getNumber().intValue();
-//				activeCurve = 
 				activeCurve.setBegin(beginLineModel.getNumber().intValue());
 				activeCurve.setEnd(endLineModel.getNumber().intValue());
 				resetIntegralCurvesComponent();
@@ -829,20 +823,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				minCurvatureBox.setEnabled(false);
 				maxCurvatureBox.setEnabled(false);
 			}
-//			if(symConjBox.isSelected() == true){
-//				symConjCurvatureBox.setEnabled(false);
-//			}
-//			else{
-//				symConjCurvatureBox.setEnabled(true);
-//			}
-//			if(symConjCurvatureBox.isSelected() == true){
-//				symConjBox.setEnabled(false);
-//			}
-//			else{
-//				symConjBox.setEnabled(true);
-//			}
-			
-			
 		}
 	}
 	
@@ -981,9 +961,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			hif.getActiveLayer().addTemporaryGeometry(sgcPoint);
 			return point;
 		}
-		
-		
-		
 	}	
 	
 	@Override

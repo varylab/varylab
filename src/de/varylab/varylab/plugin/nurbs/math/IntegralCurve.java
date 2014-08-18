@@ -66,28 +66,28 @@ public class IntegralCurve {
 	 * an assymptotic direction will be returned
 	 */
 	
-	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
-		double[] dir = {1,1};
-		if(!ns.isSurfaceOfRevolution()){
-			return dir;
-		}
-		else{
-			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
-			double[][] sF = ci.getSecondFundamental();
-			double l = sF[0][0];
-			double n = sF[1][1];
-			double K = ci.getGaussCurvature();
-			if(K >= 0){
-				dir[0] = Math.sqrt(n / l);
-				return dir;
-				
-			}
-			else{
-				return getAssymptoticDirection(ns, p);
-				
-			}
-		}
-	}
+//	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
+//		double[] dir = {1,1};
+//		if(!ns.isSurfaceOfRevolution()){
+//			return dir;
+//		}
+//		else{
+//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
+//			double[][] sF = ci.getSecondFundamental();
+//			double l = sF[0][0];
+//			double n = sF[1][1];
+//			double K = ci.getGaussCurvature();
+//			if(K >= 0){
+//				dir[0] = Math.sqrt(n / l);
+//				return dir;
+//				
+//			}
+//			else{
+//				return getAssymptoticDirection(ns, p);
+//				
+//			}
+//		}
+//	}
 	
 	public double det(double[] vec1, double[] vec2){
 		return vec1[0] * vec2[1] + vec2[0] * vec1[1];
@@ -101,9 +101,9 @@ public class IntegralCurve {
 	
 	public double[] getSymConjDirWRTCuvatureDirection(double[] point) {
 	double[] dir = {1,1};
-	if(ns.isSurfaceOfRevolution()){
-		return getSymConjDirSurfaceOfRevolution(point);
-	}
+//	if(ns.isSurfaceOfRevolution()){
+//		return getSymConjDirSurfaceOfRevolution(point);
+//	}
 	CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, point);
 	double[] w1 = ci.getPrincipalDirections()[0];
 	double[] w2 = ci.getPrincipalDirections()[1];
@@ -152,7 +152,7 @@ public class IntegralCurve {
 				delta = Math.PI;
 			}
 			else{
-				delta = 2 * Math.acos(Rn.innerProduct(v, e1));
+				delta = 2. * Math.acos(Rn.innerProduct(v, e1));
 			}
 			double theta;
 			if(k2 == 0){
@@ -730,6 +730,7 @@ public class IntegralCurve {
 		while (!nearBy && counter < 10000) {
 			counter++;
 			if(counter == 10000){
+				System.out.println("termination after 10000 steps");
 				logger.info("termination after 10000 steps");
 			}
 			double[] last = pointList.getLast().clone();
