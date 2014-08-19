@@ -166,16 +166,46 @@ public class NurbsSurfaceUtility {
 		return a3 * t * t * t + a2 * t * t + a1 * t;
 	}
 	
+	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
+			LinkedList<double[]> selPoints, double dist, int numberOfPoints){
+		LinkedList<LinkedList<double[]>> commonPointList = new LinkedList<>();
+		double currDist = 0.0;
+		for (int j = 0; j <= numberOfPoints; j++) {
+			LinkedList<double[]> commonPoints = new LinkedList<>();
+			currDist = (double)j / (double)numberOfPoints * dist;
+			for (double[] point : selPoints) {
+				if(uDir){
+					if(up){
+						double[] next = {point[0] + currDist, point[1]};
+						commonPoints.add(next);
+					}
+					if(down){
+						double[] next = {point[0] - currDist, point[1]};
+						commonPoints.add(next);
+					}
+				}
+				if(vDir){
+					if(up){
+						double[] next = {point[0], point[1] + currDist};
+						commonPoints.add(next);
+					}
+					if(down){
+						double[] next = {point[0], point[1] - currDist};
+						commonPoints.add(next);
+					}
+				}
+			}
+			commonPointList.add(commonPoints);
+		}
+		return commonPointList;
+	}
+	
 	public static LinkedList<double[]> getPointsFromDistList(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
-			double[] point, double dist, double x1, double x2, double y1, double y2, int numberOfPoints){
+			double[] point, double dist, int numberOfPoints){
 		LinkedList<double[]> distPoints = new LinkedList<>();
-		double a3 = computeA3(x1, x2, y1, y2);
-		double a2 = computeA2(x1, y1, a3);
-		double a1 = computeA1(a2, a3);
 		double currDist = 0.0;
 		for (int i = 1; i <= numberOfPoints; i++) {
-			double t = (double)i / (double)numberOfPoints;
-			currDist = getPolynomialValue(a1, a2, a3, t) * dist;
+			currDist = (double)i / (double)numberOfPoints * dist;
 			if(uDir){
 				if(up){
 					double[] next = {point[0] + currDist, point[1]};
@@ -195,6 +225,40 @@ public class NurbsSurfaceUtility {
 					double[] next = {point[0], point[1] - currDist};
 					distPoints.add(next);
 				}
+			}
+		}
+		return distPoints;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistListUp(NURBSSurface ns, boolean uDir, boolean  vDir, double[] point, double dist, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			currDist = (double)i / (double)numberOfPoints * dist;
+			if(uDir){
+				double[] next = {point[0] + currDist, point[1]};
+				distPoints.add(next);
+			}
+			if(vDir){
+				double[] next = {point[0], point[1] + currDist};
+				distPoints.add(next);
+			}
+		}
+		return distPoints;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistListDown(NURBSSurface ns, boolean uDir, boolean  vDir, double[] point, double dist, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			currDist = (double)i / (double)numberOfPoints * dist;
+			if(uDir){
+				double[] next = {point[0] - currDist, point[1]};
+				distPoints.add(next);
+			}
+			if(vDir){
+				double[] next = {point[0], point[1] - currDist};
+				distPoints.add(next);
 			}
 		}
 		return distPoints;

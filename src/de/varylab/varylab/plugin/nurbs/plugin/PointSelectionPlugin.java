@@ -50,6 +50,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
+import de.varylab.varylab.plugin.interaction.DraggablePointComponent;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
@@ -106,7 +107,10 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private boolean vDir = false;
 	private boolean up = false;
 	private boolean down = false;
-	private double dist = 0., x1 = 0.33, x2 = 0.66, y1 = 0.33, y2 = 0.66;
+	private double dist = 0.;
+	private LinkedList<LinkedList<double[]>> commonPointList;
+	
+
 	
 	private boolean startup = true;
 	
@@ -177,11 +181,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		private JSpinner distSpinner = new JSpinner(distModel),
 				numberOfPointsSpinner = new JSpinner(numberOfPointsModel);
 		
-		private JSlider x1Slider = new JSlider(0, 1000, 330),
-						y1Slider = new JSlider(0, 1000, 330),
-						x2Slider = new JSlider(0, 1000, 660),
-						y2Slider = new JSlider(0, 1000, 660);
-		
 		
 		public PointGeneratorPanel() {
 			super("Point Generator");
@@ -190,14 +189,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 			GridBagConstraints rc = LayoutFactory.createRightConstraint();
 
-			add(new JLabel("Choose x1"), lc);
-			add(x1Slider, rc);
-			add(new JLabel("Modify x1"), lc);
-			add(y1Slider, rc);
-			add(new JLabel("Choose x2"), lc);
-			add(x2Slider, rc);
-			add(new JLabel("Modify x2"), lc);
-			add(y2Slider, rc);
+		
 			add(new JLabel("Choose dist"), lc);
 			add(distSpinner, rc);
 			add(new JLabel("Choose Number Of Points"), lc);
@@ -211,10 +203,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			vDirBox.addActionListener(this);
 			upBox.addActionListener(this);
 			downBox.addActionListener(this);
-			x1Slider.addChangeListener(this);
-			x2Slider.addChangeListener(this);
-			y1Slider.addChangeListener(this);
-			y2Slider.addChangeListener(this);
 			distSpinner.addChangeListener(this);
 			numberOfPointsSpinner.addChangeListener(this);
 			
@@ -222,18 +210,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		}
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			if(x1Slider == e.getSource()){
-				x1 = (double)x1Slider.getValue() / 1000.0;
-			}
-			if(x2Slider == e.getSource()){
-				x2 = (double)x2Slider.getValue() / 1000.0;;
-			}
-			if(y1Slider == e.getSource()){
-				y1 = (double)y1Slider.getValue() / 1000.0;
-			}
-			if(y2Slider == e.getSource()){
-				y2 = (double)y2Slider.getValue() / 1000.0;
-			}
+			
 			if(distSpinner == e.getSource()){
 				dist = distModel.getNumber().doubleValue();
 			}
@@ -246,10 +223,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		@Override
 		public void actionPerformed(ActionEvent e){								
 			dist = distModel.getNumber().doubleValue();
-			x1 = (double)x1Slider.getValue() / 1000.0;
-			x2 = (double)x2Slider.getValue() / 1000.0;
-			y1 = (double)y1Slider.getValue() / 1000.0;
-			y2 = (double)y2Slider.getValue() / 1000.0;
+			
 			numberOfPoints = numberOfPointsModel.getNumber().intValue();
 			if(uDirBox.isSelected()){
 				uDir = true;
@@ -478,15 +452,15 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			for(double[] uv : getSelectedPoints()) {
 				selectedPoints.add(uv);
 			}
-			for(double[] uv : selectedPoints) {
-				LinkedList<double[]> pts = NurbsSurfaceUtility.getPointsFromDistList(surface, uDir, vDir, up, down, uv, dist, x1, x2, y1, y2, numberOfPoints);
-				for (double[] pt : pts) {
+			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, uDir, vDir, up, down, selectedPoints, dist, numberOfPoints);
+			for (LinkedList<double[]> list : commonPointList) {
+				for (double[] pt : list) {
 					if(!activeModel.contains(pt)) {
 						activeModel.add(pt);
 						selectedPointsComponent.addChild(createPointComponent(pt));
 					}
 				}
-			} 
+			}
 		}
 		
 		activeModel.fireTableDataChanged();
@@ -517,6 +491,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	public boolean getVDir(){
 		return vDir;
 	}
+	
+	public LinkedList<LinkedList<double[]>> getCommonPointList(){
+		return commonPointList;
+	}
+	
+//	public LinkedList<SelectedPoint> getSelectedPoints(){
+//		return selctedPoints;
+//	}
 	
 	
 	private SceneGraphComponent createPointComponent(double[] uv) {
