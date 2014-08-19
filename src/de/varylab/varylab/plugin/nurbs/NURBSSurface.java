@@ -1102,6 +1102,17 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
  			return PointProjectionSurface.getClosestPointDomain(this, point);
  		}
 		
+		public double[] getClosestPointDomainDir(double[] point, double[] start, boolean uDir, boolean vDir){
+			double[] p = PointProjectionSurface.getClosestPointDomain(this, point);
+			if(uDir){
+				p[1] = start[1];
+			}
+			else if(vDir){
+				p[1] = start[0];
+			}
+			return p;
+		}
+		
 		
 		/**
 		 * 

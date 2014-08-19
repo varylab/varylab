@@ -37,6 +37,7 @@ import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
+import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Vertex;
@@ -281,6 +282,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		app.setAttribute(VERTEX_DRAW, true);
 		app.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, ORANGE);
 		app.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		selectedPointsComponent.setPickable(false);
 		selectedPointsComponent.setAppearance(app);
 	}
 
@@ -507,6 +509,15 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	public List<double[]> getSelectedPoints() {
 		return activeModel.getChecked();
 	}
+	
+	public boolean getUDir(){
+		return uDir;
+	}
+	
+	public boolean getVDir(){
+		return vDir;
+	}
+	
 	
 	private SceneGraphComponent createPointComponent(double[] uv) {
 		PointSetFactory psfi = new PointSetFactory();

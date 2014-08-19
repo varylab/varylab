@@ -166,6 +166,10 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	public E remove(int index) {
 		return list.remove(index);
 	}
+	
+	public boolean remove(E pl){
+		return list.remove(pl);
+	}
 
 	public boolean isSelected(int row) {
 		return checked.contains(list.get(row));

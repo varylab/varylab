@@ -17,14 +17,30 @@ public class DraggablePointComponent extends SceneGraphComponent implements Poin
 	private PointSet 
 		point = new PointSet("Draggable point",1);
 	
+	private boolean useDefaultDraggListener = true;
+	
 	public DraggablePointComponent(double[] coords) {
 		super("Draggable point");
-		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(coords,4));
+		updateCoords(coords);
 		addTool(dragTool);
 		dragTool.addPointDragListener(this);
 		setGeometry(point);
 	}
+
+	public void setUseDefaultDraggListener(boolean useDefaultDraggListener) {
+		this.useDefaultDraggListener = useDefaultDraggListener;
+	}
 	
+	public PointSet getPoint() {
+		return point;
+	}
+
+	public void setPoint(PointSet point) {
+		this.point = point;
+	}
+
+
+
 	public void addPointDragListener(PointDragListener l) {
 		dragTool.addPointDragListener(l);
 	}
@@ -39,7 +55,14 @@ public class DraggablePointComponent extends SceneGraphComponent implements Poin
 
 	@Override
 	public void pointDragged(PointDragEvent e) {
-		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(new double[]{e.getX(),e.getY(), e.getZ(), 1.0},4));
+		double[] newCoords = new double[]{e.getX(),e.getY(), e.getZ(), 1.0};
+		if(useDefaultDraggListener) {
+			updateCoords(newCoords);
+		}
+	}
+
+	public void updateCoords(double[] newCoords) {
+		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(newCoords,4));
 	}
 
 	@Override

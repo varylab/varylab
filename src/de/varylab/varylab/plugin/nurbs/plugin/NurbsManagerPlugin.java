@@ -43,6 +43,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+//import com.thoughtworks.xstream.io.binary.Token.Attribute;
+
+
+
+
+
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -52,13 +58,20 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.scene.data.Attribute;
+import de.jreality.scene.data.DoubleArrayArray;
+import de.jreality.scene.data.StorageModel;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultLineShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
+import de.jreality.tools.DragEventTool;
+import de.jreality.tools.PointDragEvent;
+import de.jreality.tools.PointDragListener;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
@@ -77,6 +90,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
+import de.varylab.varylab.plugin.interaction.DraggablePointComponent;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.BoundaryLines;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
@@ -131,6 +145,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private List<double[]> singularities = null;
 
 	private PointSelectionPlugin pointSelectionPlugin = null;
+	
+	boolean firstVectorField = true;
+	boolean secondVectorField = true;
 
 	private NURBSSurface activeNurbsSurface;
 
@@ -372,6 +389,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private VectorFieldMapAdapter vfmax;
 
 		private VectorFieldMapAdapter vfmin;
+		
+		private IntegralCurve ic;
 
 		private double[] getVecField(){
 			if(vecFieldSpinner.isEnabled()){
@@ -384,6 +403,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		}
 		
 		public IntegralCurvesPanel() {
+			
+			
 			super("Integral Curves");
 			setShrinked(true);
 			
@@ -467,7 +488,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(curveLengthPanel, rc);
 
 			Appearance app = new Appearance();
-			app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+			app.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 			app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 			integralCurvesRoot.setAppearance(app);
 			
@@ -477,9 +498,73 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(intersectionsButton,rc);
 		}
 		
+		private class DraggableCurves implements PointDragListener {
+			
+			private LinkedList<PolygonalLine> polygonalLines;			
+			private DraggablePointComponent draggablePoint;
+			private double[] p;
+			private boolean uDir = pointSelectionPlugin.getUDir();
+			private boolean vDir = pointSelectionPlugin.getVDir();
+			double[] start;
+
+			
+
+			public DraggableCurves(double[] point, LinkedList<PolygonalLine> lines) {
+//				System.out.println("point = " + Arrays.toString(point));
+//				start = activeNurbsSurface.getClosestPointDomain(point);
+				draggablePoint = createDraggablePoint(point);
+				polygonalLines = lines;
+			}
+			
+			public DraggablePointComponent createDraggablePoint(double[] point){
+				DraggablePointComponent dpc = new DraggablePointComponent(point);
+				dpc.setUseDefaultDraggListener(false);
+				dpc.addPointDragListener(this);
+				Appearance Ap = new Appearance();
+				Ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+				dpc.setAppearance(Ap);
+				DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(Ap, false);
+				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
+				ipointShader.setDiffuseColor(Color.orange);
+				hif.getActiveLayer().addTemporaryGeometry(dpc);
+				return dpc;
+			}
+
+			
+			@Override
+			public void pointDragStart(PointDragEvent e) {
+			}
+
+			@Override
+			public void pointDragged(PointDragEvent e) {
+				for (PolygonalLine pl : polygonalLines) {
+					curvesModel.remove(pl);
+				}
+				p  = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
+//				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, start, uDir, vDir);
+				double[] uv = activeNurbsSurface.getClosestPointDomain(p);
+				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+				polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, uv);
+				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+				curvesModel.addAll(polygonalLines);
+				curvesModel.fireTableDataChanged();
+			}
+
+			@Override
+			public void pointDragEnd(PointDragEvent e) {
+//				double[] uv = activeNurbsSurface.getClosestPointDomain(p);
+				
+			}
+			
+		}
+		
+		
+		
 		
 		@Override
 		public void actionPerformed(ActionEvent e){
+			
+			
 					
 			Object source = e.getSource();
 			if(source == goButton) {
@@ -498,8 +583,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				
 
 				CurveType vfc = (CurveType)curveCombo.getSelectedItem();
-				boolean firstVectorField = true;
-				boolean secondVectorField = true;
+			
 				if(vfc == CurveType.CURVATURE){
 					firstVectorField = maxCurvatureBox.isSelected();
 					secondVectorField = minCurvatureBox.isSelected();
@@ -517,20 +601,32 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				else if(symConjCurvatureBox.isSelected()){
 					symDir = SymmetricDir.CURVATURE;
 				}	
-				IntegralCurve ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField());
+				ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField());
 				if(singularities == null) {
 //					computeUmbilicalPoints();
 				}
 				
-				LinkedList<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, startingPointsUV);
+				LinkedList<DraggableCurves> currentCurves = new LinkedList<>();
+				
+				for (double[] sp : startingPointsUV) {
+					double[] surfacePoint = activeNurbsSurface.getSurfacePoint(sp[0], sp[1]);
+					LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, umbilicStop, singularities, sp);
+					DraggableCurves dc = new DraggableCurves(surfacePoint, lines);
+					currentCurves.add(dc);
+				}
+				
+				curveIndex = currentCurves.getLast().polygonalLines.getLast().getCurveIndex() + 1;
 
-				curveIndex = currentLines.getLast().getCurveIndex() + 1;
+				for (DraggableCurves dc : currentCurves) {
+					curvesModel.addAll(dc.polygonalLines);
+				}
 
-				curvesModel.addAll(currentLines);
+//				curvesModel.addAll(currentLines);
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
 			} else if(source == deleteButton) {
 				curvesModel.clear();
+			
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
 			} else if(source == intersectionsButton) {
@@ -941,35 +1037,36 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 				ipointShader.setDiffuseColor(Color.orange);
 				hif.getActiveLayer().addTemporaryGeometry(sgci);
-//				logger.info("point before dragging " + Arrays.toString(point));
-//				DragEventTool t = new DragEventTool();
-//				t.addPointDragListener(new PointDragListener() {
-//	
-//					@Override
-//					public void pointDragStart(PointDragEvent e) {
-//					}
-//	
-//					@Override
-//					public void pointDragged(PointDragEvent e) {
-//						PointSet pointSet = e.getPointSet();
-//						double[][] points=new double[pointSet.getNumPoints()][];
-//				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
-//				        points[e.getIndex()]=e.getPosition(); 
-//				        point = e.getPosition().clone();
-////				        Pn.dehomogenize(point, point);
-//				        point[3] = 1.;
-////				        logger.info(Arrays.toString(point));
-//				    
-//				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
-//					}
-//					
-//					@Override
-//					public void pointDragEnd(PointDragEvent e) {
-//					}
-//					
-//				});
-//				
-//				sgci.addTool(t);
+				logger.info("point before dragging " + Arrays.toString(point));
+				DragEventTool t = new DragEventTool();
+				t.addPointDragListener(new PointDragListener() {
+	
+					@Override
+					public void pointDragStart(PointDragEvent e) {
+					}
+	
+					@Override
+					public void pointDragged(PointDragEvent e) {
+						PointSet pointSet = e.getPointSet();
+						double[][] points=new double[pointSet.getNumPoints()][];
+				        pointSet.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(points);
+				        points[e.getIndex()]=e.getPosition(); 
+				        point = e.getPosition().clone();
+				    
+//				        Pn.dehomogenize(point, point);
+				        point[3] = 1.;
+//				        logger.info(Arrays.toString(point));
+				    
+				        pointSet.setVertexAttributes(Attribute.COORDINATES,StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(points));
+					}
+					
+					@Override
+					public void pointDragEnd(PointDragEvent e) {
+					}
+					
+				});
+				
+				sgci.addTool(t);
 				psfi.setVertexCoordinates(point);
 				
 			}
@@ -1003,21 +1100,30 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 
 		private double[] calculateClosestPoint(double[] point) {
+//			double [] domainPoint = activeNurbsSurface.getClosestPointDomain(point);
+//			double[] surfacePoint = activeNurbsSurface.getSurfacePoint(domainPoint[0], domainPoint[1]);
+
+//			System.out.println("the point = " + Arrays.toString(point));
+
+//			
 			double[] surfacePoint = activeNurbsSurface.getClosestPoint(point);
 			HalfedgeLayer surfPoint = new HalfedgeLayer(hif);
 			surfPoint.setName("Point ");			
 			hif.addLayer(surfPoint);
 			hif.update();
-			PointSetFactory psfPoint = new PointSetFactory();
+//			PointSetFactory psfPoint = new PointSetFactory();
+			DraggablePointComponent dpc = new DraggablePointComponent(surfacePoint);
 			
-			psfPoint.setVertexCount(1);
 			
-			psfPoint.setVertexCoordinates(surfacePoint);
-			psfPoint.update();
+//			psfPoint.setVertexCount(1);
+			
+//			psfPoint.setVertexCoordinates(surfacePoint);
+//			psfPoint.update();
 			SceneGraphComponent sgcPoint = new SceneGraphComponent("closest point");
 			SceneGraphComponent PointComp = new SceneGraphComponent("PointComponent");
+			sgcPoint.addChild(dpc);
 			sgcPoint.addChild(PointComp);
-			sgcPoint.setGeometry(psfPoint.getGeometry());
+			sgcPoint.setGeometry(dpc.getGeometry());
 			Appearance iAPoint = new Appearance();
 			sgcPoint.setAppearance(iAPoint);
 			DefaultGeometryShader idgsPoint = ShaderUtility.createDefaultGeometryShader(iAPoint, false);
