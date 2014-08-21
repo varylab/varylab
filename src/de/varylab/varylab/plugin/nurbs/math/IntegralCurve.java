@@ -1040,9 +1040,6 @@ public class IntegralCurve {
 	
 	
 	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, List<double[]> startingPointsUV) {
-		System.out.println();
-		System.out.println("computeIntegralLines");
-		System.out.println();
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
@@ -1056,9 +1053,6 @@ public class IntegralCurve {
 	}
 	
 	public LinkedList<PolygonalLine> computeIntegralLine(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, double[] start) {
-		System.out.println();
-		System.out.println("computeIntegralLines");
-		System.out.println();
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();	
 		if (firstVectorField){
 			curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, singularityNeighbourhood);

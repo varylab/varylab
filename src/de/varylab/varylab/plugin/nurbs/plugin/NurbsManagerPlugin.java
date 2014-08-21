@@ -43,16 +43,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-//import com.thoughtworks.xstream.io.binary.Token.Attribute;
-
-
-
-
-
-import de.jreality.geometry.IndexedLineSetFactory;
-import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
-import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
@@ -61,7 +52,6 @@ import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
-import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.data.StorageModel;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
@@ -75,7 +65,6 @@ import de.jreality.tools.PointDragListener;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
@@ -122,6 +111,10 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
+//import com.thoughtworks.xstream.io.binary.Token.Attribute;
+import de.jreality.geometry.IndexedLineSetFactory;
+import de.jreality.geometry.IndexedLineSetUtility;
+import de.jreality.geometry.QuadMeshFactory;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
@@ -554,62 +547,65 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			@Override
 			public void pointDragStart(PointDragEvent e) {
+				LinkedList<DraggableCurves>  otherCurves = getOtherCurves(startUV);
+				for (DraggableCurves dc : otherCurves) {
+					for (PolygonalLine pl : dc.polygonalLines) {
+						if(!curvesModel.remove(pl)) {
+							System.out.println("Could not find polyline in list");
+						}
+					}
+				}
 			}
 
 			@Override
 			public void pointDragged(PointDragEvent e) {
-				LinkedList<DraggableCurves>  otherCurves = getOtherCurves(startUV);
-				for (PolygonalLine pl : polygonalLines) {
-					curvesModel.remove(pl);
-				}
-				for (DraggableCurves dc : otherCurves) {
-					for (PolygonalLine pl : dc.polygonalLines) {
+					for (PolygonalLine pl : polygonalLines) {
 						curvesModel.remove(pl);
 					}
-				}
-				p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
-//				double[] tranlation = Rn.subtract(null, uv, startUV);
-				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
-				polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, uv);
-				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
-				curvesModel.addAll(polygonalLines);
-//				
-//				for (DraggableCurves cd : otherCurves) {
-//					DraggablePointComponent dpc = cd.getDraggablePoint();
-//					LinkedList<PolygonalLine> newLines = cd.getPolygonalLines();
-//					for (PolygonalLine pl : newLines) {
-//						curvesModel.remove(pl);
-//					}
-//					double[] otherStartUV = cd.getStartUV();
-//					double[] newCoords = Rn.add(null, otherStartUV, tranlation);
-//					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-//					newLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, newCoords);
-//					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-//					curvesModel.addAll(newLines);				
-//				}
-				curvesModel.fireTableDataChanged();
+					p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
+					double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
+	//				double[] tranlation = Rn.subtract(null, uv, startUV);
+					draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+					recomputeCurves(uv);
+	//				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+					curvesModel.addAll(polygonalLines);
+	//				
+	//				for (DraggableCurves cd : otherCurves) {
+	//					DraggablePointComponent dpc = cd.getDraggablePoint();
+	//					LinkedList<PolygonalLine> newLines = cd.getPolygonalLines();
+	//					for (PolygonalLine pl : newLines) {
+	//						curvesModel.remove(pl);
+	//					}
+	//					double[] otherStartUV = cd.getStartUV();
+	//					double[] newCoords = Rn.add(null, otherStartUV, tranlation);
+	//					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
+	//					newLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, newCoords);
+	//					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
+	//					curvesModel.addAll(newLines);				
+	//				}
+					curvesModel.fireTableDataChanged();
 			}
 
+			public void recomputeCurves(double[] uv) {
+				polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, uv);
+			}
+
+			
+			
 			@Override
 			public void pointDragEnd(PointDragEvent e) {
-				LinkedList<DraggableCurves>  otherCurves = getOtherCurves(startUV);
-				for (DraggableCurves cd : otherCurves) {
-					DraggablePointComponent dpc = cd.getDraggablePoint();
-					LinkedList<PolygonalLine> newLines = cd.getPolygonalLines();
-					for (PolygonalLine pl : newLines) {
-						curvesModel.remove(pl);
+					LinkedList<DraggableCurves>  otherCurves = getOtherCurves(startUV);
+					for (DraggableCurves dc : otherCurves) {
+						DraggablePointComponent dpc = dc.getDraggablePoint();
+						double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
+						double[] tranlation = Rn.subtract(null, uv, startUV);
+						double[] otherStartUV = dc.getStartUV();
+						double[] newCoords = Rn.add(null, otherStartUV, tranlation);
+						dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
+						dc.recomputeCurves(newCoords);
+						curvesModel.addAll(dc.getPolygonalLines());				
 					}
-					double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
-					double[] tranlation = Rn.subtract(null, uv, startUV);
-					double[] otherStartUV = cd.getStartUV();
-					double[] newCoords = Rn.add(null, otherStartUV, tranlation);
-					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-					newLines = ic.computeIntegralLine(firstVectorField, secondVectorField, curveIndex, 0.01, singularities, newCoords);
-					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-					curvesModel.addAll(newLines);				
-				}
-				curvesModel.fireTableDataChanged();	
+					curvesModel.fireTableDataChanged();
 			}
 			
 		}
