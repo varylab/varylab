@@ -55,11 +55,12 @@ public class PolygonalLine {
 	
 	@Override
 	public String toString(){
-		String str = new String();
-		for (LineSegment ls : pLine) {
-			str = str + ls.toString() +"\n";
-		}
-		return str;
+//		String str = new String();
+//		for (LineSegment ls : pLine) {
+//			str = str + ls.toString() +"\n";
+//		}
+//		return str;
+		return "curve index = " + pLine.getFirst().getCurveIndex();
 	}
 
 	public String getDescription() {
@@ -68,6 +69,14 @@ public class PolygonalLine {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public static LinkedList<Integer> getCurveIndexList(LinkedList<PolygonalLine> lineList){
+		LinkedList<Integer> indexList = new LinkedList<>();
+		for (PolygonalLine pl : lineList) {
+			indexList.add(pl.getCurveIndex());
+		}
+		return indexList;
 	}
 
 }
