@@ -390,7 +390,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private IntegralCurve ic;
 		
 		private LinkedList<DraggableCurves> currentCurves = new LinkedList<>();
+		
 		private LinkedList<LinkedList<double[]>> commonPoints = new LinkedList<>();
+		
 		private boolean interactiveDragging;
 
 		private double[] getVecField(){
@@ -651,6 +653,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			interactiveDragging = pointSelectionPlugin.getInteractiveDragging();
 			Object source = e.getSource();
 			if(source == goButton) {
+				currentCurves.clear();
 				List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
 				if(startingPointsUV.size() == 0) {
 					return;
@@ -689,30 +692,22 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 //					computeUmbilicalPoints();
 				}
 				
-				
-				commonPoints = pointSelectionPlugin.getCommonPointList();
+
 				for (double[] sp : startingPointsUV) {
 					double[] surfacePoint = activeNurbsSurface.getSurfacePoint(sp[0], sp[1]);
 					LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, umbilicStop, singularities, sp);
+					curvesModel.addAll(lines);
 					DraggableCurves dc = new DraggableCurves(sp, surfacePoint, lines);
 					currentCurves.add(dc);
 				}
+				commonPoints = pointSelectionPlugin.getCommonPointList();
 				
 				curveIndex = ic.getCurveIndex() + 1;
 				
-
-				for (DraggableCurves dc : currentCurves) {
-					curvesModel.addAll(dc.polygonalLines);
-				}
 				System.out.println("All lines");
 				for (PolygonalLine pl : curvesModel.getList()) {
 					System.out.println(pl.toString());
 				}
-				
-//				LinkedList<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, umbilicStop, singularities, startingPointsUV);
-//				curveIndex = ic.getCurveIndex() + 1;
-//				curvesModel.addAll(currentLines);
-				
 				
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
