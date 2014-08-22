@@ -586,6 +586,9 @@ public class IntegralCurve {
 	}
 	
 	public boolean terminationConditionForVectorfieldPoints(double[] point, LinkedList<double[]> pointList, List<LineSegment> boundary){
+		if(pointList == null || pointList.isEmpty()) {
+			return true;
+		}
 		if(pointIsOutsideOfExtendedDomain(point)){
 			double[] last = pointList.pollLast();
 			double[] nextToLast = pointList.getLast();
