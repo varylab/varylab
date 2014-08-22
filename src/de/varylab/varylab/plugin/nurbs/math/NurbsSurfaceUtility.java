@@ -27,7 +27,6 @@ public class NurbsSurfaceUtility {
 		layer.addAdapter(uvAdapter, false);
 //		layer.update();
 	}
-
 	
 	public static double[] uniformKnotVector(int m, int deg) {
 		double[] U = new double[m + deg + 1];
@@ -45,7 +44,6 @@ public class NurbsSurfaceUtility {
 		}
 		return U;
 	}
-
 
 	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n, double[] point){
 		LinkedList<double[]> points = new LinkedList<double[]>();

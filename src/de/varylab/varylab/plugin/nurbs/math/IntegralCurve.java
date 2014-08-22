@@ -30,10 +30,11 @@ public class IntegralCurve {
 	private CurveType curveType = CurveType.CURVATURE;
 	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
 	private double[] vecField = null;
+	private int curveIndex;
 	
 	
 	
-	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance, SymmetricDir sd, double[] vf){
+	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance, SymmetricDir sd, double[] vf, int index){
 		ns = surface;
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
@@ -47,9 +48,21 @@ public class IntegralCurve {
 		curveType = cType;
 		symDir = sd;
 		vecField = vf;
+		curveIndex = index;
 		
 	}
 	
+	
+	public int getCurveIndex() {
+		return curveIndex;
+	}
+
+	public void setCurveIndex(int curveIndex) {
+		this.curveIndex = curveIndex;
+	}
+
+
+
 	/**
 	 * 
 	 * @param p
@@ -980,7 +993,7 @@ public class IntegralCurve {
 		return vs;
 	}
 	
-	public int curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> segments, int curveIndex, double[] startPoint, boolean firstVectorField, double minSigularityDistance) {
+	public int curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> lines, double[] startPoint, boolean firstVectorField, double minSigularityDistance) {
 		LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 		LinkedList<double[]> all = new LinkedList<double[]>();
 		IntObjects intObj = rungeKutta(startPoint, false, firstVectorField, singularities, minSigularityDistance);
@@ -1036,35 +1049,51 @@ public class IntegralCurve {
 		}
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
 		currentLine.setDescription((firstVectorField?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
-		segments.add(currentLine);
+		lines.add(currentLine);
 		curveIndex ++;
 		return curveIndex;
 	}
 	
 	
-	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, List<double[]> startingPointsUV) {
+	public LinkedList<PolygonalLine> computeIntegralLines(boolean firstVectorField, boolean secondVectorField, double singularityNeighbourhood, List<double[]> singularities, List<double[]> startingPointsUV) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, singularityNeighbourhood);
+					curveIndex = curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
 				}
 				if (secondVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, singularityNeighbourhood);
+					curveIndex = curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
 				}
 		}
 		return currentLines;
 	}
 	
-	public LinkedList<PolygonalLine> computeIntegralLine(boolean firstVectorField, boolean secondVectorField, int curveIndex, double singularityNeighbourhood, List<double[]> singularities, double[] start) {
+	public LinkedList<PolygonalLine> computeIntegralLine(boolean firstVectorField, boolean secondVectorField, double singularityNeighbourhood, List<double[]> singularities, double[] start) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();	
 		if (firstVectorField){
-			curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, true, singularityNeighbourhood);
+			curveIndex = curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
 		}
 		if (secondVectorField){
-			curveIndex = curveLine(ns, singularities, currentLines, curveIndex, start, false, singularityNeighbourhood);
+			curveIndex = curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
 		}
 		return currentLines;
 	}
+	
+	
+	
+//	public LinkedList<PolygonalLine> computeIntegralLineFixedCurveIndex(boolean firstVectorField, boolean secondVectorField, LinkedList<Integer> indexList, double singularityNeighbourhood, List<double[]> singularities, double[] start) {
+//		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();	
+//		
+//		if (firstVectorField){
+//			curveLine(ns, singularities, currentLines, indexList.getFirst(), start, true, singularityNeighbourhood);
+//		}
+//		if (secondVectorField){
+//			curveLine(ns, singularities, currentLines, indexList.getLast(), start, false, singularityNeighbourhood);
+//		}
+//		return currentLines;
+//	}
+	
+	
 	
 	
 

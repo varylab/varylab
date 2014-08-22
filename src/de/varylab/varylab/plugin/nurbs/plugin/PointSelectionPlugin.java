@@ -92,7 +92,8 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		equidistantPointsSpinner = new JSpinner(equidistantPointsModel);
 		
 	
-	private JCheckBox showBox = new JCheckBox("Show");
+	private JCheckBox showBox = new JCheckBox("Show"),
+			interactiveBox = new JCheckBox("Interactive Dragging");
 	
 	private SceneGraphComponent selectedPointsComponent = new SceneGraphComponent("Selected Nurbs Points");
 	private NURBSSurface surface;
@@ -104,6 +105,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private boolean vDir = false;
 	private boolean up = false;
 	private boolean down = false;
+	private boolean interactiveDragging = false;
 	private double dist = 0.;
 	private LinkedList<LinkedList<double[]>> commonPointList;
 	
@@ -134,6 +136,9 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		showBox.setSelected(true);
 		showBox.addActionListener(this);
 		
+		interactiveBox.setSelected(false);
+		interactiveBox.addActionListener(this);
+		
 		checkButton.addActionListener(this);
 		uncheckButton.addActionListener(this);
 		removeSelectedButton.addActionListener(this);
@@ -155,7 +160,8 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		panel.add(equidistantPointsButton, rc);
 		equidistantPointsButton.setEnabled(false);
 		
-		panel.add(showBox, rc);
+		panel.add(showBox, lc);
+		panel.add(interactiveBox, rc);
 		
 		
 		shrinkPanel.add(panel,rc);
@@ -241,6 +247,11 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				down = true;
 			} else {
 				down = false;
+			}
+			if(interactiveBox.isSelected()){
+				interactiveDragging = true;
+			} else {
+				interactiveDragging = false;
 			}
 		}
 		
@@ -444,19 +455,21 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				} 
 			}
 		} else if(source == distPointButton){
-			System.out.println("list length = " + getSelectedPoints().size());
 			LinkedList<double[]> selectedPoints = new LinkedList<>();
 			for(double[] uv : getSelectedPoints()) {
 				selectedPoints.add(uv);
 			}
 			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, uDir, vDir, up, down, selectedPoints, dist, numberOfPoints);
+			boolean firstPoint = true;
 			for (LinkedList<double[]> list : commonPointList) {
 				for (double[] pt : list) {
-					if(!activeModel.contains(pt)) {
+					if(!activeModel.contains(pt) && !firstPoint) {
+//					if(!activeModel.contains(pt)) {
 						activeModel.add(pt);
 						selectedPointsComponent.addChild(createPointComponent(pt));
 					}
 				}
+				firstPoint = false;
 			}
 		}
 		
@@ -491,6 +504,10 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	public LinkedList<LinkedList<double[]>> getCommonPointList(){
 		return commonPointList;
+	}
+	
+	public boolean getInteractiveDragging(){
+		return interactiveDragging;
 	}
 	
 //	public LinkedList<SelectedPoint> getSelectedPoints(){
