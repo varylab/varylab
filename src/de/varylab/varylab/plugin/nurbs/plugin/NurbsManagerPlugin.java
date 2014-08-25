@@ -21,6 +21,7 @@ import java.awt.event.ItemListener;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -396,12 +397,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		private IntegralCurve ic;
 		
-		private LinkedList<DraggableCurves> currentCurves = new LinkedList<>();
+		private List<DraggableCurves> currentCurves = Collections.synchronizedList(new LinkedList<DraggableCurves>());
 		
 		private LinkedList<LinkedList<double[]>> commonPoints = new LinkedList<>();
 		
-		private boolean interactiveDragging;
-
 		private double[] getVecField(){
 			if(vecFieldSpinner.isEnabled()){
 				double grad = vecFieldModel.getNumber().doubleValue();
@@ -562,16 +561,16 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			@Override
 			public void pointDragStart(PointDragEvent e) {
-//				LinkedList<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-//				for (DraggableCurves dc : otherCurves) {
-//					for (PolygonalLine pl : dc.polygonalLines) {
-//						curvesModel.remove(pl);
-//					}
-//				}
-//				for (PolygonalLine pl : polygonalLines) {
-//					curvesModel.remove(pl);
-//				}
-//				curvesModel.fireTableDataChanged();
+				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
+				for (DraggableCurves dc : otherCurves) {
+					for (PolygonalLine pl : dc.polygonalLines) {
+						curvesModel.remove(pl);
+					}
+				}
+				for (PolygonalLine pl : polygonalLines) {
+					curvesModel.remove(pl);
+				}
+				curvesModel.fireTableDataChanged();
 			}
 
 			@Override
@@ -588,23 +587,37 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
 				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
 				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
-				if(interactiveDragging){
-					for (PolygonalLine pl : polygonalLines) {
-						curvesModel.remove(pl);
-					}
-					recomputeCurves(uv);
-					curvesModel.addAll(polygonalLines);
+//				if(interactiveDragging){
+				recomputeCurves(uv);
+				curvesModel.addAll(polygonalLines);
+//				}
+				List<DraggableCurves>  commonCurves = getCommonCurves(startUV);
+				for (DraggableCurves dc : commonCurves) {
+					DraggablePointComponent dpc = dc.getDraggablePoint();
+					double[] translation = Rn.subtract(null, uv, startUV);
+					double[] otherStartUV = dc.getStartUV();
+					double[] newCoords = Rn.add(null, otherStartUV, translation);
+					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
+					dc.recomputeCurves(newCoords);
+					curvesModel.addAll(dc.getPolygonalLines());				
 				}
 				curvesModel.fireTableDataChanged();
 			}
 
 			@Override
 			public void pointDragEnd(PointDragEvent e) {
-				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
-				if(!interactiveDragging){
-					recomputeCurves(uv);
-					curvesModel.addAll(polygonalLines);
+				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
+				for (DraggableCurves dc : otherCurves) {
+					for (PolygonalLine pl : dc.polygonalLines) {
+						curvesModel.remove(pl);
+					}
 				}
+				for (PolygonalLine pl : polygonalLines) {
+					curvesModel.remove(pl);
+				}
+				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
+				recomputeCurves(uv);
+				curvesModel.addAll(polygonalLines);
 				List<DraggableCurves>  commonCurves = getCommonCurves(startUV);
 				for (DraggableCurves dc : commonCurves) {
 					DraggablePointComponent dpc = dc.getDraggablePoint();
@@ -660,7 +673,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		@Override
 		public void actionPerformed(ActionEvent e){
-			interactiveDragging = pointSelectionPlugin.getInteractiveDragging();
 			Object source = e.getSource();
 			if(source == goButton) {
 
