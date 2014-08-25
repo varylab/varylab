@@ -10,8 +10,6 @@ public class PolygonalLine {
 			begin = 0,
 			end = 0;
 
-	
-
 	public int getBegin() {
 		return begin;
 	}
@@ -71,12 +69,10 @@ public class PolygonalLine {
 		this.description = description;
 	}
 	
-	public static LinkedList<Integer> getCurveIndexList(LinkedList<PolygonalLine> lineList){
-		LinkedList<Integer> indexList = new LinkedList<>();
-		for (PolygonalLine pl : lineList) {
-			indexList.add(pl.getCurveIndex());
+	public void setCurveIndex(int index) {
+		for(LineSegment ls : pLine) {
+			ls.setCurveIndex(index);
 		}
-		return indexList;
 	}
 
 }

@@ -167,8 +167,9 @@ public class NurbsSurfaceUtility {
 	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
 			LinkedList<double[]> selPoints, double dist, int numberOfPoints){
 		LinkedList<LinkedList<double[]>> commonPointList = new LinkedList<>();
+		commonPointList.add(selPoints);
 		double currDist = 0.0;
-		for (int j = 0; j <= numberOfPoints; j++) {
+		for (int j = 1; j <= numberOfPoints; j++) {
 			LinkedList<double[]> commonPoints = new LinkedList<>();
 			currDist = (double)j / (double)numberOfPoints * dist;
 			for (double[] point : selPoints) {

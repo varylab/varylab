@@ -20,7 +20,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,10 @@ import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobQueuePlugin;
+import de.jreality.plugin.job.ParallelJob;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.PointSet;
@@ -115,7 +122,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 import de.varylab.varylab.ui.PrettyPrinter;
-//import com.thoughtworks.xstream.io.binary.Token.Attribute;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
@@ -132,9 +138,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	
 	private PointDistancePanel
 		pointDistancePanel = new PointDistancePanel();
-
-	private int 
-		curveIndex = 5;
 	
 	private List<double[]> singularities = null;
 
@@ -146,6 +149,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 	private NURBSSurface activeNurbsSurface;
 
 	private VisualizationInterface vif;
+
+	private JobQueuePlugin jobQueuePlugin;
 
 	public NurbsManagerPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -361,6 +366,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		private JComboBox<CurveType>
 			curveCombo = new JComboBox<CurveType>();
 		
+		private volatile int 
+			curveIndex = 5;
+		
 		private ListSelectRemoveTableModel<PolygonalLine>
 			curvesModel = new ListSelectRemoveTableModel<PolygonalLine>("Curves", new PolygonalLinePrinter());
 		
@@ -502,7 +510,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		
 		private class DraggableCurves implements PointDragListener {
 			
-			private LinkedList<PolygonalLine> polygonalLines;			
+			private List<PolygonalLine> polygonalLines;			
 			private DraggablePointComponent draggablePoint;
 			private double[] p;
 			private boolean uDir = pointSelectionPlugin.getUDir();
@@ -514,7 +522,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 			
 
-			public DraggableCurves(double[] uv, double[] point, LinkedList<PolygonalLine> lines) {
+			public DraggableCurves(double[] uv, double[] point, List<PolygonalLine> lines) {
 				startUV = uv;
 				draggablePoint = createDraggablePoint(point);
 				polygonalLines = lines;
@@ -533,7 +541,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				return draggablePoint;
 			}
 			
-			public LinkedList<PolygonalLine> getPolygonalLines(){
+			public List<PolygonalLine> getPolygonalLines(){
 				return polygonalLines;
 			}
 			
@@ -549,7 +557,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(Ap, false);
 				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
 				ipointShader.setDiffuseColor(Color.orange);
-				hif.getActiveLayer().addTemporaryGeometry(dpc);
 				return dpc;
 			}
 
@@ -570,7 +577,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 			@Override
 			public void pointDragged(PointDragEvent e) {
-				LinkedList<DraggableCurves>  otherCurves = getCommonCurves(startUV);
+				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
 				for (DraggableCurves dc : otherCurves) {
 					for (PolygonalLine pl : dc.polygonalLines) {
 						curvesModel.remove(pl);
@@ -599,7 +606,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					recomputeCurves(uv);
 					curvesModel.addAll(polygonalLines);
 				}
-				LinkedList<DraggableCurves>  otherCurves = getCommonCurves(startUV);
+				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
 				for (DraggableCurves dc : otherCurves) {
 					DraggablePointComponent dpc = dc.getDraggablePoint();
 					double[] translation = Rn.subtract(null, uv, startUV);
@@ -614,12 +621,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			public void recomputeCurves(double[] uv) {
 				polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, 0.01, singularities, uv);
+				setCurveIndices(polygonalLines);
 			}
 		
-			public LinkedList<DraggableCurves> getCommonCurves(double[] p){
+			public List<DraggableCurves> getCommonCurves(double[] p){
 				if(commonCurves == null){
 					commonCurves = new LinkedList<>();
-					LinkedList<double[]> commonPoints = getCommonPoints(p);
+					List<double[]> commonPoints = getCommonPoints(p);
 					for (DraggableCurves dc : currentCurves) {
 						if(commonPoints.contains(dc.getStartUV())){
 							commonCurves.add(dc);
@@ -630,8 +638,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				return commonCurves;
 			}
 			
-			public LinkedList<double[]> getCommonPoints(double[] p){
+			public List<double[]> getCommonPoints(double[] p){
 				LinkedList<double[]> others = new LinkedList<>();
+				if(commonPoints == null) {
+					return others;
+				}
 				for (LinkedList<double[]> list : commonPoints) {
 					if(list.contains(p)){
 						for (double[] point : list) {
@@ -653,23 +664,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			interactiveDragging = pointSelectionPlugin.getInteractiveDragging();
 			Object source = e.getSource();
 			if(source == goButton) {
+
 				currentCurves.clear();
-				List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
-				if(startingPointsUV.size() == 0) {
-					return;
-				}
-				logger.info("ALL STARTING POINTS");
-				for (double[] sp : startingPointsUV) {
-					logger.info(Arrays.toString(sp));
-				}
 				double tol = tolExpModel.getNumber().doubleValue();
 				tol = Math.pow(10, tol);
-				double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
-				umbilicStop = Math.pow(10, umbilicStop);
-				
 
 				CurveType vfc = (CurveType)curveCombo.getSelectedItem();
-			
+
 				if(vfc == CurveType.CURVATURE){
 					firstVectorField = maxCurvatureBox.isSelected();
 					secondVectorField = minCurvatureBox.isSelected();
@@ -679,8 +680,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					firstVectorField = vecFieldBox.isSelected();
 					secondVectorField = conjFieldBox.isSelected();
 				}
-				
-				SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+
+				SymmetricDir symDir = SymmetricDir.NO_SYMMETRY;
 				if(symConjBox.isSelected()){
 					symDir = SymmetricDir.DIRECTION;
 				}
@@ -689,28 +690,62 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				}	
 				ic = new IntegralCurve(activeNurbsSurface, vfc, tol, symDir, getVecField(), curveIndex);
 				if(singularities == null) {
-//					computeUmbilicalPoints();
-				}
-				
-
-				for (double[] sp : startingPointsUV) {
-					double[] surfacePoint = activeNurbsSurface.getSurfacePoint(sp[0], sp[1]);
-					LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, umbilicStop, singularities, sp);
-					curvesModel.addAll(lines);
-					DraggableCurves dc = new DraggableCurves(sp, surfacePoint, lines);
-					currentCurves.add(dc);
+					//							computeUmbilicalPoints();
 				}
 				commonPoints = pointSelectionPlugin.getCommonPointList();
 				
-				curveIndex = ic.getCurveIndex() + 1;
-				
-				System.out.println("All lines");
-				for (PolygonalLine pl : curvesModel.getList()) {
-					System.out.println(pl.toString());
-				}
-				
 				hif.clearSelection();
-				curvesModel.fireTableDataChanged();
+				
+				final double umbilicStop = Math.pow(10, nearUmbilicModel.getNumber().doubleValue());
+				Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
+				final List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
+				if(startingPointsUV.size() == 0) {
+					return;
+				}
+				logger.info("ALL STARTING POINTS");
+				for (double[] sp : startingPointsUV) {
+					logger.info(Arrays.toString(sp));
+				}
+				for (final double[] sp : startingPointsUV) {
+					jobs.add(new AbstractJob() {
+						@Override
+						public String getJobName() {
+							return Arrays.toString(sp);
+						}
+						
+						@Override
+						protected void executeJob() throws Exception {
+							LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, umbilicStop, singularities, sp);
+							setCurveIndices(lines);
+							curvesModel.addAll(lines);
+							double[] surfacePoint = activeNurbsSurface.getSurfacePoint(sp[0], sp[1]);
+							DraggableCurves dc = new DraggableCurves(sp, surfacePoint, lines);
+							currentCurves.add(dc);
+						}
+					});
+				}
+				ParallelJob parallelJob = new ParallelJob(jobs);
+				jobQueuePlugin.queueJob(parallelJob);
+
+				Job updateJob = new AbstractJob() {
+					@Override
+					public String getJobName() {
+						return "Update curves display";
+					}
+					
+					@Override
+					protected void executeJob() throws Exception {
+						System.out.println("All lines");
+						for (PolygonalLine pl : curvesModel.getList()) {
+							System.out.println(pl.toString());
+						}
+						for (DraggableCurves dc : currentCurves) {
+							hif.addTemporaryGeometry(dc.getDraggablePoint());
+						}
+						curvesModel.fireTableDataChanged();
+					}
+				};
+				jobQueuePlugin.queueJob(updateJob);
 			} else if(source == deleteButton) {
 				curvesModel.clear();
 				hif.clearSelection();
@@ -844,7 +879,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			boolean firstVectorField = maxCurvatureBox.isSelected();
 			boolean secondVectorField = minCurvatureBox.isSelected();
 			if(immediateCalculationBox.isSelected()) {
-				SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+				SymmetricDir symDir = SymmetricDir.NO_SYMMETRY;
 				if(symConjBox.isSelected()){
 					symDir = SymmetricDir.DIRECTION;
 				}
@@ -1035,11 +1070,20 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		}
 
 		private void updateIntegralCurvesRoot() {
+			
 			polylineComponentProvider.setSurface(activeNurbsSurface);
 			List<PolygonalLine> list = curvesModel.getList();
+			hif.removeTemporaryGeometry(integralCurvesRoot.getComponent());
 			integralCurvesRoot.retain(list);
 			for(PolygonalLine pl : list) {
 				integralCurvesRoot.setVisible(pl, curvesModel.isChecked(pl));
+			}
+			hif.addTemporaryGeometry(integralCurvesRoot.getComponent());
+		}
+		
+		private void setCurveIndices(List<PolygonalLine> lines) {
+			for(PolygonalLine l : lines) {
+				l.setCurveIndex(curveIndex++);
 			}
 		}
 	}
@@ -1212,6 +1256,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 		c.getPlugin(SplitAtEdge.class);
 		c.getPlugin(StretchXYZ.class);
 		c.getPlugin(LinearDeformation.class);
+		jobQueuePlugin = c.getPlugin(JobQueuePlugin.class);
 	}
 	
 	@Override

@@ -17,7 +17,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 
 public class IntegralCurve {
 	
-	public enum SymmetricDir{CURVATURE, DIRECTION, NO_SYMMETRIE};
+	public enum SymmetricDir{CURVATURE, DIRECTION, NO_SYMMETRY};
 	
 	private static Logger logger = Logger.getLogger(IntegralCurve.class.getName());
 	
@@ -28,11 +28,8 @@ public class IntegralCurve {
 	double[][] basis;
 	private double tol;
 	private CurveType curveType = CurveType.CURVATURE;
-	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRIE;
+	private SymmetricDir symDir = SymmetricDir.NO_SYMMETRY;
 	private double[] vecField = null;
-	private int curveIndex;
-	
-	
 	
 	public IntegralCurve(NURBSSurface surface, CurveType cType, double tolerance, SymmetricDir sd, double[] vf, int index){
 		ns = surface;
@@ -48,21 +45,8 @@ public class IntegralCurve {
 		curveType = cType;
 		symDir = sd;
 		vecField = vf;
-		curveIndex = index;
-		
 	}
 	
-	
-	public int getCurveIndex() {
-		return curveIndex;
-	}
-
-	public void setCurveIndex(int curveIndex) {
-		this.curveIndex = curveIndex;
-	}
-
-
-
 	/**
 	 * 
 	 * @param p
@@ -993,7 +977,7 @@ public class IntegralCurve {
 		return vs;
 	}
 	
-	public int curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> lines, double[] startPoint, boolean firstVectorField, double minSigularityDistance) {
+	public void curveLine(NURBSSurface ns, List<double[]> singularities, List<PolygonalLine> lines, double[] startPoint, boolean firstVectorField, double minSigularityDistance) {
 		LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 		LinkedList<double[]> all = new LinkedList<double[]>();
 		IntObjects intObj = rungeKutta(startPoint, false, firstVectorField, singularities, minSigularityDistance);
@@ -1031,7 +1015,6 @@ public class IntegralCurve {
 					LineSegment ls = new  LineSegment();
 					ls.setIndexOnCurve(index) ;
 					ls.setSegment(seg);
-					ls.setCurveIndex(curveIndex);
 					ls.setCyclic(cyclic);
 					ls.setRightShift(rightShift);
 					ls.setUpShift(upShift);
@@ -1050,8 +1033,6 @@ public class IntegralCurve {
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
 		currentLine.setDescription((firstVectorField?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
 		lines.add(currentLine);
-		curveIndex ++;
-		return curveIndex;
 	}
 	
 	
@@ -1059,10 +1040,10 @@ public class IntegralCurve {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] start : startingPointsUV) {
 				if (firstVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
+					curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
 				}
 				if (secondVectorField){
-					curveIndex = curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
+					curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
 				}
 		}
 		return currentLines;
@@ -1071,10 +1052,10 @@ public class IntegralCurve {
 	public LinkedList<PolygonalLine> computeIntegralLine(boolean firstVectorField, boolean secondVectorField, double singularityNeighbourhood, List<double[]> singularities, double[] start) {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();	
 		if (firstVectorField){
-			curveIndex = curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
+			curveLine(ns, singularities, currentLines, start, true, singularityNeighbourhood);
 		}
 		if (secondVectorField){
-			curveIndex = curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
+			curveLine(ns, singularities, currentLines, start, false, singularityNeighbourhood);
 		}
 		return currentLines;
 	}
