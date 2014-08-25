@@ -178,7 +178,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 						uDirBox = new JCheckBox("u Direction"),
 						vDirBox = new JCheckBox("v Direction");
 		
-		private SpinnerNumberModel distModel = new SpinnerNumberModel(1.0, -10.0, 10.0, 0.1),
+		private SpinnerNumberModel distModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01),
 						numberOfPointsModel = new SpinnerNumberModel(3, 1, 300, 1);
 		
 		private JSpinner distSpinner = new JSpinner(distModel),
@@ -222,11 +222,47 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			}
 			
 		}
+		
+		private double getDist(){
+			double min = Double.MAX_VALUE;
+			for (double[] p : getSelectedPoints()) {
+				if(uDir){
+					double[] U = surface.getUKnotVector();
+					double u0 = U[0];
+					double um = U[U.length - 1];
+					if(up){
+						if(min > um - p[0]){
+							min = um - p[0];
+						}
+					}
+					if(down){
+						if(min > p[0] - u0){
+							min = p[0] - u0;
+						}
+					}
+				}
+				else if(vDir){
+					double[] V = surface.getVKnotVector();
+					double v0 = V[0];
+					double vn = V[V.length - 1];
+					if(up){
+						if(min > vn - p[1]){
+							min = vn - p[1];
+						}
+					}
+					if(down){
+						if(min > p[1] - v0){
+							min = p[1] - v0;
+						}
+					}
+				}
+			}
+			System.out.println("MIN = " + min);
+			return distModel.getNumber().doubleValue() * min;
+		}
 	
 		@Override
 		public void actionPerformed(ActionEvent e){								
-			dist = distModel.getNumber().doubleValue();
-			
 			numberOfPoints = numberOfPointsModel.getNumber().intValue();
 			if(uDirBox.isSelected()){
 				uDir = true;
@@ -248,6 +284,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			} else {
 				down = false;
 			}
+			dist = getDist();
 			if(interactiveBox.isSelected()){
 				interactiveDragging = true;
 			} else {
@@ -464,7 +501,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			for (LinkedList<double[]> list : commonPointList) {
 				for (double[] pt : list) {
 					if(!activeModel.contains(pt) && !firstPoint) {
-//					if(!activeModel.contains(pt)) {
 						activeModel.add(pt);
 						selectedPointsComponent.addChild(createPointComponent(pt));
 					}
@@ -472,7 +508,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				firstPoint = false;
 			}
 		}
-		
 		activeModel.fireTableDataChanged();
 	}
 

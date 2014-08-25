@@ -21,7 +21,6 @@ import java.awt.event.ItemListener;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -606,8 +605,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					recomputeCurves(uv);
 					curvesModel.addAll(polygonalLines);
 				}
-				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : otherCurves) {
+				List<DraggableCurves>  commonCurves = getCommonCurves(startUV);
+				for (DraggableCurves dc : commonCurves) {
 					DraggablePointComponent dpc = dc.getDraggablePoint();
 					double[] translation = Rn.subtract(null, uv, startUV);
 					double[] otherStartUV = dc.getStartUV();
