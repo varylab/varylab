@@ -104,7 +104,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private boolean vDir = false;
 	private boolean up = false;
 	private boolean down = false;
-	private boolean interactiveDragging = false;
 	private double dist = 0.;
 	private LinkedList<LinkedList<double[]>> commonPointList;
 	
@@ -157,7 +156,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		equidistantPointsButton.setEnabled(false);
 		
 		panel.add(showBox, lc);
-		
 		
 		shrinkPanel.add(panel,rc);
 	}
@@ -529,10 +527,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	public LinkedList<LinkedList<double[]>> getCommonPointList(){
 		return commonPointList;
-	}
-	
-	public boolean getInteractiveDragging(){
-		return interactiveDragging;
 	}
 	
 //	public LinkedList<SelectedPoint> getSelectedPoints(){
