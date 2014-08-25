@@ -92,8 +92,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		equidistantPointsSpinner = new JSpinner(equidistantPointsModel);
 		
 	
-	private JCheckBox showBox = new JCheckBox("Show"),
-			interactiveBox = new JCheckBox("Interactive Dragging");
+	private JCheckBox showBox = new JCheckBox("Show");
 	
 	private SceneGraphComponent selectedPointsComponent = new SceneGraphComponent("Selected Nurbs Points");
 	private NURBSSurface surface;
@@ -136,9 +135,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		showBox.setSelected(true);
 		showBox.addActionListener(this);
 		
-		interactiveBox.setSelected(false);
-		interactiveBox.addActionListener(this);
-		
 		checkButton.addActionListener(this);
 		uncheckButton.addActionListener(this);
 		removeSelectedButton.addActionListener(this);
@@ -161,7 +157,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		equidistantPointsButton.setEnabled(false);
 		
 		panel.add(showBox, lc);
-		panel.add(interactiveBox, rc);
 		
 		
 		shrinkPanel.add(panel,rc);
@@ -285,11 +280,6 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				down = false;
 			}
 			dist = getDist();
-			if(interactiveBox.isSelected()){
-				interactiveDragging = true;
-			} else {
-				interactiveDragging = false;
-			}
 		}
 		
 	}	

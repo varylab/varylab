@@ -359,7 +359,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			vecFieldBox = new JCheckBox("Vec. Field (red)"),
 			conjFieldBox = new JCheckBox("Conj. Field (cyan)"),
 			symConjBox = new JCheckBox(),
-			symConjCurvatureBox = new JCheckBox();
+			symConjCurvatureBox = new JCheckBox(),
+			interactiveBox = new JCheckBox("Interactive Curve Dragging");
 		
 		
 		private JComboBox<CurveType>
@@ -447,6 +448,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(new JLabel("Singularity Neighbourhood Exp"), lc);
 			lc.gridwidth = 1;
 			add(nearUmbilicSpinner, rc);
+			add(interactiveBox, rc);
+			interactiveBox.setSelected(false);;
+//			interactiveBox.addActionListener(this);
 			add(new JLabel("Curvature Lines:"), lc);
 			add(minCurvatureBox, lc);
 			minCurvatureBox.setEnabled(false);
@@ -491,6 +495,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			curveLengthPanel.add(cutLineButton, rc);
 			cutLineButton.addActionListener(this);
 			cutLineButton.setEnabled(false);
+			interactiveBox.addActionListener(this);
 			
 			
 			add(curveScrollPanel, rc);
