@@ -148,21 +148,6 @@ public class NurbsSurfaceUtility {
 	}
 	
 	
-	public static double computeA3(double x1, double x2, double y1, double y2){
-		return ((y2 / x2 - 1) * (x1 - 1) / (x2 - 1) - y1 / x1 + 1) / ((x1 - 1) * (x2 * x2 - 1) / (x2 - 1) - (x1 * x1 -1));
-	}
-	
-	public static double computeA2(double x1, double y1, double a3){
-		return (y1 / x1 - (x1 * x1 - 1) * a3 - 1) / (x1 - 1);
-	}
-	
-	public static double computeA1(double a2, double a3){
-		return 1 - a2 - a3;
-	}
-	
-	public static double getPolynomialValue(double a1, double a2, double a3, double t){
-		return a3 * t * t * t + a2 * t * t + a1 * t;
-	}
 	
 	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
 			LinkedList<double[]> selPoints, double dist, int numberOfPoints){

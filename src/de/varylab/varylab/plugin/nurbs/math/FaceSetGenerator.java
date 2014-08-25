@@ -480,15 +480,6 @@ public class FaceSetGenerator {
 	
 	
 	private boolean isGluedBigonPoint(IntersectionPoint ip){
-		System.err.println("isGluedBigonPoint(IntersectionPoint ip)");
-		System.err.println("ip = " + Arrays.toString(ip.getPoint()) + "boundary point = " + ip.isBoundaryPoint());
-		for (IntersectionPoint nbr : ip.getNbrs()) {
-			System.out.println(Arrays.toString(nbr.getPoint()));
-		}
-		System.err.println("#nbrs = " + ip.getNbrs().size());
-		if(ip.getOpposite() == null){
-			System.err.println("opposite == null " + Arrays.toString(ip.getPoint()));
-		}
 		if(liesOnGluedBoundary(ip) && !ip.isBoundaryPoint() && ip.getOpposite().getNbrs().size() == 3){
 			return true;
 		}
@@ -566,7 +557,7 @@ public class FaceSetGenerator {
 			}
 			else if(ip.getGluedBoundary(ns) == GluedBoundary.lower){
 				for (IntersectionPoint upper : upperBound) {
-					System.err.println("upperBound " + Arrays.toString(upper.getPoint()));
+//					System.err.println("upperBound " + Arrays.toString(upper.getPoint()));
 					if(ip.getPoint()[0] == upper.getPoint()[0]){
 						upper.setOpposite(ip);
 						ip.setOpposite(upper);

@@ -355,7 +355,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			vecFieldBox = new JCheckBox("Vec. Field (red)"),
 			conjFieldBox = new JCheckBox("Conj. Field (cyan)"),
 			symConjBox = new JCheckBox(),
-			symConjCurvatureBox = new JCheckBox();
+			symConjCurvatureBox = new JCheckBox(),
+			interactiveBox = new JCheckBox("Interactive Dragging");
+			
 		
 		
 		private JComboBox<CurveType>
@@ -460,6 +462,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			add(symConjCurvatureBox, rc);
 			symConjCurvatureBox.setEnabled(true);
 			symConjCurvatureBox.addActionListener(this);
+			add(interactiveBox, rc);
+			interactiveBox.addActionListener(this);
 			
 			add(immediateCalculationBox,lc);
 			add(goButton, rc);
@@ -507,7 +511,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			private boolean vDir = pointSelectionPlugin.getVDir();
 			double[] startUV = null;
 			LinkedList<DraggableCurves> commonCurves = null;
-			LinkedList<Integer> indexList;
 
 
 			
@@ -516,10 +519,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				startUV = uv;
 				draggablePoint = createDraggablePoint(point);
 				polygonalLines = lines;
-				indexList = new LinkedList<>();
-				for (PolygonalLine pl : lines) {
-					indexList.add(pl.getCurveIndex());
-				}
 				
 			}
 			
@@ -597,8 +596,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 					recomputeCurves(uv);
 					curvesModel.addAll(polygonalLines);
 				}
-				LinkedList<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : otherCurves) {
+				LinkedList<DraggableCurves>  commonCurves = getCommonCurves(startUV);
+				for (DraggableCurves dc : commonCurves) {
 					DraggablePointComponent dpc = dc.getDraggablePoint();
 					double[] translation = Rn.subtract(null, uv, startUV);
 					double[] otherStartUV = dc.getStartUV();
@@ -691,28 +690,37 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				
 				
 				commonPoints = pointSelectionPlugin.getCommonPointList();
+				//check
+				int count = 1;
+				for (LinkedList<double[]> list : commonPoints) {
+					System.out.println(count + ". list");
+					for (double[] p : list) {
+						System.out.println(Arrays.toString(p));
+					}
+					count++;
+				}
+				
+				//end check
+				
 				for (double[] sp : startingPointsUV) {
 					double[] surfacePoint = activeNurbsSurface.getSurfacePoint(sp[0], sp[1]);
 					LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, umbilicStop, singularities, sp);
 					DraggableCurves dc = new DraggableCurves(sp, surfacePoint, lines);
 					currentCurves.add(dc);
 				}
-				
 				curveIndex = ic.getCurveIndex() + 1;
-				
-
+				System.out.println("All draggable curves");
 				for (DraggableCurves dc : currentCurves) {
+					System.out.println("point = " + dc.getDraggablePoint());
+					for (PolygonalLine pl : dc.getPolygonalLines()) {
+						System.out.println(pl);
+					}
 					curvesModel.addAll(dc.polygonalLines);
 				}
 				System.out.println("All lines");
 				for (PolygonalLine pl : curvesModel.getList()) {
 					System.out.println(pl.toString());
 				}
-				
-//				LinkedList<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, umbilicStop, singularities, startingPointsUV);
-//				curveIndex = ic.getCurveIndex() + 1;
-//				curvesModel.addAll(currentLines);
-				
 				
 				hif.clearSelection();
 				curvesModel.fireTableDataChanged();
