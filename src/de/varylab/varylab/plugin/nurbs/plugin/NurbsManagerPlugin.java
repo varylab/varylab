@@ -54,6 +54,7 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.job.AbstractJob;
 import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.plugin.job.ParallelJob;
 import de.jreality.scene.Appearance;
@@ -518,12 +519,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			private double[] p;
 			private boolean uDir = pointSelectionPlugin.getUDir();
 			private boolean vDir = pointSelectionPlugin.getVDir();
-			double[] startUV = null;
-			LinkedList<DraggableCurves> commonCurves = null;
-			LinkedList<Integer> indexList;
-
-
+			private double[] startUV = null;
+			private List<DraggableCurves> commonCurves = null;
+			private List<CurveJob> curveJobQueue = Collections.synchronizedList(new LinkedList<CurveJob>());
 			
+			LinkedList<Integer> indexList;
 
 			public DraggableCurves(double[] uv, double[] point, List<PolygonalLine> lines) {
 				startUV = uv;
@@ -548,12 +548,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 				return polygonalLines;
 			}
 			
-			
-			
 			public DraggablePointComponent createDraggablePoint(double[] point){
-				DraggablePointComponent dpc = new DraggablePointComponent(point);
-				dpc.setUseDefaultDraggListener(false);
-				dpc.addPointDragListener(this);
+				DraggablePointComponent dpc = new DraggablePointComponent(point,this);
 				Appearance Ap = new Appearance();
 				Ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 				dpc.setAppearance(Ap);
@@ -566,116 +562,201 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			@Override
 			public void pointDragStart(PointDragEvent e) {
-				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : otherCurves) {
-					for (PolygonalLine pl : dc.polygonalLines) {
-						curvesModel.remove(pl);
-					}
-				}
-				for (PolygonalLine pl : polygonalLines) {
-					curvesModel.remove(pl);
-				}
-				curvesModel.fireTableDataChanged();
+				ic.setTol(1E-1);
 			}
 
 			@Override
-			public void pointDragged(PointDragEvent e) {
-				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : otherCurves) {
-					for (PolygonalLine pl : dc.polygonalLines) {
-						curvesModel.remove(pl);
-					}
-				}
-				for (PolygonalLine pl : polygonalLines) {
-					curvesModel.remove(pl);
-				}
-				p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
-				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
-				if(interactiveBox.isSelected()){
-					recomputeCurves(uv);
-					curvesModel.addAll(polygonalLines);
-					List<DraggableCurves>  commonCurves = getCommonCurves(startUV);
-					for (DraggableCurves dc : commonCurves) {
-						DraggablePointComponent dpc = dc.getDraggablePoint();
-						double[] translation = Rn.subtract(null, uv, startUV);
-						double[] otherStartUV = dc.getStartUV();
-						double[] newCoords = Rn.add(null, otherStartUV, translation);
-						dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-						dc.recomputeCurves(newCoords);
-						curvesModel.addAll(dc.getPolygonalLines());				
-					}
-				}
+			public void pointDragged(final PointDragEvent e) {
 
-				curvesModel.fireTableDataChanged();
+				p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
+				final double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);
+				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+				updateAllCurves(uv);
+
 			}
 
+			
 			@Override
 			public void pointDragEnd(PointDragEvent e) {
-				List<DraggableCurves>  otherCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : otherCurves) {
-					for (PolygonalLine pl : dc.polygonalLines) {
-						curvesModel.remove(pl);
+				ic.setTol(Math.pow(10.0,tolExpModel.getNumber().doubleValue()));
+//				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);
+//				
+//				Collection<AbstractJob> jobs = new LinkedList<AbstractJob>();
+//				final List<PolygonalLine> lines = Collections.synchronizedList(new LinkedList<PolygonalLine>());
+//				
+//				AbstractJob j = createCurveJob(uv, lines);
+//				
+//				jobs.add(j);
+//				
+//				jobs.addAll(createCommonCurvesJobs(uv,lines));
+//				
+//				ParallelJob parallelJob = new ParallelJob(jobs);
+				
+				
+				AbstractJob updateJob = new AbstractJob() {
+					@Override
+					public String getJobName() {
+						return "Update curves display";
+					}
+					
+					@Override
+					protected void executeJob() throws Exception {
+//						curvesModel.addAll(lines);
+//						updateIntegralCurvesRoot();
+						synchronized(curveJobQueue) {
+							curveJobQueue.remove(0);
+							processCurveJobs();
+						}
+						curvesModel.fireTableDataChanged();
+					}
+				};
+//				addCurveJobs(new CurveJob(parallelJob, updateJob));
+			}	
+			
+			private void updateAllCurves(final double[] uv) {
+				Collection<AbstractJob> jobs = new LinkedList<AbstractJob>();
+				final List<PolygonalLine> lines = Collections.synchronizedList(new LinkedList<PolygonalLine>());
+				
+				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
+				
+				AbstractJob j = createCurveJob(uv, lines);
+				jobs.add(j);
+
+				if(interactiveBox.isSelected()){
+					jobs.addAll(createCommonCurvesJobs(uv,lines));
+				}
+				ParallelJob parallelJob = new ParallelJob(jobs);
+				
+				AbstractJob updateJob = new AbstractJob() {
+					@Override
+					public String getJobName() {
+						return "Update curves display";
+					}
+					
+					@Override
+					protected void executeJob() throws Exception {
+						curvesModel.addAll(lines);
+						updateIntegralCurvesRoot();
+						synchronized(curveJobQueue) {
+							curveJobQueue.remove(0);
+							processCurveJobs();
+						}
+					}
+				};
+				addCurveJobs(new CurveJob(parallelJob, updateJob));
+			}
+
+			private void addCurveJobs(CurveJob cj) {
+				synchronized(curveJobQueue) {
+					if(curveJobQueue.size() == 2) {
+						curveJobQueue.set(1,cj);
+					} else {
+						curveJobQueue.add(cj);
+					} 
+					if(curveJobQueue.size() == 1) {
+						processCurveJobs();
 					}
 				}
-				for (PolygonalLine pl : polygonalLines) {
-					curvesModel.remove(pl);
+			}
+
+			private void processCurveJobs() {
+				synchronized(curveJobQueue) {
+					if(!curveJobQueue.isEmpty()) {
+						CurveJob cj = curveJobQueue.get(0);
+						jobQueuePlugin.queueJob(cj.getComputationJob());
+						jobQueuePlugin.queueJob(cj.getUpdateJob());
+					}
 				}
-				double[] uv = activeNurbsSurface.getClosestPointDomainDir(p, startUV, uDir, vDir);	
-				recomputeCurves(uv);
-				curvesModel.addAll(polygonalLines);
-				List<DraggableCurves>  commonCurves = getCommonCurves(startUV);
-				for (DraggableCurves dc : commonCurves) {
-					DraggablePointComponent dpc = dc.getDraggablePoint();
-					double[] translation = Rn.subtract(null, uv, startUV);
-					double[] otherStartUV = dc.getStartUV();
-					double[] newCoords = Rn.add(null, otherStartUV, translation);
-					dpc.updateCoords(activeNurbsSurface.getSurfacePoint(newCoords[0], newCoords[1]));
-					dc.recomputeCurves(newCoords);
-					curvesModel.addAll(dc.getPolygonalLines());				
+			}
+
+			private AbstractJob createCurveJob(final double[] uv, final List<PolygonalLine> lines) {
+				AbstractJob j = new AbstractJob() {
+					
+					@Override
+					public String getJobName() {
+						return "Recompute curve " + uv;
+					}
+					
+					@Override
+					protected void executeJob() throws Exception {
+						curvesModel.removeAll(polygonalLines);
+						recomputeCurves(uv);
+						lines.addAll(polygonalLines);
+					}
+				};
+				return j;
+			}
+
+			
+			
+			private Collection<AbstractJob> createCommonCurvesJobs(final double[] uv, final List<PolygonalLine> lines) {
+				Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
+				final double[] translation = Rn.subtract(null, uv, startUV);
+				for (final DraggableCurves dc : getCommonCurves(this)) {
+					AbstractJob job = new AbstractJob() {
+						
+						@Override
+						public String getJobName() {
+							return "Recompute curve " + dc.getStartUV();
+						}
+						
+						@Override
+						protected void executeJob() throws Exception {
+							curvesModel.removeAll(dc.getPolygonalLines());
+							double[] otherStartUV = dc.getStartUV();
+							double[] newCoords = Rn.add(null, otherStartUV, translation);
+							dc.recomputeCurves(newCoords);
+							lines.addAll(dc.getPolygonalLines());	
+						}
+					};
+					jobs.add(job);
 				}
-				curvesModel.fireTableDataChanged();
-			}	
+				return jobs;
+			}
 			
 			public void recomputeCurves(double[] uv) {
 				polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, 0.01, singularities, uv);
 				setCurveIndices(polygonalLines);
-			}
-		
-			public List<DraggableCurves> getCommonCurves(double[] p){
-				if(commonCurves == null){
-					commonCurves = new LinkedList<>();
-					List<double[]> commonPoints = getCommonPoints(p);
-					for (DraggableCurves dc : currentCurves) {
-						if(commonPoints.contains(dc.getStartUV())){
-							commonCurves.add(dc);
-						}		
-		
-					}
-				}
-				return commonCurves;
+				draggablePoint.updateCoords(activeNurbsSurface.getSurfacePoint(uv[0], uv[1]));
 			}
 			
-			public List<double[]> getCommonPoints(double[] p){
-				LinkedList<double[]> others = new LinkedList<>();
-				if(commonPoints == null) {
-					return others;
+			public void setCommonCurves(List<DraggableCurves> commonCurves) {
+				this.commonCurves = commonCurves;
+			}
+
+		}
+		
+		private List<DraggableCurves> getCommonCurves(DraggableCurves curve){
+			if(curve.commonCurves == null){
+				List<DraggableCurves> commonCurves = new LinkedList<>();
+				List<double[]> commonPoints = getCommonPoints(curve);
+				for (DraggableCurves dc : currentCurves) {
+					if(commonPoints.contains(dc.getStartUV())){
+						commonCurves.add(dc);
+					}		
 				}
-				for (LinkedList<double[]> list : commonPoints) {
-					if(list.contains(p)){
-						for (double[] point : list) {
-							if(point != p){
-								others.add(point);
-							}
+				curve.setCommonCurves(commonCurves);
+			}
+			return curve.commonCurves;
+		}
+		
+		private List<double[]> getCommonPoints(DraggableCurves dc){
+			double[] p = dc.getStartUV();
+			LinkedList<double[]> others = new LinkedList<>();
+			if(commonPoints == null) {
+				return others;
+			}
+			for (LinkedList<double[]> list : commonPoints) {
+				if(list.contains(p)){
+					for (double[] point : list) {
+						if(point != p){
+							others.add(point);
 						}
 					}
 				}
-				return others;
 			}
-			
+			return others;
 		}
-		
-		
 		
 		@Override
 		public void actionPerformed(ActionEvent e){
@@ -1028,11 +1109,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 
 		@Override
 		public void tableChanged(TableModelEvent e) {
+			updateIntegralCurvesRoot();
 			Runnable runnable = new Runnable() {
 				
 				@Override
 				public void run() {
-					updateIntegralCurvesRoot();
 					curvesTable.adjustColumnSizes();
 				}
 			};
@@ -1090,12 +1171,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin {
 			
 			polylineComponentProvider.setSurface(activeNurbsSurface);
 			List<PolygonalLine> list = curvesModel.getList();
-			hif.removeTemporaryGeometry(integralCurvesRoot.getComponent());
+//			hif.removeTemporaryGeometry(integralCurvesRoot.getComponent());
 			integralCurvesRoot.retain(list);
 			for(PolygonalLine pl : list) {
 				integralCurvesRoot.setVisible(pl, curvesModel.isChecked(pl));
 			}
-			hif.addTemporaryGeometry(integralCurvesRoot.getComponent());
+//			hif.addTemporaryGeometry(integralCurvesRoot.getComponent());
 		}
 		
 		private void setCurveIndices(List<PolygonalLine> lines) {

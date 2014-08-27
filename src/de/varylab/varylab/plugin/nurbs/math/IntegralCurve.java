@@ -1059,6 +1059,10 @@ public class IntegralCurve {
 		}
 		return currentLines;
 	}
+
+	public void setTol(double tol) {
+		this.tol = tol;
+	}
 	
 	
 	

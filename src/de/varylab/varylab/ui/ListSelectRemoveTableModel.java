@@ -19,8 +19,8 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	private String[] columnNames = {" ", "Name", " "};
 	private PrettyPrinter<E> pp = null;
 	
-	private List<E> list = new LinkedList<E>();
-	private List<E> checked = new LinkedList<E>();
+	private List<E> list = Collections.synchronizedList(new LinkedList<E>());
+	private List<E> checked = Collections.synchronizedList(new LinkedList<E>());
 	
 	public ListSelectRemoveTableModel(String columnName) {
 		this(columnName,null);
@@ -190,5 +190,11 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	public void addAll(Collection<E> col) {
 		list.addAll(col);
 		checked.addAll(col);
+	}
+
+	public void removeAll(Collection<E> elts) {
+		for(E e : elts) {
+			remove(e);
+		}
 	}
 }
