@@ -32,12 +32,16 @@ public class DraggablePointComponent extends SceneGraphComponent {
 		super("Draggable point");
 		updateCoords(coords);
 		addPointDragListener(new DefaultPointDragListener());
+		addTool(dragTool);
+		setGeometry(point);
 	}
 
 	public DraggablePointComponent() {
 		super("Draggable point");
 		updateCoords(new double[]{0,0,0,0});
 		addPointDragListener(new DefaultPointDragListener());
+		addTool(dragTool);
+		setGeometry(point);
 	}
 
 	public PointSet getPoint() {
@@ -82,8 +86,6 @@ public class DraggablePointComponent extends SceneGraphComponent {
 
 		@Override
 		public void pointDragEnd(PointDragEvent e) {
-			double[] newCoords = new double[]{e.getX(),e.getY(), e.getZ(), 1.0};
-			updateCoords(newCoords);
 		}
 	}
 }

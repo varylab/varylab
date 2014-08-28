@@ -14,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,9 +37,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
+import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.SceneGraphComponent;
+import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -64,7 +70,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 
-public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
+public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener, ActionListener {
 
 	private static Logger logger = Logger.getLogger(NurbsIOPlugin.class.getName());
 	
@@ -92,11 +98,16 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		uSpinner = new JSpinner(uModel),
 		vSpinner = new JSpinner(vModel);
 	
+	private JCheckBox
+		controlMeshBox = new JCheckBox("Control mesh");
 	private ShrinkPanel
 		infoPanel = new ShrinkPanel("Mesh parameters");
 	
 	private boolean
 		loading = false;
+
+	private SceneGraphComponent 
+		controlMeshComponent = new SceneGraphComponent("Control Mesh");
 
 	public NurbsIOPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -131,8 +142,20 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		infoPanel.add(new JLabel("v-lines"),c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		infoPanel.add(vSpinner,c);
+		
+		controlMeshBox.addActionListener(this);
+		controlMeshBox.setSelected(false);
+		infoPanel.add(controlMeshBox);
+		
 		infoPanel.setShrinked(true);
 		shrinkPanel.add(infoPanel,c);
+		
+		Appearance app = new Appearance();
+		controlMeshComponent.setAppearance(app);
+		app.setAttribute(CommonAttributes.FACE_DRAW, false);
+		app.setAttribute(CommonAttributes.EDGE_DRAW, true);
+		app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		
 	}
 	
 	private void configureFileChooser() {
@@ -442,6 +465,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			vSpinner.setValue(activeNurbsAdapter.getVLineCount());
 		}
 		exportButton.setEnabled(activeNurbsAdapter != null);
+		updateControlMeshComponent();
 	}
 	
 	@Override
@@ -477,6 +501,31 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	public void stateChanged(ChangeEvent e) {
 		if(!loading && (activeNurbsAdapter != null)) {
 			NurbsSurfaceUtility.addNurbsMesh(activeNurbsAdapter.getSurface(), hif.getActiveLayer(),uModel.getNumber().intValue(),vModel.getNumber().intValue());
+		}
+	}
+	
+	private void updateControlMeshComponent() {
+		if(activeNurbsAdapter == null) {
+			return;
+		}
+		NURBSSurface surface = activeNurbsAdapter.getSurface();
+		double[][][] cm = surface.getControlMesh();
+		QuadMeshFactory qmf = new QuadMeshFactory();
+		qmf.setULineCount(cm[0].length);
+		qmf.setVLineCount(cm.length);
+		qmf.setVertexCoordinates(cm);
+		qmf.setGenerateEdgesFromFaces(true);
+		qmf.update();
+		IndexedFaceSet ifs = qmf.getIndexedFaceSet();
+		controlMeshComponent.setGeometry(ifs);
+		hif.getActiveLayer().addTemporaryGeometry(controlMeshComponent);
+		controlMeshComponent.setVisible(controlMeshBox.isSelected());
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == controlMeshBox) {
+			controlMeshComponent.setVisible(controlMeshBox.isSelected());
 		}
 	}
 	
