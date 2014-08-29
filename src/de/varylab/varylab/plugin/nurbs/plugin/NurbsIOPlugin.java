@@ -6,6 +6,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -37,6 +38,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
+import de.jreality.geometry.PointSetFactory;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
@@ -99,7 +101,8 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		vSpinner = new JSpinner(vModel);
 	
 	private JCheckBox
-		controlMeshBox = new JCheckBox("Control mesh");
+		controlMeshBox = new JCheckBox("Control mesh"),
+		umbillicsCheckBox = new JCheckBox("Umbillic points");
 	private ShrinkPanel
 		infoPanel = new ShrinkPanel("Mesh parameters");
 	
@@ -107,7 +110,8 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		loading = false;
 
 	private SceneGraphComponent 
-		controlMeshComponent = new SceneGraphComponent("Control Mesh");
+		controlMeshComponent = new SceneGraphComponent("Control Mesh"),
+		umbillicsComponent = new SceneGraphComponent("Umbillic points");
 
 	public NurbsIOPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -145,17 +149,26 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		
 		controlMeshBox.addActionListener(this);
 		controlMeshBox.setSelected(false);
-		infoPanel.add(controlMeshBox);
+		umbillicsCheckBox.addActionListener(this);
+		umbillicsCheckBox.setSelected(false);
+		infoPanel.add(controlMeshBox,c);
+		infoPanel.add(umbillicsCheckBox,c);
 		
 		infoPanel.setShrinked(true);
 		shrinkPanel.add(infoPanel,c);
 		
 		Appearance app = new Appearance();
-		controlMeshComponent.setAppearance(app);
 		app.setAttribute(CommonAttributes.FACE_DRAW, false);
 		app.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		app.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		controlMeshComponent.setAppearance(app);
 		
+		Appearance umbillicsApp = new Appearance();
+		umbillicsApp.setAttribute(CommonAttributes.FACE_DRAW, false);
+		umbillicsApp.setAttribute(CommonAttributes.EDGE_DRAW, false);
+		umbillicsApp.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		umbillicsApp.setAttribute(CommonAttributes.VERTEX_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.RED);
+		umbillicsComponent.setAppearance(umbillicsApp);
 	}
 	
 	private void configureFileChooser() {
@@ -463,9 +476,11 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		if(activeNurbsAdapter != null) {
 			uSpinner.setValue(activeNurbsAdapter.getULineCount());
 			vSpinner.setValue(activeNurbsAdapter.getVLineCount());
+			updateControlMeshComponent();
+			updateUmbillicsComponent();
 		}
 		exportButton.setEnabled(activeNurbsAdapter != null);
-		updateControlMeshComponent();
+		
 	}
 	
 	@Override
@@ -505,9 +520,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	}
 	
 	private void updateControlMeshComponent() {
-		if(activeNurbsAdapter == null) {
-			return;
-		}
 		NURBSSurface surface = activeNurbsAdapter.getSurface();
 		double[][][] cm = surface.getControlMesh();
 		QuadMeshFactory qmf = new QuadMeshFactory();
@@ -524,9 +536,25 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == controlMeshBox) {
+		Object source = e.getSource();
+		if(source == controlMeshBox) {
 			controlMeshComponent.setVisible(controlMeshBox.isSelected());
+		} else if (source == umbillicsCheckBox) {
+			umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
 		}
+	}
+
+	private void updateUmbillicsComponent() {
+		AdapterSet as = hif.getAdapters();
+		as.addAll(hif.getActiveAdapters());
+		double[][] umbillicPoints = NurbsSurfaceUtility.computeUmbilicalPoints(activeNurbsAdapter.getSurface(), hif.get(new VHDS()), as);
+		PointSetFactory psf = new PointSetFactory();
+		psf.setVertexCount(umbillicPoints.length);
+		psf.setVertexCoordinates(umbillicPoints);
+		psf.update();
+		umbillicsComponent.setGeometry(psf.getGeometry());
+		hif.getActiveLayer().addTemporaryGeometry(umbillicsComponent);
+		umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
 	}
 	
 }

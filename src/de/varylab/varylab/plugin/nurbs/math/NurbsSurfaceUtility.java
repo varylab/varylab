@@ -2,12 +2,17 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Direction;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 
 public class NurbsSurfaceUtility {
 
@@ -149,8 +154,7 @@ public class NurbsSurfaceUtility {
 	
 	
 	
-	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
-			LinkedList<double[]> selPoints, double dist, int numberOfPoints){
+	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, LinkedList<double[]> selPoints, double dist, int numberOfPoints){
 		LinkedList<LinkedList<double[]>> commonPointList = new LinkedList<>();
 		commonPointList.add(selPoints);
 		double currDist = 0.0;
@@ -158,22 +162,22 @@ public class NurbsSurfaceUtility {
 			LinkedList<double[]> commonPoints = new LinkedList<>();
 			currDist = (double)j / (double)numberOfPoints * dist;
 			for (double[] point : selPoints) {
-				if(uDir){
-					if(up){
+				if(param != Parameter.V){
+					if(dir != Direction.DOWN){
 						double[] next = {point[0] + currDist, point[1]};
 						commonPoints.add(next);
 					}
-					if(down){
+					if(dir != Direction.UP){
 						double[] next = {point[0] - currDist, point[1]};
 						commonPoints.add(next);
 					}
 				}
-				if(vDir){
-					if(up){
+				if(param != Parameter.U){
+					if(dir != Direction.DOWN){
 						double[] next = {point[0], point[1] + currDist};
 						commonPoints.add(next);
 					}
-					if(down){
+					if(dir != Direction.UP){
 						double[] next = {point[0], point[1] - currDist};
 						commonPoints.add(next);
 					}
@@ -251,6 +255,16 @@ public class NurbsSurfaceUtility {
 
 	public static void addNurbsMesh(NURBSSurface surface, HalfedgeLayer newLayer) {
 		addNurbsMesh(surface, newLayer, surface.getNumUPoints()*2, surface.getNumVPoints()*2);
+	}
+	
+
+	public static double[][] computeUmbilicalPoints(NURBSSurface surface, VHDS hds, AdapterSet as ) {
+		List<double[]> singularities = surface.findUmbilics(hds, as);
+		double[][] upoints = new double[singularities.size()][];
+		for (int i = 0; i < singularities.size(); i++) {
+			upoints[i] = surface.getSurfacePoint(singularities.get(i));
+		}
+		return upoints;
 	}
 
 }

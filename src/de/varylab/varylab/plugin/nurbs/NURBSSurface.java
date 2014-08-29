@@ -25,6 +25,7 @@ import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurface;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 /**
@@ -456,6 +457,10 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			}
 			NURBSAlgorithm.SurfacePoint(p, U, q, V, controlMesh, u, v, S);
 			return S;
+		}
+		
+		public double[] getSurfacePoint(double[] uv) {
+			return getSurfacePoint(uv[0], uv[1]);
 		}
 		
 		
@@ -1102,13 +1107,12 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
  			return PointProjectionSurface.getClosestPointDomain(this, point);
  		}
 		
-		public double[] getClosestPointDomainDir(double[] point, double[] start, boolean uDir, boolean vDir){
+		public double[] getClosestPointDomainDir(double[] point, double[] start, Parameter parameterDirection){
 			double[] p = PointProjectionSurface.getClosestPointDomain(this, point);
-			if(uDir){
+			if(parameterDirection == Parameter.U){
 				p[1] = start[1];
-			}
-			else if(vDir){
-				p[1] = start[0];
+			} else if(parameterDirection == Parameter.V){
+				p[0] = start[0];
 			}
 			return p;
 		}
@@ -1454,7 +1458,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		
 		
 	//	TODO: Why does this method need hds and as?
-	public LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
+	public List<double[]> findUmbilics(VHDS hds, AdapterSet as) {
 		
 		VectorFieldMapAdapter linefield = new VectorFieldMapAdapter();
 		FlatIndexFormAdapter indexAdapter= new FlatIndexFormAdapter(); 

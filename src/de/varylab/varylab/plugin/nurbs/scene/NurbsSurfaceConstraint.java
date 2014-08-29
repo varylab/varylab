@@ -1,11 +1,13 @@
-package de.varylab.varylab.plugin.nurbs.math;
+package de.varylab.varylab.plugin.nurbs.scene;
 
 import de.varylab.varylab.plugin.interaction.PointConstraint;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 
 public class NurbsSurfaceConstraint implements PointConstraint {
 
-	private NURBSSurface surface = null;
+	protected NURBSSurface surface = null;
+	
+	protected double[] uv = null;
 
 	public NurbsSurfaceConstraint(NURBSSurface surface) {
 		this.surface  = surface;
@@ -13,7 +15,12 @@ public class NurbsSurfaceConstraint implements PointConstraint {
 	
 	@Override
 	public double[] project(double[] src) {
-		return surface.getClosestPoint(src);
+		uv = surface.getClosestPointDomain(src);
+		return surface.getSurfacePoint(uv);
+	}
+
+	public double[] getUV() {
+		return uv;
 	}
 
 }

@@ -11,15 +11,12 @@ import de.jreality.tools.PointDragListener;
 
 public class DraggablePointComponent extends SceneGraphComponent {
 
-	private DragEventTool 
+	protected DragEventTool 
 		dragTool = new DragEventTool(InputSlot.RIGHT_BUTTON);
 	
-	private PointSet 
+	protected PointSet 
 		point = new PointSet("Draggable point",1);
-	
-	private PointConstraint 
-		constraint = null;
-	
+
 	public DraggablePointComponent(double[] coords, PointDragListener listener) {
 		super("Draggable point");
 		updateCoords(coords);
@@ -60,16 +57,7 @@ public class DraggablePointComponent extends SceneGraphComponent {
 		dragTool.removePointDragListener(l);
 	}
 
-	
-	public void setConstraint(PointConstraint constraint) {
-		this.constraint = constraint;
-	}
-	
-
 	public void updateCoords(double[] newCoords) {
-		if(constraint != null) {
-			newCoords = constraint.project(newCoords);
-		}
 		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(newCoords,4));
 	}
 	

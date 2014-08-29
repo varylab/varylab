@@ -148,7 +148,7 @@ public class StaticSetup {
 				@Override
 				public FontSet getFontSet(String lafName, UIDefaults table) {
 //					return new TahomaFontSet(10);
-					return new TrebuchetFontSet(10);
+					return new TrebuchetFontSet(12);
 				}
 			};
 			SubstanceLookAndFeel.setFontPolicy(newFontPolicy);

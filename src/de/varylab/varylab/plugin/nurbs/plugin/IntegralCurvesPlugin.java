@@ -6,7 +6,6 @@ import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -53,14 +52,12 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultLineShader;
-import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.PointDragEvent;
 import de.jreality.tools.PointDragListener;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
@@ -71,7 +68,6 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.VVertex;
-import de.varylab.varylab.plugin.interaction.DraggablePointComponent;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
@@ -84,9 +80,14 @@ import de.varylab.varylab.plugin.nurbs.math.CurveType;
 import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VectorFields;
 import de.varylab.varylab.plugin.nurbs.math.LineSegmentIntersection;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
+import de.varylab.varylab.plugin.nurbs.math.PrincipleCurvatureVectorFieldProvider;
+import de.varylab.varylab.plugin.nurbs.math.SymmetricVectorFieldProvider;
+import de.varylab.varylab.plugin.nurbs.scene.DraggableIntegralNurbsCurves;
 import de.varylab.varylab.plugin.nurbs.scene.ListSceneGraphComponent;
+import de.varylab.varylab.plugin.nurbs.scene.NurbsSurfaceDirectionConstraint;
 import de.varylab.varylab.plugin.nurbs.scene.PolygonalLineComponentProvider;
 import de.varylab.varylab.ui.ListSelectRemoveTable;
 import de.varylab.varylab.ui.ListSelectRemoveTableModel;
@@ -121,20 +122,15 @@ public class IntegralCurvesPlugin
 	private JCheckBox
 		showVectorFieldBox = new JCheckBox("vector field (angle):"),	
 		immediateCalculationBox = new JCheckBox("Immediate"),
-		maxCurvatureBox = new JCheckBox("Max (cyan)"),
-		minCurvatureBox = new JCheckBox("Min (red)"),
-		vecFieldBox = new JCheckBox("Vec. Field (red)"),
-		conjFieldBox = new JCheckBox("Conj. Field (cyan)"),
-		symConjBox = new JCheckBox("Conjugate directions"),
-		symConjCurvatureBox = new JCheckBox("Principle directions"),
 		interactiveBox = new JCheckBox("Interactive Curve Dragging");
 	
 	private JComboBox<CurveType>
 		curveCombo = new JComboBox<CurveType>(CurveType.values());
+	private JComboBox<IntegralCurve.VectorFields>
+		vectorFieldCombo = new JComboBox<>(IntegralCurve.VectorFields.values());
+	private JComboBox<IntegralCurve.SymmetricDir>
+		symmetryCombo = new JComboBox<IntegralCurve.SymmetricDir>(IntegralCurve.SymmetricDir.values());
 	
-	private boolean firstVectorField = true;
-	private boolean secondVectorField = true;
-
 	private volatile int 
 		curveIndex = 5;
 	
@@ -169,7 +165,7 @@ public class IntegralCurvesPlugin
 	
 	private IntegralCurve ic;
 	
-	private List<DraggableCurves> currentCurves = Collections.synchronizedList(new LinkedList<DraggableCurves>());
+	private List<DraggableIntegralNurbsCurves> currentCurves = Collections.synchronizedList(new LinkedList<DraggableIntegralNurbsCurves>());
 	
 	private LinkedList<LinkedList<double[]>> commonPoints = new LinkedList<>();
 
@@ -210,6 +206,7 @@ public class IntegralCurvesPlugin
 		shrinkPanel.add(integratorParametersPanel,rc);
 		
 		curveCombo.addItemListener(this);
+		curveCombo.setSelectedItem(CurveType.CONJUGATE);
 		
 		shrinkPanel.add(new JLabel("Curve Type"),lc);
 		shrinkPanel.add(curveCombo,rc);
@@ -218,26 +215,13 @@ public class IntegralCurvesPlugin
 		shrinkPanel.add(interactiveBox, rc);
 		interactiveBox.setSelected(false);
 
-		shrinkPanel.add(new JLabel("Curvature Lines:"), rc);
-		shrinkPanel.add(minCurvatureBox, lc);
-		minCurvatureBox.setEnabled(false);
-		shrinkPanel.add(maxCurvatureBox, rc);
-		maxCurvatureBox.setEnabled(false);
+		shrinkPanel.add(new JLabel("Curves:"), lc);
+		vectorFieldCombo.setSelectedItem(VectorFields.BOTH);
+		shrinkPanel.add(vectorFieldCombo, rc);
 		
-		shrinkPanel.add(new JLabel("Conjugate Lines:"), rc);
-		shrinkPanel.add(vecFieldBox, lc);
-		vecFieldBox.setEnabled(true);
-		shrinkPanel.add(conjFieldBox, rc);
-		conjFieldBox.setEnabled(true);
-		
-		
-		shrinkPanel.add(new JLabel("Symmetry"), rc);
-		shrinkPanel.add(symConjBox, rc);
-		symConjBox.addActionListener(this);
-		symConjBox.setEnabled(true);
-		shrinkPanel.add(symConjCurvatureBox, rc);
-		symConjCurvatureBox.setEnabled(true);
-		symConjCurvatureBox.addActionListener(this);
+		shrinkPanel.add(new JLabel("Symmetry"), lc);
+		symmetryCombo.setSelectedItem(SymmetricDir.CURVATURE);
+		shrinkPanel.add(symmetryCombo,rc);
 		
 		shrinkPanel.add(immediateCalculationBox,lc);
 		shrinkPanel.add(goButton, rc);
@@ -301,204 +285,22 @@ public class IntegralCurvesPlugin
 		integratorParametersPanel.add(nearUmbilicSpinner, rc);
 	}
 
-	private class DraggableCurves implements PointDragListener {
-		
-		private List<PolygonalLine> polygonalLines;			
-		private DraggablePointComponent draggablePoint;
-		private double[] p;
-		private boolean uDir = pointSelectionPlugin.getUDir();
-		private boolean vDir = pointSelectionPlugin.getVDir();
-		private double[] startUV = null;
-		private List<DraggableCurves> commonCurves = null;
-		private List<CurveJob> curveJobQueue = Collections.synchronizedList(new LinkedList<CurveJob>());
-		
-		LinkedList<Integer> indexList;
-
-		public DraggableCurves(double[] uv, double[] point, List<PolygonalLine> lines) {
-			startUV = uv;
-			draggablePoint = createDraggablePoint(point);
-			polygonalLines = lines;
-			indexList = new LinkedList<>();
-			for (PolygonalLine pl : lines) {
-				indexList.add(pl.getCurveIndex());
-			}
-			
-		}
-		
-		public double[] getStartUV(){
-			return startUV;
-		}
-		
-		public DraggablePointComponent getDraggablePoint(){
-			return draggablePoint;
-		}
-		
-		public DraggablePointComponent createDraggablePoint(double[] point){
-			DraggablePointComponent dpc = new DraggablePointComponent(point,this);
-			Appearance Ap = new Appearance();
-			Ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
-			dpc.setAppearance(Ap);
-			DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(Ap, false);
-			DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-			ipointShader.setDiffuseColor(Color.orange);
-			return dpc;
-		}
-
-		
-		@Override
-		public void pointDragStart(PointDragEvent e) {
-			ic.setTol(1E-1);
-		}
-
-		@Override
-		public void pointDragged(final PointDragEvent e) {
-
-			p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-			final double[] uv = nManager.getActiveNurbsSurface().getClosestPointDomainDir(p, startUV, uDir, vDir);
-			updateAllCurves(uv);
-
-		}
-
-		@Override
-		public void pointDragEnd(PointDragEvent e) {
-			ic.setTol(Math.pow(10.0,tolExpModel.getNumber().doubleValue()));
-			
-			AbstractJob updateJob = new AbstractJob() {
-				@Override
-				public String getJobName() {
-					return "Update curves display";
-				}
-				
-				@Override
-				protected void executeJob() throws Exception {
-					synchronized(curveJobQueue) {
-						curveJobQueue.remove(0);
-						processCurveJobs();
-					}
-					curvesModel.fireTableDataChanged();
-				}
-			};
-			addCurveJobs(new CurveJob(null, updateJob));
-		}	
-		
-		private void updateAllCurves(final double[] uv) {
-			Collection<AbstractJob> jobs = new LinkedList<AbstractJob>();
-			final List<PolygonalLine> linesToRemove = Collections.synchronizedList(new LinkedList<PolygonalLine>());
-			final List<PolygonalLine> linesToAdd = Collections.synchronizedList(new LinkedList<PolygonalLine>());
-			
-			draggablePoint.updateCoords(nManager.getActiveNurbsSurface().getSurfacePoint(uv[0], uv[1]));
-			
-			AbstractJob j = createCurveJob(uv, linesToRemove, linesToAdd);
-			jobs.add(j);
-
-			if(interactiveBox.isSelected()){
-				jobs.addAll(createCommonCurvesJobs(uv, linesToRemove, linesToAdd));
-			}
-			ParallelJob parallelJob = new ParallelJob(jobs);
-			
-			AbstractJob updateJob = new AbstractJob() {
-				@Override
-				public String getJobName() {
-					return "Update curves display";
-				}
-				
-				@Override
-				protected void executeJob() throws Exception {
-					updateIntegralCurvesRoot(linesToRemove, linesToAdd);
-					synchronized(curveJobQueue) {
-						curveJobQueue.remove(0);
-						processCurveJobs();
-					}
-				}
-			};
-			addCurveJobs(new CurveJob(parallelJob, updateJob));
-		}
-
-		private void addCurveJobs(CurveJob cj) {
-			synchronized(curveJobQueue) {
-				if(curveJobQueue.size() == 2) {
-					curveJobQueue.set(1,cj);
-				} else {
-					curveJobQueue.add(cj);
-				} 
-				if(curveJobQueue.size() == 1) {
-					processCurveJobs();
-				}
-			}
-		}
-
-		private void processCurveJobs() {
-			synchronized(curveJobQueue) {
-				if(!curveJobQueue.isEmpty()) {
-					CurveJob cj = curveJobQueue.get(0);
-					AbstractJob parallelJob = cj.getComputationJob();
-					if(parallelJob != null) {
-						jobQueuePlugin.queueJob(parallelJob);
-					}
-					jobQueuePlugin.queueJob(cj.getUpdateJob());
-				}
-			}
-		}
-
-		private AbstractJob createCurveJob(final double[] uv, final List<PolygonalLine> linesToRemove, final List<PolygonalLine> linesToAdd) {
-			AbstractJob j = new AbstractJob() {
-				
-				@Override
-				public String getJobName() {
-					return "Recompute curve " + uv;
-				}
-				
-				@Override
-				protected void executeJob() throws Exception {
-					linesToRemove.addAll(polygonalLines);
-					recomputeCurves(uv);
-					linesToAdd.addAll(polygonalLines);
-				}
-			};
-			return j;
-		}
-
-		
-		
-		private Collection<AbstractJob> createCommonCurvesJobs(final double[] uv, final List<PolygonalLine> linesToRemove, final List<PolygonalLine> linesToAdd) {
-			Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
-			final double[] translation = Rn.subtract(null, uv, startUV);
-			for (final DraggableCurves dc : getCommonCurves(this)) {
-				double[] otherStartUV = dc.getStartUV();
-				double[] newCoords = Rn.add(null, otherStartUV, translation);
-				jobs.add(dc.createCurveJob(newCoords, linesToRemove, linesToAdd));
-			}
-			return jobs;
-		}
-		
-		public void recomputeCurves(double[] uv) {
-			polygonalLines = ic.computeIntegralLine(firstVectorField, secondVectorField, 0.01, singularities, uv);
-			setCurveIndices(polygonalLines);
-			draggablePoint.updateCoords(nManager.getActiveNurbsSurface().getSurfacePoint(uv[0], uv[1]));
-		}
-		
-		public void setCommonCurves(List<DraggableCurves> commonCurves) {
-			this.commonCurves = commonCurves;
-		}
-
-	}
-	
-	private List<DraggableCurves> getCommonCurves(DraggableCurves curve){
-		if(curve.commonCurves == null){
-			List<DraggableCurves> commonCurves = new LinkedList<>();
+	private List<DraggableIntegralNurbsCurves> getCommonCurves(DraggableIntegralNurbsCurves curve){
+		if(curve.getCommonCurves() == null){
+			List<DraggableIntegralNurbsCurves> commonCurves = new LinkedList<>();
 			List<double[]> commonPoints = getCommonPoints(curve);
-			for (DraggableCurves dc : currentCurves) {
-				if(commonPoints.contains(dc.getStartUV())){
+			for (DraggableIntegralNurbsCurves dc : currentCurves) {
+				if(commonPoints.contains(dc.getInitialUV())){
 					commonCurves.add(dc);
 				}		
 			}
 			curve.setCommonCurves(commonCurves);
 		}
-		return curve.commonCurves;
+		return curve.getCommonCurves();
 	}
 	
-	private List<double[]> getCommonPoints(DraggableCurves dc){
-		double[] p = dc.getStartUV();
+	private List<double[]> getCommonPoints(DraggableIntegralNurbsCurves dc){
+		double[] p = dc.getInitialUV();
 		LinkedList<double[]> others = new LinkedList<>();
 		if(commonPoints == null) {
 			return others;
@@ -518,89 +320,24 @@ public class IntegralCurvesPlugin
 	@Override
 	public void actionPerformed(ActionEvent e){
 		Object source = e.getSource();
+		final NURBSSurface surface = nManager.getActiveNurbsSurface();
 		if(source == goButton) {
 
 			currentCurves.clear();
-			double tol = tolExpModel.getNumber().doubleValue();
-			tol = Math.pow(10, tol);
-
-			CurveType vfc = (CurveType)curveCombo.getSelectedItem();
-
-			if(vfc == CurveType.CURVATURE){
-				firstVectorField = maxCurvatureBox.isSelected();
-				secondVectorField = minCurvatureBox.isSelected();
-			}
-			else if(vfc == CurveType.CONJUGATE){
-				logger.info("conj vec");
-				firstVectorField = vecFieldBox.isSelected();
-				secondVectorField = conjFieldBox.isSelected();
-			}
-
-			SymmetricDir symDir = SymmetricDir.NO_SYMMETRY;
-			if(symConjBox.isSelected()){
-				symDir = SymmetricDir.DIRECTION;
-			}
-			else if(symConjCurvatureBox.isSelected()){
-				symDir = SymmetricDir.CURVATURE;
-			}	
-			ic = new IntegralCurve(nManager.getActiveNurbsSurface(), vfc, tol, symDir, getVecField(), curveIndex);
+			initializeIntegralCurvesFactory(surface);
+			
 			if(singularities == null) {
 				//							computeUmbilicalPoints();
 			}
+			
 			commonPoints = pointSelectionPlugin.getCommonPointList();
 			
 			hif.clearSelection();
 			
-			final double umbilicStop = Math.pow(10, nearUmbilicModel.getNumber().doubleValue());
-			Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
 			final List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
-			if(startingPointsUV.size() == 0) {
-				return;
-			}
-			logger.info("ALL STARTING POINTS");
-			for (double[] sp : startingPointsUV) {
-				logger.info(Arrays.toString(sp));
-			}
-			for (final double[] sp : startingPointsUV) {
-				jobs.add(new AbstractJob() {
-					@Override
-					public String getJobName() {
-						return Arrays.toString(sp);
-					}
-					
-					@Override
-					protected void executeJob() throws Exception {
-						LinkedList<PolygonalLine> lines = ic.computeIntegralLine(firstVectorField, secondVectorField, umbilicStop, singularities, sp);
-						setCurveIndices(lines);
-						curvesModel.addAll(lines);
-						double[] surfacePoint = nManager.getActiveNurbsSurface().getSurfacePoint(sp[0], sp[1]);
-						DraggableCurves dc = new DraggableCurves(sp, surfacePoint, lines);
-						currentCurves.add(dc);
-					}
-				});
-			}
-			ParallelJob parallelJob = new ParallelJob(jobs);
-			jobQueuePlugin.queueJob(parallelJob);
-
-			Job updateJob = new AbstractJob() {
-				@Override
-				public String getJobName() {
-					return "Update curves display";
-				}
-				
-				@Override
-				protected void executeJob() throws Exception {
-					System.out.println("All lines");
-					for (PolygonalLine pl : curvesModel.getList()) {
-						System.out.println(pl.toString());
-					}
-					for (DraggableCurves dc : currentCurves) {
-						hif.addTemporaryGeometry(dc.getDraggablePoint());
-					}
-					curvesModel.fireTableDataChanged();
-				}
-			};
-			jobQueuePlugin.queueJob(updateJob);
+			
+			computeIntegralCurves(surface, startingPointsUV);
+			
 		} else if(source == deleteButton) {
 			curvesModel.clear();
 			hif.clearSelection();
@@ -614,10 +351,10 @@ public class IntegralCurvesPlugin
 				allSegments.addAll(pl.getpLine());
 			}
 			
-			List<LineSegment> completeDomainBoundarySegments = nManager.getActiveNurbsSurface().getCompleteDomainBoundarySegments();
+			List<LineSegment> completeDomainBoundarySegments = surface.getCompleteDomainBoundarySegments();
 			
-			double[] U = nManager.getActiveNurbsSurface().getUKnotVector();
-			double[] V = nManager.getActiveNurbsSurface().getVKnotVector();
+			double[] U = surface.getUKnotVector();
+			double[] V = surface.getVKnotVector();
 			
 			int boundaryIndex = 1;
 			logger.info("All boundary curves ");
@@ -642,14 +379,14 @@ public class IntegralCurvesPlugin
 			for (IntersectionPoint ip : intersections) {
 				logger.info(ip.toString());
 			}
-			FaceSetGenerator fsg = new FaceSetGenerator(nManager.getActiveNurbsSurface(), intersections);
+			FaceSetGenerator fsg = new FaceSetGenerator(surface, intersections);
 			double lastTimeBentley = System.currentTimeMillis();
 			logger.info("Bentley Ottmann Time: " + (lastTimeBentley - firstTimeBentley));
 			allSegments.clear();
 			FaceSet fs = fsg.createFaceSet();
 			for (int i = 0; i < fs.getVerts().length; i++) {
 				double[] S = new double[4];
-				nManager.getActiveNurbsSurface().getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);
+				surface.getSurfacePoint(fs.getVerts()[i][0], fs.getVerts()[i][1], S);
 				fs.getVerts()[i] = S;
 			}
 
@@ -659,15 +396,6 @@ public class IntegralCurvesPlugin
 			hif.addLayer(hel); //add and activate
 			hel.set(fs.getIndexedFaceSet());
 			hif.update();
-		} else if(source == symConjBox || source == symConjCurvatureBox) {
-			if(symConjBox.isSelected()) {
-				symConjCurvatureBox.setEnabled(false);
-			} else if(symConjCurvatureBox.isSelected()) {
-				symConjBox.setEnabled(false);
-			} else {
-				symConjCurvatureBox.setEnabled(true);
-				symConjBox.setEnabled(true);
-			}
 		} else if(source == cutLineButton){
 			activeCurve.setBegin(beginLineModel.getNumber().intValue());
 			activeCurve.setEnd(endLineModel.getNumber().intValue());
@@ -680,6 +408,85 @@ public class IntegralCurvesPlugin
 			}
 		}
 		
+	}
+
+	private void computeIntegralCurves(final NURBSSurface surface, final List<double[]> startingPointsUV) {
+		Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
+		if(startingPointsUV.size() == 0) {
+			return;
+		}
+		logger.info("ALL STARTING POINTS");
+		for (double[] sp : startingPointsUV) {
+			logger.info(Arrays.toString(sp));
+		}
+		for (final double[] sp : startingPointsUV) {
+			jobs.add(new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return Arrays.toString(sp);
+				}
+				
+				@Override
+				protected void executeJob() throws Exception {
+					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
+					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp, pointSelectionPlugin.getParameter()));
+					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,ic,sp,dc);
+					dc.addPointDragListener(listener);
+					List<PolygonalLine> lines = dc.getPolygonalLines();
+					setCurveIndices(lines);
+					curvesModel.addAll(lines);
+					currentCurves.add(dc);
+				}
+			});
+		}
+		ParallelJob parallelJob = new ParallelJob(jobs);
+		jobQueuePlugin.queueJob(parallelJob);
+
+		Job updateJob = new AbstractJob() {
+			@Override
+			public String getJobName() {
+				return "Update curves display";
+			}
+			
+			@Override
+			protected void executeJob() throws Exception {
+				System.out.println("All lines");
+				for (PolygonalLine pl : curvesModel.getList()) {
+					System.out.println(pl.toString());
+				}
+				for (DraggableIntegralNurbsCurves dc : currentCurves) {
+					hif.addTemporaryGeometry(dc);
+				}
+				curvesModel.fireTableDataChanged();
+			}
+		};
+		jobQueuePlugin.queueJob(updateJob);
+	}
+
+	private void initializeIntegralCurvesFactory(final NURBSSurface surface) {
+		double tol = tolExpModel.getNumber().doubleValue();
+		tol = Math.pow(10, tol);
+
+		ic = new IntegralCurve(surface, tol, getVecField(), curveIndex);
+		ic.setVectorFields((VectorFields)vectorFieldCombo.getSelectedItem());
+		double umbilicStop = Math.pow(10, nearUmbilicModel.getNumber().doubleValue());
+		ic.setUmbillicStop(umbilicStop);
+
+		CurveType vfc = (CurveType)curveCombo.getSelectedItem();
+
+		SymmetricDir symDir = (SymmetricDir)symmetryCombo.getSelectedItem();
+		
+		switch (vfc) {
+		case CURVATURE:
+			ic.setVectorFieldProvider(new PrincipleCurvatureVectorFieldProvider(surface));
+			break;
+		case CONJUGATE:
+			ic.setVectorFieldProvider(new SymmetricVectorFieldProvider(surface, symDir, getVecField()));
+			break;
+		case ASYMPTOTIC:
+			logger.warning("Asymptotic line computation not yet implemented.");
+			return;
+		}
 	}
 
 	private void removeVectorFields() {
@@ -727,38 +534,7 @@ public class IntegralCurvesPlugin
 
 	@Override
 	public void pointSelected(double[] uv) {
-		List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
-		double tol = tolExpModel.getNumber().doubleValue();
-		tol = Math.pow(10, tol);
-		double umbilicStop = nearUmbilicModel.getNumber().doubleValue();
-		umbilicStop = Math.pow(10, umbilicStop);
-		boolean firstVectorField = maxCurvatureBox.isSelected();
-		boolean secondVectorField = minCurvatureBox.isSelected();
-		if(immediateCalculationBox.isSelected()) {
-			SymmetricDir symDir = SymmetricDir.NO_SYMMETRY;
-			if(symConjBox.isSelected()){
-				symDir = SymmetricDir.DIRECTION;
-			}
-			else if(symConjCurvatureBox.isSelected()){
-				symDir = SymmetricDir.CURVATURE;
-			}	
-
-			IntegralCurve ic = new IntegralCurve(nManager.getActiveNurbsSurface(), (CurveType) curveCombo.getSelectedItem(), tol, symDir, getVecField(), curveIndex);
-			
-			if(singularities == null) {
-				computeUmbilicalPoints();
-			}
-			
-			List<PolygonalLine> currentLines = ic.computeIntegralLines(firstVectorField, secondVectorField, umbilicStop, singularities, startingPointsUV);
-//			LinkedList<PolygonalLine> curvatureLines = computeCurvatureLines(Lists.newArrayList(uv));
-			for(PolygonalLine pl : currentLines) {
-				if(!curvesModel.contains(pl)) {
-					curvesModel.add(pl);
-//					integralCurvesRoot.addChild(createLineComponent(pl));
-				}
-			}
-			curvesModel.fireTableDataChanged();
-		}
+		computeIntegralCurves(nManager.getActiveNurbsSurface(), Collections.singletonList(uv));
 	}
 
 
@@ -892,25 +668,11 @@ public class IntegralCurvesPlugin
 	private void updateIntegralCurvesPanelUI() {
 		if(CurveType.CONJUGATE == curveCombo.getSelectedItem()){
 			vecFieldSpinner.setEnabled(true);
-			vecFieldBox.setEnabled(true);
-			conjFieldBox.setEnabled(true);
-			symConjBox.setEnabled(true);
-			symConjCurvatureBox.setEnabled(true);
+			symmetryCombo.setEnabled(true);
 		}
 		else{
 			vecFieldSpinner.setEnabled(false);
-			vecFieldBox.setEnabled(false);
-			conjFieldBox.setEnabled(false);
-			symConjBox.setEnabled(false);
-			symConjCurvatureBox.setEnabled(false);
-		}
-		if(CurveType.CURVATURE == curveCombo.getSelectedItem()){
-			minCurvatureBox.setEnabled(true);
-			maxCurvatureBox.setEnabled(true);
-		}
-		else{
-			minCurvatureBox.setEnabled(false);
-			maxCurvatureBox.setEnabled(false);
+			symmetryCombo.setEnabled(false);
 		}
 	}
 
@@ -925,6 +687,7 @@ public class IntegralCurvesPlugin
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
+				System.out.println(toAdd);
 				curvesModel.removeAll(toRemove);
 				curvesModel.addAll(toAdd);
 				polylineComponentProvider.setSurface(nManager.getActiveNurbsSurface());
@@ -946,26 +709,6 @@ public class IntegralCurvesPlugin
 		for(PolygonalLine l : lines) {
 			l.setCurveIndex(curveIndex++);
 		}
-	}
-
-	private double[][] computeUmbilicalPoints() {
-		AdapterSet as = hif.getAdapters();
-		as.addAll(hif.getActiveAdapters());
-		VHDS hds = hif.get(new VHDS());
-		singularities = nManager.getActiveNurbsSurface().findUmbilics(hds, as);
-		double[][] uu = new double[singularities.size()][];
-		double[][] upoints = new double[singularities.size()][];
-		for (int i = 0; i < uu.length; i++) {
-			uu[i] = singularities.get(i);
-		}
-		
-		for (int i = 0; i < uu.length; i++) {
-			double[] S = new double[4];
-			nManager.getActiveNurbsSurface().getSurfacePoint(uu[i][0], uu[i][1], S);
-			upoints[i] = S;
-		}
-		
-		return upoints;
 	}
 	
 	private double[][] getDirections(NURBSSurface ns, double[] uv, double[] vecField) {
@@ -1007,6 +750,169 @@ public class IntegralCurvesPlugin
 		return dir;
 	}
 
+	public class  DraggableIntegralCurveListener implements PointDragListener {
+		
+		private IntegralCurve
+			icf = null;
+		
+		private double[] 
+			p = null;
+		
+		private boolean
+			recomputeAll = true;
+		
+		private double[] startUV = null;
+		private List<CurveJob> curveJobQueue = Collections.synchronizedList(new LinkedList<CurveJob>());
+		
+		private NURBSSurface 
+			surface = null;
+		
+		private DraggableIntegralNurbsCurves
+			curve = null;
+		
+		public DraggableIntegralCurveListener(NURBSSurface surface, IntegralCurve icf, double[] startUV, DraggableIntegralNurbsCurves curve) {
+			this.icf = icf;
+			this.surface = surface;
+			this.startUV = startUV;
+			this.curve = curve;
+		}
+
+		@Override
+		public void pointDragStart(PointDragEvent e) {
+			icf.setTol(1E-2);
+		}
+
+		@Override
+		public void pointDragged(final PointDragEvent e) {
+
+			p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
+			updateAllCurves(curve, p);
+
+		}
+
+		@Override
+		public void pointDragEnd(PointDragEvent e) {
+			icf.setTol(Math.pow(10.0,tolExpModel.getNumber().doubleValue()));
+			updateAllCurves(curve, p);
+			
+			AbstractJob updateJob = new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return "Update curve table";
+				}
+				
+				@Override
+				protected void executeJob() throws Exception {
+					synchronized(curveJobQueue) {
+						curveJobQueue.remove(0);
+						processCurveJobs();
+					}
+					curvesModel.fireTableDataChanged();
+				}
+			};
+			addCurveJobs(new CurveJob(null, updateJob));
+		}	
+		
+		
+		public double[] getStartUV(){
+			return startUV;
+		}
+		
+		private void updateAllCurves(DraggableIntegralNurbsCurves dc, final double[] p) {
+			Collection<AbstractJob> jobs = new LinkedList<AbstractJob>();
+			final List<PolygonalLine> linesToRemove = Collections.synchronizedList(new LinkedList<PolygonalLine>());
+			final List<PolygonalLine> linesToAdd = Collections.synchronizedList(new LinkedList<PolygonalLine>());
+			
+			AbstractJob j = createCurveJob(dc, p, linesToRemove, linesToAdd);
+			jobs.add(j);
+
+			if(recomputeAll){
+				jobs.addAll(createCommonCurvesJobs(dc, p, linesToRemove, linesToAdd));
+			}
+			ParallelJob parallelJob = new ParallelJob(jobs);
+			
+			AbstractJob updateJob = new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return "Update curves display";
+				}
+				
+				@Override
+				protected void executeJob() throws Exception {
+					updateIntegralCurvesRoot(linesToRemove, linesToAdd);
+					synchronized(curveJobQueue) {
+						curveJobQueue.remove(0);
+						processCurveJobs();
+					}
+				}
+			};
+			addCurveJobs(new CurveJob(parallelJob, updateJob));
+		}
+
+		private void addCurveJobs(CurveJob cj) {
+			synchronized(curveJobQueue) {
+				if(curveJobQueue.size() == 2) {
+					curveJobQueue.set(1,cj);
+				} else {
+					curveJobQueue.add(cj);
+				} 
+				if(curveJobQueue.size() == 1) {
+					processCurveJobs();
+				}
+			}
+		}
+
+		private void processCurveJobs() {
+			synchronized(curveJobQueue) {
+				if(!curveJobQueue.isEmpty()) {
+					CurveJob cj = curveJobQueue.get(0);
+					AbstractJob parallelJob = cj.getComputationJob();
+					if(parallelJob != null) {
+						jobQueuePlugin.queueJob(parallelJob);
+					}
+					jobQueuePlugin.queueJob(cj.getUpdateJob());
+				}
+			}
+		}
+		
+		private Collection<AbstractJob> createCommonCurvesJobs(final DraggableIntegralNurbsCurves curve, final double[] p, final List<PolygonalLine> linesToRemove, final List<PolygonalLine> linesToAdd) {
+			Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
+			double[] uv = surface.getClosestPointDomain(p);
+			// TODO: replace uv with p??
+			final double[] translation = Rn.subtract(null, uv, startUV);
+			List<DraggableIntegralNurbsCurves> cc = getCommonCurves(curve);
+			System.out.println(cc);
+			for (final DraggableIntegralNurbsCurves dc : cc) {
+				double[] otherStartUV = dc.getInitialUV();
+				double[] newCoords = Rn.add(null, otherStartUV, translation);
+				jobs.add(createCurveJob(dc, surface.getSurfacePoint(newCoords), linesToRemove, linesToAdd));
+			}
+			return jobs;
+		}
+		
+		private AbstractJob createCurveJob(final DraggableIntegralNurbsCurves curve, final double[] p, final List<PolygonalLine> linesToRemove, final List<PolygonalLine> linesToAdd) {
+			AbstractJob j = new AbstractJob() {
+				
+				@Override
+				public String getJobName() {
+					return "Recompute curve " + p;
+				}
+				
+				@Override
+				protected void executeJob() throws Exception {
+					synchronized (curve) {
+						linesToRemove.addAll(curve.getPolygonalLines());
+						curve.recomputeCurves(p);
+						setCurveIndices(curve.getPolygonalLines());
+						linesToAdd.addAll(curve.getPolygonalLines());
+					}
+				}
+			};
+			return j;
+		}
+		
+	}
+	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
@@ -1024,21 +930,21 @@ public class IntegralCurvesPlugin
 		return View.class;
 	}
 	
-	@Override
-	public void storeStates(Controller c) throws Exception {
-		super.storeStates(c);
-		c.storeProperty(getClass(), "calculateMaxCurve", maxCurvatureBox.isSelected());
-		c.storeProperty(getClass(), "calculateMinCurve", minCurvatureBox.isSelected());
-		c.storeProperty(getClass(), "immediateCurveCalculation", immediateCalculationBox.isSelected());
-	}
-	
-	@Override
-	public void restoreStates(Controller c) throws Exception {
-		super.restoreStates(c);
-		maxCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMaxCurve",maxCurvatureBox.isSelected()));
-		minCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMinCurve",minCurvatureBox.isSelected()));
-		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
-	}
+//	@Override
+//	public void storeStates(Controller c) throws Exception {
+//		super.storeStates(c);
+//		c.storeProperty(getClass(), "calculateMaxCurve", maxCurvatureBox.isSelected());
+//		c.storeProperty(getClass(), "calculateMinCurve", minCurvatureBox.isSelected());
+//		c.storeProperty(getClass(), "immediateCurveCalculation", immediateCalculationBox.isSelected());
+//	}
+//	
+//	@Override
+//	public void restoreStates(Controller c) throws Exception {
+//		super.restoreStates(c);
+//		maxCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMaxCurve",maxCurvatureBox.isSelected()));
+//		minCurvatureBox.setSelected(c.getProperty(getClass(), "calculateMinCurve",minCurvatureBox.isSelected()));
+//		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
+//	}
 
 }
 

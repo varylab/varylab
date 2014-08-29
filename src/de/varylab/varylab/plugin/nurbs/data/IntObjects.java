@@ -2,13 +2,15 @@ package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.LinkedList;
 
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VectorFields;
+
 
 public class IntObjects {
 	
 	protected LinkedList<double[]> points;
 	protected double[] orientation;
 	protected boolean nearby;
-	protected boolean maxMin;
+	protected VectorFields maxMin;
 	protected boolean cyclic = false;
 	//only for debugging
 
@@ -18,18 +20,23 @@ public class IntObjects {
 		nearby = false;
 	}
 	
-	public IntObjects(LinkedList<double[]> p,double[] o,boolean n,boolean m){
+	public IntObjects(LinkedList<double[]> p,double[] o,boolean n, VectorFields m){
 		points = p;
 		orientation = o;
 		nearby = n;
 		maxMin = m;
 	}
+	
 	public IntObjects(double[] o,boolean n){
 		orientation = o;
 		nearby = n;
 	}
 
 	
+
+	public IntObjects(LinkedList<double[]> pointList, double[] ori,	boolean nearBy2, boolean conj) {
+		this(pointList, ori, nearBy2, conj?VectorFields.FIRST:VectorFields.SECOND);
+	}
 
 	public LinkedList<double[]> getPoints() {
 		return points;
@@ -55,11 +62,11 @@ public class IntObjects {
 		this.nearby = nearby;
 	}
 
-	public boolean isMaxMin() {
+	public VectorFields isMaxMin() {
 		return maxMin;
 	}
 
-	public void setMaxMin(boolean maxMin) {
+	public void setMaxMin(VectorFields maxMin) {
 		this.maxMin = maxMin;
 	}
 
