@@ -3,8 +3,8 @@ package de.varylab.varylab.plugin.nurbs.math;
 import de.jreality.math.Rn;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.SymmetricDir;
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VectorFields;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.SymmetricDir;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
 public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 	
@@ -66,7 +66,6 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 	
 	public double[] getSymConjDirWRTDirection(double[] point) {
 		double[] dir = {1,1};
-		double[] givenDir = vecField;
 		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(surface, point);
 		double[] w1 = ci.getPrincipalDirections()[0];
 		double[] w2 = ci.getPrincipalDirections()[1];
@@ -76,7 +75,7 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 			double k2 = ci.getMaxCurvature();
 			double[] e1 = ci.getCurvatureDirections()[0];
 			double[] e2 = ci.getCurvatureDirections()[1];
-			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, givenDir[0], e1), Rn.times(null, givenDir[1], e2)));
+			double[] v = Rn.normalize(null, Rn.add(null, Rn.times(null, vecField[0], e1), Rn.times(null, vecField[1], e2)));
 			double delta = 0.;
 			if(Rn.innerProduct(v, e1) > 1){
 				delta = 0.;

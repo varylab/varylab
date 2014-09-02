@@ -16,11 +16,11 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 
 	private static final long serialVersionUID = 1L;
 
-	private String[] columnNames = {" ", "Name", " "};
-	private PrettyPrinter<E> pp = null;
+	protected String[] columnNames = {" ", "Name", " "};
+	protected PrettyPrinter<E> pp = null;
 	
-	private List<E> list = Collections.synchronizedList(new LinkedList<E>());
-	private List<E> checked = Collections.synchronizedList(new LinkedList<E>());
+	protected List<E> list = Collections.synchronizedList(new LinkedList<E>());
+	protected List<E> checked = Collections.synchronizedList(new LinkedList<E>());
 	
 	public ListSelectRemoveTableModel(String columnName) {
 		this(columnName,null);

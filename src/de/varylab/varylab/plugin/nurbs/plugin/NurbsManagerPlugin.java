@@ -11,6 +11,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
+import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
@@ -19,6 +20,7 @@ import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.generator.QuadMeshGenerator;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
@@ -52,8 +54,11 @@ public class NurbsManagerPlugin extends Plugin implements HalfedgeListener {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		JRHalfedgeViewer.initHalfedgeFronted();
 		hif.addAdapter(new NurbsWeightAdapter(), true);
 		hif.addHalfedgeListener(this);
+		
+		c.getPlugin(VarylabMain.class);
 		
 		c.getPlugin(NurbsIOPlugin.class);
 		c.getPlugin(IntegralCurvesPlugin.class);

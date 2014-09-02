@@ -2,7 +2,7 @@ package de.varylab.varylab.plugin.nurbs.data;
 
 import java.util.LinkedList;
 
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VectorFields;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
 
 public class IntObjects {
@@ -27,13 +27,6 @@ public class IntObjects {
 		maxMin = m;
 	}
 	
-	public IntObjects(double[] o,boolean n){
-		orientation = o;
-		nearby = n;
-	}
-
-	
-
 	public IntObjects(LinkedList<double[]> pointList, double[] ori,	boolean nearBy2, boolean conj) {
 		this(pointList, ori, nearBy2, conj?VectorFields.FIRST:VectorFields.SECOND);
 	}

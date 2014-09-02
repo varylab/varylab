@@ -239,10 +239,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 					logger.info(surface.toObj());
 					logger.info("surface to code");
 					logger.info(surface.toReadableInputString());
-					if(surface.getClosingDir() == ClosingDir.uClosed){
+					if(surface.getDomain().getClosingDir() == ClosingDir.uClosed){
 						logger.info("surface.isClosedUDir()");
 					}
-					if(surface.getClosingDir() == ClosingDir.vClosed){
+					if(surface.getDomain().getClosingDir() == ClosingDir.vClosed){
 						logger.info("surface.isClosedVDir()");
 					}
 					surface.setName(file.getName());

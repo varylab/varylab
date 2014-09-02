@@ -6,7 +6,6 @@ import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.tool.InputSlot;
 import de.jreality.tools.DragEventTool;
-import de.jreality.tools.PointDragEvent;
 import de.jreality.tools.PointDragListener;
 
 public class DraggablePointComponent extends SceneGraphComponent {
@@ -16,29 +15,26 @@ public class DraggablePointComponent extends SceneGraphComponent {
 	
 	protected PointSet 
 		point = new PointSet("Draggable point",1);
+	
+	protected double[]
+		coords = null;
 
 	public DraggablePointComponent(double[] coords, PointDragListener listener) {
 		super("Draggable point");
-		updateCoords(coords);
-		addTool(dragTool);
-		dragTool.addPointDragListener(listener);
-		setGeometry(point);
+		init(coords);
+		addPointDragListener(listener);
 	}
 
 	public DraggablePointComponent(double[] coords) {
 		super("Draggable point");
-		updateCoords(coords);
-		addPointDragListener(new DefaultPointDragListener());
-		addTool(dragTool);
-		setGeometry(point);
+		init(coords);
 	}
 
-	public DraggablePointComponent() {
-		super("Draggable point");
-		updateCoords(new double[]{0,0,0,0});
-		addPointDragListener(new DefaultPointDragListener());
+	private void init(double[] coords) {
+		updateCoords(coords);
 		addTool(dragTool);
 		setGeometry(point);
+		updateComponent();
 	}
 
 	public PointSet getPoint() {
@@ -58,22 +54,11 @@ public class DraggablePointComponent extends SceneGraphComponent {
 	}
 
 	public void updateCoords(double[] newCoords) {
-		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(newCoords,4));
+		coords = newCoords.clone();
 	}
 	
-	public class DefaultPointDragListener implements PointDragListener {
-		@Override
-		public void pointDragStart(PointDragEvent e) {
-		}
-
-		@Override
-		public void pointDragged(PointDragEvent e) {
-			double[] newCoords = new double[]{e.getX(),e.getY(), e.getZ(), 1.0};
-			updateCoords(newCoords);
-		}
-
-		@Override
-		public void pointDragEnd(PointDragEvent e) {
-		}
+	public void updateComponent() {
+		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(coords,4));
 	}
+	
 }

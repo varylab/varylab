@@ -1,6 +1,6 @@
 package de.varylab.varylab.plugin.nurbs.math;
 
-import de.varylab.varylab.plugin.nurbs.math.IntegralCurve.VectorFields;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
 public interface VectorFieldProvider {
 

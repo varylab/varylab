@@ -23,4 +23,8 @@ public class NurbsSurfaceConstraint implements PointConstraint {
 		return uv;
 	}
 
+	public NURBSSurface getSurface() {
+		return surface;
+	}
+	
 }

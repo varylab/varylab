@@ -52,7 +52,7 @@ public class FaceSetGenerator {
 				lowerBound.add(ip);
 			}
 		}
-		boundaryVerts = surface.getBoundaryVerticesUV();
+		boundaryVerts = surface.getDomain().getBoundaryVerticesUV();
 	}
 	
 	private IndexedCurveList getListFromIndex(int index){
@@ -105,7 +105,7 @@ public class FaceSetGenerator {
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
 		double[] point = ip.getPoint();
-		ClosingDir cd = ns.getClosingDir();
+		ClosingDir cd = ns.getDomain().getClosingDir();
 		if(cd == ClosingDir.nonClosed){
 			if(point[0] == U[0] || point[0] == U[U.length - 1] || point[1] == V[0] || point[1] == V[V.length - 1]){
 				return true;
@@ -336,7 +336,7 @@ public class FaceSetGenerator {
 	}
 	
 	public IntersectionPoint getNextNbr(IntersectionPoint previous, IntersectionPoint current){
-		if(ns.getClosingDir() == ClosingDir.nonClosed){
+		if(ns.getDomain().getClosingDir() == ClosingDir.nonClosed){
 			IntersectionPoint next = null;
 			if(previous == null){
 				logger.info("previous == null");
@@ -620,9 +620,9 @@ public class FaceSetGenerator {
 		determineLocalNbrs();
 		determineOrientedNbrs();
 		logger.info("ALL USE#D POINTS");
-		logger.info("boundary values " + ns.getBoundaryValues());
-		logger.info("closind direction " + ns.getClosingDir());
-		logger.info("closed boundary values " + Arrays.toString(ns.getGluedBoundaryValues()));
+		logger.info("boundary values " + ns.getDomain().getBoundaryValues());
+		logger.info("closind direction " + ns.getDomain().getClosingDir());
+		logger.info("closed boundary values " + Arrays.toString(ns.getDomain().getGluedBoundaryValues()));
 		for (IntersectionPoint oriNbr : ipList) {
 			if(isValidIntersectionPoint(oriNbr)){
 				validVerts.add(oriNbr);
@@ -652,7 +652,7 @@ public class FaceSetGenerator {
 		int faceIndexTest = 0;
 		logger.info("All faces");
 		
-		List<Double> boundValues = ns.getBoundaryValues();
+		List<Double> boundValues = ns.getDomain().getBoundaryValues();
 		for (IntersectionPoint ip : points) {
 			while(!ip.getUnusedNbrs().isEmpty()){
 				if(!liesOnGluedBoundary(ip)){
@@ -716,9 +716,9 @@ public class FaceSetGenerator {
 		determineCurves();
 		logger.info("ALL USE#D POINTS");
 
-		logger.info("boundary values " + ns.getBoundaryValues());
-		logger.info("closind direction " + ns.getClosingDir());
-		logger.info("closed boundary values " + Arrays.toString(ns.getGluedBoundaryValues()));
+		logger.info("boundary values " + ns.getDomain().getBoundaryValues());
+		logger.info("closind direction " + ns.getDomain().getClosingDir());
+		logger.info("closed boundary values " + Arrays.toString(ns.getDomain().getGluedBoundaryValues()));
 		for (IntersectionPoint oriNbr : ipList) {
 			if(isValidIntersectionPoint(oriNbr)){
 				validVerts.add(oriNbr);
@@ -747,7 +747,7 @@ public class FaceSetGenerator {
 		fS.setVerts(verts);
 		int faceIndexTest = 0;
 		logger.info("All faces");
-		List<Double> boundValues = ns.getBoundaryValues();
+		List<Double> boundValues = ns.getDomain().getBoundaryValues();
 		for (IntersectionPoint ip : points) {
 			while(!ip.getUnusedNbrs().isEmpty()){
 				if(!liesOnGluedBoundary(ip)){

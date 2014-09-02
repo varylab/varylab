@@ -30,6 +30,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.varylab.varylab.plugin.interaction.DefaultPointDragListener;
 import de.varylab.varylab.plugin.interaction.DraggablePointComponent;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 
@@ -60,6 +61,7 @@ public class SurfaceProjectionPlugin extends ShrinkPanelPlugin implements Action
 			double[] surfacePoint = nurbsManager.getActiveNurbsSurface().getClosestPoint(point);
 			
 			DraggablePointComponent draggablePoint = new DraggablePointComponent(point);
+			draggablePoint.addPointDragListener(new DefaultPointDragListener(draggablePoint));
 			final SceneGraphComponent projectedPoint = new SceneGraphComponent("Projected point");
 			
 			draggablePoint.addPointDragListener(new PointDragListener() {

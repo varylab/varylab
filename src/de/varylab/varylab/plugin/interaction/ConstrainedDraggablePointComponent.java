@@ -1,7 +1,5 @@
 package de.varylab.varylab.plugin.interaction;
 
-import de.jreality.scene.data.Attribute;
-import de.jreality.scene.data.DoubleArrayArray;
 
 public class ConstrainedDraggablePointComponent<C extends PointConstraint> extends DraggablePointComponent {
 
@@ -17,9 +15,10 @@ public class ConstrainedDraggablePointComponent<C extends PointConstraint> exten
 	}
 
 	public void updateCoords(double[] newCoords) {
+		super.updateCoords(newCoords);
 		if(constraint != null) {
-			newCoords = constraint.project(newCoords);
+			coords = constraint.project(coords);
 		}
-		point.setVertexAttributes(Attribute.COORDINATES, new DoubleArrayArray.Inlined(newCoords,4));
 	}
+
 }

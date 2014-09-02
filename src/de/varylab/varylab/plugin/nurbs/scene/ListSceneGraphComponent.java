@@ -114,4 +114,8 @@ public class ListSceneGraphComponent<E,F extends SceneGraphComponentProvider<E>>
 		}
 
 	}
+
+	public Set<E> getElements() {
+		return Collections.unmodifiableSet(elementComponentMap.keySet());
+	}
 }
