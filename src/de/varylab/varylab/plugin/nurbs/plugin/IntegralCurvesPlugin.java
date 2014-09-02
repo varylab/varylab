@@ -540,15 +540,15 @@ public class IntegralCurvesPlugin
 			if(layers2models.containsKey(layer)) {
 				curvesModel = layers2models.get(layer);
 				curvesModel.clear();
-			} 
-//			else {
-//				curvesModel = new ListSelectRemoveTableModel<PolygonalLine>("Initial Point", new PolygonalLinePrinter());
-//				curvesModel.addTableModelListener(this);
-//				layers2models.put(layer,curvesModel);
-//			}
+			} else {
+				curvesModel = new DraggableCurvesModel("Curves", new DCPrinter());
+				curvesModel.addTableModelListener(this);
+				layers2models.put(layer,curvesModel);
+			}
 //		} else {
 //			curvesModel.clear();
 //		}
+		curvesTable.setModel(curvesModel);
 		curvesModel.fireTableDataChanged();
 	}
 
@@ -640,6 +640,7 @@ public class IntegralCurvesPlugin
 			
 			@Override
 			public void run() {
+				integralCurvesRoot.retain(curvesModel.getList());
 				curvesTable.adjustColumnSizes();
 			}
 		};
