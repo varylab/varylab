@@ -34,6 +34,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		curve = null;
 
 	private double startTol;
+	
 
 	private JobQueuePlugin jobQueuePlugin = null;
 	
@@ -42,6 +43,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		this.curve = curve;
 		jobQueuePlugin = queue;
 	}
+	
 
 	@Override
 	public void pointDragStart(PointDragEvent e) {
@@ -147,14 +149,15 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		}
 	}
 	
+	
 	private Collection<AbstractJob> createCommonCurvesJobs(final DraggableIntegralNurbsCurves curve, final double[] p, final double tol, final List<PolygonalLine> linesToRemove, final List<PolygonalLine> linesToAdd) {
 		Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
 		double[] uv = surface.getClosestPointDomain(p);
-		// TODO: replace uv with p??
-		final double[] translation = Rn.subtract(null, uv, curve.getInitialUV());
+		final double[] translation = Rn.subtract(null, uv, curve.getInitialUV().getPoint());
 		List<DraggableIntegralNurbsCurves> cc = curve.getCommonCurves();
 		for (final DraggableIntegralNurbsCurves dc : cc) {
-			double[] otherStartUV = dc.getInitialUV();
+			double[] otherStartUV = dc.getInitialUV().getPoint();
+			Rn.times(translation, curve.getSign() * dc.getSign(), translation);
 			double[] newCoords = Rn.add(null, otherStartUV, translation);
 			jobs.add(createCurveJob(dc, surface.getSurfacePoint(newCoords), tol, linesToRemove, linesToAdd));
 		}
