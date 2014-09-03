@@ -520,6 +520,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	}
 	
 	private void updateControlMeshComponent() {
+		hif.getActiveLayer().removeTemporaryGeometry(controlMeshComponent);
 		NURBSSurface surface = activeNurbsAdapter.getSurface();
 		double[][][] cm = surface.getControlMesh();
 		QuadMeshFactory qmf = new QuadMeshFactory();
@@ -545,9 +546,13 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	}
 
 	private void updateUmbillicsComponent() {
+		hif.getActiveLayer().removeTemporaryGeometry(umbillicsComponent);
 		AdapterSet as = hif.getAdapters();
 		as.addAll(hif.getActiveAdapters());
 		double[][] umbillicPoints = NurbsSurfaceUtility.computeUmbilicalPoints(activeNurbsAdapter.getSurface(), hif.get(new VHDS()), as);
+		if(umbillicPoints.length == 0) {
+			return;
+		}
 		PointSetFactory psf = new PointSetFactory();
 		psf.setVertexCount(umbillicPoints.length);
 		psf.setVertexCoordinates(umbillicPoints);
