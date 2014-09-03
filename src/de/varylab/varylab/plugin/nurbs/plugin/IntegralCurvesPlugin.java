@@ -431,18 +431,14 @@ public class IntegralCurvesPlugin
 				
 				@Override
 				protected void executeJob() throws Exception {
-					try {
-						DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
-						dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
-						DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
-						dc.addPointDragListener(listener);
-						curves.add(dc);
-						Collection<PolygonalLine> lines = dc.getPolygonalLines();
-						setCurveIndices(lines);
-						currentCurves.add(dc);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
+					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
+					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
+					dc.addPointDragListener(listener);
+					curves.add(dc);
+					Collection<PolygonalLine> lines = dc.getPolygonalLines();
+					setCurveIndices(lines);
+					currentCurves.add(dc);
 				}
 			};
 			j.addJobListener(this);
@@ -459,14 +455,10 @@ public class IntegralCurvesPlugin
 			
 			@Override
 			protected void executeJob() throws Exception {
-				try {
-					for(DraggableIntegralNurbsCurves dc : curves) {
-						setCommonCurves(dc);
-					}
-					updateIntegralCurvesRoot(null, curves);
-				} catch (Exception e) {
-					e.printStackTrace();
+				for(DraggableIntegralNurbsCurves dc : curves) {
+					setCommonCurves(dc);
 				}
+				updateIntegralCurvesRoot(null, curves);
 			}
 
 		};
