@@ -132,7 +132,7 @@ public class IntegralCurvesPlugin
 	private JComboBox<IntegralCurveFactory.SymmetricDir>
 		symmetryCombo = new JComboBox<IntegralCurveFactory.SymmetricDir>(IntegralCurveFactory.SymmetricDir.values());
 	
-	private volatile int 
+	public static volatile int 
 		curveIndex = 5;
 	
 	private DraggableCurvesModel
@@ -755,6 +755,7 @@ public class IntegralCurvesPlugin
 	}
 	
 	private void setCurveIndices(Collection<PolygonalLine> lines) {
+		logger.warning("CurveIndex:" + curveIndex);
 		for(PolygonalLine l : lines) {
 			l.setCurveIndex(curveIndex++);
 		}

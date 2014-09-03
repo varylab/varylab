@@ -9,8 +9,6 @@ import java.util.List;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.job.AbstractJob;
-import de.jreality.plugin.job.Job;
-import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.plugin.job.ParallelJob;
 import de.jreality.tools.PointDragEvent;
@@ -19,7 +17,7 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.plugin.CurveJob;
 
-public class DraggableIntegralCurveListener implements PointDragListener, JobListener {
+public class DraggableIntegralCurveListener implements PointDragListener {
 	
 	private double[] 
 		p = null;
@@ -76,7 +74,6 @@ public class DraggableIntegralCurveListener implements PointDragListener, JobLis
 				}
 			}
 		};
-		updateJob.addJobListener(this);
 		addCurveJobs(new CurveJob(null, updateJob));
 	}	
 	
@@ -123,7 +120,6 @@ public class DraggableIntegralCurveListener implements PointDragListener, JobLis
 				EventQueue.invokeLater(r);
 			}
 		};
-		updateJob.addJobListener(this);
 		return updateJob;
 	}
 
@@ -186,34 +182,7 @@ public class DraggableIntegralCurveListener implements PointDragListener, JobLis
 				}
 			}
 		};
-		j.addJobListener(this);
 		return j;
-	}
-
-
-	@Override
-	public void jobStarted(Job job) {
-	}
-
-
-	@Override
-	public void jobProgress(Job job, double progress) {
-	}
-
-
-	@Override
-	public void jobFinished(Job job) {
-	}
-
-
-	@Override
-	public void jobFailed(Job job, Exception e) {
-		e.printStackTrace();
-	}
-
-
-	@Override
-	public void jobCancelled(Job job) {
 	}
 	
 }

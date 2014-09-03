@@ -27,6 +27,7 @@ import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.CurveException;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
+import de.varylab.varylab.plugin.nurbs.plugin.IntegralCurvesPlugin;
 
 public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> implements PolygonalLineListener {
 	
@@ -81,6 +82,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 			case FIRST:{
 				try {
 					PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+					pl.setCurveIndex(IntegralCurvesPlugin.curveIndex++);
 					pl.addPolygonalLineListener(this);
 					vfLineMap.put(VectorFields.FIRST,pl);
 				} catch (CurveException e) {
@@ -92,6 +94,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 			case SECOND:{
 				try {
 					PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+					pl.setCurveIndex(IntegralCurvesPlugin.curveIndex++);
 					pl.addPolygonalLineListener(this);
 					vfLineMap.put(VectorFields.SECOND, pl);
 				} catch (CurveException e) {
@@ -103,6 +106,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 			case BOTH:{
 				try {
 					PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+					pl.setCurveIndex(IntegralCurvesPlugin.curveIndex++);
 					pl.addPolygonalLineListener(this);
 					vfLineMap.put(VectorFields.FIRST,pl);
 				} catch (CurveException e) {
@@ -111,6 +115,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 				}
 				try {
 					PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+					pl.setCurveIndex(IntegralCurvesPlugin.curveIndex++);
 					pl.addPolygonalLineListener(this);
 					vfLineMap.put(VectorFields.SECOND, pl);
 				} catch (CurveException e) {
