@@ -600,7 +600,8 @@ public class IntegralCurveFactory {
 		return vs;
 	}
 	
-	public PolygonalLine curveLine(double[] startPoint, VectorFields vf) {
+	public PolygonalLine curveLine(double[] startPoint, VectorFields vf) throws CurveException {
+		try {
 		LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 		LinkedList<double[]> all = new LinkedList<double[]>();
 		IntObjects intObj = rungeKutta(startPoint, false, vf);
@@ -656,10 +657,14 @@ public class IntegralCurveFactory {
 		PolygonalLine currentLine = new PolygonalLine(currentSegments);
 		currentLine.setDescription((vf == VectorFields.FIRST?"max:":"min:") + "("+String.format("%.3f", startPoint[0]) +", "+String.format("%.3f", startPoint[1])+")");
 		return currentLine;
+		} catch (Exception e) {
+			throw new CurveException(e.getMessage());
+		}
+
 	}
 	
 	
-	public LinkedList<PolygonalLine> computeIntegralLines(List<double[]> startingPointsUV) {
+	public LinkedList<PolygonalLine> computeIntegralLines(List<double[]> startingPointsUV) throws CurveException {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();
 		for(double[] start : startingPointsUV) {
 				currentLines.addAll(computeIntegralLine(start));
@@ -667,7 +672,7 @@ public class IntegralCurveFactory {
 		return currentLines;
 	}
 	
-	public LinkedList<PolygonalLine> computeIntegralLine(double[] start) {
+	public LinkedList<PolygonalLine> computeIntegralLine(double[] start) throws CurveException {
 		LinkedList<PolygonalLine> currentLines = new LinkedList<PolygonalLine>();	
 		switch (vectorFields) {
 		case FIRST:
@@ -719,5 +724,15 @@ public class IntegralCurveFactory {
 	public IntegralCurveFactory getCopy() {
 		IntegralCurveFactory copy = new IntegralCurveFactory(domain,singularityNeighborhood,tol,vectorFieldProvider,vectorFields);
 		return copy;
+	}
+	
+	public class CurveException extends Exception {
+
+		public CurveException(String message) {
+			super(message);
+		}
+
+		private static final long serialVersionUID = 1L;
+		
 	}
 }
