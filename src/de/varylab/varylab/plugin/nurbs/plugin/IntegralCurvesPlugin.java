@@ -120,8 +120,7 @@ public class IntegralCurvesPlugin
 	
 	private JCheckBox
 		showVectorFieldBox = new JCheckBox("vector field (angle):"),	
-		immediateCalculationBox = new JCheckBox("Immediate"),
-		interactiveBox = new JCheckBox("Interactive Curve Dragging");
+		immediateCalculationBox = new JCheckBox("Immediate");
 	
 	private JComboBox<CurveType>
 		curveCombo = new JComboBox<CurveType>(CurveType.values());
@@ -215,9 +214,6 @@ public class IntegralCurvesPlugin
 		shrinkPanel.add(curveCombo,rc);
 		
 		
-		shrinkPanel.add(interactiveBox, rc);
-		interactiveBox.setSelected(false);
-
 		shrinkPanel.add(new JLabel("Curves:"), lc);
 		vectorFieldCombo.setSelectedItem(VectorFields.BOTH);
 		shrinkPanel.add(vectorFieldCombo, rc);
@@ -252,7 +248,6 @@ public class IntegralCurvesPlugin
 		curveLengthPanel.add(cutLineButton, rc);
 		cutLineButton.addActionListener(this);
 		cutLineButton.setEnabled(false);
-		interactiveBox.addActionListener(this);
 		
 		shrinkPanel.add(curveScrollPanel, rc);
 		shrinkPanel.add(curveLengthPanel, rc);

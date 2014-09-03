@@ -1,10 +1,13 @@
 package de.varylab.varylab.plugin.nurbs.scene;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -22,12 +25,16 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLineListener;
 import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.CurveException;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
 public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> implements PolygonalLineListener {
 	
+	private static Logger 
+		logger = Logger.getLogger(DraggableIntegralNurbsCurves.class.getSimpleName());
+	
 	private Map<VectorFields, PolygonalLine>
-		vfLineMap = new LinkedHashMap<>(2);
+		vfLineMap = Collections.synchronizedMap(new LinkedHashMap<VectorFields, PolygonalLine>(2));
 
 	private List<DraggableIntegralNurbsCurves> commonCurves = null;
 	
@@ -37,7 +44,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	
 	private final SignedUV initialUV;
 
-	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv) {
+	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv) throws CurveException {
 		super(surface.getSurfacePoint(uv.getPoint()));
 		constraint = new NurbsSurfaceConstraint(surface);
 		setConstraint(constraint);
@@ -45,7 +52,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		this.icf = icf.getCopy();
 		createDraggablePoint(surface, uv.getPoint());
 		recomputeCurves(coords);
-		updateComponent();
+//		updateComponent();
 	}
 	
 	public void setSign(double sign){
@@ -65,30 +72,53 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		ipointShader.setDiffuseColor(Color.orange);
 	}
 	
-	public void recomputeCurves(double[] p) {
+	public void recomputeCurves(double[] p) throws CurveException {
 		updateCoords(p);
 		double[] uv = constraint.getUV();
-		vfLineMap.clear();
-		switch (icf.getVectorFields()) {
-		case FIRST:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.FIRST,pl);
-			break;}
-		case SECOND:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.SECOND, pl);
-			break;
-			}
-		case BOTH:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.FIRST,pl);
-			pl = icf.curveLine(uv, VectorFields.SECOND);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.SECOND, pl);
-			break;
+		synchronized(vfLineMap) {
+			vfLineMap.clear();
+			switch (icf.getVectorFields()) {
+			case FIRST:{
+				try {
+					PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+					pl.addPolygonalLineListener(this);
+					vfLineMap.put(VectorFields.FIRST,pl);
+				} catch (CurveException e) {
+					logger.severe("Error computing integral curve for FIRST vectorfield starting at "+Arrays.toString(uv));
+					throw e;
+				}
+				break;
+				}
+			case SECOND:{
+				try {
+					PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+					pl.addPolygonalLineListener(this);
+					vfLineMap.put(VectorFields.SECOND, pl);
+				} catch (CurveException e) {
+					logger.severe("Error computing integral curve for SECOND vectorfield starting at "+Arrays.toString(uv));
+					throw e;
+				}
+				break;
+				}
+			case BOTH:{
+				try {
+					PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+					pl.addPolygonalLineListener(this);
+					vfLineMap.put(VectorFields.FIRST,pl);
+				} catch (CurveException e) {
+					logger.severe("Error computing integral curve for FIRST vectorfield starting at "+Arrays.toString(uv));
+					throw e;
+				}
+				try {
+					PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+					pl.addPolygonalLineListener(this);
+					vfLineMap.put(VectorFields.SECOND, pl);
+				} catch (CurveException e) {
+					logger.severe("Error computing integral curve for SECOND vectorfield starting at "+Arrays.toString(uv));
+					throw e;
+				}
+				break;
+				}
 			}
 		}
 	}
@@ -110,22 +140,30 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	}
 
 	@Override
-	public void updateComponent() {
+	public synchronized void updateComponent() {
 		super.updateComponent();
-		removeAllChildren();
 		if(icf != null) {
-		switch (icf.getVectorFields()) {
-		case FIRST:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
-			break;
-		case SECOND:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
-			break;
-		case BOTH:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
-			break;
-		}
+			removeAllChildren();
+			switch (icf.getVectorFields()) {
+			case FIRST:
+				if(vfLineMap.get(VectorFields.FIRST) != null) {
+					addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
+				}
+				break;
+			case SECOND:
+				if(vfLineMap.get(VectorFields.SECOND) != null) {
+					addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
+				}
+				break;
+			case BOTH:
+				if(vfLineMap.get(VectorFields.FIRST) != null) {
+					addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
+				}
+				if(vfLineMap.get(VectorFields.SECOND) != null) {
+					addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
+				}
+				break;
+			}
 		}
 	}
 	

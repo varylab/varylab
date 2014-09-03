@@ -34,6 +34,7 @@ import de.varylab.varylab.plugin.nurbs.algorithm.SplitAtEdge;
 import de.varylab.varylab.plugin.nurbs.algorithm.SplitInTheMiddle;
 import de.varylab.varylab.plugin.nurbs.algorithm.StretchXYZ;
 import de.varylab.varylab.plugin.nurbs.algorithm.UVUnroll;
+import de.varylab.varylab.startup.StaticSetup;
 
 public class NurbsManagerPlugin extends Plugin implements HalfedgeListener {
 	
@@ -124,6 +125,7 @@ public class NurbsManagerPlugin extends Plugin implements HalfedgeListener {
 	}
 	
 	public static void main(String[] args) {
+		StaticSetup.initLogging();
 		JRViewer v = new JRViewer();
 		v.addContentUI();
 		v.addBasicUI();
