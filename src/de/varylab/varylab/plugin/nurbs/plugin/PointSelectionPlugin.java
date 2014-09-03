@@ -284,12 +284,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			} else {
 				activeModel = new ListSelectRemoveTableModel<double[]>("UV-coordinates", new DoubleArrayPrettyPrinter());
 				activeModel.addTableModelListener(this);
+
 				layers2models.put(layer,activeModel);
 			}
 		} else {
 			activeModel.clear();
 		}
 		updateTool(layer);
+		selectedPointsTable.setModel(activeModel);
 		activeModel.fireTableDataChanged();
 	}
 

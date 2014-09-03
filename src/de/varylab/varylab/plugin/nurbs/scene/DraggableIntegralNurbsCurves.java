@@ -19,10 +19,11 @@ import de.varylab.varylab.plugin.interaction.ConstrainedDraggablePointComponent;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.data.PolygonalLineListener;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
-public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> {
+public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> implements PolygonalLineListener {
 	
 	private Map<VectorFields, PolygonalLine>
 		vfLineMap = new LinkedHashMap<>(2);
@@ -58,16 +59,26 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		double[] uv = constraint.getUV();
 		vfLineMap.clear();
 		switch (icf.getVectorFields()) {
-		case FIRST:
-			vfLineMap.put(VectorFields.FIRST,icf.curveLine(uv, VectorFields.FIRST));
+		case FIRST:{
+			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+			pl.addPolygonalLineListener(this);
+			vfLineMap.put(VectorFields.FIRST,pl);
+			break;}
+		case SECOND:{
+			PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+			pl.addPolygonalLineListener(this);
+			vfLineMap.put(VectorFields.SECOND, pl);
 			break;
-		case SECOND:
-			vfLineMap.put(VectorFields.SECOND,icf.curveLine(uv, VectorFields.SECOND));
+			}
+		case BOTH:{
+			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+			pl.addPolygonalLineListener(this);
+			vfLineMap.put(VectorFields.FIRST,pl);
+			pl = icf.curveLine(uv, VectorFields.SECOND);
+			pl.addPolygonalLineListener(this);
+			vfLineMap.put(VectorFields.SECOND, pl);
 			break;
-		case BOTH:
-			vfLineMap.put(VectorFields.FIRST,icf.curveLine(uv, VectorFields.FIRST));
-			vfLineMap.put(VectorFields.SECOND,icf.curveLine(uv, VectorFields.SECOND));
-			break;
+			}
 		}
 	}
 	
@@ -164,6 +175,15 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 
 	public void setTol(double d) {
 		icf.setTol(d);
+	}
+
+	public PolygonalLine getPolygonalLine(VectorFields vf) {
+		return vfLineMap.get(vf);
+	}
+
+	@Override
+	public void lineChanged() {
+		updateComponent();
 	}
 
 }

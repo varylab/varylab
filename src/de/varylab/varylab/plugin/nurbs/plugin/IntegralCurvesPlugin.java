@@ -1,5 +1,8 @@
 package de.varylab.varylab.plugin.nurbs.plugin;
 
+import static de.jreality.shader.CommonAttributes.LINE_SHADER;
+import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
+import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
@@ -46,6 +49,10 @@ import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.plugin.job.ParallelJob;
 import de.jreality.scene.Appearance;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.shader.DefaultGeometryShader;
+import de.jreality.shader.DefaultLineShader;
+import de.jreality.shader.EffectiveAppearance;
+import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -119,6 +126,8 @@ public class IntegralCurvesPlugin
 		curveCombo = new JComboBox<CurveType>(CurveType.values());
 	private JComboBox<IntegralCurveFactory.VectorFields>
 		vectorFieldCombo = new JComboBox<>(IntegralCurveFactory.VectorFields.values());
+	private JComboBox<IntegralCurveFactory.VectorFields>
+		vfCombo = new JComboBox<>();
 	private JComboBox<IntegralCurveFactory.SymmetricDir>
 		symmetryCombo = new JComboBox<IntegralCurveFactory.SymmetricDir>(IntegralCurveFactory.SymmetricDir.values());
 	
@@ -130,6 +139,12 @@ public class IntegralCurvesPlugin
 	
 	private DraggableCurvesTable 
 		curvesTable = new DraggableCurvesTable(curvesModel);
+
+	private DefaultComponentProvider<DraggableIntegralNurbsCurves>
+		defaultComponentProvider = new DefaultComponentProvider<>();
+	
+	private ListSceneGraphComponent<DraggableIntegralNurbsCurves, DefaultComponentProvider<DraggableIntegralNurbsCurves>>
+		integralCurvesRoot = new ListSceneGraphComponent<>("Integral curves root", defaultComponentProvider);
 	
 	private Map<HalfedgeLayer, DraggableCurvesModel> 
 		layers2models = new HashMap<>();
@@ -139,16 +154,10 @@ public class IntegralCurvesPlugin
 	private JPanel
 		curveLengthPanel = new JPanel();
 
-	private DefaultComponentProvider<DraggableIntegralNurbsCurves>
-		defaultComponentProvider = new DefaultComponentProvider<>();
-	
-	private ListSceneGraphComponent<DraggableIntegralNurbsCurves, DefaultComponentProvider<DraggableIntegralNurbsCurves>>
-		integralCurvesRoot = new ListSceneGraphComponent<>("Integral curves root", defaultComponentProvider);
-
 	private ShrinkPanel
 		integratorParametersPanel = new ShrinkPanel("Integrator parameters"); 
 	
-	private PolygonalLine activeCurve;
+	private DraggableIntegralNurbsCurves activeCurve;
 
 	private VectorFieldMapAdapter vfmax;
 
@@ -176,6 +185,8 @@ public class IntegralCurvesPlugin
 
 	private HalfedgeInterface 
 		hif = null;
+	
+	private boolean startup = true;
 	
 	private double[] getVecField(){
 		if(vecFieldSpinner.isEnabled()){
@@ -225,19 +236,22 @@ public class IntegralCurvesPlugin
 		
 		curvesModel.addTableModelListener(this);
 		curveScrollPanel.setPreferredSize(new Dimension(100, 150));
+		
+		curveLengthPanel.setLayout(new GridBagLayout());
 		curveLengthPanel.setPreferredSize(new Dimension(100, 50));
 		
 		curveLengthPanel.add(new JLabel("Start"), lc);
 		curveLengthPanel.add(beginLineSpinner, lc);
+		curveLengthPanel.add(vfCombo,rc);
+		vfCombo.addItemListener(this);
 		beginLineSpinner.setEnabled(false);
 		curveLengthPanel.add(new JLabel("End"), lc);
-		curveLengthPanel.add(endLineSpinner, rc);
+		curveLengthPanel.add(endLineSpinner, lc);
 		endLineSpinner.setEnabled(false);
 		curveLengthPanel.add(cutLineButton, rc);
 		cutLineButton.addActionListener(this);
 		cutLineButton.setEnabled(false);
 		interactiveBox.addActionListener(this);
-		
 		
 		shrinkPanel.add(curveScrollPanel, rc);
 		shrinkPanel.add(curveLengthPanel, rc);
@@ -387,10 +401,9 @@ public class IntegralCurvesPlugin
 			hel.set(fs.getIndexedFaceSet());
 			hif.update();
 		} else if(source == cutLineButton){
-			activeCurve.setBegin(beginLineModel.getNumber().intValue());
-			activeCurve.setEnd(endLineModel.getNumber().intValue());
-			//FIXME
-//			updateIntegralCurvesRoot();
+			activeCurve.getPolygonalLine((VectorFields) vfCombo.getSelectedItem()).setBegin(beginLineModel.getNumber().intValue());
+			activeCurve.getPolygonalLine((VectorFields) vfCombo.getSelectedItem()).setEnd(endLineModel.getNumber().intValue());
+			updateIntegralCurvesRoot();
 		} else if(source == showVectorFieldBox) {
 			if(showVectorFieldBox.isSelected()) {
 				updateVectorfields();
@@ -535,7 +548,10 @@ public class IntegralCurvesPlugin
 
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
-		layer.addTemporaryGeometry(integralCurvesRoot.getComponent());
+		if(startup) {
+			layer.addTemporaryGeometry(integralCurvesRoot.getComponent());
+		}
+		startup = false;
 //		if(curvesModel == null) {
 			if(layers2models.containsKey(layer)) {
 				curvesModel = layers2models.get(layer);
@@ -584,8 +600,10 @@ public class IntegralCurvesPlugin
 	public void layerCreated(HalfedgeLayer layer) {
 		if(!layers2models.containsKey(layer)) {
 			DraggableCurvesModel newModel = new DraggableCurvesModel("Curves", new DCPrinter());
+			curvesTable.setModel(newModel);
 			newModel.addTableModelListener(this);
 			layers2models.put(layer,newModel);
+			newModel.fireTableDataChanged();
 		}
 	}
 
@@ -598,39 +616,58 @@ public class IntegralCurvesPlugin
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		// FIXME:
-//		EffectiveAppearance ea = hif.getEffectiveAppearance(integralCurvesRoot.getComponent());
-//		if(ea == null) {
-//			return;
-//		}
-//		DefaultGeometryShader dgs2 = ShaderUtility.createDefaultGeometryShader(ea);
-//		DefaultLineShader dls = (DefaultLineShader) dgs2.getLineShader();
-//		
-//		for(int i = 0; i < curvesTable.getRowCount(); ++i) {
-//			int mi = curvesTable.convertRowIndexToModel(i);
-//			SceneGraphComponent lineComp = integralCurvesRoot.getComponent().getChildComponent(mi);
-//			boolean isVisible = lineComp.isVisible();
-//			boolean beginEnd = true;
-//			Appearance app = lineComp.getAppearance();
-//			app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls.getRadiiWorldCoordinates());
-//			if(curvesTable.isRowSelected(i)) {
-//				if(beginEnd == true){
-//					activeCurve = curvesModel.getList().get(mi);
-//					int	max = activeCurve.getpLine().size()+1;
-//					beginLineModel.setMaximum(max);
-//					endLineModel.setMaximum(max);
-//					beginLineSpinner.setEnabled(true);
-//					beginLineModel.setValue(activeCurve.getBegin());
-//					endLineSpinner.setEnabled(true);
-//					endLineModel.setValue(activeCurve.getEnd());
-//					cutLineButton.setEnabled(true);
-//				}
-//				beginEnd = false;
-//				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius()*1.8);
-//			} else {
-//				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius());					
-//			}
-//			lineComp.setVisible(isVisible);
-//		}
+		EffectiveAppearance ea = hif.getEffectiveAppearance(integralCurvesRoot.getComponent());
+		if(ea == null) {
+			return;
+		}
+		DefaultGeometryShader dgs2 = ShaderUtility.createDefaultGeometryShader(ea);
+		DefaultLineShader dls = (DefaultLineShader) dgs2.getLineShader();
+		
+		for(int i = 0; i < curvesTable.getRowCount(); ++i) {
+			int mi = curvesTable.convertRowIndexToModel(i);
+			final DraggableIntegralNurbsCurves lineComp = curvesModel.getList().get(mi);
+			boolean isVisible = lineComp.isVisible();
+			boolean beginEnd = true;
+			Appearance app = lineComp.getAppearance();
+			app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls.getRadiiWorldCoordinates());
+			if(curvesTable.isRowSelected(i)) {
+				if(beginEnd == true){
+					activeCurve = curvesModel.getList().get(mi);
+					vfCombo.removeAllItems();
+					switch (lineComp.getVectorFields()) {
+					case FIRST:
+						vfCombo.addItem(VectorFields.FIRST);
+						break;
+					case SECOND:
+						vfCombo.addItem(VectorFields.SECOND);
+						break;
+					case BOTH:
+						vfCombo.addItem(VectorFields.FIRST);
+						vfCombo.addItem(VectorFields.SECOND);
+					}
+
+					cutLineButton.setEnabled(true);
+					vfCombo.setEnabled(true);
+					updateMinMaxSpinners();
+				}
+				beginEnd = false;
+				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius()*1.8);
+			} else {
+				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls.getTubeRadius());					
+			}
+			lineComp.setVisible(isVisible);
+		}
+	}
+
+	private void updateMinMaxSpinners() {
+		PolygonalLine pl = activeCurve.getPolygonalLine((VectorFields) vfCombo.getSelectedItem());
+		int	max = pl.getMax();
+		beginLineModel.setMaximum(max);
+		endLineModel.setMaximum(max);
+		beginLineSpinner.setEnabled(true);
+		beginLineModel.setValue(pl.getBegin());
+		endLineSpinner.setEnabled(true);
+		endLineModel.setValue(pl.getEnd());
 	}
 
 
@@ -658,7 +695,15 @@ public class IntegralCurvesPlugin
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		updateIntegralCurvesPanelUI();
+		if(e.getSource() == vfCombo) {
+			if(e.getStateChange() == ItemEvent.SELECTED) {
+				if(vfCombo.isEnabled()) {
+					updateMinMaxSpinners();
+				}
+			}
+		} else if(e.getSource() == curveCombo) {
+			updateIntegralCurvesPanelUI();
+		}
 	}
 
 	private void updateIntegralCurvesPanelUI() {
@@ -702,6 +747,10 @@ public class IntegralCurvesPlugin
 			}
 		};
 		EventQueue.invokeLater(r);
+	}
+	
+	private void updateIntegralCurvesRoot() {
+		updateIntegralCurvesRoot(null, null);
 	}
 	
 	private void setCurveIndices(Collection<PolygonalLine> lines) {
@@ -781,6 +830,5 @@ public class IntegralCurvesPlugin
 		symmetryCombo.setSelectedItem(c.getProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem()));
 		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
 	}
-
 }
 
