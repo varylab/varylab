@@ -424,7 +424,7 @@ public class IntegralCurvesPlugin
 				protected void executeJob() throws Exception {
 					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
 					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
-					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
+					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin, tolExpModel.getNumber().doubleValue());
 					dc.addPointDragListener(listener);
 					curves.add(dc);
 					Collection<PolygonalLine> lines = dc.getPolygonalLines();
