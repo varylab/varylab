@@ -75,6 +75,7 @@ import de.varylab.varylab.plugin.nurbs.data.FaceSet;
 import de.varylab.varylab.plugin.nurbs.data.IntersectionPoint;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.CurveType;
 import de.varylab.varylab.plugin.nurbs.math.FaceSetGenerator;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
@@ -167,7 +168,7 @@ public class IntegralCurvesPlugin
 	
 	private List<DraggableIntegralNurbsCurves> currentCurves = Collections.synchronizedList(new LinkedList<DraggableIntegralNurbsCurves>());
 	
-	private LinkedList<LinkedList<double[]>> commonPoints = new LinkedList<>();
+	private LinkedList<LinkedList<SignedUV>> commonPoints = new LinkedList<>();
 
 	private List<double[]> singularities = null;
 
@@ -293,8 +294,9 @@ public class IntegralCurvesPlugin
 	private List<DraggableIntegralNurbsCurves> setCommonCurves(DraggableIntegralNurbsCurves curve){
 		if(curve.getCommonCurves() == null){
 			List<DraggableIntegralNurbsCurves> commonCurves = new LinkedList<>();
-			List<double[]> commonPoints = getCommonPoints(curve);
+			List<SignedUV> commonPoints = getCommonPoints(curve);
 			for (DraggableIntegralNurbsCurves dc : currentCurves) {
+				dc.setSign(dc.getInitialUV().getSign());
 				if(commonPoints.contains(dc.getInitialUV())){
 					commonCurves.add(dc);
 				}		
@@ -304,17 +306,17 @@ public class IntegralCurvesPlugin
 		return curve.getCommonCurves();
 	}
 	
-	private List<double[]> getCommonPoints(DraggableIntegralNurbsCurves dc){
-		double[] p = dc.getInitialUV();
-		LinkedList<double[]> others = new LinkedList<>();
+	private List<SignedUV> getCommonPoints(DraggableIntegralNurbsCurves dc){
+		SignedUV p = dc.getInitialUV();
+		LinkedList<SignedUV> others = new LinkedList<>();
 		if(commonPoints == null) {
 			return others;
 		}
-		for (LinkedList<double[]> list : commonPoints) {
+		for (LinkedList<SignedUV> list : commonPoints) {
 			if(list.contains(p)){
-				for (double[] point : list) {
-					if(point != p){
-						others.add(point);
+				for (SignedUV signedPoint : list) {
+					if(signedPoint != p){
+						others.add(signedPoint);
 					}
 				}
 			}
@@ -338,7 +340,7 @@ public class IntegralCurvesPlugin
 			
 			hif.clearSelection();
 			
-			final List<double[]> startingPointsUV = pointSelectionPlugin.getSelectedPoints();
+			final List<SignedUV> startingPointsUV = pointSelectionPlugin.getSelectedSignedPoints();
 			
 			computeIntegralCurves(surface, startingPointsUV);
 			
@@ -414,27 +416,27 @@ public class IntegralCurvesPlugin
 		
 	}
 
-	private void computeIntegralCurves(final NURBSSurface surface, final List<double[]> startingPointsUV) {
+	private void computeIntegralCurves(final NURBSSurface surface, final List<SignedUV> startingPointsUV) {
 		Collection<AbstractJob> jobs = new LinkedHashSet<AbstractJob>();
 		if(startingPointsUV.size() == 0) {
 			return;
 		}
 		logger.info("ALL STARTING POINTS");
-		for (double[] sp : startingPointsUV) {
-			logger.info(Arrays.toString(sp));
+		for (SignedUV sp : startingPointsUV) {
+			logger.info(Arrays.toString(sp.getPoint()));
 		}
 		final List<DraggableIntegralNurbsCurves> curves = new LinkedList<>();
-		for (final double[] sp : startingPointsUV) {
+		for (final SignedUV sp : startingPointsUV) {
 			jobs.add(new AbstractJob() {
 				@Override
 				public String getJobName() {
-					return Arrays.toString(sp);
+					return Arrays.toString(sp.getPoint());
 				}
 				
 				@Override
 				protected void executeJob() throws Exception {
 					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
-					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp, pointSelectionPlugin.getParameter()));
+					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
 					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
 					dc.addPointDragListener(listener);
 					curves.add(dc);
@@ -542,7 +544,7 @@ public class IntegralCurvesPlugin
 
 	@Override
 	public void pointSelected(double[] uv) {
-		computeIntegralCurves(nManager.getActiveNurbsSurface(), Collections.singletonList(uv));
+		computeIntegralCurves(nManager.getActiveNurbsSurface(), Collections.singletonList(new SignedUV(uv,1.0)));
 	}
 
 
@@ -615,7 +617,6 @@ public class IntegralCurvesPlugin
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// FIXME:
 		EffectiveAppearance ea = hif.getEffectiveAppearance(integralCurvesRoot.getComponent());
 		if(ea == null) {
 			return;

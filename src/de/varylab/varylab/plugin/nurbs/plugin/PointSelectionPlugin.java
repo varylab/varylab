@@ -49,6 +49,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
@@ -99,7 +100,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	private NURBSSurface surface;
 	private NurbsUVAdapter nurbsUVAdapter;
 
-	private LinkedList<LinkedList<double[]>> commonPointList;
+	private LinkedList<LinkedList<SignedUV>> commonPointList;
 	
 	private boolean startup = true;
 	
@@ -452,11 +453,11 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			int numberOfPoints = pgp.getNumberOfPoints();
 			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, param, dir, selectedPoints, dist, numberOfPoints);
 			boolean firstPoint = true;
-			for (LinkedList<double[]> list : commonPointList) {
-				for (double[] pt : list) {
-					if(!activeModel.contains(pt) && !firstPoint) {
-						activeModel.add(pt);
-						selectedPointsComponent.addChild(createPointComponent(pt));
+			for (LinkedList<SignedUV> list : commonPointList) {
+				for (SignedUV pt : list) {
+					if(!activeModel.contains(pt.getPoint()) && !firstPoint) {
+						activeModel.add(pt.getPoint());
+						selectedPointsComponent.addChild(createPointComponent(pt.getPoint()));
 					}
 				}
 				firstPoint = false;
@@ -479,6 +480,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		return View.class;
 	}
 	
+	public List<SignedUV> getSelectedSignedPoints(){
+		List<SignedUV> list = new LinkedList<>();
+		for(LinkedList<SignedUV> l : commonPointList) {
+			list.addAll(l);
+		}
+		return list;
+	}
+	
 	public List<double[]> getSelectedPoints() {
 		return activeModel.getChecked();
 	}
@@ -487,7 +496,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		return pgp.getParameter();
 	}
 	
-	public LinkedList<LinkedList<double[]>> getCommonPointList(){
+	public LinkedList<LinkedList<SignedUV>> getCommonPointList(){
 		return commonPointList;
 	}
 	

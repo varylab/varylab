@@ -20,6 +20,7 @@ import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.data.PolygonalLineListener;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
@@ -32,17 +33,27 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	
 	private IntegralCurveFactory icf = null;
 	
-	private final double[] initialUV;
+	private double sign = 1.0;
+	
+	private final SignedUV initialUV;
 
-	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, double[] uv) {
-		super(surface.getSurfacePoint(uv));
+	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv) {
+		super(surface.getSurfacePoint(uv.getPoint()));
 		constraint = new NurbsSurfaceConstraint(surface);
 		setConstraint(constraint);
-		initialUV = uv;
+		this.initialUV = uv;
 		this.icf = icf.getCopy();
-		createDraggablePoint(surface, uv);
+		createDraggablePoint(surface, uv.getPoint());
 		recomputeCurves(coords);
 		updateComponent();
+	}
+	
+	public void setSign(double sign){
+		this.sign = sign;
+	}
+	
+	public double getSign(){
+		return sign;
 	}
 	
 	public void createDraggablePoint( NURBSSurface surface, double[] uv){
@@ -94,7 +105,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		return vfLineMap.values();
 	}
 
-	public double[] getInitialUV() {
+	public SignedUV getInitialUV() {
 		return initialUV;
 	}
 

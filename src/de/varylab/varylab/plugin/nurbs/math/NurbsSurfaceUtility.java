@@ -11,6 +11,7 @@ import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Direction;
 import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 
@@ -154,32 +155,45 @@ public class NurbsSurfaceUtility {
 	
 	
 	
-	public static LinkedList<LinkedList<double[]>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, LinkedList<double[]> selPoints, double dist, int numberOfPoints){
-		LinkedList<LinkedList<double[]>> commonPointList = new LinkedList<>();
-		commonPointList.add(selPoints);
+	public static LinkedList<LinkedList<SignedUV>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, LinkedList<double[]> selPoints, double dist, int numberOfPoints){
+		LinkedList<LinkedList<SignedUV>> commonPointList = new LinkedList<>();
+		LinkedList<SignedUV> selPointsSigned = new LinkedList<>();
+		for (double[] selPoint : selPoints) {
+			SignedUV signedPoint = new SignedUV(selPoint, 1.0);
+			selPointsSigned.add(signedPoint);
+		}
+		commonPointList.add(selPointsSigned);
 		double currDist = 0.0;
 		for (int j = 1; j <= numberOfPoints; j++) {
-			LinkedList<double[]> commonPoints = new LinkedList<>();
+			LinkedList<SignedUV> commonPoints = new LinkedList<>();
 			currDist = (double)j / (double)numberOfPoints * dist;
 			for (double[] point : selPoints) {
 				if(param != Parameter.V){
 					if(dir != Direction.DOWN){
 						double[] next = {point[0] + currDist, point[1]};
-						commonPoints.add(next);
+						double sign = -1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
 					}
 					if(dir != Direction.UP){
 						double[] next = {point[0] - currDist, point[1]};
-						commonPoints.add(next);
+						double sign = 1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
 					}
 				}
 				if(param != Parameter.U){
 					if(dir != Direction.DOWN){
 						double[] next = {point[0], point[1] + currDist};
-						commonPoints.add(next);
+						double sign = -1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
 					}
 					if(dir != Direction.UP){
 						double[] next = {point[0], point[1] - currDist};
-						commonPoints.add(next);
+						double sign = 1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
 					}
 				}
 			}
