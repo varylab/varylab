@@ -38,11 +38,11 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 
 	private JobQueuePlugin jobQueuePlugin = null;
 	
-	public DraggableIntegralCurveListener(NURBSSurface surface, DraggableIntegralNurbsCurves curve, JobQueuePlugin queue, double startTol) {
+	public DraggableIntegralCurveListener(NURBSSurface surface, DraggableIntegralNurbsCurves curve, JobQueuePlugin queue) {
 		this.surface = surface;
 		this.curve = curve;
-		this.startTol = startTol;
 		jobQueuePlugin = queue;
+		startTol = curve.getTol();
 	}
 	
 
@@ -108,7 +108,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 					public void run() {
 						List<DraggableIntegralNurbsCurves> cc = curve.getCommonCurves();
 						curve.updateComponent();
-						for (final DraggableIntegralNurbsCurves dc : cc) {
+						for (DraggableIntegralNurbsCurves dc : cc) {
 							dc.updateComponent();
 						}
 						synchronized(curveJobQueue) {

@@ -425,7 +425,7 @@ public class IntegralCurvesPlugin
 		for (SignedUV sp : startingPointsUV) {
 			logger.info(Arrays.toString(sp.getPoint()));
 		}
-		final List<DraggableIntegralNurbsCurves> curves = new LinkedList<>();
+		final List<DraggableIntegralNurbsCurves> curves = Collections.synchronizedList(new LinkedList<DraggableIntegralNurbsCurves>());
 		for (final SignedUV sp : startingPointsUV) {
 			jobs.add(new AbstractJob() {
 				@Override
@@ -435,15 +435,18 @@ public class IntegralCurvesPlugin
 				
 				@Override
 				protected void executeJob() throws Exception {
-					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
-					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
-					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin, tolExpModel.getNumber().doubleValue());
-					dc.addPointDragListener(listener);
-					curves.add(dc);
-					Collection<PolygonalLine> lines = dc.getPolygonalLines();
-					setCurveIndices(lines);
-//					curvesModel.add(dc);
-					currentCurves.add(dc);
+					try {
+						DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
+						dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
+						DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
+						dc.addPointDragListener(listener);
+						curves.add(dc);
+						Collection<PolygonalLine> lines = dc.getPolygonalLines();
+						setCurveIndices(lines);
+						currentCurves.add(dc);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			});
 		}
@@ -458,10 +461,14 @@ public class IntegralCurvesPlugin
 			
 			@Override
 			protected void executeJob() throws Exception {
-				for(DraggableIntegralNurbsCurves dc : curves) {
-					setCommonCurves(dc);
+				try {
+					for(DraggableIntegralNurbsCurves dc : curves) {
+						setCommonCurves(dc);
+					}
+					updateIntegralCurvesRoot(null, curves);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				updateIntegralCurvesRoot(null, curves);
 			}
 
 		};
@@ -552,6 +559,7 @@ public class IntegralCurvesPlugin
 	public void dataChanged(HalfedgeLayer layer) {
 		if(startup) {
 			layer.addTemporaryGeometry(integralCurvesRoot.getComponent());
+			logger.severe("adding integral curves root to temporary geometry");
 		}
 		startup = false;
 //		if(curvesModel == null) {
@@ -737,6 +745,7 @@ public class IntegralCurvesPlugin
 				if(toAdd != null) {
 					for(DraggableIntegralNurbsCurves dc : toAdd) {
 						curvesModel.add(dc);
+						dc.updateComponent();
 					}
 				}
 				List<DraggableIntegralNurbsCurves> list = curvesModel.getList();

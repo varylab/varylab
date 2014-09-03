@@ -2,9 +2,11 @@ package de.varylab.varylab.plugin.nurbs.scene;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -26,8 +28,12 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 
 public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> implements PolygonalLineListener {
 	
+	@SuppressWarnings("unused")
+	private static Logger 
+		logger = Logger.getLogger(DraggableIntegralNurbsCurves.class.getSimpleName());
+	
 	private Map<VectorFields, PolygonalLine>
-		vfLineMap = new LinkedHashMap<>(2);
+		vfLineMap = Collections.synchronizedMap(new LinkedHashMap<VectorFields, PolygonalLine>(2));
 
 	private List<DraggableIntegralNurbsCurves> commonCurves = null;
 	
@@ -45,7 +51,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		this.icf = icf.getCopy();
 		createDraggablePoint(surface, uv.getPoint());
 		recomputeCurves(coords);
-		updateComponent();
+//		updateComponent();
 	}
 	
 	public void setSign(double sign){
@@ -68,27 +74,29 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	public void recomputeCurves(double[] p) {
 		updateCoords(p);
 		double[] uv = constraint.getUV();
-		vfLineMap.clear();
-		switch (icf.getVectorFields()) {
-		case FIRST:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.FIRST,pl);
-			break;}
-		case SECOND:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.SECOND, pl);
-			break;
-			}
-		case BOTH:{
-			PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.FIRST,pl);
-			pl = icf.curveLine(uv, VectorFields.SECOND);
-			pl.addPolygonalLineListener(this);
-			vfLineMap.put(VectorFields.SECOND, pl);
-			break;
+		synchronized(vfLineMap) {
+			vfLineMap.clear();
+			switch (icf.getVectorFields()) {
+			case FIRST:{
+				PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+				pl.addPolygonalLineListener(this);
+				vfLineMap.put(VectorFields.FIRST,pl);
+				break;}
+			case SECOND:{
+				PolygonalLine pl = icf.curveLine(uv, VectorFields.SECOND);
+				pl.addPolygonalLineListener(this);
+				vfLineMap.put(VectorFields.SECOND, pl);
+				break;
+				}
+			case BOTH:{
+				PolygonalLine pl = icf.curveLine(uv, VectorFields.FIRST);
+				pl.addPolygonalLineListener(this);
+				vfLineMap.put(VectorFields.FIRST,pl);
+				pl = icf.curveLine(uv, VectorFields.SECOND);
+				pl.addPolygonalLineListener(this);
+				vfLineMap.put(VectorFields.SECOND, pl);
+				break;
+				}
 			}
 		}
 	}
@@ -110,22 +118,22 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	}
 
 	@Override
-	public void updateComponent() {
+	public synchronized void updateComponent() {
 		super.updateComponent();
-		removeAllChildren();
 		if(icf != null) {
-		switch (icf.getVectorFields()) {
-		case FIRST:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
-			break;
-		case SECOND:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
-			break;
-		case BOTH:
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
-			addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
-			break;
-		}
+			removeAllChildren();
+			switch (icf.getVectorFields()) {
+			case FIRST:
+				addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
+				break;
+			case SECOND:
+				addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
+				break;
+			case BOTH:
+				addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.FIRST)));
+				addChild(createSceneGraphComponent(vfLineMap.get(VectorFields.SECOND)));
+				break;
+			}
 		}
 	}
 	
