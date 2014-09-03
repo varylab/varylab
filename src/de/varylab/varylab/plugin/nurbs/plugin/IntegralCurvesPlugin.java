@@ -45,6 +45,7 @@ import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.job.AbstractJob;
 import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.plugin.job.ParallelJob;
 import de.jreality.scene.Appearance;
@@ -94,7 +95,7 @@ import de.varylab.varylab.ui.PrettyPrinter;
 
 public class IntegralCurvesPlugin 
 		extends ShrinkPanelPlugin 
-		implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener, ChangeListener {
+		implements ActionListener, PointSelectionListener, HalfedgeListener, ListSelectionListener, TableModelListener, ItemListener, ChangeListener, JobListener {
 	
 	private static Logger logger = Logger.getLogger(IntegralCurvesPlugin.class.getSimpleName());
 	
@@ -422,7 +423,7 @@ public class IntegralCurvesPlugin
 		}
 		final List<DraggableIntegralNurbsCurves> curves = Collections.synchronizedList(new LinkedList<DraggableIntegralNurbsCurves>());
 		for (final SignedUV sp : startingPointsUV) {
-			jobs.add(new AbstractJob() {
+			AbstractJob j = new AbstractJob() {
 				@Override
 				public String getJobName() {
 					return Arrays.toString(sp.getPoint());
@@ -439,7 +440,9 @@ public class IntegralCurvesPlugin
 					setCurveIndices(lines);
 					currentCurves.add(dc);
 				}
-			});
+			};
+			j.addJobListener(this);
+			jobs.add(j);
 		}
 		ParallelJob parallelJob = new ParallelJob(jobs);
 		jobQueuePlugin.queueJob(parallelJob);
@@ -459,6 +462,7 @@ public class IntegralCurvesPlugin
 			}
 
 		};
+		updateJob.addJobListener(this);
 		jobQueuePlugin.queueJob(updateJob);
 	}
 
@@ -826,6 +830,27 @@ public class IntegralCurvesPlugin
 		curveCombo.setSelectedItem(c.getProperty(getClass(), "curves", curveCombo.getSelectedItem()));
 		symmetryCombo.setSelectedItem(c.getProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem()));
 		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
+	}
+
+	@Override
+	public void jobStarted(Job job) {
+	}
+
+	@Override
+	public void jobProgress(Job job, double progress) {
+	}
+
+	@Override
+	public void jobFinished(Job job) {
+	}
+
+	@Override
+	public void jobFailed(Job job, Exception e) {
+		e.printStackTrace();
+	}
+
+	@Override
+	public void jobCancelled(Job job) {
 	}
 }
 
