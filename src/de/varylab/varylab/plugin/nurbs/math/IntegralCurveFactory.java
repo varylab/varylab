@@ -228,7 +228,7 @@ public class IntegralCurveFactory {
 			LineSegment ls = new LineSegment(nextToLast, last);
 			double[] intersection =  domain.boundaryIntersection(ls);
 			pointList.add(intersection);
-			logger.info("terminationConditionForVectorfieldPoints");
+//			logger.info("terminationConditionForVectorfieldPoints");
 			return true;
 		}
 		return false;
