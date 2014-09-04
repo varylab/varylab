@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.job.AbstractJob;
@@ -18,6 +19,9 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.plugin.CurveJob;
 
 public class DraggableIntegralCurveListener implements PointDragListener {
+	
+	private static Logger
+		logger = Logger.getLogger(DraggableIntegralCurveListener.class.getSimpleName());
 	
 	private double[] 
 		p = null;
@@ -34,7 +38,6 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		curve = null;
 
 	private double startTol;
-	
 
 	private JobQueuePlugin jobQueuePlugin = null;
 	

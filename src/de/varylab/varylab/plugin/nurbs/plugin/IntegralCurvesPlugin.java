@@ -550,7 +550,7 @@ public class IntegralCurvesPlugin
 	public void dataChanged(HalfedgeLayer layer) {
 		if(startup) {
 			layer.addTemporaryGeometry(integralCurvesRoot.getComponent());
-			logger.severe("adding integral curves root to temporary geometry");
+//			logger.severe("adding integral curves root to temporary geometry");
 		}
 		startup = false;
 //		if(curvesModel == null) {
@@ -755,7 +755,6 @@ public class IntegralCurvesPlugin
 	}
 	
 	private void setCurveIndices(Collection<PolygonalLine> lines) {
-		logger.warning("CurveIndex:" + curveIndex);
 		for(PolygonalLine l : lines) {
 			l.setCurveIndex(curveIndex++);
 		}
