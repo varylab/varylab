@@ -16,11 +16,11 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 
 	private static final long serialVersionUID = 1L;
 
-	private String[] columnNames = {" ", "Name", " "};
-	private PrettyPrinter<E> pp = null;
+	protected String[] columnNames = {" ", "Name", " "};
+	protected PrettyPrinter<E> pp = null;
 	
-	private List<E> list = new LinkedList<E>();
-	private List<E> checked = new LinkedList<E>();
+	protected List<E> list = Collections.synchronizedList(new LinkedList<E>());
+	protected List<E> checked = Collections.synchronizedList(new LinkedList<E>());
 	
 	public ListSelectRemoveTableModel(String columnName) {
 		this(columnName,null);
@@ -164,7 +164,13 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	}
 
 	public E remove(int index) {
+		checked.remove(list.get(index));
 		return list.remove(index);
+	}
+	
+	public boolean remove(E pl){
+		checked.remove(pl);
+		return list.remove(pl);
 	}
 
 	public boolean isSelected(int row) {
@@ -184,5 +190,11 @@ public class ListSelectRemoveTableModel<E> extends DefaultTableModel {
 	public void addAll(Collection<E> col) {
 		list.addAll(col);
 		checked.addAll(col);
+	}
+
+	public void removeAll(Collection<E> elts) {
+		for(E e : elts) {
+			remove(e);
+		}
 	}
 }

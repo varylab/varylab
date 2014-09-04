@@ -2,12 +2,18 @@ package de.varylab.varylab.plugin.nurbs.math;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurfaceFactory;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Direction;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 
 public class NurbsSurfaceUtility {
 
@@ -27,7 +33,6 @@ public class NurbsSurfaceUtility {
 		layer.addAdapter(uvAdapter, false);
 //		layer.update();
 	}
-
 	
 	public static double[] uniformKnotVector(int m, int deg) {
 		double[] U = new double[m + deg + 1];
@@ -45,7 +50,6 @@ public class NurbsSurfaceUtility {
 		}
 		return U;
 	}
-
 
 	public static LinkedList<double[]> getEquidistantRotatedPoints(NURBSSurface ns, int n, double[] point){
 		LinkedList<double[]> points = new LinkedList<double[]>();
@@ -148,10 +152,133 @@ public class NurbsSurfaceUtility {
 		}
 		return points;
 	}
+	
+	
+	
+	public static LinkedList<LinkedList<SignedUV>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, LinkedList<double[]> selPoints, double dist, int numberOfPoints){
+		LinkedList<LinkedList<SignedUV>> commonPointList = new LinkedList<>();
+		LinkedList<SignedUV> selPointsSigned = new LinkedList<>();
+		for (double[] selPoint : selPoints) {
+			SignedUV signedPoint = new SignedUV(selPoint, 1.0);
+			selPointsSigned.add(signedPoint);
+		}
+		commonPointList.add(selPointsSigned);
+		double currDist = 0.0;
+		for (int j = 1; j <= numberOfPoints; j++) {
+			LinkedList<SignedUV> commonPoints = new LinkedList<>();
+			currDist = (double)j / (double)numberOfPoints * dist;
+			for (double[] point : selPoints) {
+				if(param != Parameter.V){
+					if(dir != Direction.DOWN){
+						double[] next = {point[0] + currDist, point[1]};
+						double sign = -1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
+					}
+					if(dir != Direction.UP){
+						double[] next = {point[0] - currDist, point[1]};
+						double sign = 1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
+					}
+				}
+				if(param != Parameter.U){
+					if(dir != Direction.DOWN){
+						double[] next = {point[0], point[1] + currDist};
+						double sign = -1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
+					}
+					if(dir != Direction.UP){
+						double[] next = {point[0], point[1] - currDist};
+						double sign = 1.0;
+						SignedUV signedPoint = new SignedUV(next, sign);
+						commonPoints.add(signedPoint);
+					}
+				}
+			}
+			commonPointList.add(commonPoints);
+		}
+		return commonPointList;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistList(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 
+			double[] point, double dist, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			currDist = (double)i / (double)numberOfPoints * dist;
+			if(uDir){
+				if(up){
+					double[] next = {point[0] + currDist, point[1]};
+					distPoints.add(next);
+				}
+				if(down){
+					double[] next = {point[0] - currDist, point[1]};
+					distPoints.add(next);
+				}
+			}
+			if(vDir){
+				if(up){
+					double[] next = {point[0], point[1] + currDist};
+					distPoints.add(next);
+				}
+				if(down){
+					double[] next = {point[0], point[1] - currDist};
+					distPoints.add(next);
+				}
+			}
+		}
+		return distPoints;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistListUp(NURBSSurface ns, boolean uDir, boolean  vDir, double[] point, double dist, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			currDist = (double)i / (double)numberOfPoints * dist;
+			if(uDir){
+				double[] next = {point[0] + currDist, point[1]};
+				distPoints.add(next);
+			}
+			if(vDir){
+				double[] next = {point[0], point[1] + currDist};
+				distPoints.add(next);
+			}
+		}
+		return distPoints;
+	}
+	
+	public static LinkedList<double[]> getPointsFromDistListDown(NURBSSurface ns, boolean uDir, boolean  vDir, double[] point, double dist, int numberOfPoints){
+		LinkedList<double[]> distPoints = new LinkedList<>();
+		double currDist = 0.0;
+		for (int i = 1; i <= numberOfPoints; i++) {
+			currDist = (double)i / (double)numberOfPoints * dist;
+			if(uDir){
+				double[] next = {point[0] - currDist, point[1]};
+				distPoints.add(next);
+			}
+			if(vDir){
+				double[] next = {point[0], point[1] - currDist};
+				distPoints.add(next);
+			}
+		}
+		return distPoints;
+	}
 
 
 	public static void addNurbsMesh(NURBSSurface surface, HalfedgeLayer newLayer) {
 		addNurbsMesh(surface, newLayer, surface.getNumUPoints()*2, surface.getNumVPoints()*2);
+	}
+	
+
+	public static double[][] computeUmbilicalPoints(NURBSSurface surface, VHDS hds, AdapterSet as ) {
+		List<double[]> singularities = surface.findUmbilics(hds, as);
+		double[][] upoints = new double[singularities.size()][];
+		for (int i = 0; i < singularities.size(); i++) {
+			upoints[i] = surface.getSurfacePoint(singularities.get(i));
+		}
+		return upoints;
 	}
 
 }

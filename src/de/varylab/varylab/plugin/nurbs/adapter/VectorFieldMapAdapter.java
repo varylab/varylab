@@ -51,7 +51,7 @@ public class VectorFieldMapAdapter extends AbstractAdapter<double[]>{
 		if(vertexVectorMap.containsKey(v)) {
 			return vertexVectorMap.get(v);
 		} else {
-			return new double[]{0.0,0.0};
+			return new double[]{0.0,0.0,0.0};
 		}
 	}
 	

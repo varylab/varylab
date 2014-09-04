@@ -20,7 +20,6 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 	public class IntegralCurvesOriginal {
 		
 		private static Logger logger = Logger.getLogger(IntegralCurvesOriginal.class.getName());
-		public enum VectorField{curvature, conjugate};
 
 		public static double[] getMaxMinCurv(NURBSSurface ns, double[] p,boolean max) {
 			if (max) {
@@ -86,7 +85,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		
 		private static boolean segmentIntersectBoundary(NURBSSurface ns  , LineSegment ls){
 			double[][] seg = ls.getSegment();
-			if(ns.getClosingDir() == ClosingDir.uClosed){
+			if(ns.getDomain().getClosingDir() == ClosingDir.uClosed){
 				double[] V = ns.getVKnotVector();
 				double v0 = V[0];
 				double vn = V[V.length - 1];
@@ -94,7 +93,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					return true;
 				}
 			}
-			else if(ns.getClosingDir() == ClosingDir.vClosed){
+			else if(ns.getDomain().getClosingDir() == ClosingDir.vClosed){
 				double[] U = ns.getUKnotVector();
 				double u0 = U[0];
 				double um = U[U.length - 1];
@@ -147,7 +146,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		}
 		
 		public static boolean isOutsideOfShiftedDomain(NURBSSurface ns, double[] point){
-			if(ns.getClosingDir() == ClosingDir.uClosed){
+			if(ns.getDomain().getClosingDir() == ClosingDir.uClosed){
 				double[] V = ns.getVKnotVector();
 				double v0 = V[0];
 				double vn = V[V.length - 1];
@@ -157,7 +156,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					return false;
 				}
 			}
-			if(ns.getClosingDir() == ClosingDir.vClosed){
+			if(ns.getDomain().getClosingDir() == ClosingDir.vClosed){
 				double[] U = ns.getUKnotVector();
 				double u0 = U[0];
 				double um = U[U.length - 1];
@@ -172,7 +171,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		
 		
 		private static boolean isNotAtBoundary(NURBSSurface ns, double[] point){
-			LinkedList<Double> boundaryValues = ns.getBoundaryValues();
+			LinkedList<Double> boundaryValues = ns.getDomain().getBoundaryValues();
 			for (Double value : boundaryValues) {
 				if(point[0] == value || point[1] == value){
 					logger.info("\n not at boundary,  U = "+ Arrays.toString(ns.getUKnotVector())+" V = " +ns.getVKnotVector()+" point = " + Arrays.toString(point) + "\n");
@@ -203,7 +202,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		}
 		
 		private static double[] projectOntoBoundary(NURBSSurface ns, double[] point){
-			LinkedList<Double> boundaryValues = ns.getBoundaryValues();
+			LinkedList<Double> boundaryValues = ns.getDomain().getBoundaryValues();
 			double boundaryValue = getMinBoundValue(point, boundaryValues);
 			
 			if(isUBoundaryValue(ns, boundaryValue)){
@@ -1241,7 +1240,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 		}
 
 		private static void flipClosedBoundaryPoint(NURBSSurface ns, double u0, double um, double v0, double vn, double[] point){
-			if(ns.getClosingDir() == ClosingDir.uClosed){
+			if(ns.getDomain().getClosingDir() == ClosingDir.uClosed){
 				if(point[0] == u0){
 					point[0] = um;
 				}
@@ -1249,7 +1248,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 					point[0] = u0;
 				}
 			}
-			if(ns.getClosingDir() == ClosingDir.vClosed){
+			if(ns.getDomain().getClosingDir() == ClosingDir.vClosed){
 				if(point[1] == v0){
 					point[1] = vn;
 				}
@@ -1309,7 +1308,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 			for (double[] p : pointList) {
 				if(counter != 0){
 					seg[1] = p.clone();
-					if(counter == 1 && ns.isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
+					if(counter == 1 && ns.getDomain().isClosedBoundaryPoint(seg[0]) && pointsAreInDifferentDomains(u0, um, v0, vn, seg[0], seg[1])){
 //						flipClosedBoundaryPoint(ns, u0, um, v0, vn, seg[0]);
 						flipClosedBoundaryPoint(ns, u0, um, v0, vn, pointList.getFirst());
 //						domainList
@@ -1954,7 +1953,7 @@ import de.varylab.varylab.plugin.nurbs.data.ValidSegment;
 //			IntObjects intObj;
 //			int noSegment;
 			LinkedList<double[]> all = new LinkedList<double[]>();
-			List<LineSegment> boundary = ns.getBoundarySegments();
+			List<LineSegment> boundary = ns.getDomain().getBoundarySegments();
 			IntObjects intObj = IntegralCurvesOriginal.rungeKuttaCurvatureLine(ns, y0, tol,false, maxMin, umbilics, umbilicStop, boundary );
 //			IntObjects intObj = IntegralCurvesOriginal.rungeKuttaConjugateLine(ns, y0, tol ,false, maxMin, umbilics, umbilicStop, boundary );
 			

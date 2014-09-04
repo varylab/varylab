@@ -12,7 +12,7 @@ public class TrebuchetFontSet implements FontSet {
 		tahoma11 = null;
 
 	public TrebuchetFontSet(int size) {
-		tahoma11 = new FontUIResource("Trebuchet MS", Font.BOLD, size);
+		tahoma11 = new FontUIResource("Trebuchet", Font.PLAIN, size);
 	}
 	
 	@Override

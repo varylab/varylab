@@ -19,12 +19,12 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.plugin.nurbs.adapter.FlatIndexFormAdapter;
 import de.varylab.varylab.plugin.nurbs.adapter.VectorFieldMapAdapter;
 import de.varylab.varylab.plugin.nurbs.data.CurvatureInfo;
-import de.varylab.varylab.plugin.nurbs.data.LineSegment;
 import de.varylab.varylab.plugin.nurbs.math.NURBSAlgorithm;
 import de.varylab.varylab.plugin.nurbs.math.NURBSCurvatureUtility;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurface;
 import de.varylab.varylab.plugin.nurbs.math.PointProjectionSurfaceOfRevolution;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 
 /**
@@ -40,12 +40,14 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		
 		public enum BoundaryLines{u0, um, v0, vn};
 		public enum CornerPoints{P00, Pm0, P0n, Pmn};
+		
 		public enum RevolutionDir{uDir, vDir};
-		public enum ClosingDir{uClosed, vClosed, uvClosed, nonClosed};
+		
+		public enum ClosingDir {uClosed, vClosed, uvClosed, nonClosed};
+		
 		private LinkedList<BoundaryLines> boundLines = new LinkedList<NURBSSurface.BoundaryLines>();
 		private LinkedList<CornerPoints> cornerPoints = new LinkedList<CornerPoints>();
 		private RevolutionDir revDir = null;
-		private ClosingDir closDir = null;
 		private double[] U;
 		private double[] V;
 		private LinkedList<NURBSTrimLoop> trimC = new LinkedList<NURBSTrimLoop>();
@@ -53,8 +55,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		private double[][][] controlMesh;
 		private int p, q;
 		private String name = "Nurbs Surface";
-		private LinkedList<Double> boundaryValues = null;
-		private double[] closedBoundaryValues = null;
+		private NurbsDomain domain = null;
 
 //		private List<double[]> umbilics = new LinkedList<double[]>();
 		
@@ -68,16 +69,19 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			controlMesh = cm;
 			p = pDegree;
 			q = qDegree;
+			
 			cornerPoints.add(CornerPoints.P00);
 			cornerPoints.add(CornerPoints.Pm0);
 			cornerPoints.add(CornerPoints.P0n);
 			cornerPoints.add(CornerPoints.Pmn);
+			
 			boundLines.add(BoundaryLines.u0);
 			boundLines.add(BoundaryLines.um);
 			boundLines.add(BoundaryLines.v0);
 			boundLines.add(BoundaryLines.vn);
 //			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 //			closDir = getClosingDir();
+			domain = new NurbsDomain(this);
 		}
 		
 		public NURBSSurface(double[] UVec, double[] VVec, double[][][] cm, int pDegree, int qDegree, LinkedList<BoundaryLines> boundList, LinkedList<CornerPoints> cornerList){
@@ -89,7 +93,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			cornerPoints = cornerList;
 			boundLines = boundList;
 //			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
-			closDir = getClosingDir();
+			domain = new NurbsDomain(this);
 		}
 		
 		public NURBSSurface(double[][][] cm, int pDeg, int qDeg) {
@@ -100,6 +104,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			int n = cm[0].length;
 			U = NurbsSurfaceUtility.uniformKnotVector(m, pDeg);
 			V = NurbsSurfaceUtility.uniformKnotVector(n, qDeg);
+			domain = new NurbsDomain(this);
 		}
 		
 		public boolean hasClampedKnotVectors(){
@@ -171,44 +176,9 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		public void setRevolutionDir(){
 			revDir = PointProjectionSurfaceOfRevolution.getRotationDir(this);
 		}
-		
-		
 
 		public RevolutionDir getRevolutionDir(){
 			return revDir;
-		}
-		
-		
-		public double[] getGluedBoundaryValues(){
-			if(getClosingDir() == ClosingDir.nonClosed){
-				return null;
-			}
-			else if(getClosingDir() == ClosingDir.uClosed){
-				closedBoundaryValues = new double[2];
-				closedBoundaryValues[0] = U[0];
-				closedBoundaryValues[1] = U[U.length - 1];
-			}
-			else if(getClosingDir() == ClosingDir.vClosed){
-				closedBoundaryValues = new double[2];
-				closedBoundaryValues[0] = V[0];
-				closedBoundaryValues[1] = V[V.length - 1];
-			}
-			return closedBoundaryValues;
-		}
-		
-		
-		
-
-		public LinkedList<Double> getBoundaryValues() {
-			if(boundaryValues == null){
-				boundaryValues = determineBoundaryValues();
-			}
-			return boundaryValues;
-		}
-		
-
-		public void setBoundaryValues(LinkedList<Double> boundaryValues) {
-			this.boundaryValues = boundaryValues;
 		}
 
 		public LinkedList<CornerPoints> getCornerPoints() {
@@ -293,81 +263,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			bl.add(BoundaryLines.vn);
 		}
 		
-		private ClosingDir determineClosingCondition(){
-			if(isClosedUDir() && isClosedVDir()){
-				return ClosingDir.uvClosed;
-			}
-			if(isClosedUDir()){
-				return ClosingDir.uClosed;
-			}
-			if(isClosedVDir()){
-				return ClosingDir.vClosed;
-			}
-			else{
-				return ClosingDir.nonClosed;
-			}
-		}
-		
-		public void setClosingDir(ClosingDir dir){
-			closDir = dir;
-		}
-		
-		public ClosingDir getClosingDir(){
-			if(closDir == null){
-				return determineClosingCondition();
-			}
-			else{
-				return closDir;
-			}
-		}
-		
-		private boolean isClosedUDir(){
-			int m = controlMesh.length;
-			int n = controlMesh[0].length;
-			for (int j = 0; j < n; j++) {
-				if(Rn.euclideanDistance(controlMesh[0][j], controlMesh[m - 1][j]) > 0.0001){
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		private boolean isClosedVDir(){
-			int m = controlMesh.length;
-			int n = controlMesh[0].length;
-			for (int i = 0; i < m; i++) {
-				if(Rn.euclideanDistance(controlMesh[i][0],  controlMesh[i][n - 1]) > 0.0001){
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		
-		
-		public boolean isClosedBoundaryPoint(double[] point){
-			if(getClosingDir() == ClosingDir.uClosed){
-				if(point[0] == U[0] || point[0] == U[U.length - 1]){
-					return true;
-				}
-				else return false;
-			}
-			if(getClosingDir() == ClosingDir.vClosed){
-				if(point[1] == V[0] || point[1] == V[V.length - 1]){
-					return true;
-				}
-				else return false;
-			}
-			if(getClosingDir() == ClosingDir.uvClosed){
-				if(point[0] == U[0] || point[0] == U[U.length - 1] || point[1] == V[0] || point[1] == V[V.length - 1]){
-					return true;
-				}
-				else return false;
-			}
-			return false;
-		}
-		
-
 		/**
 		
 		 * @param cm
@@ -456,6 +351,10 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			}
 			NURBSAlgorithm.SurfacePoint(p, U, q, V, controlMesh, u, v, S);
 			return S;
+		}
+		
+		public double[] getSurfacePoint(double[] uv) {
+			return getSurfacePoint(uv[0], uv[1]);
 		}
 		
 		
@@ -1102,6 +1001,16 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
  			return PointProjectionSurface.getClosestPointDomain(this, point);
  		}
 		
+		public double[] getClosestPointDomainDir(double[] point, double[] start, Parameter parameterDirection){
+			double[] p = PointProjectionSurface.getClosestPointDomain(this, point);
+			if(parameterDirection == Parameter.U){
+				p[1] = start[1];
+			} else if(parameterDirection == Parameter.V){
+				p[0] = start[0];
+			}
+			return p;
+		}
+		
 		
 		/**
 		 * 
@@ -1207,7 +1116,7 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 				str = str + "surface of revolution ";
 				str = str + '\n' + revDir + '\n';
 			}
-			closDir = getClosingDir();
+			ClosingDir closDir = getDomain().getClosingDir();
 			if(closDir == ClosingDir.nonClosed){
 				str = str + "surface is nonclosed ";
 			}
@@ -1275,175 +1184,10 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 			
 		}
 		
-		public List<double[]> getBoundaryVerticesUV() {
-			List<double[]> boundaryVerts = new LinkedList<double[]>();
-			double[] boundVert1 = new double[2];
-			boundVert1[0] = U[0];
-			boundVert1[1] = V[0];
-			double[] boundVert2 = new double[2];
-			boundVert2[0] = U[U.length - 1];
-			boundVert2[1] = V[0];
-			double[] boundVert3 = new double[2];
-			boundVert3[0] = U[U.length - 1];
-			boundVert3[1] = V[V.length - 1];
-			double[] boundVert4 = new double[2];
-			boundVert4[0] = U[0];
-			boundVert4[1] = V[V.length - 1];
-			boundaryVerts.add(boundVert1);
-			boundaryVerts.add(boundVert2);
-			boundaryVerts.add(boundVert3);
-			boundaryVerts.add(boundVert4);
-			return boundaryVerts;
-		}
-		
-		public List<LineSegment> getCompleteDomainBoundarySegments() {
-			List<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-			List<double[]> boundaryVertices = getBoundaryVerticesUV();
-			double[] 
-					boundVert1 = boundaryVertices.get(0),
-					boundVert2 = boundaryVertices.get(1),
-					boundVert3 = boundaryVertices.get(2),
-					boundVert4 = boundaryVertices.get(3);
-					
-			double[][] seg1 = new double[2][2];
-			seg1[0] = boundVert1;
-			seg1[1] = boundVert2;
-			LineSegment b1 = new LineSegment(seg1, 1, 1);
-			double[][] seg2 = new double[2][2];
-			seg2[0] = boundVert2;
-			seg2[1] = boundVert3;
-			LineSegment b2 = new LineSegment(seg2, 1, 2);
-			double[][] seg3 = new double[2][2];
-			seg3[0] = boundVert3;
-			seg3[1] = boundVert4;
-			LineSegment b3 = new LineSegment(seg3, 1, 3);
-			double[][] seg4 = new double[2][2];
-			seg4[0] = boundVert4;
-			seg4[1] = boundVert1;
-			LineSegment b4 = new LineSegment(seg4, 1, 4);
-			boundarySegments.add(b1);
-			boundarySegments.add(b2);
-			boundarySegments.add(b3);
-			boundarySegments.add(b4);
-			return boundarySegments;
-		}
 
-		public List<LineSegment> getBoundarySegments() {
-			List<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-			List<double[]> boundaryVertices = getBoundaryVerticesUV();
-			double[] 
-					boundVert1 = boundaryVertices.get(0),
-					boundVert2 = boundaryVertices.get(1),
-					boundVert3 = boundaryVertices.get(2),
-					boundVert4 = boundaryVertices.get(3);
-					
-			double[][] seg1 = new double[2][2];
-			seg1[0] = boundVert1;
-			seg1[1] = boundVert2;
-			LineSegment b1 = new LineSegment(seg1, 1, 1);
-			double[][] seg2 = new double[2][2];
-			seg2[0] = boundVert2;
-			seg2[1] = boundVert3;
-			LineSegment b2 = new LineSegment(seg2, 1, 2);
-			double[][] seg3 = new double[2][2];
-			seg3[0] = boundVert3;
-			seg3[1] = boundVert4;
-			LineSegment b3 = new LineSegment(seg3, 1, 3);
-			double[][] seg4 = new double[2][2];
-			seg4[0] = boundVert4;
-			seg4[1] = boundVert1;
-			LineSegment b4 = new LineSegment(seg4, 1, 4);
-			if(getClosingDir() == ClosingDir.nonClosed){
-				boundarySegments.add(b1);
-				boundarySegments.add(b2);
-				boundarySegments.add(b3);
-				boundarySegments.add(b4);
-			}
-			else if(getClosingDir() == ClosingDir.uClosed){
-				boundarySegments.add(b1);
-				boundarySegments.add(b3);
-			}
-			else if(getClosingDir() == ClosingDir.vClosed){
-				boundarySegments.add(b2);
-				boundarySegments.add(b4);
-			}
-			return boundarySegments;
-		}
-		
-		public LinkedList<Double> determineClosedBoundaryValues(){
-			LinkedList<Double> closedBoundaryValues = new LinkedList<Double>();
-			double[] U = getUKnotVector();
-			double[] V = getVKnotVector();
-			if(getClosingDir() == ClosingDir.vClosed){
-				double v0 = V[0];
-				double vn = V[V.length - 1];
-				closedBoundaryValues.add(v0);
-				closedBoundaryValues.add(vn);
-			}
-			else{
-				double u0 = U[0];
-				double um = U[U.length - 1];
-				closedBoundaryValues.add(u0);
-				closedBoundaryValues.add(um);
-			}
-			return closedBoundaryValues;
-		}
-		
-		
-		
-		public LinkedList<Double> determineBoundaryValues(){
-			LinkedList<Double> boundaryValues = new LinkedList<Double>();
-			double[] U = getUKnotVector();
-			double[] V = getVKnotVector();
-			if(getClosingDir() == ClosingDir.uClosed){
-				double v0 = V[0];
-				double vn = V[V.length - 1];
-				boundaryValues.add(v0);
-				boundaryValues.add(vn);
-			}
-			else if(getClosingDir() == ClosingDir.vClosed){
-				double u0 = U[0];
-				double um = U[U.length - 1];
-				boundaryValues.add(u0);
-				boundaryValues.add(um);
-			}
-			else{
-				double u0 = U[0];
-				double um = U[U.length - 1];
-				double v0 = V[0];
-				double vn = V[V.length - 1];
-				boundaryValues.add(u0);
-				boundaryValues.add(um);
-				boundaryValues.add(v0);
-				boundaryValues.add(vn);
-			}
-			return boundaryValues;
-		}
-		
-		
-		public double[] determineGluedBoundary(){
-			double[] gluedBoundValues = new double[2];
-			if(getClosingDir() == ClosingDir.nonClosed){
-				return null;
-			}
-			else{
-				if(getClosingDir() == ClosingDir.uClosed){
-					gluedBoundValues[0] = U[0];
-					gluedBoundValues[1] = U[U.length - 1];
-				}
-				else{
-					gluedBoundValues[0] = V[0];
-					gluedBoundValues[1] = V[V.length - 1];
-				}
-			}
-			return gluedBoundValues;
-		}
-		
-		
-		
 		
 	//	TODO: Why does this method need hds and as?
-	public LinkedList<double[]> findUmbilics(VHDS hds, AdapterSet as) {
+	public List<double[]> findUmbilics(VHDS hds, AdapterSet as) {
 		
 		VectorFieldMapAdapter linefield = new VectorFieldMapAdapter();
 		FlatIndexFormAdapter indexAdapter= new FlatIndexFormAdapter(); 
@@ -1601,8 +1345,6 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		}
 	};
 
-	
-	
 	public Geometry createNurbsMesh(int u, int v) {
 		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
 		qmf.setGenerateVertexNormals(true);
@@ -1622,4 +1364,13 @@ import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 		double[] newU = insertUInKnot(p, u, U);
 		logger.info(Arrays.toString(newU));
 	}
+	
+	public NurbsDomain getDomain() {
+		if(domain == null) {
+			domain = new NurbsDomain(this);
+		}
+		return domain;
+	}
+	
+
 }

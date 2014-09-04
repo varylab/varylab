@@ -31,13 +31,9 @@ public class IntersectionPoint {
 	private Boolean boundaryPoint = null;
 	private LinkedList<CurveTangent> curveTangents = null;
 	
-
-	
-	
 	public IntersectionPoint() {
 		
 	}
-	
 	
 	public LinkedList<CurveTangent> getCurveTangents() {
 		return curveTangents;
@@ -82,16 +78,10 @@ public class IntersectionPoint {
 		this.boundaryPoint = boundaryPoint;
 	}
 
-
-
-
-
-
-	
 	public GluedBoundary getGluedBoundary(NURBSSurface ns){
 		if(gluedBoundary == null){
-			if(ns.getClosingDir() == ClosingDir.uClosed){
-				double [] bound  = ns.getGluedBoundaryValues();
+			if(ns.getDomain().getClosingDir() == ClosingDir.uClosed){
+				double [] bound  = ns.getDomain().getGluedBoundaryValues();
 				if(getPoint()[0] == bound[0]){
 					gluedBoundary = GluedBoundary.left;
 				}
@@ -102,8 +92,8 @@ public class IntersectionPoint {
 					gluedBoundary = GluedBoundary.interior;
 				}
 			}
-			else if(ns.getClosingDir() == ClosingDir.vClosed){
-				double [] bound  = ns.getGluedBoundaryValues();
+			else if(ns.getDomain().getClosingDir() == ClosingDir.vClosed){
+				double [] bound  = ns.getDomain().getGluedBoundaryValues();
 				if(getPoint()[1] == bound[0]){
 					gluedBoundary = GluedBoundary.lower;
 				}

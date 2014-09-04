@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -44,8 +46,10 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.data.SignedUV;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.nurbs.type.NurbsUVCoordinate;
 import de.varylab.varylab.ui.DoubleArrayPrettyPrinter;
@@ -54,11 +58,15 @@ import de.varylab.varylab.ui.ListSelectRemoveTableModel;
 
 public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeListener, ActionListener, TableModelListener {
 
+	public static enum Parameter { U, V, UV };
+	public static enum Direction {UP, DOWN, UP_DOWN };
+	
 	private HalfedgeInterface hif = null;
 	private PointSelectionTool tool = new PointSelectionTool();
 	private List<PointSelectionListener> listeners = new LinkedList<PointSelectionListener>();
 	
 	private JPanel panel = new JPanel();
+	private PointGeneratorPanel pgp = new PointGeneratorPanel();
 	
 
 	private ListSelectRemoveTableModel<double[]> 
@@ -71,6 +79,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	private JScrollPane selectedPointsPane = new JScrollPane(selectedPointsTable);
 	
+	private JButton distPointButton = new JButton("distPoints");
 	private JButton uncheckButton = new JButton("None");
 	private JButton checkButton = new JButton("All");
 	private JButton removeSelectedButton = new JButton("Delete selected");
@@ -80,15 +89,18 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 	
 	private SpinnerNumberModel
 		equidistantPointsModel = new SpinnerNumberModel(11, 2, 1000, 1);
-	
+
 	private JSpinner
 		equidistantPointsSpinner = new JSpinner(equidistantPointsModel);
+		
 	
 	private JCheckBox showBox = new JCheckBox("Show");
 	
 	private SceneGraphComponent selectedPointsComponent = new SceneGraphComponent("Selected Nurbs Points");
 	private NURBSSurface surface;
 	private NurbsUVAdapter nurbsUVAdapter;
+
+	private LinkedList<LinkedList<SignedUV>> commonPointList;
 	
 	private boolean startup = true;
 	
@@ -98,7 +110,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		shrinkPanel.setName("Nurbs Selection");
 		shrinkPanel.setLayout(new GridBagLayout());
 		
-		panel.setPreferredSize(new Dimension(250, 200));
+		panel.setPreferredSize(new Dimension(250, 400));
 		panel.setMinimumSize(new Dimension(250, 200));
 		panel.setLayout(new GridBagLayout());
 		panel.add(selectedPointsPane);
@@ -120,8 +132,12 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		removeSelectedButton.addActionListener(this);
 		selectionButton.addActionListener(this);
 		equidistantPointsButton.addActionListener(this);
+		distPointButton.addActionListener(this);
 		
 		initSelectedPointsComponent();
+	
+		panel.add(pgp,rc);
+		panel.add(distPointButton,rc);
 		panel.add(checkButton,lc);
 		panel.add(uncheckButton,rc);
 		panel.add(removeSelectedButton,lc);
@@ -132,16 +148,109 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		panel.add(equidistantPointsButton, rc);
 		equidistantPointsButton.setEnabled(false);
 		
-		panel.add(showBox, rc);
+		panel.add(showBox, lc);
 		
 		shrinkPanel.add(panel,rc);
 	}
+	
+	private class PointGeneratorPanel extends ShrinkPanel {
+	
+		private static final long 
+			serialVersionUID = 1L;
+		
+		private JComboBox<Parameter>
+			parameterCombo = new JComboBox<PointSelectionPlugin.Parameter>(Parameter.values());
+		
+		private JComboBox<Direction>
+			directionCombo = new JComboBox<PointSelectionPlugin.Direction>(Direction.values());
+		
+		private SpinnerNumberModel
+			distModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01),
+			numberOfPointsModel = new SpinnerNumberModel(3, 1, 300, 1);
+		
+		private JSpinner 
+			distSpinner = new JSpinner(distModel),
+			numberOfPointsSpinner = new JSpinner(numberOfPointsModel);
+		
+		public PointGeneratorPanel() {
+			super("Point Generator");
+			setShrinked(true);
+			setLayout(new GridBagLayout());
+			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+
+		
+			add(new JLabel("Choose dist"), lc);
+			add(distSpinner, rc);
+			add(new JLabel("Choose Number Of Points"), lc);
+			add(numberOfPointsSpinner, rc);
+			add(new JLabel("Directions"),rc);
+			add(parameterCombo,lc);
+			add(directionCombo, rc);
+		}
+		
+		public Direction getDirection() {
+			return (Direction) directionCombo.getSelectedItem();
+		}
+		
+		public Parameter getParameter() {
+			return (Parameter) parameterCombo.getSelectedItem();
+		}
+		
+		private double getDist(){
+			double min = Double.MAX_VALUE;
+			Parameter param = (Parameter) parameterCombo.getSelectedItem();
+			Direction dir = (Direction) directionCombo.getSelectedItem();
+			
+			for (double[] p : getSelectedPoints()) {
+				
+				if(param != Parameter.V){
+					double[] U = surface.getUKnotVector();
+					double u0 = U[0];
+					double um = U[U.length - 1];
+					if(dir != Direction.DOWN){
+						if(min > um - p[0]){
+							min = um - p[0];
+						}
+					}
+					if(dir != Direction.UP){
+						if(min > p[0] - u0){
+							min = p[0] - u0;
+						}
+					}
+				}
+				else if(param != Parameter.U){
+					double[] V = surface.getVKnotVector();
+					double v0 = V[0];
+					double vn = V[V.length - 1];
+					if(dir != Direction.DOWN){
+						if(min > vn - p[1]){
+							min = vn - p[1];
+						}
+					}
+					if(dir != Direction.UP){
+						if(min > p[1] - v0){
+							min = p[1] - v0;
+						}
+					}
+				}
+			}
+			System.out.println("MIN = " + min);
+			return distModel.getNumber().doubleValue() * min;
+		}
+
+		public int getNumberOfPoints() {
+			return numberOfPointsModel.getNumber().intValue();
+		}
+	}	
+	
 	
 	private void initSelectedPointsComponent() {
 		Appearance app = new Appearance();
 		app.setAttribute(VERTEX_DRAW, true);
 		app.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, ORANGE);
 		app.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, ORANGE);
+		selectedPointsComponent.setPickable(false);
 		selectedPointsComponent.setAppearance(app);
 	}
 
@@ -176,12 +285,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 			} else {
 				activeModel = new ListSelectRemoveTableModel<double[]>("UV-coordinates", new DoubleArrayPrettyPrinter());
 				activeModel.addTableModelListener(this);
+
 				layers2models.put(layer,activeModel);
 			}
 		} else {
 			activeModel.clear();
 		}
 		updateTool(layer);
+		selectedPointsTable.setModel(activeModel);
 		activeModel.fireTableDataChanged();
 	}
 
@@ -331,6 +442,26 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 					}
 				} 
 			}
+		} else if(source == distPointButton){
+			LinkedList<double[]> selectedPoints = new LinkedList<>();
+			for(double[] uv : getSelectedPoints()) {
+				selectedPoints.add(uv);
+			}
+			Parameter param = pgp.getParameter();
+			Direction dir = pgp.getDirection();
+			double dist = pgp.getDist();
+			int numberOfPoints = pgp.getNumberOfPoints();
+			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, param, dir, selectedPoints, dist, numberOfPoints);
+			boolean firstPoint = true;
+			for (LinkedList<SignedUV> list : commonPointList) {
+				for (SignedUV pt : list) {
+					if(!activeModel.contains(pt.getPoint()) && !firstPoint) {
+						activeModel.add(pt.getPoint());
+						selectedPointsComponent.addChild(createPointComponent(pt.getPoint()));
+					}
+				}
+				firstPoint = false;
+			}
 		}
 		activeModel.fireTableDataChanged();
 	}
@@ -349,8 +480,24 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		return View.class;
 	}
 	
+	public List<SignedUV> getSelectedSignedPoints(){
+		List<SignedUV> list = new LinkedList<>();
+		for(LinkedList<SignedUV> l : commonPointList) {
+			list.addAll(l);
+		}
+		return list;
+	}
+	
 	public List<double[]> getSelectedPoints() {
 		return activeModel.getChecked();
+	}
+	
+	public Parameter getParameter(){
+		return pgp.getParameter();
+	}
+	
+	public LinkedList<LinkedList<SignedUV>> getCommonPointList(){
+		return commonPointList;
 	}
 	
 	private SceneGraphComponent createPointComponent(double[] uv) {

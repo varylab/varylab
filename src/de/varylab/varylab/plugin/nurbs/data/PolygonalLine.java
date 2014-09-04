@@ -1,8 +1,14 @@
 package de.varylab.varylab.plugin.nurbs.data;
 
+import java.awt.EventQueue;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class PolygonalLine {
+	
+	private List<PolygonalLineListener> 
+		listeners = Collections.synchronizedList(new LinkedList<PolygonalLineListener>());
 	
 	private LinkedList<LineSegment> pLine;
 	private String description = null;
@@ -10,14 +16,13 @@ public class PolygonalLine {
 			begin = 0,
 			end = 0;
 
-	
-
 	public int getBegin() {
 		return begin;
 	}
 
 	public void setBegin(int begin) {
 		this.begin = begin;
+		fireLineChanged();
 	}
 
 	public int getEnd() {
@@ -26,8 +31,13 @@ public class PolygonalLine {
 
 	public void setEnd(int end) {
 		this.end = end;
+		fireLineChanged();
 	}
 
+	public int getMax() {
+		return pLine.size()-1;
+	}
+	
 	public PolygonalLine(){
 		pLine = null;
 	}
@@ -55,11 +65,12 @@ public class PolygonalLine {
 	
 	@Override
 	public String toString(){
-		String str = new String();
-		for (LineSegment ls : pLine) {
-			str = str + ls.toString() +"\n";
-		}
-		return str;
+//		String str = new String();
+//		for (LineSegment ls : pLine) {
+//			str = str + ls.toString() +"\n";
+//		}
+//		return str;
+		return "curve index = " + pLine.getFirst().getCurveIndex();
 	}
 
 	public String getDescription() {
@@ -68,6 +79,31 @@ public class PolygonalLine {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public void setCurveIndex(int index) {
+		for(LineSegment ls : pLine) {
+			ls.setCurveIndex(index);
+		}
+	}
+	
+	public void addPolygonalLineListener(PolygonalLineListener l) {
+		listeners.add(l);
+	}
+	
+	protected void fireLineChanged() {
+		synchronized(listeners) {
+			Runnable r = new Runnable() {
+				
+				@Override
+				public void run() {
+					for(PolygonalLineListener l : listeners) {
+						l.lineChanged();
+					}
+				}
+			};
+			EventQueue.invokeLater(r);
+		}
 	}
 
 }
