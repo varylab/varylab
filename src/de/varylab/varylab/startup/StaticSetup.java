@@ -41,6 +41,7 @@ public class StaticSetup {
 	
 	public static void initLogging() {
 		LogManager lm = LogManager.getLogManager();
+		lm.reset();
 		File localConf = new File("logging.properties");
 		File localCustomConf = new File("logcustom.properties");
 		String fileName = null;
