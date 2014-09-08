@@ -23,7 +23,7 @@
 	<classpathentry kind="lib" path="lib/conformallab/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="lib/conformallab/batik-util.jar"/>
-	<classpathentry kind="lib" path="lib/conformallab/DiscreteConformalLab.jar" sourcepath="/DiscreteConformalLab"/>
+	<classpathentry kind="lib" path="lib/conformallab/DiscreteConformalLab.jar" sourcepath="/ConformalLab"/>
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/java2d.jar"/>
