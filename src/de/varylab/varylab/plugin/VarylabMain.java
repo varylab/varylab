@@ -3,6 +3,7 @@ package de.varylab.varylab.plugin;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.skin.SkinChangeListener;
@@ -38,7 +39,7 @@ public class VarylabMain extends Plugin {
 		configureJReality(c);
 		configureHalfedgeInterface(c);
 		hideInfoOverlayWorkaround(c);
-		firstStartCofig(c);
+		firstStartConfig(c);
 		
 		SubstanceLookAndFeel.registerSkinChangeListener(new SkinChangeListener() {
 			@Override
@@ -55,7 +56,7 @@ public class VarylabMain extends Plugin {
 	}
 
 	
-	protected void firstStartCofig(Controller c) {
+	protected void firstStartConfig(Controller c) {
 		String flag = c.getProperty(VarylabMain.class, "firstStartFlag", "true");
 		c.storeProperty(VarylabMain.class, "firstStartFlag", "false");
 		if (flag.equals("false")) return;
@@ -110,6 +111,7 @@ public class VarylabMain extends Plugin {
 	
 	protected void configureJReality(Controller c) {
 		c.getPlugin(ContentTools.class).setRotateAnimationEnabled(false);
+		Logger.getLogger("de.jreality").setUseParentHandlers(true);
 	}
 	
 }

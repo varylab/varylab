@@ -444,7 +444,7 @@ public class IntegralCurvesPlugin
 			j.addJobListener(this);
 			jobs.add(j);
 		}
-		ParallelJob parallelJob = new ParallelJob(jobs);
+		ParallelJob parallelJob = new ParallelJob(jobs,"Integral curves");
 		jobQueuePlugin.queueJob(parallelJob);
 
 		Job updateJob = new AbstractJob() {
