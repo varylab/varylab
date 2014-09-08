@@ -88,7 +88,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		if(recomputeAll){
 			jobs.addAll(createCommonCurvesJobs(dc, p, tol, linesToRemove, linesToAdd));
 		}
-		ParallelJob parallelJob = new ParallelJob(jobs);
+		ParallelJob parallelJob = new ParallelJob(jobs, "Integral curves");
 		
 		AbstractJob updateJob = createUpdateJob(dc, linesToRemove, linesToAdd);
 		addCurveJobs(new CurveJob(parallelJob, updateJob));
