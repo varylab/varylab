@@ -87,7 +87,18 @@ public class DraggableCurvesModel extends ListSelectRemoveTableModel<DraggableIn
 	public List<PolygonalLine> getCheckedPolygonalLines() {
 		List<PolygonalLine> lines = new LinkedList<>();
 		for(DraggableIntegralNurbsCurves dc : checked) {
-			lines.addAll(dc.getPolygonalLines());
+			switch (dc.getVectorFields()) {
+			case FIRST:
+				lines.add(dc.getPolygonalLine(VectorFields.FIRST));
+				break;
+			case SECOND:
+				lines.add(dc.getPolygonalLine(VectorFields.SECOND));
+				break;
+			case BOTH:
+				lines.add(dc.getPolygonalLine(VectorFields.FIRST));
+				lines.add(dc.getPolygonalLine(VectorFields.SECOND));
+				break;
+			}
 		}
 		return lines;
 	}		
