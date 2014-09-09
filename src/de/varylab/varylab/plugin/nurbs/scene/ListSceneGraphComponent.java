@@ -110,7 +110,9 @@ public class ListSceneGraphComponent<E,F extends SceneGraphComponentProvider<E>>
 			elementComponentMap.remove(e);
 		}
 		synchronized(root) {
-			root.removeChildren(cpts.toArray(new SceneGraphComponent[cpts.size()]));
+			for (SceneGraphComponent c : cpts) {
+				root.removeChild(c);
+			}
 		}
 
 	}

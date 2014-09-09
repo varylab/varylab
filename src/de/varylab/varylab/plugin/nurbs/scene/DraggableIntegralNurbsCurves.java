@@ -28,8 +28,9 @@ import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.CurveException;
 import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory.VectorFields;
 import de.varylab.varylab.plugin.nurbs.plugin.IntegralCurvesPlugin;
+import de.varylab.varylab.plugin.nurbs.plugin.PointSelectionPlugin.Parameter;
 
-public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceConstraint> implements PolygonalLineListener {
+public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointComponent<NurbsSurfaceDirectionConstraint> implements PolygonalLineListener {
 	
 	private static Logger 
 		logger = Logger.getLogger(DraggableIntegralNurbsCurves.class.getSimpleName());
@@ -47,7 +48,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 
 	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv) throws CurveException {
 		super(surface.getSurfacePoint(uv.getPoint()));
-		constraint = new NurbsSurfaceConstraint(surface);
+		constraint = new NurbsSurfaceDirectionConstraint(surface, uv.getPoint(), Parameter.UV);
 		setConstraint(constraint);
 		this.initialUV = uv;
 		this.icf = icf.getCopy();
@@ -68,14 +69,16 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		Appearance Ap = new Appearance();
 		Ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		setAppearance(Ap);
-		DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(Ap, false);
-		DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-		ipointShader.setDiffuseColor(Color.orange);
+//		DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(Ap, false);
+//		DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
+//		ipointShader.setDiffuseColor(Color.orange);
 	}
 	
 	public void recomputeCurves(double[] p) throws CurveException {
 		updateCoords(p);
 		double[] uv = constraint.getUV();
+		
+		setName(String.format("(%.2f, %.2f)", uv[0], uv[1]));
 		synchronized(vfLineMap) {
 			vfLineMap.clear();
 			switch (icf.getVectorFields()) {
@@ -240,4 +243,8 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		updateComponent();
 	}
 
+	public void setParameterDirection(Parameter p) {
+		constraint.setParameterDirection(p);
+		constraint.resetInitialUV();
+	}
 }

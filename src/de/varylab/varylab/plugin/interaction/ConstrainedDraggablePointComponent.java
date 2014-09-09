@@ -21,4 +21,7 @@ public class ConstrainedDraggablePointComponent<C extends PointConstraint> exten
 		}
 	}
 
+	public C getConstraint() {
+		return constraint;
+	}
 }

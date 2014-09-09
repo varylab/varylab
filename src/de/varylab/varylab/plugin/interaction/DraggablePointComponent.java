@@ -1,5 +1,6 @@
 package de.varylab.varylab.plugin.interaction;
 
+import de.jreality.scene.Appearance;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
@@ -35,6 +36,7 @@ public class DraggablePointComponent extends SceneGraphComponent {
 		addTool(dragTool);
 		setGeometry(point);
 		updateComponent();
+		setAppearance(new Appearance());
 	}
 
 	public PointSet getPoint() {

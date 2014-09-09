@@ -81,14 +81,20 @@ public class WatertightMesh extends AlgorithmDialogPlugin {
 			if (collected.contains(v)) continue;
 			double[] p = a.getD(Position3d.class, v);
 			List<V> identList = new ArrayList<>(kd.collectInRadius(p, threshold));
+			if (!identList.contains(v)) {
+				identList.add(v);
+			}
 			for (V vv : identList) {
 				identMap.put(vv, identList);
 			}
 			collected.addAll(identList);
-			indexMap.put(identList, index++);
+			Object o = indexMap.put(identList, index);
+			if (o == null) {
+				index++;
+			}
 		}
 		double[][] vData = new double[indexMap.size()][];
-		for (List<V> cluster : identMap.values()) {
+		for (List<V> cluster : indexMap.keySet()) {
 			int i = indexMap.get(cluster);
 			vData[i] = a.getD(Position3d.class, cluster.get(0));
 		}

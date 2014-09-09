@@ -21,5 +21,24 @@ public class NurbsSurfaceDirectionConstraint extends NurbsSurfaceConstraint {
 		uv = surface.getClosestPointDomainDir(src,initialUV,parameterDirection);
 		return surface.getSurfacePoint(uv[0], uv[1]);
 	}
+	
+
+	public void setParameterDirection(Parameter p) {
+		parameterDirection = p;
+	}
+	
+	public Parameter getParameterDirection() {
+		return parameterDirection;
+	}
+	
+	public void setInitialUV(double[] initialUV) {
+		this.initialUV = initialUV;
+	}
+
+	public void resetInitialUV() {
+		if(uv != null){
+			System.arraycopy(uv, 0, initialUV, 0, 2);
+		}
+	}
 
 }
