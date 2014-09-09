@@ -104,6 +104,7 @@ public class IntegralCurvesPlugin
 	
 	private SpinnerNumberModel
 		tolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
+		interactiveTolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
 		nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 		vecFieldModel = new SpinnerNumberModel(10, 0, 180, 1),
 		beginLineModel = new SpinnerNumberModel(0, 0, 4000, 1),
@@ -111,6 +112,7 @@ public class IntegralCurvesPlugin
 	
 	private JSpinner
 		tolSpinner = new JSpinner(tolExpModel),
+		interactiveTolSpinner = new JSpinner(interactiveTolExpModel),
 		nearUmbilicSpinner = new JSpinner(nearUmbilicModel),
 		vecFieldSpinner = new JSpinner(vecFieldModel),
 		beginLineSpinner = new JSpinner(beginLineModel),
@@ -281,13 +283,19 @@ public class IntegralCurvesPlugin
 		vecFieldSpinner.setEnabled(true);
 		vecFieldSpinner.addChangeListener(this);
 		lc.gridwidth = 2;
-		integratorParametersPanel.add(new JLabel("Runge-Kutta Tolerance Exp"), lc);
+		integratorParametersPanel.add(new JLabel("Precision"), lc);
 		lc.gridwidth = 1;
 		integratorParametersPanel.add(tolSpinner, rc);
 		lc.gridwidth = 2;
-		integratorParametersPanel.add(new JLabel("Singularity Neighbourhood Exp"), lc);
+		integratorParametersPanel.add(new JLabel("-interactive-"), lc);
+		lc.gridwidth = 1;
+		integratorParametersPanel.add(interactiveTolSpinner, rc);
+		lc.gridwidth = 2;
+		integratorParametersPanel.add(new JLabel("Singularity Exp"), lc);
 		lc.gridwidth = 1;
 		integratorParametersPanel.add(nearUmbilicSpinner, rc);
+		interactiveTolExpModel.addChangeListener(this);
+		tolExpModel.addChangeListener(this);
 	}
 
 	private List<DraggableIntegralNurbsCurves> setCommonCurves(DraggableIntegralNurbsCurves curve){
@@ -438,7 +446,7 @@ public class IntegralCurvesPlugin
 				
 				@Override
 				protected void executeJob() throws Exception {
-					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
+					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp, Math.pow(10, interactiveTolExpModel.getNumber().doubleValue()));
 					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
 					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
 					dc.addPointDragListener(listener);
@@ -720,7 +728,20 @@ public class IntegralCurvesPlugin
 	public void stateChanged(ChangeEvent e) {
 		if(e.getSource() == vecFieldSpinner) {
 			updateVectorfields();
+		} else if(e.getSource() == interactiveTolExpModel) {
+			for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+				double tol = Math.pow(10.0, interactiveTolExpModel.getNumber().doubleValue());
+				tol *= Math.min(nManager.getActiveNurbsSurface().getDomain().getURange(),nManager.getActiveNurbsSurface().getDomain().getVRange());
+				dc.setInteractiveTol(tol);
+			}
+		} else if(e.getSource() == tolExpModel) {
+			for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+				double tol = Math.pow(10.0, tolExpModel.getNumber().doubleValue());
+				tol *= Math.min(nManager.getActiveNurbsSurface().getDomain().getURange(),nManager.getActiveNurbsSurface().getDomain().getVRange());
+				dc.setTol(tol);
+			}
 		}
+		
 	}
 
 	private void updateIntegralCurvesRoot(final List<DraggableIntegralNurbsCurves> toRemove, final List<DraggableIntegralNurbsCurves> toAdd) {
@@ -821,6 +842,8 @@ public class IntegralCurvesPlugin
 		c.storeProperty(getClass(), "curves", curveCombo.getSelectedItem());
 		c.storeProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem());
 		c.storeProperty(getClass(), "immediateCurveCalculation", immediateCalculationBox.isSelected());
+		c.storeProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().intValue());
+		c.storeProperty(getClass(), "tol", tolExpModel.getNumber().intValue());
 	}
 	
 	@Override
@@ -829,6 +852,8 @@ public class IntegralCurvesPlugin
 		curveCombo.setSelectedItem(c.getProperty(getClass(), "curves", curveCombo.getSelectedItem()));
 		symmetryCombo.setSelectedItem(c.getProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem()));
 		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
+		interactiveTolExpModel.setValue(c.getProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().intValue()));
+		tolExpModel.setValue(c.getProperty(getClass(), "tol", tolExpModel.getNumber().intValue()));
 	}
 
 	@Override

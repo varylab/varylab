@@ -38,15 +38,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	private DraggableIntegralNurbsCurves
 		curve = null;
 
-	private double startTol;
-
 	private JobQueuePlugin jobQueuePlugin = null;
 	
 	public DraggableIntegralCurveListener(NURBSSurface surface, DraggableIntegralNurbsCurves curve, JobQueuePlugin queue) {
 		this.surface = surface;
 		this.curve = curve;
 		jobQueuePlugin = queue;
-		startTol = curve.getTol();
 	}
 	
 
@@ -57,12 +54,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	@Override
 	public void pointDragged(final PointDragEvent e) {
 		p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-		updateAllCurves(curve, p, (1E-4)*Math.min(surface.getDomain().getURange(), surface.getDomain().getVRange()));
+		updateAllCurves(curve, p, curve.getInteractiveTol());
 	}
 
 	@Override
 	public void pointDragEnd(PointDragEvent e) {
-		updateAllCurves(curve, p, startTol);
+		updateAllCurves(curve, p, curve.getTol());
 		
 		AbstractJob updateJob = new AbstractJob() {
 			@Override
@@ -179,10 +176,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 			@Override
 			protected void executeJob() throws Exception {
 				synchronized (curve) {
+					double oldTol = curve.getTol();
 					curve.setTol(tol);
 					linesToRemove.addAll(curve.getPolygonalLines());
 					curve.recomputeCurves(p);
 					linesToAdd.addAll(curve.getPolygonalLines());
+					curve.setTol(oldTol);
 				}
 			}
 		};

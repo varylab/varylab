@@ -45,8 +45,10 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	private double sign = 1.0;
 	
 	private final SignedUV initialUV;
+	
+	private double interactiveTol = 1E-2;
 
-	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv) throws CurveException {
+	public DraggableIntegralNurbsCurves(NURBSSurface surface, IntegralCurveFactory icf, SignedUV uv, double intTol) throws CurveException {
 		super(surface.getSurfacePoint(uv.getPoint()));
 		constraint = new NurbsSurfaceDirectionConstraint(surface, uv.getPoint(), Parameter.UV);
 		setConstraint(constraint);
@@ -54,6 +56,7 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 		this.icf = icf.getCopy();
 		createDraggablePoint(surface, uv.getPoint());
 		recomputeCurves(coords);
+		interactiveTol = intTol*Math.min(surface.getDomain().getURange(), surface.getDomain().getVRange());
 //		updateComponent();
 	}
 	
@@ -246,5 +249,13 @@ public class DraggableIntegralNurbsCurves extends ConstrainedDraggablePointCompo
 	public void setParameterDirection(Parameter p) {
 		constraint.setParameterDirection(p);
 		constraint.resetInitialUV();
+	}
+	
+	public double getInteractiveTol() {
+		return interactiveTol;
+	}
+
+	public void setInteractiveTol(double tol) {
+		interactiveTol = tol;		
 	}
 }

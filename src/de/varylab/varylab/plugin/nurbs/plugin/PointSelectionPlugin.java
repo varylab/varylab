@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -108,11 +109,12 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		tool.addActionListener(this);
 		
 		shrinkPanel.setName("Nurbs Selection");
-		shrinkPanel.setLayout(new GridBagLayout());
+		shrinkPanel.setLayout(new GridLayout(1,1));
 		
-		panel.setPreferredSize(new Dimension(250, 400));
-		panel.setMinimumSize(new Dimension(250, 200));
+		selectedPointsPane.setPreferredSize(new Dimension(100, 150));
+//		panel.setMinimumSize(new Dimension(250, 200));
 		panel.setLayout(new GridBagLayout());
+		panel.setPreferredSize(new Dimension(150,150));
 		panel.add(selectedPointsPane);
 		
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
