@@ -430,28 +430,27 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 					selectedPointsComponent.addChild(createPointComponent(pt));
 				}
 			}
+			setCommonPointList();
 		} else if(source == equidistantPointsButton) {
 			if(surface.isSurfaceOfRevolution()){
-				for(double[] uv : getSelectedPoints()) {
-					LinkedList<double[]> pts = NurbsSurfaceUtility.getEquidistantRotatedPoints(surface, equidistantPointsModel.getNumber().intValue(), uv);
-					for (double[] pt : pts) {
-						if(!activeModel.contains(pt)) {
-							activeModel.add(pt);
-							selectedPointsComponent.addChild(createPointComponent(pt));
-						}
+				double[] uv = getSelectedPoints().iterator().next();
+				activeModel.clear();
+				activeModel.fireTableDataChanged();
+				LinkedList<double[]> pts = NurbsSurfaceUtility.getEquidistantRotatedPoints(surface, equidistantPointsModel.getNumber().intValue(), uv);
+				for (double[] pt : pts) {
+					if(!activeModel.contains(pt)) {
+						activeModel.add(pt);
+						selectedPointsComponent.addChild(createPointComponent(pt));
 					}
-				} 
+				}
+				setCommonPointList();
 			}
 		} else if(source == distPointButton){
-			LinkedList<double[]> selectedPoints = new LinkedList<>();
-			for(double[] uv : getSelectedPoints()) {
-				selectedPoints.add(uv);
-			}
 			Parameter param = pgp.getParameter();
 			Direction dir = pgp.getDirection();
 			double dist = pgp.getDist();
 			int numberOfPoints = pgp.getNumberOfPoints();
-			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, param, dir, selectedPoints, dist, numberOfPoints);
+			commonPointList = NurbsSurfaceUtility.getCommonPointsFromSelection(surface, param, dir, getSelectedPoints(), dist, numberOfPoints);
 			boolean firstPoint = true;
 			for (LinkedList<SignedUV> list : commonPointList) {
 				for (SignedUV pt : list) {
@@ -462,8 +461,14 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				}
 				firstPoint = false;
 			}
-		}
+		} 
 		activeModel.fireTableDataChanged();
+	}
+	
+	private void setCommonPointList(){
+		Parameter param = pgp.getParameter();
+		Direction dir = pgp.getDirection();
+		commonPointList = NurbsSurfaceUtility.getPointsFromSelection(surface, param, dir, getSelectedPoints());
 	}
 
 	private void resetSelectedPointsComponent() {

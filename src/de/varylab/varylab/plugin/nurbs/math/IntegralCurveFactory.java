@@ -54,44 +54,7 @@ public class IntegralCurveFactory {
 		this.vectorFields = vectorFields2;
 	}
 
-	/**
-	 * 
-	 * @param p
-	 * @return a given direction if the surface is not a surface of revolution  </br>
-	 * else in the case of a surface of revolution:</br>
-	 * 1.case (gaussian curvature K >= 0):</br> 
-	 * a direction will be returned such that the conjugate direction appears with the same angle with respect to the rotation axis</br>
-	 *  <table>
-	 * <tr><td><td><td><td><td><td>l<td>m<td><td><td><td>-v1
-	 * <tr><td>(v1,<td>1)<td><td><td>*<td>m<td>n<td>*<td><td><td>1<td><td>= -l * v1^2 + n  = 0 <=> v1 = sqrt(n/l)
-	 * </table> 
-	 * </br>
-	 * 2.case (gaussian curvature K < 0):</br> 
-	 * an assymptotic direction will be returned
-	 */
-	
-//	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
-//		double[] dir = {1,1};
-//		if(!ns.isSurfaceOfRevolution()){
-//			return dir;
-//		}
-//		else{
-//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
-//			double[][] sF = ci.getSecondFundamental();
-//			double l = sF[0][0];
-//			double n = sF[1][1];
-//			double K = ci.getGaussCurvature();
-//			if(K >= 0){
-//				dir[0] = Math.sqrt(n / l);
-//				return dir;
-//				
-//			}
-//			else{
-//				return getAssymptoticDirection(ns, p);
-//				
-//			}
-//		}
-//	}
+
 	
 	public double[][] getShiftedBoundaryIntersectionPoints(double[] point1, double[] point2){
 		logger.info("GET SHIFTED");

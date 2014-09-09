@@ -329,7 +329,7 @@ public class IntegralCurvesPlugin
 			initializeIntegralCurvesFactory(surface);
 			
 			if(singularities == null) {
-				//							computeUmbilicalPoints();
+				//     computeUmbilicalPoints();
 			}
 			
 			commonPoints = pointSelectionPlugin.getCommonPointList();

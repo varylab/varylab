@@ -53,7 +53,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	@Override
 	public void pointDragged(final PointDragEvent e) {
 		p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-		updateAllCurves(curve, p, 1E-2);
+		updateAllCurves(curve, p, 1E-4);
 	}
 
 	@Override
