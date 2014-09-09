@@ -14,8 +14,9 @@ import de.varylab.varylab.ui.PrettyPrinter;
 
 public class DraggableCurvesModel extends ListSelectRemoveTableModel<DraggableIntegralNurbsCurves> {
 
-	public DraggableCurvesModel(String columnName, PrettyPrinter<DraggableIntegralNurbsCurves> printer) {
-		super(columnName, printer);
+	public DraggableCurvesModel(String columnName) {
+		super(columnName, null);
+		pp = new DCPrinter();
 		columnNames = new String[]{" ", columnName, " ", "VF", "PC"};
 	}
 
@@ -70,10 +71,15 @@ public class DraggableCurvesModel extends ListSelectRemoveTableModel<DraggableIn
     	}
     	if(col == 4) {
     		Parameter p = (Parameter) value;
-    		NurbsSurfaceConstraint constraint = list.get(row).getConstraint();
-    		if(constraint instanceof NurbsSurfaceDirectionConstraint) {
-    			((NurbsSurfaceDirectionConstraint) constraint).setParameterDirection(p);
+    		DraggableIntegralNurbsCurves dc = list.get(row);
+    		dc.setParameterDirection(p);
+    		if(dc.getCommonCurves() != null) {
+    			for(DraggableIntegralNurbsCurves c : dc.getCommonCurves()) {
+    				c.setParameterDirection(p);
+    				c.getConstraint().resetInitialUV();
+    			}
     		}
+
     	}
     	fireTableDataChanged();
     }
@@ -101,4 +107,14 @@ public class DraggableCurvesModel extends ListSelectRemoveTableModel<DraggableIn
 			return String.class;
 		}
 	}
+	
+	private class DCPrinter implements PrettyPrinter<DraggableIntegralNurbsCurves> {
+
+		@Override
+		public String toString(DraggableIntegralNurbsCurves t) {
+			return t.getName();
+		}
+		
+	}
+
 }

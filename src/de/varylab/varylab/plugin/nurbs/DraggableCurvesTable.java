@@ -111,9 +111,9 @@ public class DraggableCurvesTable extends ListSelectRemoveTable<DraggableIntegra
 	private class ParameterDirectionEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
 		private static final long serialVersionUID = 1L;
 		private final JButton
-			uButton = new JButton("u"),
-			vButton = new JButton("v"),
-			uvButton = new JButton("*");
+			uButton = new JButton(ImageHook.getIcon("arrow_leftright.png")),
+			vButton = new JButton(ImageHook.getIcon("arrow_updown.png")),
+			uvButton = new JButton(ImageHook.getIcon("arrow_updownleftright.png"));
 		private Parameter currentValue = null;
 		
 		public ParameterDirectionEditor() {
@@ -165,13 +165,13 @@ public class DraggableCurvesTable extends ListSelectRemoveTable<DraggableIntegra
 		@Override
 		protected void setValue(Object value) {
 			if(value == Parameter.U) {
-				setText("u");
+				setIcon(ImageHook.getIcon("arrow_leftright.png"));
 				setToolTipText("U");
 			} else if(value == Parameter.UV) {
-				setText("*");
+				setIcon(ImageHook.getIcon("arrow_updownleftright.png"));
 				setToolTipText("UV");
 			} else { // value == VectorFields.SECOND
-				setText("v");
+				setIcon(ImageHook.getIcon("arrow_updown.png"));
 				setToolTipText("V");
 			}
 		}

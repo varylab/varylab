@@ -20,6 +20,7 @@ import de.varylab.varylab.plugin.nurbs.plugin.CurveJob;
 
 public class DraggableIntegralCurveListener implements PointDragListener {
 	
+	@SuppressWarnings("unused")
 	private static Logger
 		logger = Logger.getLogger(DraggableIntegralCurveListener.class.getSimpleName());
 	

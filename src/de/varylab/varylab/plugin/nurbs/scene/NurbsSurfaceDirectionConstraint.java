@@ -30,5 +30,15 @@ public class NurbsSurfaceDirectionConstraint extends NurbsSurfaceConstraint {
 	public Parameter getParameterDirection() {
 		return parameterDirection;
 	}
+	
+	public void setInitialUV(double[] initialUV) {
+		this.initialUV = initialUV;
+	}
+
+	public void resetInitialUV() {
+		if(uv != null){
+			System.arraycopy(uv, 0, initialUV, 0, 2);
+		}
+	}
 
 }
