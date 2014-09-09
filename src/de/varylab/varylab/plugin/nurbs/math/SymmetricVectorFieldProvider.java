@@ -49,32 +49,35 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 	 * an assymptotic direction will be returned
 	 */
 	
-//	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
-//		double[] dir = {1,1};
-//		if(!surface.isSurfaceOfRevolution()){
-//			return dir;
-//		}
-//		else{
-//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(surface, p);
-//			double[][] sF = ci.getSecondFundamental();
-//			double l = sF[0][0];
-//			double n = sF[1][1];
-//			double K = ci.getGaussCurvature();
-//			if(K >= 0){
-//				dir[0] = Math.sqrt(n / l);
-//				return dir;
-//				
-//			}
-//			else{
-//				return getAssymptoticDirection(p);
-//				
-//			}
-//		}
-//	}
+	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
+		double[] dir = {1,1};
+		if(!surface.isSurfaceOfRevolution()){
+			return dir;
+		}
+		else{
+			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(surface, p);
+			double[][] sF = ci.getSecondFundamental();
+			double l = sF[0][0];
+			double n = sF[1][1];
+			double K = ci.getGaussCurvature();
+			if(K >= 0){
+				dir[0] = Math.sqrt(n / l);
+				return dir;
+				
+			}
+			else{
+				return getAssymptoticDirection(p);
+				
+			}
+		}
+	}
 	
 	
 	private double[] getSymConjDirWRTCuvatureDirection(double[] point) {
 		double[] dir = {1,1};
+		if(surface.isSurfaceOfRevolution()){
+			return getSymConjDirSurfaceOfRevolution(point);
+		}
 		CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(surface, point);
 		double[] w1 = ci.getPrincipalDirections()[0];
 		double[] w2 = ci.getPrincipalDirections()[1];
@@ -150,7 +153,7 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 	 * </br>
 	 * Let K be the gaussian curvature</br>
 	 * 1.case: assume n != 0 and set v1 = 1, then </br>
-	 * v2^2  + 2 * (m/n) * v2 + l/n = 0 <=> v2 = (-m + sqrt(m^2 - l * n)) / n = (-m + sqrt(-K)) / n
+	 * v2^2  + 2 * (m/n) * v2 + l/n = 0 <=> v2 = (-m + sqrt(m ^ 2 - l * n)) / n = (-m + sqrt(-K)) / n
 	 * @param ns
 	 * @param p
 	 * @return assymptotic direction at a point p
@@ -174,19 +177,32 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 			assymptotic[0] = 0;
 			assymptotic[1] = 1;
 		}
-		
 		return assymptotic;
 	}
 
 	private double[] getConj(double[] v, double[] p){
 		CurvatureInfo ci = NURBSCurvatureUtility.curvatureAndDirections(surface, p);
 		double[][] sF = ci.getSecondFundamental();
-		double[] b = new double[2];
-		b[0] = v[0] * sF[0][0] + v[1] * sF[0][1];
-		b[1] = v[0] * sF[1][0] + v[1] * sF[1][1];
-		double[] w = new double[2];
-		w[0] = -b[1];
-		w[1] = b[0];
-		return w;
+		double K = ci.getGaussCurvature();
+		if(!(surface.isSurfaceOfRevolution() && symDir == SymmetricDir.CURVATURE) && K > 0){
+			double[] b = new double[2];
+			b[0] = v[0] * sF[0][0] + v[1] * sF[0][1];
+			b[1] = v[0] * sF[1][0] + v[1] * sF[1][1];
+			double[] w = new double[2];
+			w[0] = -b[1];
+			w[1] = b[0];
+			return w;
+			/**
+			 *  We assume that symmetric direction w.r.t. curvature direction is chosen and the other
+			 *  asymptotic direction on a surface of revolution is a reflection at the 
+			 *  canonical axis in the domain
+			 */
+		} else {
+			double[] w = new double[2];
+			w[0] = v[0];
+			w[1] = -v[1];
+			return w;
+		}
+		
 	}
 }

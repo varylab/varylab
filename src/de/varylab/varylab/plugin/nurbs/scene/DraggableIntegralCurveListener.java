@@ -57,7 +57,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	@Override
 	public void pointDragged(final PointDragEvent e) {
 		p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-		updateAllCurves(curve, p, 1E-4);
+		updateAllCurves(curve, p, (1E-4)*Math.min(surface.getDomain().getURange(), surface.getDomain().getVRange()));
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		for (final DraggableIntegralNurbsCurves dc : cc) {
 			double[] otherStartUV = dc.getInitialUV().getPoint();
 			Rn.times(translation, curve.getSign() * dc.getSign(), translation);
-			double[] newCoords = Rn.add(null, otherStartUV, translation);
+			double[] newCoords = surface.getDomain().getPointInOriginalDomain(Rn.add(null, otherStartUV, translation));
 			jobs.add(createCurveJob(dc, surface.getSurfacePoint(newCoords), tol, linesToRemove, linesToAdd));
 		}
 		return jobs;

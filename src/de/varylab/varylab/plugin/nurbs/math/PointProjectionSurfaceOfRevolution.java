@@ -61,7 +61,7 @@ public class PointProjectionSurfaceOfRevolution {
 		if(m1 == null || m2 == null){
 			return false;
 		}
-		if(!Rn.equals(m1, m2, 0.0001)){
+		if(!Rn.equals(m1, m2, 0.00001)){
 			return false;
 		}
 		return true;
@@ -134,8 +134,8 @@ public class PointProjectionSurfaceOfRevolution {
 			double[][] p1 = new double[3][];
 			double[][] p2 = new double[3][];
 			for (int j = 0; j < 3; j++) {
-				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + 2 * j / 6. * (vn - v0)));
-				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + (2 * j + 1) / 6. * (vn - v0)));
+				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + 2 * j / 5.6123 * (vn - v0)));
+				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u, v0 + (2 * j + 1) / 5.6123 * (vn - v0)));
 			}
 			if(!isCircle(p1, p2)){
 				return false;
@@ -181,8 +181,8 @@ public class PointProjectionSurfaceOfRevolution {
 			double[][] p1 = new double[3][];
 			double[][] p2 = new double[3][];
 			for (int j = 0; j < 3; j++) {
-				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u0 + 2 * j / 5. * (um - u0), v));
-				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u0 + (2 * j + 1) / 5. * (um - u0), v));
+				p1[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u0 + 2 * j / 5.6123 * (um - u0), v));
+				p2[j] = MathUtility.get3DPoint(ns.getSurfacePoint(u0 + (2 * j + 1) / 5.6123 * (um - u0), v));
 				}
 				if(!isCircle(p1, p2)){
 					return false;
@@ -229,7 +229,7 @@ public class PointProjectionSurfaceOfRevolution {
 	 * @param ns NURBSSurface
 	 * @return the rotation axis if the NURBSSurface is a surface of revolution else null
 	 */
-	public static double[][] getRotationAxis(NURBSSurface ns){
+	private static double[][] getRotationAxis(NURBSSurface ns){
 		double[] U = ns.getUKnotVector();
 		double[] V = ns.getVKnotVector();
 		double u0 = U[0];

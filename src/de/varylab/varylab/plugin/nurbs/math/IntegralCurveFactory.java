@@ -63,7 +63,7 @@ public class IntegralCurveFactory {
 		int[] domain2 = domain.getModDomain(point2);
 		double[][] seg = new double[2][2];
 		if(domain1[0] > domain2[0]){ // left
-			double Shift =  domain.uRange();
+			double Shift =  domain.getURange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][0] = seg[1][0] - Shift;
@@ -92,7 +92,7 @@ public class IntegralCurveFactory {
 			intersectionPoints[1] = leftIntersection;
 			logger.info("right");
 		}else if(domain1[1] > domain2[1]){ // lower
-			double Shift =  domain.vRange();
+			double Shift =  domain.getVRange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][1] = seg[1][1] - Shift;
@@ -107,7 +107,7 @@ public class IntegralCurveFactory {
 			logger.info("lower");
 		}
 		else{ // upper
-			double Shift =  domain.vRange();
+			double Shift =  domain.getVRange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][1] = seg[1][1] + Shift;
@@ -296,8 +296,8 @@ public class IntegralCurveFactory {
 		int counter = 0;
 		double[] initialValue = startPoint.clone();
 		LinkedList<double[]> pointList = new LinkedList<double[]>();
-		double h = Math.max(domain.uRange(), domain.vRange()) / 100;
-		double maxDist = Math.min(domain.uRange(), domain.vRange()) / 40;
+		double h = Math.max(domain.getURange(), domain.getVRange()) / 100;
+		double maxDist = Math.min(domain.getURange(), domain.getVRange()) / 40;
 		double [] vec1 = new double[2];
 		double [] vec2 = new double[2];
 		boolean closed = false;
@@ -416,8 +416,8 @@ public class IntegralCurveFactory {
 		int counter = 0;
 		double[] initialValue = startPoint.clone();
 		LinkedList<double[]> pointList = new LinkedList<double[]>();
-		double h = Math.max(domain.uRange(), domain.vRange()) / 100;
-		double maxDist = Math.min(domain.uRange(), domain.vRange()) / 40;
+		double h = Math.max(domain.getURange(), domain.getVRange()) / 100;
+		double maxDist = Math.min(domain.getURange(), domain.getVRange()) / 40;
 		double [] vec1 = new double[2];
 		double [] vec2 = new double[2];
 		boolean closed = false;

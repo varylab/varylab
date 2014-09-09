@@ -479,6 +479,7 @@ public class IntegralCurvesPlugin
 		
 		double tol = tolExpModel.getNumber().doubleValue();
 		tol = Math.pow(10, tol);
+		tol *= Math.min(surface.getDomain().getURange(), surface.getDomain().getVRange());
 		ic.setTol(tol);
 
 		

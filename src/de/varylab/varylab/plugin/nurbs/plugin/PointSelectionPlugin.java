@@ -405,6 +405,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 				selectedPointsComponent.addChild(createPointComponent(pt));
 			}
 			firePointSelected(tool.getSelectedPoint());
+			setCommonPointList();
 		} else if(source == showBox) {
 			selectedPointsComponent.setVisible(showBox.isSelected());
 		} else if(source == checkButton) {

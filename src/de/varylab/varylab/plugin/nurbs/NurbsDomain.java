@@ -464,7 +464,7 @@ public class NurbsDomain {
 		}
 	}
 
-	public double uRange() {
+	public double getURange() {
 		return uMax-uMin;
 	}
 
@@ -484,7 +484,7 @@ public class NurbsDomain {
 		return vMax;
 	}
 
-	public double vRange() {
+	public double getVRange() {
 		return vMax-vMin;
 	}
 
