@@ -695,6 +695,9 @@ public class IntegralCurvesPlugin
 			public void run() {
 				integralCurvesRoot.retain(curvesModel.getList());
 				curvesTable.adjustColumnSizes();
+				for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+					integralCurvesRoot.setVisible(dc,curvesModel.isChecked(dc));
+				}
 			}
 		};
 		EventQueue.invokeLater(runnable);
