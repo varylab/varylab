@@ -69,6 +69,7 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.math.ConstructionTools;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 
@@ -233,6 +234,8 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
+					System.out.println(surface.toString());
+					surface = ConstructionTools.constructNGon(5);
 					logger.info("surface to String");
 					logger.info(surface.toString());
 					logger.info("surface to obj");

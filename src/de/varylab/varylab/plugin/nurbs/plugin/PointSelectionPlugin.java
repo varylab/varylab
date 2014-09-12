@@ -114,7 +114,7 @@ public class PointSelectionPlugin extends ShrinkPanelPlugin implements HalfedgeL
 		selectedPointsPane.setPreferredSize(new Dimension(100, 150));
 //		panel.setMinimumSize(new Dimension(250, 200));
 		panel.setLayout(new GridBagLayout());
-		panel.setPreferredSize(new Dimension(150,150));
+//		panel.setPreferredSize(new Dimension(150,150));
 		panel.add(selectedPointsPane);
 		
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
