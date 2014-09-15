@@ -28,6 +28,7 @@ import de.varylab.varylab.plugin.nurbs.adapter.NurbsWeightAdapter;
 import de.varylab.varylab.plugin.nurbs.algorithm.ComputeVectorFields;
 import de.varylab.varylab.plugin.nurbs.algorithm.ExtractControlMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.LinearDeformation;
+import de.varylab.varylab.plugin.nurbs.algorithm.NgonNurbsGenerator;
 import de.varylab.varylab.plugin.nurbs.algorithm.NurbsSurfaceFromMesh;
 import de.varylab.varylab.plugin.nurbs.algorithm.ProjectToNurbsSurface;
 import de.varylab.varylab.plugin.nurbs.algorithm.SplitAtEdge;
@@ -78,6 +79,7 @@ public class NurbsManagerPlugin extends Plugin implements HalfedgeListener {
 		c.getPlugin(SplitAtEdge.class);
 		c.getPlugin(StretchXYZ.class);
 		c.getPlugin(LinearDeformation.class);
+		c.getPlugin(NgonNurbsGenerator.class);
 		
 		c.getPlugin(JobMonitorPlugin.class);
 	}

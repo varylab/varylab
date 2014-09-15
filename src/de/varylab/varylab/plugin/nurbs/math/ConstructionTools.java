@@ -76,7 +76,7 @@ public class ConstructionTools {
 		xyzw[0] = xy[0];
 		xyzw[1] = xy[1];
 		xyzw[2] = z;
-		xyzw[3] = Math.sqrt(1.5);
+		xyzw[3] = 1.2;
 		return xyzw;
 	}
 	
@@ -100,7 +100,7 @@ public class ConstructionTools {
 	
 	public static NURBSSurface constructNGon(int n){
 		double[][][] controlMesh = new double[2 * n + 1][3][4];
-		double[] summit = {0.,0.,0.3,1.};
+		double[] summit = {0.,0.,0.3,1.2};
 		double[][] vertsXY = getNGonVertsXY(n);
 		for (int i = 0; i < vertsXY.length; i++) {
 			controlMesh[i][0] = getPointXYZW(vertsXY[i], 0.);
