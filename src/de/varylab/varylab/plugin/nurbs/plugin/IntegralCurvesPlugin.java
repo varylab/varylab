@@ -103,8 +103,8 @@ public class IntegralCurvesPlugin
 	private static Logger logger = Logger.getLogger(IntegralCurvesPlugin.class.getSimpleName());
 	
 	private SpinnerNumberModel
-		tolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
-		interactiveTolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
+		tolExpModel = new SpinnerNumberModel(-4, -30, 0, 1),
+		interactiveTolExpModel = new SpinnerNumberModel(-4, -30, 0, 1),
 		nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 		vecFieldModel = new SpinnerNumberModel(10, 0, 180, 1),
 		beginLineModel = new SpinnerNumberModel(0, 0, 4000, 1),
