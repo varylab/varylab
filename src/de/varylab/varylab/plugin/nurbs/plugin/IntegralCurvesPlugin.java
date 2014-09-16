@@ -1,11 +1,14 @@
 package de.varylab.varylab.plugin.nurbs.plugin;
 
+import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
+import static de.jreality.shader.CommonAttributes.POINT_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -23,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -91,7 +95,6 @@ import de.varylab.varylab.plugin.nurbs.scene.DraggableIntegralCurveListener;
 import de.varylab.varylab.plugin.nurbs.scene.DraggableIntegralNurbsCurves;
 import de.varylab.varylab.plugin.nurbs.scene.ListSceneGraphComponent;
 import de.varylab.varylab.plugin.nurbs.scene.NurbsSurfaceDirectionConstraint;
-import de.varylab.varylab.ui.PrettyPrinter;
 
 public class IntegralCurvesPlugin 
 		extends ShrinkPanelPlugin 
@@ -101,6 +104,7 @@ public class IntegralCurvesPlugin
 	
 	private SpinnerNumberModel
 		tolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
+		interactiveTolExpModel = new SpinnerNumberModel(-4, -30.0, 0, 1),
 		nearUmbilicModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 		vecFieldModel = new SpinnerNumberModel(10, 0, 180, 1),
 		beginLineModel = new SpinnerNumberModel(0, 0, 4000, 1),
@@ -108,6 +112,7 @@ public class IntegralCurvesPlugin
 	
 	private JSpinner
 		tolSpinner = new JSpinner(tolExpModel),
+		interactiveTolSpinner = new JSpinner(interactiveTolExpModel),
 		nearUmbilicSpinner = new JSpinner(nearUmbilicModel),
 		vecFieldSpinner = new JSpinner(vecFieldModel),
 		beginLineSpinner = new JSpinner(beginLineModel),
@@ -136,7 +141,7 @@ public class IntegralCurvesPlugin
 		curveIndex = 5;
 	
 	private DraggableCurvesModel
-		curvesModel = new DraggableCurvesModel("Curves", new DCPrinter());
+		curvesModel = new DraggableCurvesModel("Curves");
 	
 	private DraggableCurvesTable 
 		curvesTable = new DraggableCurvesTable(curvesModel);
@@ -278,23 +283,33 @@ public class IntegralCurvesPlugin
 		vecFieldSpinner.setEnabled(true);
 		vecFieldSpinner.addChangeListener(this);
 		lc.gridwidth = 2;
-		integratorParametersPanel.add(new JLabel("Runge-Kutta Tolerance Exp"), lc);
+		integratorParametersPanel.add(new JLabel("Precision"), lc);
 		lc.gridwidth = 1;
 		integratorParametersPanel.add(tolSpinner, rc);
 		lc.gridwidth = 2;
-		integratorParametersPanel.add(new JLabel("Singularity Neighbourhood Exp"), lc);
+		integratorParametersPanel.add(new JLabel("-interactive-"), lc);
+		lc.gridwidth = 1;
+		integratorParametersPanel.add(interactiveTolSpinner, rc);
+		lc.gridwidth = 2;
+		integratorParametersPanel.add(new JLabel("Singularity Exp"), lc);
 		lc.gridwidth = 1;
 		integratorParametersPanel.add(nearUmbilicSpinner, rc);
+		interactiveTolExpModel.addChangeListener(this);
+		tolExpModel.addChangeListener(this);
 	}
 
 	private List<DraggableIntegralNurbsCurves> setCommonCurves(DraggableIntegralNurbsCurves curve){
 		if(curve.getCommonCurves() == null){
+			Random rnd = new Random();
+			Color color = Color.getHSBColor(rnd.nextFloat(),1.0f,1.0f);
+			curve.getAppearance().setAttribute(POINT_SHADER+"."+DIFFUSE_COLOR, color);
 			List<DraggableIntegralNurbsCurves> commonCurves = new LinkedList<>();
 			List<SignedUV> commonPoints = getCommonPoints(curve);
 			for (DraggableIntegralNurbsCurves dc : currentCurves) {
 				dc.setSign(dc.getInitialUV().getSign());
 				if(commonPoints.contains(dc.getInitialUV())){
 					commonCurves.add(dc);
+					dc.getAppearance().setAttribute(POINT_SHADER+"."+DIFFUSE_COLOR, color);
 				}		
 			}
 			curve.setCommonCurves(commonCurves);
@@ -329,7 +344,7 @@ public class IntegralCurvesPlugin
 			initializeIntegralCurvesFactory(surface);
 			
 			if(singularities == null) {
-				//							computeUmbilicalPoints();
+				//     computeUmbilicalPoints();
 			}
 			
 			commonPoints = pointSelectionPlugin.getCommonPointList();
@@ -431,7 +446,7 @@ public class IntegralCurvesPlugin
 				
 				@Override
 				protected void executeJob() throws Exception {
-					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp);
+					DraggableIntegralNurbsCurves dc = new DraggableIntegralNurbsCurves(surface, ic, sp, Math.pow(10, interactiveTolExpModel.getNumber().doubleValue()));
 					dc.setConstraint(new NurbsSurfaceDirectionConstraint(surface, sp.getPoint(), pointSelectionPlugin.getParameter()));
 					DraggableIntegralCurveListener listener = new DraggableIntegralCurveListener(surface,dc,jobQueuePlugin);
 					dc.addPointDragListener(listener);
@@ -472,6 +487,7 @@ public class IntegralCurvesPlugin
 		
 		double tol = tolExpModel.getNumber().doubleValue();
 		tol = Math.pow(10, tol);
+		tol *= Math.min(surface.getDomain().getURange(), surface.getDomain().getVRange());
 		ic.setTol(tol);
 
 		
@@ -550,7 +566,7 @@ public class IntegralCurvesPlugin
 	public void dataChanged(HalfedgeLayer layer) {
 		if(startup) {
 			layer.addTemporaryGeometry(integralCurvesRoot.getComponent());
-			logger.severe("adding integral curves root to temporary geometry");
+//			logger.severe("adding integral curves root to temporary geometry");
 		}
 		startup = false;
 //		if(curvesModel == null) {
@@ -558,7 +574,7 @@ public class IntegralCurvesPlugin
 				curvesModel = layers2models.get(layer);
 				curvesModel.clear();
 			} else {
-				curvesModel = new DraggableCurvesModel("Curves", new DCPrinter());
+				curvesModel = new DraggableCurvesModel("Curves");
 				curvesModel.addTableModelListener(this);
 				layers2models.put(layer,curvesModel);
 			}
@@ -600,7 +616,7 @@ public class IntegralCurvesPlugin
 	@Override
 	public void layerCreated(HalfedgeLayer layer) {
 		if(!layers2models.containsKey(layer)) {
-			DraggableCurvesModel newModel = new DraggableCurvesModel("Curves", new DCPrinter());
+			DraggableCurvesModel newModel = new DraggableCurvesModel("Curves");
 			curvesTable.setModel(newModel);
 			newModel.addTableModelListener(this);
 			layers2models.put(layer,newModel);
@@ -679,18 +695,12 @@ public class IntegralCurvesPlugin
 			public void run() {
 				integralCurvesRoot.retain(curvesModel.getList());
 				curvesTable.adjustColumnSizes();
+				for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+					integralCurvesRoot.setVisible(dc,curvesModel.isChecked(dc));
+				}
 			}
 		};
 		EventQueue.invokeLater(runnable);
-	}
-
-	private class DCPrinter implements PrettyPrinter<DraggableIntegralNurbsCurves> {
-
-		@Override
-		public String toString(DraggableIntegralNurbsCurves t) {
-			return t.getName();
-		}
-		
 	}
 
 	@Override
@@ -721,7 +731,20 @@ public class IntegralCurvesPlugin
 	public void stateChanged(ChangeEvent e) {
 		if(e.getSource() == vecFieldSpinner) {
 			updateVectorfields();
+		} else if(e.getSource() == interactiveTolExpModel) {
+			for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+				double tol = Math.pow(10.0, interactiveTolExpModel.getNumber().doubleValue());
+				tol *= Math.min(nManager.getActiveNurbsSurface().getDomain().getURange(),nManager.getActiveNurbsSurface().getDomain().getVRange());
+				dc.setInteractiveTol(tol);
+			}
+		} else if(e.getSource() == tolExpModel) {
+			for(DraggableIntegralNurbsCurves dc : curvesModel.getList()) {
+				double tol = Math.pow(10.0, tolExpModel.getNumber().doubleValue());
+				tol *= Math.min(nManager.getActiveNurbsSurface().getDomain().getURange(),nManager.getActiveNurbsSurface().getDomain().getVRange());
+				dc.setTol(tol);
+			}
 		}
+		
 	}
 
 	private void updateIntegralCurvesRoot(final List<DraggableIntegralNurbsCurves> toRemove, final List<DraggableIntegralNurbsCurves> toAdd) {
@@ -755,7 +778,6 @@ public class IntegralCurvesPlugin
 	}
 	
 	private void setCurveIndices(Collection<PolygonalLine> lines) {
-		logger.warning("CurveIndex:" + curveIndex);
 		for(PolygonalLine l : lines) {
 			l.setCurveIndex(curveIndex++);
 		}
@@ -823,6 +845,8 @@ public class IntegralCurvesPlugin
 		c.storeProperty(getClass(), "curves", curveCombo.getSelectedItem());
 		c.storeProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem());
 		c.storeProperty(getClass(), "immediateCurveCalculation", immediateCalculationBox.isSelected());
+		c.storeProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().intValue());
+		c.storeProperty(getClass(), "tol", tolExpModel.getNumber().intValue());
 	}
 	
 	@Override
@@ -831,6 +855,8 @@ public class IntegralCurvesPlugin
 		curveCombo.setSelectedItem(c.getProperty(getClass(), "curves", curveCombo.getSelectedItem()));
 		symmetryCombo.setSelectedItem(c.getProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem()));
 		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
+		interactiveTolExpModel.setValue(c.getProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().intValue()));
+		tolExpModel.setValue(c.getProperty(getClass(), "tol", tolExpModel.getNumber().intValue()));
 	}
 
 	@Override

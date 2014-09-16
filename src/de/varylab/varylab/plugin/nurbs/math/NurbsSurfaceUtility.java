@@ -155,7 +155,7 @@ public class NurbsSurfaceUtility {
 	
 	
 	
-	public static LinkedList<LinkedList<SignedUV>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, LinkedList<double[]> selPoints, double dist, int numberOfPoints){
+	public static LinkedList<LinkedList<SignedUV>> getCommonPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, List<double[]> selPoints, double dist, int numberOfPoints){
 		LinkedList<LinkedList<SignedUV>> commonPointList = new LinkedList<>();
 		LinkedList<SignedUV> selPointsSigned = new LinkedList<>();
 		for (double[] selPoint : selPoints) {
@@ -200,6 +200,17 @@ public class NurbsSurfaceUtility {
 			commonPointList.add(commonPoints);
 		}
 		return commonPointList;
+	}
+	
+	public static LinkedList<LinkedList<SignedUV>> getPointsFromSelection(NURBSSurface ns, Parameter param, Direction dir, List<double[]> selPoints){
+		LinkedList<LinkedList<SignedUV>> pointList = new LinkedList<>();
+		for (double[] selPoint : selPoints) {
+			LinkedList<SignedUV> singlePointList = new LinkedList<>();
+			SignedUV signedPoint = new SignedUV(selPoint, 1.0);			
+			singlePointList.add(signedPoint);
+			pointList.add(singlePointList);
+		}
+		return pointList;
 	}
 	
 	public static LinkedList<double[]> getPointsFromDistList(NURBSSurface ns, boolean uDir, boolean  vDir, boolean up, boolean down, 

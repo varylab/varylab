@@ -354,38 +354,12 @@ public class NurbsIO {
 			ns.setUKnotVector(U);
 			ns.setVKnotVector(V);
 			
-//			NURBSSurface[] split1 = ns.splitAtKnot1(false, -0.0);
-//			ns = split1[1];
-//			NURBSSurface[] split2 = ns.splitAtKnot1(false, 573.4675668352676);
-//			ns = split2[0];
-			
-			
-			//debugg not clamped test
-			// for v = {0,0,1,2,3,3}
-//			NURBSSurface[] split1 = ns.splitAtKnot1(false, 1.0);
-//			ns = split1[1];
-//			NURBSSurface[] split2 = ns.splitAtKnot1(true, 2.0);
-//			ns = split2[0];
-			
-			// for U = {0,0,2,3,4,4}
-//			NURBSSurface[] split1 = ns.splitAtKnot(true, 2.0);
-//			ns = split1[1];
-//			NURBSSurface[] split2 = ns.splitAtKnot(true, 3.0);
-//			ns = split2[0];
-			//end
-			
-			
 			if(!ns.hasClampedKnotVectors()){
 				logger.info("NOT CLAMPED");
 				ns.repairKnotVectors();
 			}
 			ns.setRevolutionDir();
 			
-//			System.out.println("gelesene NURBS flaeche");
-//			System.out.println(ns.toString());
-//			System.out.println("end");
-
-
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {

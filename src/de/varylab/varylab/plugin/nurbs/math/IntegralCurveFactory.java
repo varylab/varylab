@@ -54,44 +54,7 @@ public class IntegralCurveFactory {
 		this.vectorFields = vectorFields2;
 	}
 
-	/**
-	 * 
-	 * @param p
-	 * @return a given direction if the surface is not a surface of revolution  </br>
-	 * else in the case of a surface of revolution:</br>
-	 * 1.case (gaussian curvature K >= 0):</br> 
-	 * a direction will be returned such that the conjugate direction appears with the same angle with respect to the rotation axis</br>
-	 *  <table>
-	 * <tr><td><td><td><td><td><td>l<td>m<td><td><td><td>-v1
-	 * <tr><td>(v1,<td>1)<td><td><td>*<td>m<td>n<td>*<td><td><td>1<td><td>= -l * v1^2 + n  = 0 <=> v1 = sqrt(n/l)
-	 * </table> 
-	 * </br>
-	 * 2.case (gaussian curvature K < 0):</br> 
-	 * an assymptotic direction will be returned
-	 */
-	
-//	private double[] getSymConjDirSurfaceOfRevolution(double[] p) {
-//		double[] dir = {1,1};
-//		if(!ns.isSurfaceOfRevolution()){
-//			return dir;
-//		}
-//		else{
-//			CurvatureInfo ci =  NURBSCurvatureUtility.curvatureAndDirections(ns, p);
-//			double[][] sF = ci.getSecondFundamental();
-//			double l = sF[0][0];
-//			double n = sF[1][1];
-//			double K = ci.getGaussCurvature();
-//			if(K >= 0){
-//				dir[0] = Math.sqrt(n / l);
-//				return dir;
-//				
-//			}
-//			else{
-//				return getAssymptoticDirection(ns, p);
-//				
-//			}
-//		}
-//	}
+
 	
 	public double[][] getShiftedBoundaryIntersectionPoints(double[] point1, double[] point2){
 		logger.info("GET SHIFTED");
@@ -100,7 +63,7 @@ public class IntegralCurveFactory {
 		int[] domain2 = domain.getModDomain(point2);
 		double[][] seg = new double[2][2];
 		if(domain1[0] > domain2[0]){ // left
-			double Shift =  domain.uRange();
+			double Shift =  domain.getURange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][0] = seg[1][0] - Shift;
@@ -129,7 +92,7 @@ public class IntegralCurveFactory {
 			intersectionPoints[1] = leftIntersection;
 			logger.info("right");
 		}else if(domain1[1] > domain2[1]){ // lower
-			double Shift =  domain.vRange();
+			double Shift =  domain.getVRange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][1] = seg[1][1] - Shift;
@@ -144,7 +107,7 @@ public class IntegralCurveFactory {
 			logger.info("lower");
 		}
 		else{ // upper
-			double Shift =  domain.vRange();
+			double Shift =  domain.getVRange();
 			seg[0] = domain.getPointInOriginalDomain(point1);
 			seg[1] = domain.getPointInOriginalDomain(point2);
 			seg[1][1] = seg[1][1] + Shift;
@@ -333,8 +296,8 @@ public class IntegralCurveFactory {
 		int counter = 0;
 		double[] initialValue = startPoint.clone();
 		LinkedList<double[]> pointList = new LinkedList<double[]>();
-		double h = Math.max(domain.uRange(), domain.vRange()) / 100;
-		double maxDist = Math.min(domain.uRange(), domain.vRange()) / 40;
+		double h = Math.max(domain.getURange(), domain.getVRange()) / 100;
+		double maxDist = Math.min(domain.getURange(), domain.getVRange()) / 40;
 		double [] vec1 = new double[2];
 		double [] vec2 = new double[2];
 		boolean closed = false;
@@ -453,8 +416,8 @@ public class IntegralCurveFactory {
 		int counter = 0;
 		double[] initialValue = startPoint.clone();
 		LinkedList<double[]> pointList = new LinkedList<double[]>();
-		double h = Math.max(domain.uRange(), domain.vRange()) / 100;
-		double maxDist = Math.min(domain.uRange(), domain.vRange()) / 40;
+		double h = Math.max(domain.getURange(), domain.getVRange()) / 100;
+		double maxDist = Math.min(domain.getURange(), domain.getVRange()) / 40;
 		double [] vec1 = new double[2];
 		double [] vec2 = new double[2];
 		boolean closed = false;

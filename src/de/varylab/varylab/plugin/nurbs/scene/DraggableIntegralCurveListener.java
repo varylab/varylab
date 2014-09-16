@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.jreality.plugin.job.AbstractJob;
@@ -18,6 +19,10 @@ import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.plugin.nurbs.plugin.CurveJob;
 
 public class DraggableIntegralCurveListener implements PointDragListener {
+	
+	@SuppressWarnings("unused")
+	private static Logger
+		logger = Logger.getLogger(DraggableIntegralCurveListener.class.getSimpleName());
 	
 	private double[] 
 		p = null;
@@ -33,16 +38,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	private DraggableIntegralNurbsCurves
 		curve = null;
 
-	private double startTol;
-	
-
 	private JobQueuePlugin jobQueuePlugin = null;
 	
 	public DraggableIntegralCurveListener(NURBSSurface surface, DraggableIntegralNurbsCurves curve, JobQueuePlugin queue) {
 		this.surface = surface;
 		this.curve = curve;
 		jobQueuePlugin = queue;
-		startTol = curve.getTol();
 	}
 	
 
@@ -53,12 +54,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 	@Override
 	public void pointDragged(final PointDragEvent e) {
 		p = new double[]{e.getX(), e.getY(), e.getZ(), 1.0};
-		updateAllCurves(curve, p, 1E-2);
+		updateAllCurves(curve, p, curve.getInteractiveTol());
 	}
 
 	@Override
 	public void pointDragEnd(PointDragEvent e) {
-		updateAllCurves(curve, p, startTol);
+		updateAllCurves(curve, p, curve.getTol());
 		
 		AbstractJob updateJob = new AbstractJob() {
 			@Override
@@ -158,7 +159,7 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 		for (final DraggableIntegralNurbsCurves dc : cc) {
 			double[] otherStartUV = dc.getInitialUV().getPoint();
 			Rn.times(translation, curve.getSign() * dc.getSign(), translation);
-			double[] newCoords = Rn.add(null, otherStartUV, translation);
+			double[] newCoords = surface.getDomain().getPointInOriginalDomain(Rn.add(null, otherStartUV, translation));
 			jobs.add(createCurveJob(dc, surface.getSurfacePoint(newCoords), tol, linesToRemove, linesToAdd));
 		}
 		return jobs;
@@ -175,10 +176,12 @@ public class DraggableIntegralCurveListener implements PointDragListener {
 			@Override
 			protected void executeJob() throws Exception {
 				synchronized (curve) {
+					double oldTol = curve.getTol();
 					curve.setTol(tol);
 					linesToRemove.addAll(curve.getPolygonalLines());
 					curve.recomputeCurves(p);
 					linesToAdd.addAll(curve.getPolygonalLines());
+					curve.setTol(oldTol);
 				}
 			}
 		};

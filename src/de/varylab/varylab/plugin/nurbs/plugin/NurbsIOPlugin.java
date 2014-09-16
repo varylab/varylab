@@ -69,6 +69,7 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
+import de.varylab.varylab.plugin.nurbs.math.ConstructionTools;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 
@@ -95,14 +96,18 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 	private SpinnerNumberModel
 		uModel = new SpinnerNumberModel(10, 0, 100, 5),
 		vModel = new SpinnerNumberModel(10, 0, 100, 5);
+		
+	private JCheckBox
+		nGonCheckBox = new JCheckBox("create n-gon");
 	
 	private JSpinner
 		uSpinner = new JSpinner(uModel),
 		vSpinner = new JSpinner(vModel);
 	
+	
 	private JCheckBox
-		controlMeshBox = new JCheckBox("Control mesh"),
-		umbillicsCheckBox = new JCheckBox("Umbillic points");
+		controlMeshBox = new JCheckBox("Control mesh");
+//		umbillicsCheckBox = new JCheckBox("Umbillic points");
 	private ShrinkPanel
 		infoPanel = new ShrinkPanel("Mesh parameters");
 	
@@ -120,6 +125,9 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = 1;
 		
+		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+		GridBagConstraints rc = LayoutFactory.createRightConstraint();
+		
 		configureFileChooser();
 		importButton.setToolTipText("Load Nurbs surface");
 		
@@ -129,6 +137,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		shrinkPanel.add(exportButton,c);
 		exportButton.setEnabled(false);
+		
 
 		uModel.setMinimum(2);
 		vModel.setMinimum(2);
@@ -149,10 +158,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		
 		controlMeshBox.addActionListener(this);
 		controlMeshBox.setSelected(false);
-		umbillicsCheckBox.addActionListener(this);
-		umbillicsCheckBox.setSelected(false);
+//		umbillicsCheckBox.addActionListener(this);
+//		umbillicsCheckBox.setSelected(false);
 		infoPanel.add(controlMeshBox,c);
-		infoPanel.add(umbillicsCheckBox,c);
+//		infoPanel.add(umbillicsCheckBox,c);
 		
 		infoPanel.setShrinked(true);
 		shrinkPanel.add(infoPanel,c);
@@ -233,6 +242,8 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 			try {
 				if (file.getName().toLowerCase().endsWith(".obj")) {
 					NURBSSurface surface = NurbsIO.readNURBS(new FileReader(file));
+//					System.out.println(surface.toString());
+					
 					logger.info("surface to String");
 					logger.info(surface.toString());
 					logger.info("surface to obj");
@@ -540,9 +551,10 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		Object source = e.getSource();
 		if(source == controlMeshBox) {
 			controlMeshComponent.setVisible(controlMeshBox.isSelected());
-		} else if (source == umbillicsCheckBox) {
-			umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
-		}
+		}  
+//		else if (source == umbillicsCheckBox) {
+//			umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
+//		}
 	}
 
 	private void updateUmbillicsComponent() {
@@ -559,7 +571,7 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		psf.update();
 		umbillicsComponent.setGeometry(psf.getGeometry());
 		hif.getActiveLayer().addTemporaryGeometry(umbillicsComponent);
-		umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
+//		umbillicsComponent.setVisible(umbillicsCheckBox.isSelected());
 	}
 	
 }

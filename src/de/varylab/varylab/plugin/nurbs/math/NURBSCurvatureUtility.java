@@ -251,21 +251,18 @@ public class NURBSCurvatureUtility {
 				Rn.times(null, w[0][1], SKL[0][1]));
 		Rn.add(e[1], Rn.times(null, w[1][0], SKL[1][0]),
 				Rn.times(null, w[1][1], SKL[0][1]));
-		// the w's are the coefficients of the normalized curvature directions
-		// in the basis Su, Sv
+		
+		/**
+		 *  the w's are the coefficients of the normalized curvature directions
+		 *   in the basis Su, Sv
+		 */
+		
 		Rn.times(w[0], 1 / Math.sqrt(Rn.innerProduct(e[0], e[0])), w[0]);
 		Rn.times(w[1], 1 / Math.sqrt(Rn.innerProduct(e[1], e[1])), w[1]);
 		if(!isPosOriented(w[0], w[1])){
 			Rn.times(w[0], -1, w[0]);
 			Rn.times(e[0], -1, e[0]);
 		 }
-	
-//		if(w[0][0] * w[1][1] - w[1][0] * w[0][1] < 0){
-////			System.out.println("flip to orientation");
-//			Rn.times(w[0], -1, w[0]);
-//			Rn.times(e[0], -1, e[0]);
-//		}
-
 		dG.setPrincipalDirections(w);
 		Rn.normalize(e[0], e[0]);
 		Rn.normalize(e[1], e[1]);
