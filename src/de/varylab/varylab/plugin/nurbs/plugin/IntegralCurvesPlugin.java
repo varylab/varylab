@@ -855,7 +855,7 @@ public class IntegralCurvesPlugin
 		curveCombo.setSelectedItem(c.getProperty(getClass(), "curves", curveCombo.getSelectedItem()));
 		symmetryCombo.setSelectedItem(c.getProperty(getClass(), "symmetry", symmetryCombo.getSelectedItem()));
 		immediateCalculationBox.setSelected(c.getProperty(getClass(),"immediateCurveCalculation",immediateCalculationBox.isSelected()));
-		interactiveTolExpModel.setValue(c.getProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().doubleValue()));
+		interactiveTolExpModel.setValue(c.getProperty(getClass(), "interactiveTol", interactiveTolExpModel.getNumber().intValue()));
 		tolExpModel.setValue(c.getProperty(getClass(), "tol", tolExpModel.getNumber().intValue()));
 	}
 
