@@ -69,7 +69,6 @@ import de.varylab.varylab.plugin.io.NurbsIO;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface.ClosingDir;
 import de.varylab.varylab.plugin.nurbs.adapter.NurbsUVAdapter;
-import de.varylab.varylab.plugin.nurbs.math.ConstructionTools;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.utilities.OpenNurbsUtility;
 
@@ -97,9 +96,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		uModel = new SpinnerNumberModel(10, 0, 100, 5),
 		vModel = new SpinnerNumberModel(10, 0, 100, 5);
 		
-	private JCheckBox
-		nGonCheckBox = new JCheckBox("create n-gon");
-	
 	private JSpinner
 		uSpinner = new JSpinner(uModel),
 		vSpinner = new JSpinner(vModel);
@@ -124,9 +120,6 @@ public class NurbsIOPlugin extends ShrinkPanelPlugin implements HalfedgeListener
 		c.weightx = 1.0;
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = 1;
-		
-		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
-		GridBagConstraints rc = LayoutFactory.createRightConstraint();
 		
 		configureFileChooser();
 		importButton.setToolTipText("Load Nurbs surface");
