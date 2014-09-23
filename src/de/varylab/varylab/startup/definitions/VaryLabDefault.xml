@@ -1046,7 +1046,12 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:lineLabelColor</string>
-    <awt-color reference="../../entry[89]/awt-color"/>
+    <awt-color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+      <alpha>255</alpha>
+    </awt-color>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentTools:pickVertices</string>
@@ -1186,7 +1191,12 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:pointLabelColor</string>
-    <awt-color reference="../../entry[89]/awt-color"/>
+    <awt-color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+      <alpha>255</alpha>
+    </awt-color>
   </entry>
   <entry>
     <string>de.jtem.halfedgetools.plugin.HalfedgeInterface:initPosition</string>
