@@ -70,6 +70,6 @@
 	<classpathentry kind="lib" path="lib/itext/itext-xtra-5.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/itext/itextpdf-5.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/jython_console.jar"/>
-	<classpathentry kind="lib" path="lib/jreality/jython-standalone-2.5.4-rc1.jar"/>
+	<classpathentry kind="lib" path="lib/jreality/jython-standalone-2.7-b3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

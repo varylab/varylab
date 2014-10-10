@@ -82,7 +82,7 @@
 		<pathelement location="${lib}/jreality/janino.jar"/>
 		<pathelement location="${lib}/jreality/jterm.jar"/>
 		<pathelement location="${lib}/jreality/jython_console.jar"/>
-		<pathelement location="${lib}/jreality/jython-standalone-2.5.4-rc1.jar"/>
+		<pathelement location="${lib}/jreality/jython-standalone-2.7-b3.jar"/>
 		<pathelement location="${lib}/jreality/NetUtil.jar"/>
 		<pathelement location="${lib}/jreality/sunflow.jar"/>
 		<pathelement location="${lib}/jreality/hidapi-1.1.jar"/>
@@ -189,7 +189,7 @@
 
 
 	<target name="compile" depends="create build folders">
-		<javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+		<javac debug="false" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
 			<src path="${src}"/>
 			<src path="${src-resource}"/>
 			<classpath refid="conformallab.libraryclasspath"/>
