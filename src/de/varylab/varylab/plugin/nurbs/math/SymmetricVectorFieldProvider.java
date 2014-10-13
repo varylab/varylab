@@ -18,6 +18,7 @@ public class SymmetricVectorFieldProvider implements VectorFieldProvider {
 		this.vecField  = vecField;
 	}
 	
+	@Override
 	public double[] getVectorField(double[] uv, VectorFields vf) {
 		double[] vec = vecField;
 		if(symDir == SymmetricDir.CURVATURE){

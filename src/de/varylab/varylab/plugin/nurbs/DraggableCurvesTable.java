@@ -28,6 +28,7 @@ public class DraggableCurvesTable extends ListSelectRemoveTable<DraggableIntegra
 		setDefaultRenderer(Parameter.class, new ParameterDirectionRenderer());
 	}
 
+	@Override
 	public void adjustColumnSizes() {
 		getColumnModel().getColumn(4).setMaxWidth(22);
 		getColumnModel().getColumn(4).setPreferredWidth(22);

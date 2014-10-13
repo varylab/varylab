@@ -198,6 +198,7 @@ public class GeodesicsPlugin extends ShrinkPanelPlugin implements ActionListener
 		EventQueue.invokeLater(r);
 	}
 
+	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);

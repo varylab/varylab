@@ -14,6 +14,7 @@ public class ConstrainedDraggablePointComponent<C extends PointConstraint> exten
 		this.constraint = constraint;
 	}
 
+	@Override
 	public void updateCoords(double[] newCoords) {
 		super.updateCoords(newCoords);
 		if(constraint != null) {

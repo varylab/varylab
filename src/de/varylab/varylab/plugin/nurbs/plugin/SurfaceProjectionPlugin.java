@@ -109,6 +109,7 @@ public class SurfaceProjectionPlugin extends ShrinkPanelPlugin implements Action
 		return barycenter;
 	}
 
+	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
