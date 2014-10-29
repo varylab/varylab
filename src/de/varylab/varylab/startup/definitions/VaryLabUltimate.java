@@ -32,6 +32,8 @@ import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.affineminimal.AffineMinimalOptimizerPlugin;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.algorithm.topology.WatertightMesh;
+import de.varylab.varylab.plugin.blender.BlenderPlugin;
+import de.varylab.varylab.plugin.datasource.Circles;
 import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
 import de.varylab.varylab.plugin.datasource.FaceEdgeLengthMean;
@@ -120,6 +122,7 @@ import de.varylab.varylab.plugin.topology.ExplodePlugin;
 import de.varylab.varylab.plugin.topology.IdentifyVerticesPlugin;
 import de.varylab.varylab.plugin.topology.StitchCutPathPlugin;
 import de.varylab.varylab.plugin.topology.StitchingPlugin;
+import de.varylab.varylab.plugin.visualizers.CircleVisualizer;
 import de.varylab.varylab.plugin.visualizers.CircularityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConicalityVisualizer;
 import de.varylab.varylab.plugin.visualizers.ConnectionVisualizer;
@@ -269,6 +272,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(ConicalityVisualizer.class);
 		pSet.add(IncircleVisualizer.class);
 		pSet.add(DiagonalLengthVisualizer.class);
+		pSet.add(CircleVisualizer.class);
 		
 		// new data visualization data sources
 		pSet.add(OppositeEdgesCurvature.class);
@@ -283,6 +287,7 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(Conicality.class);
 		pSet.add(HyperbolicNetsPlugin.class);
 		pSet.add(FaceEdgeLengthMean.class);
+		pSet.add(Circles.class);
 	}
 
 
