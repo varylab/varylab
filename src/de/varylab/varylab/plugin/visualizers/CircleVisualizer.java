@@ -27,12 +27,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.geometry.IndexedLineSetUtility;
-import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
@@ -43,15 +43,17 @@ import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
+import de.varylab.varylab.utilities.Disk;
 
 public class CircleVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
 
 	private JCheckBox
-		useDisks = new JCheckBox("Use Disks");
+		useDisks = new JCheckBox("Use Disks"),
+		showEdges = new JCheckBox("Edges");
 	
 	private SpinnerNumberModel
-		diskHeightModel = new SpinnerNumberModel(0.3, 0.01, 100.0, 0.01),
-		tubeRadiusModel = new SpinnerNumberModel(0.3, 0.01, 100.0, 0.01),
+		diskHeightModel = new SpinnerNumberModel(0.2, 0.01, 100.0, 0.01),
+		tubeRadiusModel = new SpinnerNumberModel(0.03, 0.01, 100.0, 0.01),
 		circleResModel = new SpinnerNumberModel(20, 3, 200, 1);
 	
 	private JSpinner
@@ -79,14 +81,18 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 		optionsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
-		optionsPanel.add(useDisks, cr);
+		optionsPanel.add(useDisks, cl);
+		optionsPanel.add(showEdges, cr);
+		
 		optionsPanel.add(new JLabel("Resolution"), cl);
 		optionsPanel.add(circleResSpinner, cr);
 		optionsPanel.add(new JLabel("Disk Height"), cl);
 		optionsPanel.add(diskHeightSpinner, cr);
 		optionsPanel.add(new JLabel("Tube radius"), cl);
 		optionsPanel.add(tubeRadiusSpinner, cr);
+		
 		useDisks.addActionListener(this);
+		showEdges.addActionListener(this);
 		circleResSpinner.addChangeListener(this);
 		diskHeightSpinner.addChangeListener(this);
 		tubeRadiusSpinner.addChangeListener(this);
@@ -101,6 +107,7 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		CircleVisualization vis = new CircleVisualization(layer, source, this, type);
 		vis.useDisks = useDisks.isSelected();
+		vis.showDiskEdges = showEdges.isSelected();
 		vis.circleRes = circleResModel.getNumber().intValue();
 		vis.tubeRadius = tubeRadiusModel.getNumber().doubleValue();
 		vis.diskHeight = diskHeightModel.getNumber().doubleValue();
@@ -121,6 +128,7 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 
 		listenersDisabled = true;
 		useDisks.setSelected(actVis.useDisks);
+		showEdges.setSelected(actVis.showDiskEdges);
 		diskHeightModel.setValue(actVis.diskHeight);
 		circleResModel.setValue(actVis.circleRes);
 		listenersDisabled = false;
@@ -131,7 +139,8 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 	public class CircleVisualization extends AbstractDataVisualization {
 
 		private boolean
-			useDisks = false;
+			useDisks = false,
+			showDiskEdges = true;
 		
 		private int
 			circleRes = 36;
@@ -157,6 +166,7 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 
 		@Override
 		public void update() {
+			getLayer().removeTemporaryGeometry(circlesComponent);
 			if (!isActive()) {
 				circlesComponent.setVisible(false);
 				return;
@@ -185,7 +195,7 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 
 			circlesComponent.removeAllChildren();
 			if(useDisks) {
-				geometry = Primitives.cylinder(circleRes);
+				geometry = new Disk(circleRes,diskHeight);
 			} else {
 				geometry = IndexedLineSetUtility.circle(circleRes);
 			}
@@ -202,10 +212,19 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 			circlesComponent.setName(getName());
 			circlesComponent.setVisible(true);
 
-			app.setAttribute(LINE_SHADER + "." + TUBES_DRAW, !useDisks);
-			app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, tubeRadius);
+			if(useDisks) {
+				app.setAttribute(CommonAttributes.EDGE_DRAW, showDiskEdges);
+				app.setAttribute(LINE_SHADER + "." + TUBES_DRAW, showDiskEdges);
+				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, tubeRadius);
+			} else {
+				app.setAttribute(CommonAttributes.EDGE_DRAW, true);
+				app.setAttribute(LINE_SHADER + "." + TUBES_DRAW, true);
+				app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, tubeRadius);
+				
+			}
 			app.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,	color);
-
+			app.setAttribute(CommonAttributes.POLYGON_SHADER + "." + CommonAttributes.SMOOTH_SHADING, true);
+			getLayer().addTemporaryGeometry(circlesComponent);
 		}
 
 		private SceneGraphComponent createTubeComponent(Circle3d circle) {
@@ -279,6 +298,7 @@ public class CircleVisualizer extends DataVisualizerPlugin implements ActionList
 		actVis.circleRes = circleResModel.getNumber().intValue();
 		actVis.tubeRadius = tubeRadiusModel.getNumber().doubleValue();
 		actVis.diskHeight = diskHeightModel.getNumber().doubleValue();
+		actVis.showDiskEdges = showEdges.isSelected();
 		Runnable r = new Runnable() {
 			
 			@Override

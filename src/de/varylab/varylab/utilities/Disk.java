@@ -36,52 +36,77 @@ public class Disk extends IndexedFaceSet{
 	
 	
 	private void makeDisk(int resolution, double thickness){
-		double[][] verts = new double[resolution*2 + 2][3];
+		double[][] verts = new double[resolution*4][3];
 		double alpha = 0;
 		double delta = 2*PI / resolution;
-		for (int i = 0; i < resolution*2; i += 2){
-			verts[i][0] = verts[i + 1][0] = cos(alpha);
-			verts[i][1] = verts[i + 1][1] = sin(alpha);
+		for (int i = 0; i < resolution; i++){
+			verts[i][0] = cos(alpha);
+			verts[i][1] = sin(alpha);
 			verts[i][2] = -thickness / 2;
-			verts[i + 1][2] = thickness / 2;
+
+			verts[i + resolution][0] = cos(alpha);
+			verts[i + resolution][1] = sin(alpha);
+			verts[i + resolution][2] = -thickness / 2;
+
+			verts[i + 2*resolution][0] = cos(alpha);
+			verts[i + 2*resolution][1] = sin(alpha);
+			verts[i + 2*resolution][2] = thickness / 2;
+
+			verts[i + 3*resolution][0] = cos(alpha);
+			verts[i + 3*resolution][1] = sin(alpha);
+			verts[i + 3*resolution][2] = thickness / 2;
+			
 			alpha += delta;
 		}
-		verts[resolution*2 + 0][2] = -thickness / 2;
-		verts[resolution*2 + 1][2] = thickness / 2;
 		
-		int[][] indices = new int[resolution * 3][];
-		double[][] normals = new double[resolution*3][];
-		int v = 0;
-		alpha = delta / 2;
-		for (int i = 0; i < indices.length; i+=3) {
-			int[] faceUpper = indices[i+0] = new int[3];
-			int[] faceLower = indices[i+1] = new int[3];
-			int[] faceBorder = indices[i+2] = new int[4];
-			normals[i + 1] = zNegNormal;
-			normals[i + 0] = zPosNormal;
-			normals[i + 2] = new double[]{cos(alpha), sin(alpha), 0.0};
-			faceUpper[0] = (v + 2) % (resolution*2);
-			faceUpper[1] = v;
-			faceUpper[2] = resolution*2;
-			faceLower[0] = resolution*2 + 1;
-			faceLower[1] = v + 1;
-			faceLower[2] = (v + 3) % (resolution*2);
-			faceBorder[0] = faceUpper[1];
-			faceBorder[1] = faceUpper[0];
-			faceBorder[2] = faceLower[2];
-			faceBorder[3] = faceLower[1];
-			v += 2;
+		int[][] indices = new int[resolution+2][];
+		
+		indices[0] = new int[resolution];
+		for(int i = 0; i < indices[0].length; ++i) {
+			indices[0][i] = i;
+		}
+		for (int i = 0; i < resolution; ++i) {
+			indices[i+1] = new int[]{i+resolution, i+2*resolution, (i+1)%resolution + 2*resolution, (i+1)%resolution + resolution};
+		}
+		indices[resolution+1] = new int[resolution];
+		for(int i = 0; i < indices[0].length; ++i) {
+			indices[resolution+1][i] = 3*resolution+i;
+		}
+		
+		alpha = 0;
+		double[][] normals = new double[4*resolution][];
+		for(int i = 0; i < resolution; ++i) {
+			normals[i] = zNegNormal;
+			normals[i+resolution] = new double[]{-cos(alpha), -sin(alpha), 0};
+			normals[i+2*resolution] = new double[]{-cos(alpha), -sin(alpha), 0};
+			normals[i+3*resolution] = zNegNormal;
 			alpha += delta;
 		}
+		int[][] edges = new int[2][resolution+1];
+		for(int i = 0; i < resolution+1; ++i) {
+			edges[0][i] = i%resolution;
+		}
+		for(int i = 0; i < resolution+1; ++i) {
+			edges[1][i] = i%resolution + 3*resolution;
+		}
+
 		setNumPoints(verts.length);
 		setNumFaces(indices.length);
+		setNumEdges(edges.length);
+		
 		DataList vList = DOUBLE3_ARRAY.createReadOnly(verts);
 		setVertexCountAndAttributes(COORDINATES, vList);
+		
 		DataList iList = INT_ARRAY_ARRAY.createReadOnly(indices);
 		setFaceCountAndAttributes(INDICES, iList);
+		
 		DataList nList = DOUBLE_ARRAY_ARRAY.createReadOnly(normals);
-		setFaceAttributes(Attribute.NORMALS, nList);
-		setName("disk");
+		setVertexAttributes(Attribute.NORMALS, nList);
+		
+		DataList eList = INT_ARRAY_ARRAY.createReadOnly(edges);
+		setEdgeAttributes(Attribute.INDICES, eList);
+		
+		setName("Disk");
 	}
 	
 	

@@ -32,7 +32,6 @@ import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.affineminimal.AffineMinimalOptimizerPlugin;
 import de.varylab.varylab.plugin.algorithm.geometry.Spherize;
 import de.varylab.varylab.plugin.algorithm.topology.WatertightMesh;
-import de.varylab.varylab.plugin.blender.BlenderPlugin;
 import de.varylab.varylab.plugin.datasource.Circles;
 import de.varylab.varylab.plugin.datasource.Conicality;
 import de.varylab.varylab.plugin.datasource.EdgeNormalTorsion;
@@ -130,7 +129,6 @@ import de.varylab.varylab.plugin.visualizers.CurvatureLinesQualityVisualizer;
 import de.varylab.varylab.plugin.visualizers.DiagonalLengthVisualizer;
 import de.varylab.varylab.plugin.visualizers.GaussCurvatureVisualizer;
 import de.varylab.varylab.plugin.visualizers.GeodesicLabelVisualizer;
-import de.varylab.varylab.plugin.visualizers.IncircleVisualizer;
 import de.varylab.varylab.plugin.visualizers.OddVertexVisualizer;
 import de.varylab.varylab.plugin.visualizers.StarPlanarityVisualizer;
 import de.varylab.varylab.plugin.visualizers.WeightsVisualizer;
@@ -270,7 +268,6 @@ public class VaryLabUltimate extends VarylabStartupDefinition {
 		pSet.add(ConnectionVisualizer.class);
 		pSet.add(PositiveEdgeVisualizer.class);
 		pSet.add(ConicalityVisualizer.class);
-		pSet.add(IncircleVisualizer.class);
 		pSet.add(DiagonalLengthVisualizer.class);
 		pSet.add(CircleVisualizer.class);
 		
