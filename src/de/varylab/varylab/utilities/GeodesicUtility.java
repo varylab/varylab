@@ -29,6 +29,10 @@ public class GeodesicUtility {
 		double sine = Math.sin(alpha);
 		return 4 * sine * sine /l2;
 	}
+	
+	public static double circumcircleCurvature(double[] a, double[] b, double[] c) {
+		return Math.sqrt(circumcircleCurvatureSquared(a, b, c));
+	}
 
 	/**
 	 * Finds pairs of edges in the star of vertex v which have the

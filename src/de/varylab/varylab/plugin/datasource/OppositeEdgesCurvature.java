@@ -10,6 +10,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
@@ -22,6 +23,14 @@ public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider
 	private GeodesicEdgeCurvatureAdapter
 		adapter = new GeodesicEdgeCurvatureAdapter();
 	
+	
+	/**
+	 *
+	 * The geodesic edge curvature is the squared outer angle between edges that are opposite
+	 * at a vertex. This curvature is not defined for boundary vertices. The value at a vertex
+	 * is the sum of all squared outer angles of incoming edges.
+	 *
+	 */
 	private class GeodesicEdgeCurvatureAdapter extends AbstractAdapter<Double> {
 
 		public GeodesicEdgeCurvatureAdapter() {
@@ -34,23 +43,39 @@ public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> Double getV(V v, AdapterSet a) {
-			double[] p = a.getD(Position3d.class, v);
 			Map<E, E> geoMap = GeodesicUtility.findGeodesicPairs(v, false, false, a);
 			double[] angles = new double[geoMap.size()];
 			if (angles.length == 0) return null; // unknown curvature
 			int i = 0;
 			for (E e : geoMap.keySet()) {
-				E ee = geoMap.get(e);
-				double[] p1 = a.getD(Position3d.class, e.getStartVertex());
-				double[] p2 = a.getD(Position3d.class, ee.getStartVertex());
-				angles[i++] = PI - angle(p1, p, p2); 
+				angles[i++] = getE(e,a);
 			}
 			return Rn.euclideanNormSquared(angles);
 		}
 		
 		@Override
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> Double getE(E e, AdapterSet a) {
+			V v = e.getTargetVertex();
+			double[] vv = a.getD(Position3d.class, v);
+			Map<E, E> geodesicPairs = GeodesicUtility.findGeodesicPairs(v, false, true, a);
+			if (geodesicPairs.isEmpty() || HalfEdgeUtils.isBoundaryVertex(v)) {
+				return null;
+			}
+			E ee = geodesicPairs.get(e);
+			if(ee == null) {return null;}
+			double[] s = a.getD(Position3d.class, e.getStartVertex());
+			double[] t = a.getD(Position3d.class, ee.getStartVertex());
+			return PI - angle(s, vv, t); 
+		}
+		
+		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-			return Vertex.class.isAssignableFrom(nodeClass);
+			return Vertex.class.isAssignableFrom(nodeClass) ||
+				   Edge.class.isAssignableFrom(nodeClass);
 		}
 		
 		@Override

@@ -2,6 +2,7 @@ package de.varylab.varylab.plugin.datasource;
 
 import java.util.Map;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
@@ -27,6 +28,22 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 			super(Double.class, true, false);
 		}
 
+		@Override
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> Double getV(V v, AdapterSet a) {
+			Map<E, E> geoMap = GeodesicUtility.findGeodesicPairs(v, false, false, a);
+			double[] curvatures = new double[geoMap.size()];
+			if (curvatures.length == 0) return null; // unknown curvature
+			int i = 0;
+			for (E e : geoMap.keySet()) {
+				curvatures[i++] = getE(e,a); 
+			}
+			return Rn.euclideanNormSquared(curvatures);
+		}
+		
 		/**
 		 * Uses the radius of the circumcircle in the plane spanned by "consecutive" edges.
 		 */
@@ -46,12 +63,12 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 			if(ee == null) {return null;}
 			double[] s = a.getD(Position3d.class, e.getStartVertex());
 			double[] t = a.getD(Position3d.class, ee.getStartVertex());
-			return Math.sqrt(GeodesicUtility.circumcircleCurvatureSquared(s, vv, t));
+			return GeodesicUtility.circumcircleCurvature(s, vv, t);
 		}
 
 		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-			return Edge.class.isAssignableFrom(nodeClass);
+			return Vertex.class.isAssignableFrom(nodeClass) || Edge.class.isAssignableFrom(nodeClass);
 		}
 		
 		@Override
