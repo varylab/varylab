@@ -48,7 +48,7 @@ public class OppositeEdgesCurvature extends Plugin implements DataSourceProvider
 			if (angles.length == 0) return null; // unknown curvature
 			int i = 0;
 			for (E e : geoMap.keySet()) {
-				angles[i++] = getE(e,a);
+				angles[i++] = getE(e,a).doubleValue();
 			}
 			return Rn.euclideanNormSquared(angles);
 		}

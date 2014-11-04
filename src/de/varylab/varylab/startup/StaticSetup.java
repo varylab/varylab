@@ -5,12 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -23,6 +26,9 @@ import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.fonts.FontPolicy;
 import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
+import org.python.Version;
+import org.python.core.Py;
+import org.python.core.SyspathArchive;
 
 import de.varylab.varylab.plugin.lnf.TrebuchetFontSet;
 import de.varylab.varylab.startup.definitions.VaryLabUltimate;
@@ -84,6 +90,41 @@ public class StaticSetup {
 		iconList.add(SplashImageHook.getImage("icon_512.png"));
 		iconList.add(SplashImageHook.getImage("icon_1024.png"));
 		return iconList;
+	}
+	
+	public static void initJython() {
+		URL jythonPropertiesURL = Version.class.getResource("version.properties");
+		Properties jythonProperties = new Properties();
+		try {
+			jythonProperties.load(jythonPropertiesURL.openStream());
+		} catch (IOException e) {
+			log.warning("could not load jython version, skip loading library");
+			return;
+		}
+		String jythonVersion = jythonProperties.getProperty("jython.version");
+		log.info("loading jython library for version " + jythonVersion);
+		try {
+			String archiveName = new File(jythonPropertiesURL.getFile()).getParent();
+			archiveName = archiveName.substring(5, archiveName.indexOf('!'));
+			archiveName += "/Lib";
+			if (isRunningJavaWebStart()) {
+				Py.getSystemState().path.append(new SyspathArchive(archiveName));
+				log.info("adding jython sys path " + Py.getSystemState().path);
+			}
+		} catch (Exception e) {
+			log.log(Level.WARNING, "could not set jython system path.", e);
+		}
+	}
+	
+	private static boolean isRunningJavaWebStart() {
+	    boolean hasJNLP = false;
+	    try {
+	      Class.forName("javax.jnlp.ServiceManager");
+	      hasJNLP = true;
+	    } catch (ClassNotFoundException ex) {
+	      hasJNLP = false;
+	    }
+	    return hasJNLP;
 	}
 	
 	

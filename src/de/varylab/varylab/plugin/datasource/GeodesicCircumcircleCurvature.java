@@ -39,7 +39,7 @@ public class GeodesicCircumcircleCurvature extends Plugin implements DataSourceP
 			if (curvatures.length == 0) return null; // unknown curvature
 			int i = 0;
 			for (E e : geoMap.keySet()) {
-				curvatures[i++] = getE(e,a); 
+				curvatures[i++] = getE(e,a).doubleValue(); 
 			}
 			return Rn.euclideanNormSquared(curvatures);
 		}

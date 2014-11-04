@@ -56,6 +56,7 @@ public abstract class VarylabStartupDefinition {
 	
 	private void staticInit() {
 		StaticSetup.initLogging();
+		StaticSetup.initJython();
 		NativePathUtility.set("native");
 		Image appIcon = SplashImageHook.getImage("icon_256.png");
 		JRViewer.setApplicationIcon(appIcon);
