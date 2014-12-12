@@ -116,7 +116,6 @@ public class TextureUtility {
 			}
 			if(it.hasNext()) {
 				V v2 = it.next();
-				@SuppressWarnings("unchecked")
 				F f = HalfEdgeUtilsExtra.findCommonFace(v1,v2);
 				if(f != null) {
 					E newEdge = RemeshingUtility.splitFaceAt(f, v1, v2);
