@@ -1,8 +1,8 @@
 //
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// \u00c4nderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2013.09.13 um 11:55:55 AM CEST 
+// Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+// Generiert: 2015.01.28 um 02:10:44 PM CET 
 //
 
 
@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _RVLSurface_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLSurface");
     private final static QName _RVLLineSet_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLLineSet");
     private final static QName _RVLMesh_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLMesh");
 
@@ -50,11 +51,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RVLSurface }
+     * 
+     */
+    public RVLSurface createRVLSurface() {
+        return new RVLSurface();
+    }
+
+    /**
      * Create an instance of {@link RVLMesh }
      * 
      */
     public RVLMesh createRVLMesh() {
         return new RVLMesh();
+    }
+
+    /**
+     * Create an instance of {@link KnotList }
+     * 
+     */
+    public KnotList createKnotList() {
+        return new KnotList();
     }
 
     /**
@@ -98,11 +115,28 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Knot }
+     * 
+     */
+    public Knot createKnot() {
+        return new Knot();
+    }
+
+    /**
      * Create an instance of {@link LineList }
      * 
      */
     public LineList createLineList() {
         return new LineList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RVLSurface }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLSurface")
+    public JAXBElement<RVLSurface> createRVLSurface(RVLSurface value) {
+        return new JAXBElement<RVLSurface>(_RVLSurface_QNAME, RVLSurface.class, null, value);
     }
 
     /**

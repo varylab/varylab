@@ -1,8 +1,8 @@
 //
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// \u00c4nderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2013.09.13 um 11:55:55 AM CEST 
+// Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+// Generiert: 2015.01.28 um 02:10:44 PM CET 
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)

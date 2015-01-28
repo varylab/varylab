@@ -24,12 +24,15 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Face;
 import de.varylab.varylab.plugin.grasshopper.data.binding.FaceList;
+import de.varylab.varylab.plugin.grasshopper.data.binding.Knot;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Line;
 import de.varylab.varylab.plugin.grasshopper.data.binding.LineList;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
+import de.varylab.varylab.plugin.grasshopper.data.binding.RVLSurface;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Vertex;
 import de.varylab.varylab.plugin.grasshopper.data.binding.VertexList;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
 import de.varylab.varylab.utilities.NodeIndexComparator;
 
 public class RVLUtility {
@@ -198,6 +201,36 @@ public class RVLUtility {
 			e2.setTargetVertex(v2);
 		}
 		return hds;
+	}
+
+	public static NURBSSurface toNurbsSurface(RVLSurface surface) {
+		double[][][] cm = new double[surface.getUCount()][surface.getVCount()][3];
+		for(int u = 0; u < surface.getUCount(); ++u) {
+			for(int v = 0; v < surface.getVCount(); ++v) {
+				Vertex vert = surface.getControlPoints().getVertex().get(u*surface.getVCount()+v);
+				cm[u][v] = new double[]{vert.getX(), vert.getY(), vert.getZ(), 1.0};
+			}
+		}
+		
+		double[] U = toDoubleArray(surface.getUVector().getKnot());
+		double[] V = toDoubleArray(surface.getVVector().getKnot());
+		return new NURBSSurface(U, V, cm, surface.getUDegree(), surface.getVDegree());
+	}
+
+	private static double[] toDoubleArray(List<Knot> doubleList) {
+		int i;
+		double[] V = new double[doubleList.size()+2];
+		i = 0;
+		for(Knot k : doubleList) {
+			if(i == 0) {
+				V[i++] = k.getD();
+			}
+			V[i++] = k.getD();
+			if(i == V.length-1) {
+				V[i++] = k.getD();
+			}
+		}
+		return V;
 	}
 	
 	

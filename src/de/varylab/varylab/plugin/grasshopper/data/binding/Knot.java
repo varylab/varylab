@@ -15,17 +15,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für line complex type.
+ * <p>Java-Klasse für knot complex type.
  * 
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="line">
+ * &lt;complexType name="knot">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="A" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="B" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="D" type="{http://www.w3.org/2001/XMLSchema}double"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -35,47 +34,28 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "line", propOrder = {
-    "a",
-    "b"
+@XmlType(name = "knot", propOrder = {
+    "d"
 })
-public class Line {
+public class Knot {
 
-    @XmlElement(name = "A")
-    protected int a;
-    @XmlElement(name = "B")
-    protected int b;
+    @XmlElement(name = "D")
+    protected double d;
 
     /**
-     * Ruft den Wert der a-Eigenschaft ab.
+     * Ruft den Wert der d-Eigenschaft ab.
      * 
      */
-    public int getA() {
-        return a;
+    public double getD() {
+        return d;
     }
 
     /**
-     * Legt den Wert der a-Eigenschaft fest.
+     * Legt den Wert der d-Eigenschaft fest.
      * 
      */
-    public void setA(int value) {
-        this.a = value;
-    }
-
-    /**
-     * Ruft den Wert der b-Eigenschaft ab.
-     * 
-     */
-    public int getB() {
-        return b;
-    }
-
-    /**
-     * Legt den Wert der b-Eigenschaft fest.
-     * 
-     */
-    public void setB(int value) {
-        this.b = value;
+    public void setD(double value) {
+        this.d = value;
     }
 
 }

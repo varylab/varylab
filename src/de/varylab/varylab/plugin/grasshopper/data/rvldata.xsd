@@ -8,6 +8,7 @@
 >
 	<element name="RVLMesh" type="rvl:RVLMesh"/>
 	<element name="RVLLineSet" type="rvl:RVLLineSet"/>
+	<element name="RVLSurface" type="rvl:RVLSurface"/>
 
 	<complexType name="RVLMesh">
 		<sequence>
@@ -20,6 +21,30 @@
 		<sequence>
 			<element name="Lines" type="rvl:line_list"/>
 			<element name="Vertices" type="rvl:vertex_list"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="RVLSurface">
+		<sequence>
+			<element name="ControlPoints" type="rvl:vertex_list"/>
+			<element name="UVector" type="rvl:knot_list"/>
+			<element name="VVector" type="rvl:knot_list"/>
+			<element name="UDegree" type="int"/>
+			<element name="VDegree" type="int"/>
+			<element name="UCount" type="int"/>
+			<element name="VCount" type="int"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="knot_list">
+		<sequence>
+			<element name="Knot" type="rvl:knot" minOccurs="2" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	
+	<complexType name="knot">
+		<sequence>
+			<element name="D" type="double"/>
 		</sequence>
 	</complexType>
 

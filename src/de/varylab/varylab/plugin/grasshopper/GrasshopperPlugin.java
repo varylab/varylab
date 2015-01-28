@@ -35,11 +35,15 @@ import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.grasshopper.data.RVLLineSetFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLMeshFactory;
+import de.varylab.varylab.plugin.grasshopper.data.RVLSurfaceFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLUtility;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
+import de.varylab.varylab.plugin.grasshopper.data.binding.RVLSurface;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
+import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
 import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 
 public class GrasshopperPlugin extends Plugin {
@@ -91,14 +95,12 @@ public class GrasshopperPlugin extends Plugin {
 				}
 				switch (cmd) {
 					case "COMMAND SEND MESH":
-					case "COMMAND SEND LINESET":{
-						String data = "";
-						String line = "";
-						while ((line = lineReader.readLine()) != null) {
-							data += line;
-						}
+					case "COMMAND SEND LINESET":
+					case "COMMAND SEND SURFACE":{
+						String data = readData(lineReader);
 						String xml = xmlHeader + data;
-						receiveGeometry(xml, false);								
+						receiveGeometry(xml, false);
+						hif.update();
 						socket.close();
 					}
 					break;
@@ -116,19 +118,28 @@ public class GrasshopperPlugin extends Plugin {
 					break;
 					case "COMMAND OPTIMIZE MESH":
 					case "COMMAND OPTIMIZE LINESET": {
-						String data = "";
-						String line = "";
-						while ((line = lineReader.readLine()) != null) {
-							data += line;
-						}
+						String data = readData(lineReader);
 						String xml = xmlHeader + data;
 						doOptimization(xml, out);
+//						lineReader.close();
 					}
 					break;
 				}
 			} catch (Exception e) {
 				log.warning("error transferring data: " + e);
 			}
+		}
+
+		private String readData(LineNumberReader lineReader) throws IOException {
+			String data = "";
+			String line = "";
+			while ((line = lineReader.readLine()) != null) {
+				if(line.equals(".")) {
+					break;
+				}
+				data += line;
+			}
+			return data;
 		}
 		
 		public void writeHDSAsLineSet(VHDS hds, OutputStream out) throws Exception {
@@ -198,7 +209,18 @@ public class GrasshopperPlugin extends Plugin {
 				} catch (Exception e) {
 					log.warning("could not parse grasshopper line set: " + e + "\n" + startXML + "...");
 				}
-			} else {
+			} else 
+			if (startXML.contains("RVLSurface")){
+				try {
+					RVLSurface surface = RVLSurfaceFactory.loadRVLSurface(xmlReader);
+					NURBSSurface ns = RVLUtility.toNurbsSurface(surface); 
+					NurbsSurfaceUtility.addNurbsMesh(ns, getLayer(), 10, 10);
+					log.info("Surface: " + surface);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper surface: " + e + "\n" + startXML + "...");
+				}
+			} else 
+			{
 				log.warning("data type not recognized: " + startXML +"...");
 				return;
 			}

@@ -17,16 +17,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für face_list complex type.
+ * <p>Java-Klasse für knot_list complex type.
  * 
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="face_list">
+ * &lt;complexType name="knot_list">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Face" type="{http://schemas.datacontract.org/2004/07/GHVaryLab}face" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Knot" type="{http://schemas.datacontract.org/2004/07/GHVaryLab}knot" maxOccurs="unbounded" minOccurs="2"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -36,41 +36,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "face_list", propOrder = {
-    "face"
+@XmlType(name = "knot_list", propOrder = {
+    "knot"
 })
-public class FaceList {
+public class KnotList {
 
-    @XmlElement(name = "Face")
-    protected List<Face> face;
+    @XmlElement(name = "Knot", required = true)
+    protected List<Knot> knot;
 
     /**
-     * Gets the value of the face property.
+     * Gets the value of the knot property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the face property.
+     * This is why there is not a <CODE>set</CODE> method for the knot property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getFace().add(newItem);
+     *    getKnot().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Face }
+     * {@link Knot }
      * 
      * 
      */
-    public List<Face> getFace() {
-        if (face == null) {
-            face = new ArrayList<Face>();
+    public List<Knot> getKnot() {
+        if (knot == null) {
+            knot = new ArrayList<Knot>();
         }
-        return this.face;
+        return this.knot;
     }
 
 }
