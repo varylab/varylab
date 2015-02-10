@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2015.01.28 um 02:10:44 PM CET 
+// Generiert: 2015.02.10 um 05:49:51 PM CET 
 //
 
 
@@ -112,14 +112,6 @@ public class ObjectFactory {
      */
     public VertexList createVertexList() {
         return new VertexList();
-    }
-
-    /**
-     * Create an instance of {@link Knot }
-     * 
-     */
-    public Knot createKnot() {
-        return new Knot();
     }
 
     /**

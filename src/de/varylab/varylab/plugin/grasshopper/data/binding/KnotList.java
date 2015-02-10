@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2015.01.28 um 02:10:44 PM CET 
+// Generiert: 2015.02.10 um 05:49:51 PM CET 
 //
 
 
@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Knot" type="{http://schemas.datacontract.org/2004/07/GHVaryLab}knot" maxOccurs="unbounded" minOccurs="2"/>
+ *         &lt;element name="double" type="{http://www.w3.org/2001/XMLSchema}double" maxOccurs="unbounded" minOccurs="2"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,40 +37,40 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "knot_list", propOrder = {
-    "knot"
+    "_double"
 })
 public class KnotList {
 
-    @XmlElement(name = "Knot", required = true)
-    protected List<Knot> knot;
+    @XmlElement(name = "double", type = Double.class)
+    protected List<Double> _double;
 
     /**
-     * Gets the value of the knot property.
+     * Gets the value of the double property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the knot property.
+     * This is why there is not a <CODE>set</CODE> method for the double property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getKnot().add(newItem);
+     *    getDouble().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Knot }
+     * {@link Double }
      * 
      * 
      */
-    public List<Knot> getKnot() {
-        if (knot == null) {
-            knot = new ArrayList<Knot>();
+    public List<Double> getDouble() {
+        if (_double == null) {
+            _double = new ArrayList<Double>();
         }
-        return this.knot;
+        return this._double;
     }
 
 }

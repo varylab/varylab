@@ -3,6 +3,7 @@
 	xmlns="http://www.w3.org/2001/XMLSchema" 
 	targetNamespace="http://schemas.datacontract.org/2004/07/GHVaryLab"
 	xmlns:rvl="http://schemas.datacontract.org/2004/07/GHVaryLab" 
+	xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 >
@@ -38,16 +39,10 @@
 
 	<complexType name="knot_list">
 		<sequence>
-			<element name="Knot" type="rvl:knot" minOccurs="2" maxOccurs="unbounded"/>
+			<element name="double" type="double" minOccurs="2" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
 	
-	<complexType name="knot">
-		<sequence>
-			<element name="D" type="double"/>
-		</sequence>
-	</complexType>
-
 	<complexType name="line_list">
 		<sequence>
 			<element name="Line" type="rvl:line" minOccurs="0" maxOccurs="unbounded"/>

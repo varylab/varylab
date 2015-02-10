@@ -24,7 +24,7 @@ import de.varylab.varylab.halfedge.VVertex;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Face;
 import de.varylab.varylab.plugin.grasshopper.data.binding.FaceList;
-import de.varylab.varylab.plugin.grasshopper.data.binding.Knot;
+import de.varylab.varylab.plugin.grasshopper.data.binding.KnotList;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Line;
 import de.varylab.varylab.plugin.grasshopper.data.binding.LineList;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
@@ -212,22 +212,22 @@ public class RVLUtility {
 			}
 		}
 		
-		double[] U = toDoubleArray(surface.getUVector().getKnot());
-		double[] V = toDoubleArray(surface.getVVector().getKnot());
+		double[] U = toDoubleArray(surface.getUVector());
+		double[] V = toDoubleArray(surface.getVVector());
 		return new NURBSSurface(U, V, cm, surface.getUDegree(), surface.getVDegree());
 	}
 
-	private static double[] toDoubleArray(List<Knot> doubleList) {
+	private static double[] toDoubleArray(KnotList knotList) {
 		int i;
-		double[] V = new double[doubleList.size()+2];
+		double[] V = new double[knotList.getDouble().size()+2];
 		i = 0;
-		for(Knot k : doubleList) {
+		for(double d : knotList.getDouble()) {
 			if(i == 0) {
-				V[i++] = k.getD();
+				V[i++] = d;
 			}
-			V[i++] = k.getD();
+			V[i++] = d;
 			if(i == V.length-1) {
-				V[i++] = k.getD();
+				V[i++] = d;
 			}
 		}
 		return V;
