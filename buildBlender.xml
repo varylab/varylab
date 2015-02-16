@@ -28,6 +28,7 @@
 			destdir="src"
 			package="de.varylab.varylab.plugin.blender.data.binding"
 			extension="false"
+			encoding="utf-8"
 		>
 			<produces dir="${src}/binding" includes="*"/>
 		</xjc>

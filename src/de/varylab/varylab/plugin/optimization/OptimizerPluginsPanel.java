@@ -91,8 +91,8 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		shrinkPanel.add(tablePanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(optionScroller, c);
-		tablePanel.setPreferredSize(new Dimension(250, 200));
-		tablePanel.setMinimumSize(new Dimension(250, 200));
+		tablePanel.setPreferredSize(new Dimension(350, 200));
+		tablePanel.setMinimumSize(new Dimension(350, 200));
 	}
 
 	@Override
