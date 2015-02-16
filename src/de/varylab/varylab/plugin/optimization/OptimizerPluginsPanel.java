@@ -17,7 +17,6 @@ import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -128,16 +127,15 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		
 		@Override
 		public int getColumnCount() {
-			return 4;
+			return 3;
 		}
 		
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (columnIndex) {
-				case 0: return Icon.class;
-				case 1: return Boolean.class;
-				case 2: return VarylabOptimizerPlugin.class;
-				case 3: return Double.class;
+				case 0: return Boolean.class;
+				case 1: return VarylabOptimizerPlugin.class;
+				case 2: return Double.class;
 				default: return String.class;
 			}
 		}
@@ -150,14 +148,12 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 			VarylabOptimizerPlugin op = optimizerPlugins.get(row);
 			Object value = null;
 			switch (column) {
-				case 0:
-					return op.getPluginInfo().icon;
-				case 1: 
+				case 0: 
 					return activateSet.contains(op.getName());
-				case 2:
+				case 1:
 					value = op;
 					break;
-				case 3:
+				case 2:
 					return getCoefficient(op);
 				default: 
 					value = "-";
@@ -168,7 +164,7 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		
 		@Override
 		public void setValueAt(Object aValue, int row, int column) {
-			if (column == 1) {
+			if (column == 0) {
 				VarylabOptimizerPlugin op = optimizerPlugins.get(row);
 				setActive(op, (boolean)aValue);
 			}
@@ -177,14 +173,13 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 		@Override
 		public boolean isCellEditable(int row, int column) {
 			switch (column) {
-				case 1:
-				case 3:
+				case 0:
+				case 2:
 					return true;
 				default: 
 					return false;
 			}
 		}
-		
 		
 	}
 	
@@ -272,11 +267,9 @@ public class OptimizerPluginsPanel extends ShrinkPanelPlugin implements ListSele
 	private void updatePluginTable() {
 		pluginTable.setModel(new PluginTableModel());
 		pluginTable.getColumnModel().getColumn(0).setMaxWidth(30);
-		pluginTable.getColumnModel().getColumn(0).setCellRenderer(iconCellRenderer);
-		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
-		pluginTable.getColumnModel().getColumn(3).setMaxWidth(60);
-		pluginTable.getColumnModel().getColumn(3).setCellEditor(spinnerCellEditor);
-		pluginTable.getColumnModel().getColumn(3).setCellRenderer(spinnerCellRenderer);
+		pluginTable.getColumnModel().getColumn(2).setMaxWidth(60);
+		pluginTable.getColumnModel().getColumn(2).setCellEditor(spinnerCellEditor);
+		pluginTable.getColumnModel().getColumn(2).setCellRenderer(spinnerCellRenderer);
 	}
 	
 	public void addOptimizerPlugin(VarylabOptimizerPlugin op) {

@@ -17,7 +17,7 @@ public class WillmoreOptimizer extends VarylabOptimizerPlugin {
 	
 	@Override
 	public String getName() {
-		return "Willmore Energy";
+		return "Willmore";
 	}
 	
 	@Override

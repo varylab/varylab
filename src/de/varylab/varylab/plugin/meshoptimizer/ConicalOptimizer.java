@@ -21,7 +21,7 @@ public class ConicalOptimizer extends VarylabOptimizerPlugin {
 
 	@Override
 	public String getName() {
-		return "Conical Energy";
+		return "Conical";
 	}
 	
 	@Override

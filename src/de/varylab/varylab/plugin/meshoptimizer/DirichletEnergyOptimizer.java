@@ -18,7 +18,7 @@ public class DirichletEnergyOptimizer extends VarylabOptimizerPlugin {
 
 	@Override
 	public String getName() {
-		return "Cotangent Dirichlet Energy";
+		return "Cotangent Dirichlet";
 	}
 
 }

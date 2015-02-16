@@ -25,7 +25,7 @@ public class TouchingIncirclesOptimizerCot extends VarylabOptimizerPlugin {
 
 	@Override
 	public String getName() {
-		return "Touching Cot Incircles";
+		return "Touching Incircles";
 	}
 
 }
