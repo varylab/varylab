@@ -18,6 +18,7 @@ import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.plugin.job.Job;
 import de.jreality.plugin.job.JobListener;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.util.NativePathUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -25,11 +26,22 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.varylab.discreteconformal.ConformalLab;
+import de.varylab.discreteconformal.heds.CoHDS;
+import de.varylab.discreteconformal.heds.adapter.CoDirectTextureAdapter;
+import de.varylab.discreteconformal.logging.LoggingUtility;
+import de.varylab.discreteconformal.plugin.CutStrategy;
+import de.varylab.discreteconformal.plugin.TargetGeometry;
+import de.varylab.discreteconformal.plugin.UnwrapJob;
+import de.varylab.discreteconformal.unwrapper.BoundaryMode;
+import de.varylab.discreteconformal.unwrapper.QuantizationMode;
 import de.varylab.varylab.halfedge.VHDS;
 import de.varylab.varylab.halfedge.adapter.VPositionAdapter;
 import de.varylab.varylab.plugin.VarylabMain;
@@ -58,6 +70,7 @@ public class GrasshopperPlugin extends Plugin {
 		SERVER_PORT = 6789;
 	private Selection
 		selection = new Selection();
+	private JobQueuePlugin jobQueue;
 		
 	private class ComponentClient extends Thread {
 			
@@ -106,7 +119,7 @@ public class GrasshopperPlugin extends Plugin {
 					break;
 					case "COMMAND RECEIVE MESH": {
 						VHDS hds = hif.get(new VHDS());
-						writeHDSAsMesh(hds, out);
+						writeHDSAsMesh(hds, out, false);
 						socket.close();
 					}
 					break;
@@ -122,6 +135,12 @@ public class GrasshopperPlugin extends Plugin {
 						String xml = xmlHeader + data;
 						doOptimization(xml, out);
 //						lineReader.close();
+					}
+					case "COMMAND UNWRAP MESH":
+					{
+						String data = readData(lineReader);
+						String xml = xmlHeader + data;
+						unwrap(xml, out);
 					}
 					break;
 				}
@@ -152,10 +171,16 @@ public class GrasshopperPlugin extends Plugin {
 			outWriter.flush();
 		}
 		
-		public void writeHDSAsMesh(VHDS hds, OutputStream out) throws Exception {
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V,E,F>,
+			F extends Face<V,E,F>,
+			HDS extends HalfEdgeDataStructure<V, E, F>
+		> void writeHDSAsMesh(HDS hds, OutputStream out, boolean useTextureCoords) throws Exception {
 			AdapterSet aSet = AdapterSet.createGenericAdapters();
+			aSet.add(new CoDirectTextureAdapter());
 			aSet.addAll(getLayer().getAdapters());
-			RVLMesh mesh = RVLUtility.toRVLMesh(hds, aSet);
+			RVLMesh mesh = RVLUtility.toRVLMesh(hds, aSet, useTextureCoords);
 			String xml = RVLMeshFactory.meshToXML(mesh);
 			OutputStreamWriter outWriter = new OutputStreamWriter(out);
 			outWriter.write(xml + "\r\n");
@@ -275,7 +300,7 @@ public class GrasshopperPlugin extends Plugin {
 							try {
 								VHDS hds = getLayer().get(new VHDS());
 								if (isMesh.get()) {
-									writeHDSAsMesh(hds, out);
+									writeHDSAsMesh(hds, out, false);
 								} else {
 									writeHDSAsLineSet(hds, out);
 								}
@@ -316,6 +341,96 @@ public class GrasshopperPlugin extends Plugin {
 			optimizationPanel.optimize(getLayer(), jobListener);
 		}
 		
+		public void unwrap(String xml, final OutputStream out) throws IOException {
+			storeSelection();
+			StringReader xmlReader = new StringReader(xml);
+			String startXML = xml.substring(0, 100);
+			final AtomicBoolean isMesh = new AtomicBoolean(true);
+			if (startXML.contains("RVLMesh")) {
+				try {
+					RVLMesh mesh = RVLMeshFactory.loadRVLMesh(xmlReader);
+					getLayer().set(RVLUtility.toIndexedFaceSet(mesh));
+					log.info("mesh: " + mesh);
+					isMesh.set(true);
+				} catch (Exception e) {
+					log.warning("could not parse grasshopper mesh: " + e + "\n" + startXML + "...");
+				}
+			} else {
+				log.warning("data type not recognized: " + startXML +"...");
+				return;
+			}
+			restoreSelection();
+			JobListener jobListener = new JobListener() {
+				@Override
+				public void jobStarted(Job arg0) {
+				}
+				
+				@Override
+				public void jobProgress(Job arg0, double arg1) {
+				}
+				
+				@Override
+				public void jobFinished(Job arg0) {
+					Runnable queuedWoker = new Runnable() {
+						@Override
+						public void run() {
+							try {
+								CoHDS hds = getLayer().get(new CoHDS());
+								writeHDSAsMesh(hds, out, true);
+								out.flush();
+								out.close();
+							} catch (Exception e) {
+								log.warning("error writing response: " + e);
+							}
+						}
+					};
+					EventQueue.invokeLater(queuedWoker);
+				}
+				
+				@Override
+				public void jobFailed(Job arg0, Exception e) {
+					try {
+						OutputStreamWriter outWriter = new OutputStreamWriter(out);
+						outWriter.write("Unwrap failed: " + e);
+						out.flush();
+						out.close();
+					} catch (IOException e2) {
+						log.warning("error writing response: " + e2);
+					}
+				}
+				
+				@Override
+				public void jobCancelled(Job arg0) {
+					try {
+						OutputStreamWriter outWriter = new OutputStreamWriter(out);
+						outWriter.write("Unwrap cancelled by user.");
+						out.flush();
+						out.close();
+					} catch (IOException e2) {
+						log.warning("error writing response: " + e2);
+					}
+				}
+			};
+			AdapterSet aSet = hif.getAdapters();
+			CoHDS surface = new CoHDS();
+			surface.setTexCoordinatesValid(false);
+			surface = hif.get(surface);
+			Triangulator.triangulateSingleSource(surface);
+			UnwrapJob uw = new UnwrapJob(surface, aSet);
+			uw.setTargetGeometry(TargetGeometry.Euclidean);
+			uw.setToleranceExponent(-8);
+			uw.setMaxIterations(100);
+			uw.setNumCones(0);
+			uw.setQuantizationMode(QuantizationMode.AllAngles);
+			uw.setBoundaryQuantizationMode(QuantizationMode.AllAngles);
+			uw.setBoundaryMode(BoundaryMode.Isometric);
+			uw.setUsePetsc(true);
+			uw.setSelectedVertices(selection.getVertices(surface));
+			uw.setSelectedEdges(selection.getEdges(surface));
+			uw.setCutStrategy(CutStrategy.Automatic);
+			uw.addJobListener(jobListener);
+			jobQueue.queueJob(uw);
+		}
 	}
 	
 	private class Server extends Thread {
@@ -364,6 +479,7 @@ public class GrasshopperPlugin extends Plugin {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		OptimizationPanel optPanel = c.getPlugin(OptimizationPanel.class);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 		Server server = new Server(optPanel);
 		server.start();
 	}
@@ -382,6 +498,7 @@ public class GrasshopperPlugin extends Plugin {
 	public static void main(String[] args) {
 		NativePathUtility.set("native");
 		JRHalfedgeViewer.initHalfedgeFronted();
+		LoggingUtility.initLogging();
 		JRViewer v = new JRViewer();
 		v.addBasicUI();
 		v.addContentUI();
@@ -393,6 +510,8 @@ public class GrasshopperPlugin extends Plugin {
 		v.registerPlugin(ConsolePlugin.class);
 		v.registerPlugin(PlanarQuadsOptimizer.class);
 		v.registerPlugin(GrashopperDebug.class);
+		v.registerPlugins(ConformalLab.createConformalPlugins());
+		v.registerPlugins(HalfedgePluginFactory.createDataVisualizationPlugins());
 		v.startup();
 	}
 

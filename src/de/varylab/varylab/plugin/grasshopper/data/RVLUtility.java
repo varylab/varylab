@@ -12,10 +12,12 @@ import java.util.TreeSet;
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.math.Rn;
 import de.jreality.scene.IndexedFaceSet;
+import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.varylab.varylab.halfedge.VEdge;
 import de.varylab.varylab.halfedge.VFace;
@@ -64,12 +66,24 @@ public class RVLUtility {
 		return iff.getIndexedFaceSet();
 	}
 	
-	public static RVLMesh toRVLMesh(VHDS hds, AdapterSet a) {
+	public static <
+		V extends de.jtem.halfedge.Vertex<V, E, F>,
+		E extends de.jtem.halfedge.Edge<V,E,F>,
+		F extends de.jtem.halfedge.Face<V,E,F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> RVLMesh toRVLMesh(HDS hds, AdapterSet a, boolean useTextureCoords) {
 		RVLMesh mesh = new RVLMesh();
 		VertexList vList = new VertexList();
 		FaceList fList = new FaceList();
-		for (VVertex v : hds.getVertices()) {
-			double[] p = a.getD(Position3d.class, v);
+		for (V v : hds.getVertices()) {
+			double[] p = new double[3];
+			if(useTextureCoords) {
+				double[] tc = a.getD(TexturePosition2d.class, v);
+				p[0] = tc[0];
+				p[1] = tc[1];
+			} else {
+				p = a.getD(Position3d.class, v);
+			}
 			Vertex rv = new Vertex();
 			rv.setID(v.getIndex());
 			rv.setX(p[0]);
@@ -78,9 +92,9 @@ public class RVLUtility {
 			vList.getVertex().add(rv);
 		}
 		mesh.setVertices(vList);
-		for(VFace f : hds.getFaces()) {
+		for(F f : hds.getFaces()) {
 			Face rf = new Face();
-			List<VVertex> bv = HalfEdgeUtils.boundaryVertices(f);
+			List<V> bv = HalfEdgeUtils.boundaryVertices(f);
 			if (bv.size() == 3) {
 				rf.setA(bv.get(0).getIndex());
 				rf.setB(bv.get(1).getIndex());
