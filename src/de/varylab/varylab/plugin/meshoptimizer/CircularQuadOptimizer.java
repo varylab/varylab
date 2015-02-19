@@ -21,12 +21,12 @@ public class CircularQuadOptimizer extends VarylabOptimizerPlugin {
 
 	@Override
 	public String getName() {
-		return "Circular Quad Energy";
+		return "Circular Quads";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Circular Quad Optimizer", "Thilo Roerig");
+		PluginInfo info = new PluginInfo("Circular Quads", "Thilo Roerig");
 //		info.icon = ImageHook.getIcon("angle.png");
 		return info;
 	}

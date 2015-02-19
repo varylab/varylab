@@ -260,7 +260,7 @@ public class SpringOptimizer extends VarylabOptimizerPlugin implements ChangeLis
 	
 	@Override
 	public String getName() {
-		return "Spring Energy";
+		return "Springs";
 	}
 	
 	@Override

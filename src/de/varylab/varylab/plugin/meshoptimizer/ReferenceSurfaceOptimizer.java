@@ -95,12 +95,12 @@ public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements
 
 	@Override
 	public String getName() {
-		return "Reference Surface Energy";
+		return "Reference Mesh";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Reference Surface Optimizer", "Thilo Roerig");
+		PluginInfo info = new PluginInfo("Reference Mesh", "Thilo Roerig");
 //		info.icon = ImageHook.getIcon("electro.png");
 		return info;
 	}
