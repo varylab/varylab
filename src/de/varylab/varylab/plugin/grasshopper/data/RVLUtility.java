@@ -35,6 +35,8 @@ import de.varylab.varylab.plugin.grasshopper.data.binding.RVLSurface;
 import de.varylab.varylab.plugin.grasshopper.data.binding.Vertex;
 import de.varylab.varylab.plugin.grasshopper.data.binding.VertexList;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.data.LineSegment;
+import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
 import de.varylab.varylab.utilities.NodeIndexComparator;
 
 public class RVLUtility {
@@ -135,8 +137,8 @@ public class RVLUtility {
 			v2.setZ(p2[2]);
 			v2.setID(index++);
 			Line line = new Line();
-			line.setA(index - 2);
-			line.setB(index - 1);
+			line.getInt().add(index - 2);
+			line.getInt().add(index - 1);
 			result.getVertices().getVertex().add(v1);
 			result.getVertices().getVertex().add(v2);
 			result.getLines().getLine().add(line);
@@ -144,6 +146,39 @@ public class RVLUtility {
 		return result;
 	}
 	
+	public static RVLLineSet toRVLLineSet(List<PolygonalLine> uvCurves) {
+		RVLLineSet result = new RVLLineSet();
+		result.setVertices(new VertexList());
+		result.setLines(new LineList());
+		int index = 0;
+		for(PolygonalLine pl : uvCurves) {
+			boolean begin = true;
+			Line line = new Line();
+			for(LineSegment s : pl.getpLine()) {
+				double[][] coords = s.getSegment();
+				if(begin) {
+					Vertex v1 = new Vertex();
+					v1.setX(coords[0][0]);
+					v1.setY(coords[0][1]);
+					v1.setID(index);
+					result.getVertices().getVertex().add(v1);
+					
+					line.getInt().add(index);
+					++index;
+					begin = false;
+				}
+				Vertex v2 = new Vertex();
+				v2.setX(coords[1][0]);
+				v2.setY(coords[1][1]);
+				v2.setID(index);
+				line.getInt().add(index);
+				++index;
+				result.getVertices().getVertex().add(v2);
+			}
+			result.getLines().getLine().add(line);
+		}
+		return result;
+	}
 	
 	public static VHDS toHDS(RVLLineSet lineSet, boolean join) {
 		VHDS hds = new VHDS();
@@ -204,15 +239,23 @@ public class RVLUtility {
 		}
 
 		for (Line l : lineSet.getLines().getLine()) {
-			VVertex v1 = vMap.get(l.getA());
-			VVertex v2 = vMap.get(l.getB());
-			VEdge e1 = hds.addNewEdge();
-			VEdge e2 = hds.addNewEdge();
-			e1.linkNextEdge(e2);
-			e1.linkPreviousEdge(e2);
-			e1.linkOppositeEdge(e2);
-			e1.setTargetVertex(v1);
-			e2.setTargetVertex(v2);
+			VVertex previous = null;
+			for(Integer i : l.getInt()) {
+				if(previous == null) {
+					VVertex v1 = vMap.get(i);
+					previous = v1;
+				} else {
+					VVertex v = vMap.get(i);
+					VEdge e1 = hds.addNewEdge();
+					VEdge e2 = hds.addNewEdge();
+					e1.linkNextEdge(e2);
+					e1.linkPreviousEdge(e2);
+					e1.linkOppositeEdge(e2);
+					e1.setTargetVertex(previous);
+					e2.setTargetVertex(v);
+					previous = v;
+				}
+			}
 		}
 		return hds;
 	}

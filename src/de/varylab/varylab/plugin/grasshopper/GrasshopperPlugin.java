@@ -10,6 +10,8 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -48,14 +50,22 @@ import de.varylab.varylab.plugin.VarylabMain;
 import de.varylab.varylab.plugin.grasshopper.data.RVLLineSetFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLMeshFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLSurfaceFactory;
+import de.varylab.varylab.plugin.grasshopper.data.RVLUVListException;
+import de.varylab.varylab.plugin.grasshopper.data.RVLUVListFactory;
 import de.varylab.varylab.plugin.grasshopper.data.RVLUtility;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLLineSet;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLMesh;
 import de.varylab.varylab.plugin.grasshopper.data.binding.RVLSurface;
+import de.varylab.varylab.plugin.grasshopper.data.binding.RVLUVList;
+import de.varylab.varylab.plugin.grasshopper.data.binding.UvPoint;
 import de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer;
 import de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer;
 import de.varylab.varylab.plugin.nurbs.NURBSSurface;
+import de.varylab.varylab.plugin.nurbs.data.PolygonalLine;
+import de.varylab.varylab.plugin.nurbs.math.IntegralCurveFactory;
 import de.varylab.varylab.plugin.nurbs.math.NurbsSurfaceUtility;
+import de.varylab.varylab.plugin.nurbs.math.PrincipleCurvatureVectorFieldProvider;
+import de.varylab.varylab.plugin.nurbs.plugin.NurbsManagerPlugin;
 import de.varylab.varylab.plugin.optimization.OptimizationPanel;
 
 public class GrasshopperPlugin extends Plugin {
@@ -117,6 +127,22 @@ public class GrasshopperPlugin extends Plugin {
 						socket.close();
 					}
 					break;
+					case "COMMAND COMPUTE CURVES": {
+						String data = readData(lineReader);
+						String xml = xmlHeader + data;
+						StringReader xmlReader = new StringReader(xml);
+						RVLSurface surface = RVLSurfaceFactory.loadRVLSurface(xmlReader);
+						NURBSSurface ns = RVLUtility.toNurbsSurface(surface); 
+						data = readData(lineReader);
+						xml = xmlHeader + data;
+						List<double[]> startingPoints = receiveUVList(xml);
+						IntegralCurveFactory icf = new IntegralCurveFactory(ns.getDomain());
+						icf.setVectorFieldProvider(new PrincipleCurvatureVectorFieldProvider(ns));
+						List<PolygonalLine> curves = icf.computeIntegralLines(startingPoints);
+						writeCurvesAsLineSet(curves, out);
+						hif.update();
+						
+					}
 					case "COMMAND RECEIVE MESH": {
 						VHDS hds = hif.get(new VHDS());
 						writeHDSAsMesh(hds, out, false);
@@ -149,6 +175,16 @@ public class GrasshopperPlugin extends Plugin {
 			}
 		}
 
+		private List<double[]> receiveUVList(String xml) throws RVLUVListException {
+			StringReader xmlReader = new StringReader(xml);
+			RVLUVList uvList = RVLUVListFactory.loadRVLUVList(xmlReader);
+			List<double[]> uvs = new LinkedList<double[]>();
+			for(UvPoint uv : uvList.getUVPoints().getUVPoint()) {
+				uvs.add(new double[]{uv.getU(), uv.getV()});
+			}
+			return uvs;
+		}
+
 		private String readData(LineNumberReader lineReader) throws IOException {
 			String data = "";
 			String line = "";
@@ -159,6 +195,16 @@ public class GrasshopperPlugin extends Plugin {
 				data += line;
 			}
 			return data;
+		}
+		
+		public void writeCurvesAsLineSet(List<PolygonalLine> curves, OutputStream out) throws Exception {
+			RVLLineSet lineSet = RVLUtility.toRVLLineSet(curves);
+			String xml = RVLLineSetFactory.lineSetToXML(lineSet);
+			OutputStreamWriter outWriter = new OutputStreamWriter(out);
+			outWriter.write(xml + "\r\n");
+			outWriter.write(".\r\n");
+			outWriter.flush();
+			log.severe(xml);
 		}
 		
 		public void writeHDSAsLineSet(VHDS hds, OutputStream out) throws Exception {
@@ -512,6 +558,7 @@ public class GrasshopperPlugin extends Plugin {
 		v.registerPlugin(GrashopperDebug.class);
 		v.registerPlugins(ConformalLab.createConformalPlugins());
 		v.registerPlugins(HalfedgePluginFactory.createDataVisualizationPlugins());
+		v.registerPlugin(NurbsManagerPlugin.class);
 		v.startup();
 	}
 

@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.6 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2015.02.19 um 10:53:19 AM CET 
+// Generiert: 2015.02.24 um 11:58:48 AM CET 
 //
 
 
@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _RVLUVList_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLUVList");
     private final static QName _RVLSurface_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLSurface");
     private final static QName _RVLLineSet_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLLineSet");
     private final static QName _RVLMesh_QNAME = new QName("http://schemas.datacontract.org/2004/07/GHVaryLab", "RVLMesh");
@@ -51,6 +52,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RVLUVList }
+     * 
+     */
+    public RVLUVList createRVLUVList() {
+        return new RVLUVList();
+    }
+
+    /**
      * Create an instance of {@link RVLSurface }
      * 
      */
@@ -67,11 +76,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link KnotList }
+     * Create an instance of {@link UvList }
      * 
      */
-    public KnotList createKnotList() {
-        return new KnotList();
+    public UvList createUvList() {
+        return new UvList();
     }
 
     /**
@@ -83,6 +92,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Line }
+     * 
+     */
+    public Line createLine() {
+        return new Line();
+    }
+
+    /**
+     * Create an instance of {@link KnotList }
+     * 
+     */
+    public KnotList createKnotList() {
+        return new KnotList();
+    }
+
+    /**
      * Create an instance of {@link Vertex }
      * 
      */
@@ -91,19 +116,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link UvPoint }
+     * 
+     */
+    public UvPoint createUvPoint() {
+        return new UvPoint();
+    }
+
+    /**
      * Create an instance of {@link FaceList }
      * 
      */
     public FaceList createFaceList() {
         return new FaceList();
-    }
-
-    /**
-     * Create an instance of {@link Line }
-     * 
-     */
-    public Line createLine() {
-        return new Line();
     }
 
     /**
@@ -120,6 +145,15 @@ public class ObjectFactory {
      */
     public LineList createLineList() {
         return new LineList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RVLUVList }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/GHVaryLab", name = "RVLUVList")
+    public JAXBElement<RVLUVList> createRVLUVList(RVLUVList value) {
+        return new JAXBElement<RVLUVList>(_RVLUVList_QNAME, RVLUVList.class, null, value);
     }
 
     /**

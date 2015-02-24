@@ -10,6 +10,7 @@
 	<element name="RVLMesh" type="rvl:RVLMesh"/>
 	<element name="RVLLineSet" type="rvl:RVLLineSet"/>
 	<element name="RVLSurface" type="rvl:RVLSurface"/>
+	<element name="RVLUVList" type="rvl:RVLUVList"/>
 
 	<complexType name="RVLMesh">
 		<sequence>
@@ -37,6 +38,26 @@
 		</sequence>
 	</complexType>
 
+	<complexType name="RVLUVList">
+		<sequence>
+			<element name="UVPoints" type="rvl:uv_list"/>
+		</sequence>
+	</complexType>
+	
+	<complexType name="uv_list">
+		<sequence>
+			<element name="UVPoint" type="rvl:uv_point" minOccurs="1" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	
+	<complexType name="uv_point">
+		<sequence>
+			<element name="U" type="double"/>
+			<element name="V" type="double"/>
+			<element name="Id" type="int"/>
+		</sequence>
+	</complexType>
+	
 	<complexType name="knot_list">
 		<sequence>
 			<element name="double" type="double" minOccurs="2" maxOccurs="unbounded"/>
@@ -51,8 +72,7 @@
 
 	<complexType name="line">
 		<sequence>
-			<element name="A" type="int"/>
-			<element name="B" type="int"/>
+			<element name="int" type="int" minOccurs="2" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
 
