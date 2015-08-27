@@ -53,6 +53,11 @@ public class LatticeRemesher <
 	
 	public HDS remesh(HDS surf, AdapterSet a) throws RemeshingException {
 		log.fine("start lattice remeshing");
+		
+//		SceneGraphComponent child0 = new SceneGraphComponent("Texture Coordinate Mesh");
+//		child0.setGeometry(conv.heds2ifs(surf, new AdapterSet(new VTexturePositionAdapter(), new VTexturePositionPositionAdapter())));
+//		root.addChild(child0);
+		
 		HDS hds = lattice.getHDS();
 //		SceneGraphComponent child1 = new SceneGraphComponent("Initial Lattice");
 //		child1.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
@@ -75,7 +80,7 @@ public class LatticeRemesher <
 		
 		log.fine("create induced polygon");
 		LinkedList<E> edges = lattice.createInducedPolygon(polygon, addNewVertices);
-//		SceneGraphComponent child2 = new SceneGraphComponent();
+//		SceneGraphComponent child2 = new SceneGraphComponent("Induced Polygon");
 //		child2.setGeometry(conv.heds2ifs(hds, new AdapterSet(new VPositionAdapter())));
 //		root.addChild(child2);
 		
@@ -108,7 +113,13 @@ public class LatticeRemesher <
 		log.fine("aligning remesh boundary");
 		RemeshingUtility.alignRemeshBoundary(hds, surf, a);
 		
-//		JRViewer.display(root);
+//		EventQueue.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				JRViewer.display(root);				
+//			}
+//		});
+		
 		log.fine("remeshing done");
 		return hds;
 	}	
