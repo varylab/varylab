@@ -427,6 +427,8 @@ public class GrasshopperPlugin extends Plugin {
 								out.close();
 							} catch (Exception e) {
 								log.warning("error writing response: " + e);
+							} finally {
+								hif.update();
 							}
 						}
 					};
@@ -442,6 +444,8 @@ public class GrasshopperPlugin extends Plugin {
 						out.close();
 					} catch (IOException e2) {
 						log.warning("error writing response: " + e2);
+					} finally {
+						hif.update();
 					}
 				}
 				
@@ -454,6 +458,8 @@ public class GrasshopperPlugin extends Plugin {
 						out.close();
 					} catch (IOException e2) {
 						log.warning("error writing response: " + e2);
+					} finally {
+						hif.update();
 					}
 				}
 			};
