@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module
+	xmlns="http://www.varylab.com/module"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<manifest>
+		<id>sbdtznfe36dhe64f</id>
+		<name>Water-Tight Mesh Generator</name>
+		<revision>1</revision>
+		<category>Generator</category>
+	</manifest>
+	<description>
+		Remove cuts from meshes. Merges vertices within a given threshold.
+	</description>
+	<plugin class="de.varylab.varylab.plugin.algorithm.topology.WatertightMesh"/>
+	
+</module>
