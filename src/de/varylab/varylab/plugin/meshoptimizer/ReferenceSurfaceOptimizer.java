@@ -12,18 +12,37 @@ import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static java.awt.Color.ORANGE;
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.JFileChooser.FILES_ONLY;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import de.jreality.geometry.IndexedFaceSetUtility;
+import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobQueuePlugin;
+import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.Geometry;
+import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.SceneGraphComponent;
+import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.plugin.GeometryPreviewerPanel;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -39,15 +58,24 @@ import de.varylab.varylab.plugin.VarylabOptimizerPlugin;
 
 public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements ActionListener, UIFlavor {
 
-
+	private JobQueuePlugin
+		jobQueue = null;
+	private Logger
+		log = Logger.getLogger(ReferenceSurfaceOptimizer.class.getName());
 	private ReferenceSurfaceFunctional<VVertex, VEdge, VFace>
 		functional = new ReferenceSurfaceFunctional<VVertex, VEdge, VFace>();
 	private JPanel
 		panel = new JPanel();
 	private JCheckBox
-		showLayerChecker = new JCheckBox("Show Surface"),
-		wireFrameChecker = new JCheckBox("Wireframe");
+		showLayerChecker = new JCheckBox("Show Surface", false),
+		wireFrameChecker = new JCheckBox("Wireframe", true);
+	private JButton
+		loadMeshButton = new JButton("Load Reference OBJ Mesh...");
 	
+	private JFileChooser 
+		chooser = new JFileChooser();		
+	private GeometryPreviewerPanel 
+		previewPanel = new GeometryPreviewerPanel();
 	private Appearance
 		refSurfaceAppearance = new Appearance("Reference Surface Appearance");
 	private HalfedgeLayer
@@ -70,10 +98,19 @@ public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements
 		c2.anchor = GridBagConstraints.WEST;
 		c2.weightx = 1.0;
 		c2.gridwidth = GridBagConstraints.REMAINDER;
+		panel.add(loadMeshButton, c2);
 		panel.add(showLayerChecker,c1);
 		panel.add(wireFrameChecker,c2);
 		showLayerChecker.addActionListener(this);
 		wireFrameChecker.addActionListener(this);
+		loadMeshButton.addActionListener(this);
+		
+		chooser.setAccessory(previewPanel);
+		chooser.addPropertyChangeListener(previewPanel);
+		chooser.setAcceptAllFileFilterUsed(false);
+		chooser.setFileSelectionMode(FILES_ONLY);
+		chooser.setMultiSelectionEnabled(false);
+		chooser.setFileFilter(new FileNameExtensionFilter("Reference Mesh OBJ (*.obj)", "obj"));
 	}
 	
 	@Override
@@ -135,6 +172,36 @@ public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (loadMeshButton == e.getSource()) {
+			final Window w = SwingUtilities.getWindowAncestor(panel);
+			chooser.setDialogTitle("Import Into Layer");
+			if (chooser.showOpenDialog(w) != APPROVE_OPTION) {
+				return;
+			}
+			final File file = chooser.getSelectedFile();
+			Job job = new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return "Load Reference Mesh";
+				}
+				@Override
+				protected void executeJob() throws Exception {
+					ReaderOBJ r = new ReaderOBJ();
+					SceneGraphComponent root = r.read(file);
+					Geometry g = SceneGraphUtility.getFirstGeometry(root);
+					if (g == null) {
+						log.warning("no geometry found in " + file);
+						return;
+					}
+					if (g instanceof IndexedFaceSet) {
+						IndexedFaceSet ifs = (IndexedFaceSet) g;
+						IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+						refSurfaceLayer.set(ifs);
+					}
+				}
+			};
+			jobQueue.queueJob(job);
+		}
 		hif.checkContent();
 		updateStates();
 	}
@@ -142,6 +209,7 @@ public class ReferenceSurfaceOptimizer extends VarylabOptimizerPlugin implements
 	@Override
 	public void install(Controller c) throws Exception {
 		hif = c.getPlugin(HalfedgeInterface.class);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 		c.getPlugin(VarylabMain.class);
 		refSurfaceLayer = new HalfedgeLayer(hif);
 		refSurfaceLayer.set(new VHDS());

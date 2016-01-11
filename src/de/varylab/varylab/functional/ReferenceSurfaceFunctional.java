@@ -1,9 +1,11 @@
 package de.varylab.varylab.functional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.DenseVector;
@@ -26,15 +28,12 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
-
 public class ReferenceSurfaceFunctional<
 	V extends Vertex<V, E, F>, 
 	E extends Edge<V, E, F>, 
 	F extends Face<V, E, F>>
 implements Functional<V, E, F> {
 
-	private HashMap<V,double[]> 
-		closestPointMap = new HashMap<V, double[]>();
 	private HalfEdgeDataStructure<V, E, F> 
 		refSurface = null;
 	private AdapterSet
@@ -46,37 +45,40 @@ implements Functional<V, E, F> {
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void evaluate(
-			HDS hds,
-			DomainValue x, 
-			Energy E, 
-			Gradient G, 
-			Hessian H
+		HDS hds,
+		DomainValue x, 
+		Energy E, 
+		Gradient G, 
+		Hessian H
 	) {
 		if(refSurface == null) {
 			if(E != null) E.setZero();
 			if(G != null) G.setZero();
 			return;
 		}
+		Map<V,double[]> closestPointMap = Collections.emptyMap();
 		if(E != null || G != null) {
-			computeClosestPointMap(hds, x);
+			closestPointMap = computeClosestPointMap(hds, x);
 		}
 		if (E != null) {
-			E.set(evaluate(hds, x));
+			E.set(evaluate(hds, x, closestPointMap));
 		}
 		if (G != null) {
-			evaluateGradient(hds, x, G);
+			evaluateGradient(hds, x, closestPointMap, G);
 		}
-		closestPointMap.clear();
 	}
 
-	private <HDS extends HalfEdgeDataStructure<V, E, F>> void computeClosestPointMap(
-			HDS hds, DomainValue x) {
+	private <
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Map<V, double[]> computeClosestPointMap(HDS hds, DomainValue x) {
+		Map<V, double[]> result = new HashMap<V, double[]>(); 
 		double[] vpos = new double[3];
 		for(V v: hds.getVertices()) {
 			FunctionalUtils.getPosition(v, x, vpos);
 			double[] pt = getClosestPointOnSurface(refSurface, refas, kdtree, vpos);
-			closestPointMap.put(v, pt);
+			result.put(v, pt);
 		}
+		return result;
 	}
 
 	@Override
@@ -99,7 +101,7 @@ implements Functional<V, E, F> {
 	}
 
 	// Calculate the energy of a given configuration
-	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
+	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x, Map<V, double[]> closestPointMap) {
 		double result = 0.0;
 		for(V v : hds.getVertices()) {
 			double[] vpos = FunctionalUtils.getPosition(v, x, null);
@@ -123,8 +125,8 @@ implements Functional<V, E, F> {
 		HalfEdgeDataStructure<V, E, F> surface,
 		AdapterSet ras,
 		KdTree<V, E, F> kdtree,
-		double[] v)
-	{
+		double[] v
+	) {
 		Collection<V> closest = kdtree.collectKNearest(v, 5);
 		double[] closestPointOnSurface = new double[3];
 		double[] pointOnSurface = new double[3];
@@ -150,14 +152,14 @@ implements Functional<V, E, F> {
 		List<V> verts = HalfEdgeUtils.boundaryVertices(f);
 		
 		double[] 
-		       v1 = as.getD(Position3d.class, verts.get(0)),
-		       v2 = as.getD(Position3d.class, verts.get(1)),
-		       v3 = as.getD(Position3d.class, verts.get(2));
+	       v1 = as.getD(Position3d.class, verts.get(0)),
+	       v2 = as.getD(Position3d.class, verts.get(1)),
+	       v3 = as.getD(Position3d.class, verts.get(2));
 		
 		double[] 
-		       vt1 = Rn.subtract(null, v1, v1),
-		       vt2 = Rn.subtract(null, v2, v1),
-		       vt3 = Rn.subtract(null, v3, v1);
+	       vt1 = Rn.subtract(null, v1, v1),
+	       vt2 = Rn.subtract(null, v2, v1),
+	       vt3 = Rn.subtract(null, v3, v1);
 		
 		double[] proj = Rn.subtract(null, pos, v1);
 		
@@ -178,18 +180,19 @@ implements Functional<V, E, F> {
 	
 	private double[] projectOntoLine(double[] pos, double[] v, double[] w) {
 		double[] 
-		       l = Rn.subtract(null, w, v),
-		       np = Rn.subtract(null, pos, v);
+	       l = Rn.subtract(null, w, v),
+	       np = Rn.subtract(null, pos, v);
 		Rn.projectOnto(np, np, l);
 		Rn.add(np,np,v);
 		return np;
 	}
 
 	private double[] barycentricCoordinates(
-			double[] pos, 
-			double[] v1,
-			double[] v2, 
-			double[] v3) {
+		double[] pos, 
+		double[] v1,
+		double[] v2, 
+		double[] v3
+	) {
 		double[][] A = new double[3][4];
 		System.arraycopy(v1, 0, A[0], 0, 3);
 		System.arraycopy(v2, 0, A[1], 0, 3);
@@ -210,10 +213,12 @@ implements Functional<V, E, F> {
 
 	public void evaluateGradient(
 		//input
-			HalfEdgeDataStructure<V, E, F> hds,
-			DomainValue x,
+		HalfEdgeDataStructure<V, E, F> hds,
+		DomainValue x,
+		Map<V, double[]> closestPointMap,
 		//output
-			Gradient grad
+		Gradient grad
+			
 	) {
 		for(V v: hds.getVertices()) {
 			double[] pt = closestPointMap.get(v);
@@ -225,13 +230,6 @@ implements Functional<V, E, F> {
 		}
 	}
 
-	public void evaluateHessian(
-		// input
-			HalfEdgeDataStructure<V, E, F> G, DomainValue x,
-		// output
-			Hessian hess) {
-	}
-
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void setReferenceSurface(HDS refSurface, AdapterSet as) {
@@ -240,7 +238,6 @@ implements Functional<V, E, F> {
 		kdtree = new KdTree<V, E, F>(refSurface, as, 10, false);
 		refas = as;
 	}
-	
 	
 	public KdTree<V, E, F> getKdtree() {
 		return kdtree;

@@ -76,7 +76,7 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 	private JButton
 		resetButton = new JButton("Clear Protocol");
 	private JCheckBox
-		activeChecker = new JCheckBox("Protocol", true);
+		activeChecker = new JCheckBox("Protocol", false);
 	
 	public IterationProtocolPanel() {
 		setInitialPosition(SHRINKER_TOP);
