@@ -16,6 +16,6 @@
 		diagonals of quadrilaterals. 
 	</description>
 	<plugin class="de.varylab.varylab.plugin.meshoptimizer.PlanarQuadsOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.PlanarNGonsOptimizer"/>
 	<plugin class="de.jtem.halfedgetools.plugin.data.source.FacePlanarityDataSource"/>
-	
 </module>

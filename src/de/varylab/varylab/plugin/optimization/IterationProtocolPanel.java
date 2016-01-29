@@ -14,8 +14,6 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,8 +59,6 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		axisIndexMap = new HashMap<Long, Integer>();
 	private ValueAxis 
 		domainAxis = new NumberAxis();
-	private NumberFormat
-		rangeFormat = new DecimalFormat("0.0E0");
 	private SamplingXYLineRenderer
 		plotRenderer = new SamplingXYLineRenderer();
 	private CombinedDomainXYPlot
@@ -161,10 +157,9 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 			XYPlot subPlot = getPlotForValue(p, v);
 			// add a new axis
 			int index = getPlotAxisIndex(pId, vId);
-			System.out.println("index of " + v.getName() + ": " + index);
 			String name = v.getName();
-			NumberAxis axis = new LogarithmicAxis(name);
-			axis.setNumberFormatOverride(rangeFormat);
+			LogarithmicAxis axis = new LogarithmicAxis(name);
+			axis.setLog10TickLabelsFlag(true);
 			axis.setLabelPaint(v.getColor());
 			subPlot.setRangeAxis(index, axis);
 			subPlot.setRangeAxisLocation(index, AxisLocation.BOTTOM_OR_LEFT);
@@ -189,7 +184,9 @@ public class IterationProtocolPanel extends VarylabShrinkPlugin implements Actio
 		for (IterationProtocol p : pList) {
 			for (ProtocolValue v : p.getValues()) {
 				XYSeries s = getSeriesForValue(p, v);
-				s.add(activeIteration, v.getValue());
+				// only allow positive values since we do logarithmic plot
+				double val = Math.max(Double.MIN_VALUE, v.getValue());
+				s.add(activeIteration, val);
 			}
 		}
 		activeIteration++;

@@ -67,8 +67,8 @@
 	</path>
 
 	<path id="jfreechart.libraryclasspath">
-		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>
-		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>
+		<pathelement location="${lib}/jfreechart/jfreechart-1.0.19.jar"/>
+		<pathelement location="${lib}/jfreechart/jcommon-1.0.23.jar"/>
 	</path>
 
 	<path id="jogamp.libraryclasspath">

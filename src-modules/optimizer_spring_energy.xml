@@ -12,7 +12,13 @@
 	<description>
 		The spring energy optimizer is a collection of energies. You can 
 		have springs of constant, mean, or zero length.
+		It also contains optimizers for Dirichlet energy minimization, 
+		edge length equalization, n-gon regularization, and spherical 
+		point distribution.
 	</description>
 	<plugin class="de.varylab.varylab.plugin.meshoptimizer.SpringOptimizer"/>
-	
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.DirichletEnergyOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.EdgeLengthEqualizerOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.ElectrostaticSphereOptimizer"/>
+	<plugin class="de.varylab.varylab.plugin.meshoptimizer.NgonRegularizer"/>
 </module>
