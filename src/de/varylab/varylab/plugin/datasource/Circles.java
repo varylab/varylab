@@ -27,7 +27,7 @@ public class Circles extends Plugin implements DataSourceProvider {
 
 		@Override
 		public String toString() {
-			return "Incircle";
+			return "Face Incircles";
 		}
 
 		@Override

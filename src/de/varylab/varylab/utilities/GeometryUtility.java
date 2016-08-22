@@ -2,11 +2,11 @@ package de.varylab.varylab.utilities;
 
 import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryVertices;
 import static de.jtem.halfedgetools.util.GeometryUtility.circumCircle;
-import static java.lang.Math.PI;
-import static java.lang.Math.sqrt;
 
 import java.util.List;
 
+import de.jreality.math.P3;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -18,15 +18,6 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 public class GeometryUtility {
 
-	/**
-	 * @param <V>
-	 * @param <E>
-	 * @param <F>
-	 * @param <HDS>
-	 * @param f
-	 * @param as
-	 * @return
-	 */
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -34,59 +25,62 @@ public class GeometryUtility {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> double[] getIncircle(F f, AdapterSet as) {
 		List<V> bd = boundaryVertices(f);
-		if(bd.size() == 3) {
-			double[] p1 = as.getD(Position3d.class, bd.get(0));
-			double[] p2 = as.getD(Position3d.class, bd.get(1));
-			double[] p3 = as.getD(Position3d.class, bd.get(2));
-			double a = Rn.euclideanDistance(p1, p2);
-			double b = Rn.euclideanDistance(p2, p3);
-			double c = Rn.euclideanDistance(p3, p1);
-			double s = 0.5*(a+b+c);
-			double[] center = Rn.linearCombination(null, b/(a+b+c), p1, 1, Rn.linearCombination(null, c/(a+b+c), p2, a/(a+b+c), p3));
-			double a1 = 0,b1 = 0,c1 = 0;
-			for (int k=0; k<3; k++) {
-	           a1 += (p1[k] - p2[k]) * (p1[k] - p2[k]);
-	           b1 += (p1[k] - p2[k]) * (p3[k] - p2[k]);
-	           c1 += (p3[k] - p2[k]) * (p3[k] - p2[k]);
-			}
-			double area = a1*c1-b1*b1;
-			if (area <= 0.0) {
-	           area = sqrt(-area) / 2.0;
-			} else {
-	           area = sqrt(area) / 2.0;
-			}
-			return  new double[]{center[0], center[1], center[2], area/s};
-		}
-		if (bd.size() != 4) return new double[] {0,0,0,1};
-		double[] p1 = as.getD(Position3d.class, bd.get(0));
-		double[] p2 = as.getD(Position3d.class, bd.get(1));
-		double[] p3 = as.getD(Position3d.class, bd.get(2));
-		double[] p4 = as.getD(Position3d.class, bd.get(3));
-		double[] v2 = Rn.subtract(null, p2, p1);
-		double[] v4 = Rn.subtract(null, p4, p1);
-		if (Math.abs(Rn.euclideanAngle(v2, v4) - PI) < 1E-1) { // rotate
-			double[] tmp = p1;
-			p1 = p2; p2 = p3; p3 = p4; p4 = tmp;
-			v2 = Rn.subtract(null, p2, p1);
-			v4 = Rn.subtract(null, p4, p1);
-		}
-		double p = Rn.euclideanDistance(p1, p3);
-		double q = Rn.euclideanDistance(p2, p4);
-		double a = Rn.euclideanDistance(p1, p2);
-		double b = Rn.euclideanDistance(p2, p3);
-		double c = Rn.euclideanDistance(p3, p4);
-		double d = Rn.euclideanDistance(p4, p1);
-		double alpha = Rn.euclideanAngle(v2, v4) / 2;
-		double s = 0.5 * (a+b+c+d);
-		double r = p*p*q*q - (a-b)*(a-b)*(a+b-s)*(a+b-s);
-		r = Math.sqrt(r) / (2*s);
-		double len = r / Math.sin(alpha);
-		Rn.normalize(v2, v2);
-		Rn.normalize(v4, v4);
-		double[] dir = Rn.average(null, new double[][] {v2, v4});
-		Rn.setToLength(dir, dir, len);
-		double[] m = Rn.add(null, p1, dir);
-		return new double[] {m[0], m[1], m[2], r};
+		int n = bd.size();
+        double[] v0 = as.getD(Position3d.class, bd.get(0));
+        double[] v1 = as.getD(Position3d.class, bd.get(1));
+        double[] v2 = as.getD(Position3d.class, bd.get(2));
+        double[] v3 = as.getD(Position3d.class, bd.get(n - 1));
+        return getIncircle(v0, v1, v2, v3);
+	}
+	
+	/**
+	 * Calculate the incircle of the tangents v3:v0; v0:v2, and v2:v3 
+	 * @param v0
+	 * @param v1
+	 * @param v2
+	 * @param v3
+	 * @return Returns an array of length 4 containing the 3 coordinates 
+	 * of the center and the radius in the 4th dimension.
+	 */
+	static double[] getIncircle(double[] v0, double[] v1, double[] v2, double[] v3) {
+		// edge vectors
+		double[] V0 = Rn.subtract(null, v0, v1);
+	    double[] V1 = Rn.subtract(null, v1, v0);
+	    double[] V2 = Rn.subtract(null, v2, v1);
+	    double[] V3 = Rn.subtract(null, v3, v0);
+	    double[] N = Rn.crossProduct(null, V1, V3);
+	    Rn.normalize(V0, V0);
+	    Rn.normalize(V1, V1);
+	    Rn.normalize(V2, V2);
+	    Rn.normalize(V3, V3);
+	    
+	    // find bisecting planes
+	    double[] B0 = Rn.add(null, V1, V3);
+	    double[] B1 = Rn.add(null, V0, V2);
+	    double[] N0 = Rn.crossProduct(null, B0, N);
+	    double[] N1 = Rn.crossProduct(null, B1, N);
+	    double[] N2 = Rn.crossProduct(null, N, V3);
+	    Rn.normalize(N0, N0);
+	    Rn.normalize(N1, N1);
+	    Rn.normalize(N2, N2);
+	    double d0 = Rn.innerProduct(N0, v0);
+	    double d1 = Rn.innerProduct(N1, v1);
+	    double d2 = Rn.innerProduct(N2, v0);
+	    double[] p0 = {N0[0], N0[1], N0[2], -d0};
+	    double[] p1 = {N1[0], N1[1], N1[2], -d1};
+	    
+	    // find intersection
+	    v0 = Pn.homogenize(null, v0);
+	    v1 = Pn.homogenize(null, v1);
+	    v2 = Pn.homogenize(null, v2);
+	    v3 = Pn.homogenize(null, v3);
+	    double[] p2 = P3.planeFromPoints(null, v0, v1, v3);
+	    double[] c = P3.pointFromPlanes(null, p0, p1, p2);
+	    Pn.dehomogenize(c, c);
+	    
+	    // radius
+	    c[3] = d2 - Rn.innerProduct(N2, new double[]{c[0], c[1], c[2]});
+	    return c;
 	}
 	
 	public static < 
@@ -103,7 +97,11 @@ public class GeometryUtility {
 		double[] circle = new double[4];
 		i = 0;
 		for(int j = 0; j < boundaryVertices.length/3; ++j) {
-			Rn.add(circle,circle, circumCircle(boundaryVertices[j], boundaryVertices[j+boundaryVertices.length/3], boundaryVertices[j+2*boundaryVertices.length/3]));
+			Rn.add(circle, circle, circumCircle(
+				boundaryVertices[j], 
+				boundaryVertices[j+boundaryVertices.length/3], 
+				boundaryVertices[j+2*boundaryVertices.length/3]
+			));
 			i++;
 		}
 		Rn.times(circle, 1.0/i, circle);
